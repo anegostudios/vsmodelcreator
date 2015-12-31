@@ -81,7 +81,7 @@ public class ModelCreator extends JFrame
 	// Canvas Variables
 	private final static AtomicReference<Dimension> newCanvasSize = new AtomicReference<Dimension>();
 	private final Canvas canvas;
-	private int width = 990, height = 800;
+	private int width = 990, height = 700;
 
 	// Swing Components
 	private JScrollPane scroll;
@@ -106,7 +106,7 @@ public class ModelCreator extends JFrame
 	{
 		super(title);
 
-		setPreferredSize(new Dimension(1200, 815));
+		setPreferredSize(new Dimension(1200, 715));
 		setMinimumSize(new Dimension(1200, 500));
 		setLayout(new BorderLayout(10, 0));
 		setIconImages(getIcons());
@@ -157,7 +157,7 @@ public class ModelCreator extends JFrame
 		{
 			Display.create();
 
-			WelcomeDialog.show(ModelCreator.this);
+			//WelcomeDialog.show(ModelCreator.this);
 
 			loop();
 

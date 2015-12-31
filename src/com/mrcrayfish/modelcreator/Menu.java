@@ -45,20 +45,12 @@ public class Menu extends JMenuBar
 	/* Share */
 	private JMenu menuScreenshot;
 	private JMenuItem itemSaveToDisk;
-	private JMenuItem itemShareFacebook;
-	private JMenuItem itemShareTwitter;
-	private JMenuItem itemShareReddit;
 	private JMenuItem itemImgurLink;
 
 	/* Extras */
-	private JMenu menuHelp;
 	private JMenu menuExamples;
 	private JMenuItem itemModelCauldron;
 	private JMenuItem itemModelChair;
-	private JMenuItem itemDonate;
-	private JMenuItem itemPM;
-	private JMenuItem itemMF;
-	private JMenuItem itemGitHub;
 
 	public Menu(ModelCreator creator)
 	{
@@ -84,27 +76,16 @@ public class Menu extends JMenuBar
 			itemTransparency = createItem("Toggle Transparency", "Enables transparent rendering in program", KeyEvent.VK_E, Icons.transparent);
 		}
 
-		menuScreenshot = new JMenu("Screenshot");
+		menuScreenshot = new JMenu("Other");
 		{
-			itemSaveToDisk = createItem("Save to Disk...", "Save screenshot to disk.", KeyEvent.VK_S, Icons.disk);
-			itemShareFacebook = createItem("Share to Facebook", "Share a screenshot of your model Facebook.", KeyEvent.VK_S, Icons.facebook);
-			itemShareTwitter = createItem("Share to Twitter", "Share a screenshot of your model to Twitter.", KeyEvent.VK_S, Icons.twitter);
-			itemShareReddit = createItem("Share to Minecraft Subreddit", "Share a screenshot of your model to Minecraft Reddit.", KeyEvent.VK_S, Icons.reddit);
+			itemSaveToDisk = createItem("Save Screenhot to Disk...", "Save screenshot to disk.", KeyEvent.VK_S, Icons.disk);
 			itemImgurLink = createItem("Get Imgur Link", "Get an Imgur link of your screenshot to share.", KeyEvent.VK_G, Icons.imgur);
-		}
-
-		menuHelp = new JMenu("More");
-		{
 			menuExamples = new JMenu("Examples");
 			menuExamples.setIcon(Icons.new_);
 			{
 				itemModelCauldron = createItem("Cauldron", "<html>Model by MrCrayfish<br><b>Private use only</b></html>", KeyEvent.VK_C, Icons.model_cauldron);
 				itemModelChair = createItem("Chair", "<html>Model by MrCrayfish<br><b>Private use only</b></html>", KeyEvent.VK_C, Icons.model_chair);
 			}
-			itemDonate = createItem("Donate (PayPal)", "Donate to MrCrayfish", KeyEvent.VK_D, Icons.coin);
-			itemPM = createItem("Planet Minecraft", "Open PMC Post", KeyEvent.VK_P, Icons.planet_minecraft);
-			itemMF = createItem("Minecraft Forum", "Open MF Post", KeyEvent.VK_M, Icons.minecraft_forum);
-			itemGitHub = createItem("Github", "View Source Code", KeyEvent.VK_G, Icons.github);
 		}
 
 		initActions();
@@ -112,20 +93,9 @@ public class Menu extends JMenuBar
 		menuExamples.add(itemModelCauldron);
 		menuExamples.add(itemModelChair);
 
-		menuHelp.add(menuExamples);
-		menuHelp.addSeparator();
-		menuHelp.add(itemPM);
-		menuHelp.add(itemMF);
-		menuHelp.add(itemGitHub);
-		menuHelp.addSeparator();
-		menuHelp.add(itemDonate);
-
 		menuOptions.add(itemTransparency);
 
 		menuScreenshot.add(itemSaveToDisk);
-		menuScreenshot.add(itemShareFacebook);
-		menuScreenshot.add(itemShareTwitter);
-		menuScreenshot.add(itemShareReddit);
 		menuScreenshot.add(itemImgurLink);
 
 		menuFile.add(itemNew);
@@ -143,7 +113,6 @@ public class Menu extends JMenuBar
 		add(menuFile);
 		add(menuOptions);
 		add(menuScreenshot);
-		add(menuHelp);
 	}
 
 	private void initActions()
@@ -315,68 +284,7 @@ public class Menu extends JMenuBar
 			}
 		});
 
-		itemShareFacebook.addActionListener(a ->
-		{
-			creator.activeSidebar = null;
-			creator.startScreenshot(new PendingScreenshot(null, new ScreenshotCallback()
-			{
-				@Override
-				public void callback(File file)
-				{
-					try
-					{
-						String url = Uploader.upload(file);
-						Screenshot.shareToFacebook(url);
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}));
-		});
 
-		itemShareTwitter.addActionListener(a ->
-		{
-			creator.activeSidebar = null;
-			creator.startScreenshot(new PendingScreenshot(null, new ScreenshotCallback()
-			{
-				@Override
-				public void callback(File file)
-				{
-					try
-					{
-						String url = Uploader.upload(file);
-						Screenshot.shareToTwitter(url);
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}));
-		});
-
-		itemShareReddit.addActionListener(a ->
-		{
-			creator.activeSidebar = null;
-			creator.startScreenshot(new PendingScreenshot(null, new ScreenshotCallback()
-			{
-				@Override
-				public void callback(File file)
-				{
-					try
-					{
-						String url = Uploader.upload(file);
-						Screenshot.shareToReddit(url);
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}));
-		});
 
 		itemImgurLink.addActionListener(a ->
 		{
@@ -426,26 +334,7 @@ public class Menu extends JMenuBar
 			}));
 		});
 
-		itemMF.addActionListener(a ->
-		{
-			JOptionPane.showMessageDialog(null, "This option has not been added yet. Please wait until the next preview.");
-		});
-
-		itemPM.addActionListener(a ->
-		{
-			JOptionPane.showMessageDialog(null, "This option has not been added yet. Please wait until the next preview.");
-		});
-
-		itemGitHub.addActionListener(a ->
-		{
-			Util.openUrl("https://github.com/MrCrayfish/ModelCreator");
-		});
-
-		itemDonate.addActionListener(a ->
-		{
-			Util.openUrl("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HVXLDWFN4MNA2");
-		});
-
+		
 		itemModelCauldron.addActionListener(a ->
 		{
 			Util.loadModelFromJar(creator.getElementManager(), getClass(), "models/cauldron");

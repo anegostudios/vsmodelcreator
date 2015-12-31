@@ -6,6 +6,8 @@ import java.util.Properties;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import org.lwjgl.LWJGLUtil;
+
 import com.jtattoo.plaf.fast.FastLookAndFeel;
 
 public class Start
@@ -20,8 +22,31 @@ public class Start
 		}
 
 		System.setProperty("org.lwjgl.util.Debug", "true");
-		//System.setProperty("org.lwjgl.librarypath", new File("natives/windows").getAbsolutePath());
 
+		File JGLLib = null;
+		switch(LWJGLUtil.getPlatform())
+		{
+		    case LWJGLUtil.PLATFORM_WINDOWS:
+		    {
+		        JGLLib = new File("./natives/windows/");
+		    }
+		    break;
+
+		    case LWJGLUtil.PLATFORM_LINUX:
+		    {
+		        JGLLib = new File("./natives/linux/");
+		    }
+		    break;
+
+		    case LWJGLUtil.PLATFORM_MACOSX:
+		    {
+		        JGLLib = new File("./natives/macosx/");
+		    }
+		    break;
+		}
+
+		System.setProperty("org.lwjgl.librarypath", JGLLib.getAbsolutePath());
+		
 		try
 		{
 			Properties props = new Properties();
