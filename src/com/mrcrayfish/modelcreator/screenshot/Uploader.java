@@ -52,7 +52,7 @@ public class Uploader
 		byte[] buffer = new byte[8192];
 		int count = 0;
 		int n = 0;
-		int size = input.available();
+		//int size = input.available();
 
 		while (-1 != (n = input.read(buffer)))
 		{

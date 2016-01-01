@@ -48,7 +48,7 @@ public class SidebarPanel extends JPanel implements ElementManager
 	private CuboidTabbedPane tabbedPane = new CuboidTabbedPane(this);
 
 	private String particle = null;
-	private String particleLocation = null;
+	//private String particleLocation = null;
 	private boolean ambientOcc = true;
 
 	public SidebarPanel(ModelCreator creator)

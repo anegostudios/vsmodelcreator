@@ -28,7 +28,7 @@ public class Importer
 	// Model Variables
 	private ElementManager manager;
 
-	private boolean ignoreTextures = false;
+	//private boolean ignoreTextures = false;
 
 	public Importer(ElementManager manager, String outputPath)
 	{
@@ -38,7 +38,7 @@ public class Importer
 
 	public void ignoreTextureLoading()
 	{
-		this.ignoreTextures = true;
+		//this.ignoreTextures = true;
 	}
 
 	public void importFromJSON()

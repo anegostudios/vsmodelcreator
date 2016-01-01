@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project modelcreator with Jar-in-Jar Loader">
+    <!--this file was created by Eclipse Runnable JAR file Export Wizard-->
+    <!--ANT 1.7 is required-->
+    <!--define folder properties-->
+    <property name="dir.buildfile" value="."/>
+    <property name="dir.workspace" value="${dir.buildfile}/.."/>
+    <property name="dir.jarfile" value="${dir.buildfile}/output"/>
+    <target name="create_run_jar">
+        <jar destfile="${dir.jarfile}/vcmodelcreator.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="com.mrcrayfish.modelcreator.Start"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./ gson-2.3.1.jar JTattoo-1.6.11.jar lwjgl_util.jar slick-util.jar lwjgl.jar"/>
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <fileset dir="${dir.buildfile}/bin"/>
+            <zipfileset dir="${dir.buildfile}/libs" includes="gson-2.3.1.jar"/>
+            <zipfileset dir="${dir.buildfile}/libs" includes="JTattoo-1.6.11.jar"/>
+            <zipfileset dir="${dir.buildfile}/libs" includes="lwjgl_util.jar"/>
+            <zipfileset dir="${dir.buildfile}/libs" includes="slick-util.jar"/>
+            <zipfileset dir="${dir.buildfile}/libs" includes="lwjgl.jar"/>
+        </jar>
+    </target>
+</project>
