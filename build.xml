@@ -5,7 +5,7 @@
     <!--define folder properties-->
     <property name="dir.buildfile" value="."/>
     <property name="dir.workspace" value="${dir.buildfile}/.."/>
-    <property name="dir.jarfile" value="${dir.buildfile}/output"/>
+    <property name="dir.jarfile" value="${dir.buildfile}/output-jar"/>
     <target name="create_run_jar">
         <jar destfile="${dir.jarfile}/vcmodelcreator.jar">
             <manifest>
