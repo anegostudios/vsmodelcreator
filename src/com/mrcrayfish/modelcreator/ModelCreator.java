@@ -34,10 +34,21 @@ import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -104,7 +115,42 @@ public class ModelCreator extends JFrame
 	public ModelCreator(String title)
 	{
 		super(title);
-
+		
+		setDropTarget(new DropTarget() {
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+		    public synchronized void drop(DropTargetDropEvent evt) {
+				DataFlavor flavor = evt.getCurrentDataFlavors()[0];
+		        evt.acceptDrop(evt.getDropAction());
+				
+		        
+		        
+				try {
+					List data = (List)evt.getTransferable().getTransferData(flavor);
+					
+					for (Object elem : data) {
+						if (elem instanceof File) {
+							File file = (File)elem;
+							
+							Importer importer = new Importer(getElementManager(), file.getAbsolutePath());
+							importer.importFromJSON();
+							
+							return;
+						}
+							
+					}
+					
+					
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+		        		        
+		        evt.dropComplete(true);
+		    }
+			
+		});
+		//setTransferHandler(new JsonTransferHandler());
 		setPreferredSize(new Dimension(1200, 715));
 		setMinimumSize(new Dimension(1200, 500));
 		setLayout(new BorderLayout(10, 0));
@@ -152,6 +198,8 @@ public class ModelCreator extends JFrame
 
 		initDisplay();
 
+		
+		
 		try
 		{
 			Display.create();
@@ -714,4 +762,7 @@ public class ModelCreator extends JFrame
 	{
 		return closeRequested;
 	}
+
+	
+
 }

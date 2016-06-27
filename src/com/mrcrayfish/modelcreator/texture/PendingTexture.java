@@ -9,9 +9,11 @@ import org.newdawn.slick.opengl.TextureLoader;
 
 public class PendingTexture
 {
-	private File texture;
-	private File meta;
-	private TextureCallback callback;
+	public File texture;
+	public File meta;
+	public TextureCallback callback;
+	
+	public TextureEntry entry;
 
 	public PendingTexture(File texture)
 	{
@@ -36,13 +38,25 @@ public class PendingTexture
 		this.callback = callback;
 	}
 
+	public PendingTexture(TextureEntry entry)
+	{
+		this.entry = entry;
+	}
+
 	public void load()
 	{
 		try
 		{
+			if (entry != null) {
+				TextureManager.reloadExternalTexture(entry);
+				return;
+			}
+			
 			boolean result = false;
+			
 			String fileName = this.texture.getName().replace(".png", "").replaceAll("\\d*$", "");
 			Texture texture = TextureManager.getTexture(fileName);
+			
 			if (texture == null)
 			{
 				FileInputStream is = new FileInputStream(this.texture);
@@ -50,6 +64,7 @@ public class PendingTexture
 				result = TextureManager.loadExternalTexture(this.texture, this.meta);
 				is.close();
 			}
+			
 			if (callback != null)
 				callback.callback(result, fileName);
 		}

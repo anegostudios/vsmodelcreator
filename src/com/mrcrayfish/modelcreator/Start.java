@@ -68,6 +68,6 @@ public class Start
 			e.printStackTrace();
 		}
 
-		new ModelCreator("Model Creator - pre4");
+		new ModelCreator("Model Creator");
 	}
 }

@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -32,8 +33,10 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.BufferedImageUtil;
 
+import com.mrcrayfish.modelcreator.ModelCreator;
 import com.mrcrayfish.modelcreator.element.ElementManager;
 import com.mrcrayfish.modelcreator.panels.SidebarPanel;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 public class TextureManager
 {
@@ -87,6 +90,32 @@ public class TextureManager
 		}
 		return loadTexture(image, null, null);
 	}
+	
+	
+	public static void reloadTextures(ModelCreator creator) {
+		for (TextureEntry entry : textureCache) {
+			try {
+				creator.pendingTextures.add(new PendingTexture(entry));
+			} catch (Exception e) {}
+		}
+	}
+	
+	
+	public static void reloadExternalTexture(TextureEntry entry) throws IOException {
+		FileInputStream is = new FileInputStream(entry.getFilePath());
+		Texture texture = TextureLoader.getTexture("PNG", is);
+		is.close();
+		
+		if (texture.getImageHeight() % 16 != 0 | texture.getImageWidth() % 16 != 0)
+		{
+			texture.release();
+			return;
+		}
+		
+		entry.icon = upscale(new ImageIcon(entry.getFilePath()), 256);
+		entry.textures = Arrays.asList(texture);
+	}
+	
 
 	private static boolean loadTexture(File image, TextureMeta meta, String location) throws IOException
 	{
@@ -141,7 +170,7 @@ public class TextureManager
 		{
 			if (entry.getName().equalsIgnoreCase(name))
 			{
-				return entry.getTextureLocation();
+				return entry.getFilePath();
 			}
 		}
 		return null;
@@ -165,7 +194,7 @@ public class TextureManager
 		{
 			if (entry.getName().equalsIgnoreCase(name))
 			{
-				return entry.getImage();
+				return entry.getIcon();
 			}
 		}
 		return null;

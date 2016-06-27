@@ -43,6 +43,19 @@ public class Element
 		initFaces();
 		updateUV();
 	}
+	
+	public Element(double width, double height) {
+		name = "Face";
+		this.width = width;
+		this.height = height;
+		this.depth = 1;
+		initFaces();
+		for (int i = 1; i < faces.length; i++) {
+			faces[i].setEnabled(false);
+		}
+
+		updateUV();
+	}
 
 	public Element(Element cuboid)
 	{
@@ -166,7 +179,7 @@ public class Element
 		{
 			if(ModelCreator.transparent)
 				GL11.glEnable(GL_BLEND);
-			GL11.glEnable(GL_CULL_FACE);
+			GL11.glDisable(GL_CULL_FACE);
 			GL11.glTranslated(getOriginX(), getOriginY(), getOriginZ());
 			rotateAxis();
 			GL11.glTranslated(-getOriginX(), -getOriginY(), -getOriginZ());

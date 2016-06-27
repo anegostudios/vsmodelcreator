@@ -16,9 +16,11 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.mrcrayfish.modelcreator.element.Element;
 import com.mrcrayfish.modelcreator.screenshot.PendingScreenshot;
 import com.mrcrayfish.modelcreator.screenshot.ScreenshotCallback;
 import com.mrcrayfish.modelcreator.screenshot.Uploader;
+import com.mrcrayfish.modelcreator.texture.TextureManager;
 import com.mrcrayfish.modelcreator.util.Util;
 
 public class Menu extends JMenuBar
@@ -40,10 +42,17 @@ public class Menu extends JMenuBar
 	/* Options */
 	private JMenu menuOptions;
 	private JMenuItem itemTransparency;
+	
+	/* Add */
+	private JMenu menuAdd;
+	private JMenuItem itemAddCube;
+	private JMenuItem itemAddFace;
 
-	/* Share */
+
+	/* Other */
 	private JMenu menuScreenshot;
 	private JMenuItem itemSaveToDisk;
+	private JMenuItem reloadTextures;
 	private JMenuItem itemImgurLink;
 
 	/* Extras */
@@ -75,8 +84,16 @@ public class Menu extends JMenuBar
 			itemTransparency = createItem("Toggle Transparency", "Enables transparent rendering in program", KeyEvent.VK_E, Icons.transparent);
 		}
 
+		menuAdd = new JMenu("Add");
+		{
+			itemAddCube = createItem("Add cube", "Add new cube", KeyEvent.VK_C, Icons.cube);
+			itemAddFace = createItem("Add face", "Add single face", KeyEvent.VK_C, Icons.cube);
+		}
+
+		
 		menuScreenshot = new JMenu("Other");
 		{
+			reloadTextures = createItem("Reload textures", "Reload textures", KeyEvent.VK_F5, Icons.new_);
 			itemSaveToDisk = createItem("Save Screenhot to Disk...", "Save screenshot to disk.", KeyEvent.VK_S, Icons.disk);
 			itemImgurLink = createItem("Get Imgur Link", "Get an Imgur link of your screenshot to share.", KeyEvent.VK_G, Icons.imgur);
 			menuExamples = new JMenu("Examples");
@@ -93,7 +110,11 @@ public class Menu extends JMenuBar
 		menuExamples.add(itemModelChair);
 
 		menuOptions.add(itemTransparency);
+		
+		menuAdd.add(itemAddCube);
+		menuAdd.add(itemAddFace);
 
+		menuScreenshot.add(reloadTextures);
 		menuScreenshot.add(itemSaveToDisk);
 		menuScreenshot.add(itemImgurLink);
 
@@ -111,6 +132,7 @@ public class Menu extends JMenuBar
 
 		add(menuFile);
 		add(menuOptions);
+		add(menuAdd);
 		add(menuScreenshot);
 	}
 
@@ -254,6 +276,10 @@ public class Menu extends JMenuBar
 			if (ModelCreator.transparent)
 				JOptionPane.showMessageDialog(null, "<html>Transparent textures do not represent the same as in Minecraft.<br> " + "It depends if the model you are overwriting, allows transparent<br>" + "textures in the code. Blocks like Grass and Stone don't allow<br>" + "transparency, where as Glass and Cauldron do. Please take this into<br>" + "consideration when designing. Transparency is now turned on.<html>", "Rendering Warning", JOptionPane.INFORMATION_MESSAGE);
 		});
+		
+		reloadTextures.addActionListener(a -> {
+			TextureManager.reloadTextures(creator);
+		});
 
 		itemSaveToDisk.addActionListener(a ->
 		{
@@ -343,6 +369,17 @@ public class Menu extends JMenuBar
 		{
 			Util.loadModelFromJar(creator.getElementManager(), getClass(), "models/modern_chair");
 		});
+		
+		itemAddCube.addActionListener(a ->
+		{
+			creator.getElementManager().addElement(new Element(1, 1, 1));
+		});
+		
+		itemAddFace.addActionListener(a ->
+		{
+			creator.getElementManager().addElement(new Element(1, 1));
+		});
+
 	}
 
 	private JMenuItem createItem(String name, String tooltip, int mnemonic, Icon icon)

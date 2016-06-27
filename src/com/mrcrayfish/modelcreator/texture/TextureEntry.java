@@ -9,11 +9,11 @@ import org.newdawn.slick.opengl.Texture;
 
 public class TextureEntry
 {
-	private String name;
-	private ImageIcon image;
-	private List<Texture> textures;
-	private String textureLocation;
-	private String metaLocation;
+	public String name;
+	public ImageIcon icon;
+	public List<Texture> textures;
+	public String filePath;
+	public String metaLocation;
 
 	private TextureAnimation anim;
 	private TextureProperties props;
@@ -22,16 +22,16 @@ public class TextureEntry
 	{
 		this.name = name;
 		this.textures = Arrays.asList(texture);
-		this.image = image;
-		this.textureLocation = textureLocation;
+		this.icon = image;
+		this.filePath = textureLocation;
 	}
 
 	public TextureEntry(String name, Texture texture, ImageIcon image, String textureLocation, TextureMeta meta, String metaLocation)
 	{
 		this.name = name;
 		this.textures = Arrays.asList(texture);
-		this.image = image;
-		this.textureLocation = textureLocation;
+		this.icon = image;
+		this.filePath = textureLocation;
 		if (meta != null)
 			this.anim = meta.getAnimation();
 		if (meta != null)
@@ -43,8 +43,8 @@ public class TextureEntry
 	{
 		this.name = name;
 		this.textures = textures;
-		this.image = image;
-		this.textureLocation = textureLocation;
+		this.icon = image;
+		this.filePath = textureLocation;
 		if (meta != null)
 			this.anim = meta.getAnimation();
 		if (meta != null)
@@ -71,14 +71,14 @@ public class TextureEntry
 		return textures.get(0);
 	}
 
-	public ImageIcon getImage()
+	public ImageIcon getIcon()
 	{
-		return image;
+		return icon;
 	}
 
-	public String getTextureLocation()
+	public String getFilePath()
 	{
-		return textureLocation;
+		return filePath;
 	}
 
 	public TextureAnimation getAnimation()
