@@ -1,6 +1,7 @@
 package com.mrcrayfish.modelcreator.panels.tabs;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -14,10 +15,12 @@ import java.util.Hashtable;
 
 import javax.swing.*;
 
+import com.mrcrayfish.modelcreator.ModelCreator;
 import com.mrcrayfish.modelcreator.element.Element;
 import com.mrcrayfish.modelcreator.element.ElementManager;
 import com.mrcrayfish.modelcreator.panels.IValueUpdater;
 import com.mrcrayfish.modelcreator.panels.OriginPanel;
+import com.mrcrayfish.modelcreator.util.ComponentUtil;
 import com.mrcrayfish.modelcreator.util.Parser;
 
 public class RotationPanel extends JPanel implements IValueUpdater
@@ -29,17 +32,17 @@ public class RotationPanel extends JPanel implements IValueUpdater
 	private OriginPanel panelOrigin;
 	
 	
-	private JPanel[] rotationPanels;
 	private JTextField[] rotationFields;
 	private JSlider[] rotationSliders;
 	
-	private JPanel extraPanel;
-	//private JRadioButton btnRescale;
-	
 
-	private final int ROTATION_MIN = -90;
-	private final int ROTATION_MAX = 90;
-	private final int ROTATION_INIT = 0;
+	static int ROTATION_MIN = -4;
+	static int ROTATION_MAX = 4;
+	static int ROTATION_INIT = 0;
+	
+	boolean ignoreSliderChanges;
+	
+	static double multiplier = 22.5;
 
 	public RotationPanel(ElementManager manager)
 	{
@@ -48,49 +51,47 @@ public class RotationPanel extends JPanel implements IValueUpdater
 		
 		this.manager = manager;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		initMenu();
+		//setAlignmentY(TOP_ALIGNMENT);
 		initComponents();
-		addComponents();
 	}
 
-	public void initMenu()
-	{
-	}
+	
 
 	public void initComponents()
 	{
 		panelOrigin = new OriginPanel(manager);
 
+		add(Box.createRigidArea(new Dimension(188, 5)));
+		add(panelOrigin);
 		
-		//extraPanel = new JPanel(new GridLayout(1, 2));
-		//extraPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Extras</b></html>"));
+		JPanel sliderPanel = new JPanel(new GridBagLayout());
+		sliderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>XYZ Rotation</b></html>"));
 		
-		/*btnRescale = ComponentUtil.createRadioButton("Rescale", "<html>Should scale faces across whole block<br>Default: Off<html>");
-		btnRescale.addActionListener(e ->
-		{
-			manager.getSelectedElement().setRescale(btnRescale.isSelected());
-		});
-		extraPanel.setMaximumSize(new Dimension(186, 50));
-		extraPanel.add(btnRescale);*/
+		GridBagConstraints cons = new GridBagConstraints();
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		cons.gridheight = 1;
+		cons.anchor = GridBagConstraints.NORTH;
+		
+		cons.gridy = 0;
+		AddRotationPanel("X", 0, sliderPanel, cons);
+		cons.gridy = 1;
+		AddRotationPanel("Y", 1, sliderPanel, cons);
+		cons.gridy = 2;
+		AddRotationPanel("Z", 2, sliderPanel, cons);
+		
+		cons.gridy = 3;
+		cons.fill = GridBagConstraints.BOTH;
+		cons.weightx=1;
+		cons.weighty=1;
+		cons.gridwidth = 2;
+		sliderPanel.add(new JLabel(" "), cons);
+
+		add(sliderPanel);
 	}
 	
 	
-	JPanel GetRotationPanel(String axis, int num) {
-		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-		labelTable.put(new Integer(-90), new JLabel("-90\u00b0"));
-		labelTable.put(new Integer(0), new JLabel("0\u00b0"));
-		labelTable.put(new Integer(90), new JLabel("90\u00b0"));
-		
-
-		JPanel sliderPanel = new JPanel(new GridBagLayout());
-		GridBagConstraints cons = new GridBagConstraints();
-		
-		cons.gridy = 0;
-		cons.fill = GridBagConstraints.HORIZONTAL;
-
-		
-		sliderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 3), "<html><b>Rotation " + axis + "</b></html>"));
-		
+	
+	void AddRotationPanel(String axis, int num, JPanel sliderPanel, GridBagConstraints cons) {
 		rotationFields[num] = new JTextField();
 		Font defaultFont = new Font("SansSerif", Font.PLAIN, 10);
 		rotationFields[num].setFont(defaultFont);
@@ -131,10 +132,11 @@ public class RotationPanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+
+		
 		
 		cons.gridx = 0;
 		cons.weightx = 0.5f;
-		
 		sliderPanel.add(rotationFields[num], cons);
 		
 		
@@ -142,51 +144,80 @@ public class RotationPanel extends JPanel implements IValueUpdater
 		rotationSliders[num].setMajorTickSpacing(1);
 		rotationSliders[num].setPaintTicks(true);
 		rotationSliders[num].setPaintLabels(true);
-		rotationSliders[num].setLabelTable(labelTable);
+		rotationSliders[num].setLabelTable(getLabelTable());
 		
 		
 		rotationSliders[num].addChangeListener(e ->
 		{
-			rotationFields[num].setText(""+rotationSliders[num].getValue());
+			if (ignoreSliderChanges) return;
+			
+			double newValue = multiplier * rotationSliders[num].getValue();
+			
+			rotationFields[num].setText(""+newValue);
+			
+			Element elem = manager.getSelectedElement();
+			if (elem == null) return;
+			
 			if (num == 0) {
-				manager.getSelectedElement().setRotationX(rotationSliders[num].getValue());
+				elem.setRotationX(newValue);
 			}
 			if (num == 1) {
-				manager.getSelectedElement().setRotationY(rotationSliders[num].getValue());
+				elem.setRotationY(newValue);
 			}
 			if (num == 2) {
-				manager.getSelectedElement().setRotationZ(rotationSliders[num].getValue());
+				elem.setRotationZ(newValue);
 			}
 		});
 		
 
 		cons.gridx = 1;
 		cons.weightx = 1.3f;
-		
+				
 		sliderPanel.add(rotationSliders[num], cons);
-
-		
-		return sliderPanel;
 	}
 
-	public void addComponents()
-	{
-		add(Box.createRigidArea(new Dimension(188, 5)));
-		add(panelOrigin);
-		
-		rotationPanels = new JPanel[] { GetRotationPanel("x", 0), GetRotationPanel("y", 1), GetRotationPanel("z", 2)};
-		
-		add(rotationPanels[0]);
-		add(rotationPanels[1]);
-		add(rotationPanels[2]);
-		
-		//add(extraPanel);
-	}
 
 	@Override
 	public void updateValues(Element cube)
 	{
 		panelOrigin.updateValues(cube);
+		
+		ignoreSliderChanges = true;
+		
+		if (ModelCreator.unlockAngles) {
+			if (ROTATION_MIN != -90) {
+				ROTATION_MIN = -90;
+				ROTATION_MAX = 90;
+				
+				for (int i = 0; i < 3; i++) {
+					rotationSliders[i].setMinimum(-90);
+					rotationSliders[i].setMaximum(90);
+					rotationSliders[i].setMajorTickSpacing(45);
+					rotationSliders[i].setLabelTable(getLabelTable());
+				}
+				
+				multiplier = 1;				
+			}
+			
+		} else {
+			if (ROTATION_MIN != -4) {
+				ROTATION_MIN = -4;
+				ROTATION_MAX = 4;
+				
+				for (int i = 0; i < 3; i++) {
+					rotationSliders[i].setMinimum(-4);
+					rotationSliders[i].setMaximum(4);		
+					rotationSliders[i].setMajorTickSpacing(1);
+					rotationSliders[i].setLabelTable(getLabelTable());
+				}
+				
+				multiplier = 22.5;							
+			}
+		}
+		
+		
+		ignoreSliderChanges = false;
+		
 		
 		if (cube != null)
 		{
@@ -195,13 +226,9 @@ public class RotationPanel extends JPanel implements IValueUpdater
 				rotationSliders[i].setEnabled(true);
 			}
 			
-			rotationSliders[0].setValue((int) (cube.getRotationX()));
-			rotationSliders[1].setValue((int) (cube.getRotationY()));
-			rotationSliders[2].setValue((int) (cube.getRotationZ()));
-
-			
-			//btnRescale.setEnabled(true);
-			//btnRescale.setSelected(cube.shouldRescale());
+			rotationSliders[0].setValue((int) Math.round(cube.getRotationX() / multiplier));
+			rotationSliders[1].setValue((int) Math.round(cube.getRotationY() / multiplier));
+			rotationSliders[2].setValue((int) Math.round(cube.getRotationZ() / multiplier));
 		}
 		else
 		{
@@ -210,10 +237,35 @@ public class RotationPanel extends JPanel implements IValueUpdater
 				rotationSliders[i].setValue(0);
 				rotationSliders[i].setEnabled(false);
 			}
+		}
+		
+
+	}
+	
+	
+
+	Hashtable<Integer, JLabel> getLabelTable() {
+		if (ModelCreator.unlockAngles) {
+			Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+			labelTable.put(new Integer(-90), new JLabel("-90\u00b0"));
+			labelTable.put(new Integer(-45), new JLabel("-45\u00b0"));
+			labelTable.put(new Integer(0), new JLabel("0\u00b0"));
+			labelTable.put(new Integer(45), new JLabel("45\u00b0"));
+			labelTable.put(new Integer(90), new JLabel("90\u00b0"));
 			
+			return labelTable;
 			
-			//btnRescale.setSelected(false);
-			//btnRescale.setEnabled(false);
+		} else {
+			Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+			labelTable.put(new Integer(-4), new JLabel("-90\u00b0"));
+			labelTable.put(new Integer(-2), new JLabel("-45\u00b0"));
+			labelTable.put(new Integer(0), new JLabel("0\u00b0"));
+			labelTable.put(new Integer(2), new JLabel("45\u00b0"));
+			labelTable.put(new Integer(4), new JLabel("90\u00b0"));
+			
+			return labelTable;
+			
 		}
 	}
+	
 }

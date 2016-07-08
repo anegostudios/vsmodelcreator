@@ -86,7 +86,8 @@ public class ModelCreator extends JFrame
 
 	// TODO remove static instance
 	public static String texturePath = ".";
-	public static boolean transparent = false;
+	public static boolean transparent = true;
+	public static boolean unlockAngles = false;
 
 	// Canvas Variables
 	private final static AtomicReference<Dimension> newCanvasSize = new AtomicReference<Dimension>();

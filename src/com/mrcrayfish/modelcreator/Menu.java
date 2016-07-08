@@ -7,6 +7,7 @@ import java.io.File;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
@@ -41,7 +42,8 @@ public class Menu extends JMenuBar
 
 	/* Options */
 	private JMenu menuOptions;
-	private JMenuItem itemTransparency;
+	private JCheckBoxMenuItem itemTransparency;
+	private JCheckBoxMenuItem itemUnlockAngles;
 	
 	/* Add */
 	private JMenu menuAdd;
@@ -81,7 +83,11 @@ public class Menu extends JMenuBar
 
 		menuOptions = new JMenu("Options");
 		{
-			itemTransparency = createItem("Toggle Transparency", "Enables transparent rendering in program", KeyEvent.VK_E, Icons.transparent);
+			itemTransparency = createCheckboxItem("Transparency", "Toggles transparent rendering in program", KeyEvent.VK_E, Icons.transparent);
+			itemTransparency.setSelected(ModelCreator.transparent);
+			
+			itemUnlockAngles = createCheckboxItem("Unlock all Angles", "Disabling this allows angle stepping of single degrees. Suggested to unlock this only for entities.", KeyEvent.VK_A, Icons.transparent);
+			itemUnlockAngles.setSelected(ModelCreator.unlockAngles);
 		}
 
 		menuAdd = new JMenu("Add");
@@ -110,6 +116,7 @@ public class Menu extends JMenuBar
 		menuExamples.add(itemModelChair);
 
 		menuOptions.add(itemTransparency);
+		menuOptions.add(itemUnlockAngles);
 		
 		menuAdd.add(itemAddCube);
 		menuAdd.add(itemAddFace);
@@ -272,10 +279,15 @@ public class Menu extends JMenuBar
 
 		itemTransparency.addActionListener(a ->
 		{
-			ModelCreator.transparent ^= true;
-			if (ModelCreator.transparent)
-				JOptionPane.showMessageDialog(null, "<html>Transparent textures do not represent the same as in Minecraft.<br> " + "It depends if the model you are overwriting, allows transparent<br>" + "textures in the code. Blocks like Grass and Stone don't allow<br>" + "transparency, where as Glass and Cauldron do. Please take this into<br>" + "consideration when designing. Transparency is now turned on.<html>", "Rendering Warning", JOptionPane.INFORMATION_MESSAGE);
+			ModelCreator.transparent = itemTransparency.isSelected();
 		});
+		
+		itemUnlockAngles.addActionListener(a ->
+		{
+			ModelCreator.unlockAngles = itemUnlockAngles.isSelected();
+			creator.getElementManager().updateValues();
+		});
+
 		
 		reloadTextures.addActionListener(a -> {
 			TextureManager.reloadTextures(creator);
@@ -385,6 +397,15 @@ public class Menu extends JMenuBar
 	private JMenuItem createItem(String name, String tooltip, int mnemonic, Icon icon)
 	{
 		JMenuItem item = new JMenuItem(name);
+		item.setToolTipText(tooltip);
+		item.setMnemonic(mnemonic);
+		item.setIcon(icon);
+		return item;
+	}
+	
+	private JCheckBoxMenuItem createCheckboxItem(String name, String tooltip, int mnemonic, Icon icon)
+	{
+		JCheckBoxMenuItem item = new JCheckBoxMenuItem(name);
 		item.setToolTipText(tooltip);
 		item.setMnemonic(mnemonic);
 		item.setIcon(icon);
