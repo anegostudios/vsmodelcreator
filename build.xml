@@ -7,7 +7,7 @@
     <property name="dir.workspace" value="${dir.buildfile}/.."/>
     <property name="dir.jarfile" value="${dir.buildfile}/output-jar"/>
     <target name="create_run_jar">
-        <jar destfile="${dir.jarfile}/vcmodelcreator.jar">
+        <jar destfile="${dir.jarfile}/modelcreator.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="com.mrcrayfish.modelcreator.Start"/>

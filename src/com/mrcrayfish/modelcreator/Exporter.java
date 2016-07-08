@@ -141,10 +141,9 @@ public class Exporter
 			writeShade(writer, cuboid);
 			writer.newLine();
 		}
-		if (cuboid.getRotation() != 0)
+		if (cuboid.getRotationX() != 0 || cuboid.getRotationY() != 0 || cuboid.getRotationZ() != 0)
 		{
 			writeRotation(writer, cuboid);
-			writer.newLine();
 		}
 		writeFaces(writer, cuboid);
 
@@ -164,15 +163,16 @@ public class Exporter
 
 	private void writeRotation(BufferedWriter writer, Element cuboid) throws IOException
 	{
-		writer.write(space(3) + "\"rotation\": { ");
-		writer.write("\"origin\": [ " + cuboid.getOriginX() + ", " + cuboid.getOriginY() + ", " + cuboid.getOriginZ() + " ], ");
-		writer.write("\"axis\": \"" + Element.parseAxis(cuboid.getPrevAxis()) + "\", ");
-		writer.write("\"angle\": " + cuboid.getRotation());
-		if (cuboid.shouldRescale())
+		writer.write(space(3) + "\"rotationOrigin\": [ " + cuboid.getOriginX() + ", " + cuboid.getOriginY() + ", " + cuboid.getOriginZ() + " ],");
+		writer.newLine();
+		if (cuboid.getRotationX() != 0) { writer.write(space(3) + "\"rotationX\": " + cuboid.getRotationX() + ","); writer.newLine(); }
+		if (cuboid.getRotationY() != 0) { writer.write(space(3) + "\"rotationY\": " + cuboid.getRotationY() + ","); writer.newLine(); }
+		if (cuboid.getRotationZ() != 0) { writer.write(space(3) + "\"rotationZ\": " + cuboid.getRotationZ() + ","); writer.newLine(); }
+
+		/*if (cuboid.shouldRescale())
 		{
 			writer.write(", \"rescale\": " + cuboid.shouldRescale());
-		}
-		writer.write(" },");
+		}*/
 	}
 
 	private void writeFaces(BufferedWriter writer, Element cuboid) throws IOException

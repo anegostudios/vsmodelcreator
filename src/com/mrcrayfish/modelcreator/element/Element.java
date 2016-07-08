@@ -25,8 +25,8 @@ public class Element
 
 	// Rotation Variables
 	private double originX = 8, originY = 8, originZ = 8;
-	private double rotation;
-	private int axis = 0;
+	private double rotationX = 0, rotationY = 0, rotationZ = 0;
+	
 	private boolean rescale = false;
 
 	// Extra Variables
@@ -68,8 +68,10 @@ public class Element
 		this.originX = cuboid.getOriginX();
 		this.originY = cuboid.getOriginY();
 		this.originZ = cuboid.getOriginZ();
-		this.rotation = cuboid.getRotation();
-		this.axis = cuboid.getPrevAxis();
+		this.rotationX = cuboid.getRotationX();
+		this.rotationY = cuboid.getRotationY();
+		this.rotationZ = cuboid.getRotationZ();
+		
 		this.rescale = cuboid.shouldRescale();
 		this.shade = cuboid.isShaded();
 		this.selectedFace = cuboid.getSelectedFaceIndex();
@@ -393,25 +395,36 @@ public class Element
 		this.originZ = amt;
 	}
 
-	public double getRotation()
+	public double getRotationX()
 	{
-		return rotation;
+		return rotationX;
 	}
 
-	public void setRotation(double rotation)
+	public double getRotationY()
 	{
-		this.rotation = rotation;
+		return rotationY;
 	}
 
-	public int getPrevAxis()
+	public double getRotationZ()
 	{
-		return axis;
+		return rotationZ;
 	}
 
-	public void setPrevAxis(int prevAxis)
+	public void setRotationX(double rotation)
 	{
-		this.axis = prevAxis;
+		this.rotationX = rotation;
 	}
+
+	public void setRotationY(double rotation)
+	{
+		this.rotationY = rotation;
+	}
+	
+	public void setRotationZ(double rotation)
+	{
+		this.rotationZ = rotation;
+	}
+	
 
 	public void setRescale(boolean rescale)
 	{
@@ -454,47 +467,11 @@ public class Element
 
 	public void rotateAxis()
 	{
-		switch (axis)
-		{
-		case 0:
-			GL11.glRotated(getRotation(), 1, 0, 0);
-			break;
-		case 1:
-			GL11.glRotated(getRotation(), 0, 1, 0);
-			break;
-		case 2:
-			GL11.glRotated(getRotation(), 0, 0, 1);
-			break;
-		}
+		GL11.glRotated(getRotationX(), 1, 0, 0);
+		GL11.glRotated(getRotationY(), 0, 1, 0);
+		GL11.glRotated(getRotationZ(), 0, 0, 1);
 	}
 
-	public static String parseAxis(int axis)
-	{
-		switch (axis)
-		{
-		case 0:
-			return "x";
-		case 1:
-			return "y";
-		case 2:
-			return "z";
-		}
-		return "x";
-	}
-
-	public static int parseAxisString(String axis)
-	{
-		switch (axis)
-		{
-		case "x":
-			return 0;
-		case "y":
-			return 1;
-		case "z":
-			return 2;
-		}
-		return 0;
-	}
 
 	public Element copy()
 	{

@@ -223,38 +223,34 @@ public class Importer
 			element.setStartY(y);
 			element.setStartZ(z);
 
-			if (obj.has("rotation") && obj.get("rotation").isJsonObject())
+			if (obj.has("rotationOrigin") && obj.get("rotationOrigin").isJsonArray())
 			{
-				JsonObject rot = obj.get("rotation").getAsJsonObject();
+				JsonArray origin = obj.get("rotationOrigin").getAsJsonArray();
+				double ox = origin.get(0).getAsDouble();
+				double oy = origin.get(1).getAsDouble();
+				double oz = origin.get(2).getAsDouble();
 
-				if (rot.has("origin") && rot.get("origin").isJsonArray())
-				{
-					JsonArray origin = rot.get("origin").getAsJsonArray();
-
-					double ox = origin.get(0).getAsDouble();
-					double oy = origin.get(1).getAsDouble();
-					double oz = origin.get(2).getAsDouble();
-
-					element.setOriginX(ox);
-					element.setOriginY(oy);
-					element.setOriginZ(oz);
-				}
-
-				if (rot.has("axis") && rot.get("axis").isJsonPrimitive())
-				{
-					element.setPrevAxis(Element.parseAxisString(rot.get("axis").getAsString()));
-				}
-
-				if (rot.has("angle") && rot.get("angle").isJsonPrimitive())
-				{
-					element.setRotation(rot.get("angle").getAsDouble());
-				}
-
-				if (rot.has("rescale") && rot.get("rescale").isJsonPrimitive())
-				{
-					element.setRescale(rot.get("rescale").getAsBoolean());
-				}
+				element.setOriginX(ox);
+				element.setOriginY(oy);
+				element.setOriginZ(oz);
 			}
+			
+		
+			if (obj.has("rotationX") && obj.get("rotationX").isJsonPrimitive())
+			{
+				element.setRotationX(obj.get("rotationX").getAsDouble());
+			}		
+
+			if (obj.has("rotationY") && obj.get("rotationY").isJsonPrimitive())
+			{
+				element.setRotationY(obj.get("rotationY").getAsDouble());
+			}
+			
+			if (obj.has("rotationZ") && obj.get("rotationZ").isJsonPrimitive())
+			{
+				element.setRotationZ(obj.get("rotationZ").getAsDouble());
+			}		
+			
 
 			element.setShade(true);
 			if (obj.has("shade") && obj.get("shade").isJsonPrimitive())

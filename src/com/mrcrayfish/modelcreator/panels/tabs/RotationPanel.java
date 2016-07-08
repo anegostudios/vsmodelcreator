@@ -2,24 +2,23 @@ package com.mrcrayfish.modelcreator.panels.tabs;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Hashtable;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSlider;
+import javax.swing.*;
 
 import com.mrcrayfish.modelcreator.element.Element;
 import com.mrcrayfish.modelcreator.element.ElementManager;
 import com.mrcrayfish.modelcreator.panels.IValueUpdater;
 import com.mrcrayfish.modelcreator.panels.OriginPanel;
-import com.mrcrayfish.modelcreator.util.ComponentUtil;
+import com.mrcrayfish.modelcreator.util.Parser;
 
 public class RotationPanel extends JPanel implements IValueUpdater
 {
@@ -28,21 +27,25 @@ public class RotationPanel extends JPanel implements IValueUpdater
 	private ElementManager manager;
 
 	private OriginPanel panelOrigin;
-	private JPanel axisPanel;
-	private JComboBox<String> axisList;
-	private JPanel sliderPanel;
-	private JSlider rotation;
+	
+	
+	private JPanel[] rotationPanels;
+	private JTextField[] rotationFields;
+	private JSlider[] rotationSliders;
+	
 	private JPanel extraPanel;
-	private JRadioButton btnRescale;
+	//private JRadioButton btnRescale;
+	
 
-	private DefaultComboBoxModel<String> model;
-
-	private final int ROTATION_MIN = -2;
-	private final int ROTATION_MAX = 2;
+	private final int ROTATION_MIN = -90;
+	private final int ROTATION_MAX = 90;
 	private final int ROTATION_INIT = 0;
 
 	public RotationPanel(ElementManager manager)
 	{
+		rotationFields = new JTextField[3];
+		rotationSliders = new JSlider[3];
+		
 		this.manager = manager;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		initMenu();
@@ -52,91 +55,165 @@ public class RotationPanel extends JPanel implements IValueUpdater
 
 	public void initMenu()
 	{
-		model = new DefaultComboBoxModel<String>();
-		model.addElement("<html><div style='padding:5px;color:red;'><b>X</b></html>");
-		model.addElement("<html><div style='padding:5px;color:green;'><b>Y</b></html>");
-		model.addElement("<html><div style='padding:5px;color:blue;'><b>Z</b></html>");
 	}
 
 	public void initComponents()
 	{
 		panelOrigin = new OriginPanel(manager);
 
-		axisPanel = new JPanel(new GridLayout(1, 1));
-		axisPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Axis</b></html>"));
-		axisList = new JComboBox<String>();
-		axisList.setModel(model);
-		axisList.setToolTipText("The axis the element will rotate around");
-		axisList.addActionListener(e ->
-		{
-			if (manager.getSelectedElement() != null)
-				manager.getSelectedElement().setPrevAxis(axisList.getSelectedIndex());
-		});
-		axisList.setMaximumSize(new Dimension(186, 55));
-		axisPanel.setMaximumSize(new Dimension(186, 55));
-		axisPanel.add(axisList);
-
-		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-		labelTable.put(new Integer(-2), new JLabel("-45\u00b0"));
-		labelTable.put(new Integer(-1), new JLabel("-22.5\u00b0"));
-		labelTable.put(new Integer(0), new JLabel("0\u00b0"));
-		labelTable.put(new Integer(1), new JLabel("22.5\u00b0"));
-		labelTable.put(new Integer(2), new JLabel("45\u00b0"));
-
-		sliderPanel = new JPanel(new GridLayout(1, 1));
-		sliderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Rotation</b></html>"));
-		rotation = new JSlider(JSlider.HORIZONTAL, ROTATION_MIN, ROTATION_MAX, ROTATION_INIT);
-		rotation.setMajorTickSpacing(1);
-		rotation.setPaintTicks(true);
-		rotation.setPaintLabels(true);
-		rotation.setLabelTable(labelTable);
-		rotation.addChangeListener(e ->
-		{
-			manager.getSelectedElement().setRotation(rotation.getValue() * 22.5D);
-		});
-		rotation.setToolTipText("<html>The rotation of the element<br>Default: 0</html>");
-		sliderPanel.setMaximumSize(new Dimension(190, 80));
-		sliderPanel.add(rotation);
-
-		extraPanel = new JPanel(new GridLayout(1, 2));
-		extraPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Extras</b></html>"));
 		
-		btnRescale = ComponentUtil.createRadioButton("Rescale", "<html>Should scale faces across whole block<br>Default: Off<html>");
+		//extraPanel = new JPanel(new GridLayout(1, 2));
+		//extraPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Extras</b></html>"));
+		
+		/*btnRescale = ComponentUtil.createRadioButton("Rescale", "<html>Should scale faces across whole block<br>Default: Off<html>");
 		btnRescale.addActionListener(e ->
 		{
 			manager.getSelectedElement().setRescale(btnRescale.isSelected());
 		});
 		extraPanel.setMaximumSize(new Dimension(186, 50));
-		extraPanel.add(btnRescale);
+		extraPanel.add(btnRescale);*/
+	}
+	
+	
+	JPanel GetRotationPanel(String axis, int num) {
+		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+		labelTable.put(new Integer(-90), new JLabel("-90\u00b0"));
+		labelTable.put(new Integer(0), new JLabel("0\u00b0"));
+		labelTable.put(new Integer(90), new JLabel("90\u00b0"));
+		
+
+		JPanel sliderPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints cons = new GridBagConstraints();
+		
+		cons.gridy = 0;
+		cons.fill = GridBagConstraints.HORIZONTAL;
+
+		
+		sliderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 3), "<html><b>Rotation " + axis + "</b></html>"));
+		
+		rotationFields[num] = new JTextField();
+		Font defaultFont = new Font("SansSerif", Font.PLAIN, 10);
+		rotationFields[num].setFont(defaultFont);
+		rotationFields[num].setHorizontalAlignment(JTextField.CENTER);
+		
+		
+		rotationFields[num].addKeyListener(new KeyAdapter()
+		{
+			@Override
+			public void keyPressed(KeyEvent e)
+			{
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+				{
+					Element element = manager.getSelectedElement();
+					if (element != null)
+					{
+						if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
+						if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
+						if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
+						manager.updateValues();
+					}
+				}
+			}
+		});
+		
+		rotationFields[num].addFocusListener(new FocusAdapter()
+		{
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				Element element = manager.getSelectedElement();
+				if (element != null)
+				{
+					if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
+					if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
+					if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
+					manager.updateValues();
+				}
+			}
+		});
+		
+		cons.gridx = 0;
+		cons.weightx = 0.5f;
+		
+		sliderPanel.add(rotationFields[num], cons);
+		
+		
+		rotationSliders[num] = new JSlider(JSlider.HORIZONTAL, ROTATION_MIN, ROTATION_MAX, ROTATION_INIT);
+		rotationSliders[num].setMajorTickSpacing(1);
+		rotationSliders[num].setPaintTicks(true);
+		rotationSliders[num].setPaintLabels(true);
+		rotationSliders[num].setLabelTable(labelTable);
+		
+		
+		rotationSliders[num].addChangeListener(e ->
+		{
+			rotationFields[num].setText(""+rotationSliders[num].getValue());
+			if (num == 0) {
+				manager.getSelectedElement().setRotationX(rotationSliders[num].getValue());
+			}
+			if (num == 1) {
+				manager.getSelectedElement().setRotationY(rotationSliders[num].getValue());
+			}
+			if (num == 2) {
+				manager.getSelectedElement().setRotationZ(rotationSliders[num].getValue());
+			}
+		});
+		
+
+		cons.gridx = 1;
+		cons.weightx = 1.3f;
+		
+		sliderPanel.add(rotationSliders[num], cons);
+
+		
+		return sliderPanel;
 	}
 
 	public void addComponents()
 	{
 		add(Box.createRigidArea(new Dimension(188, 5)));
 		add(panelOrigin);
-		add(axisPanel);
-		add(sliderPanel);
-		add(extraPanel);
+		
+		rotationPanels = new JPanel[] { GetRotationPanel("x", 0), GetRotationPanel("y", 1), GetRotationPanel("z", 2)};
+		
+		add(rotationPanels[0]);
+		add(rotationPanels[1]);
+		add(rotationPanels[2]);
+		
+		//add(extraPanel);
 	}
 
 	@Override
 	public void updateValues(Element cube)
 	{
 		panelOrigin.updateValues(cube);
+		
 		if (cube != null)
 		{
-			axisList.setSelectedIndex(cube.getPrevAxis());
-			rotation.setEnabled(true);
-			rotation.setValue((int) (cube.getRotation() / 22.5));
-			btnRescale.setEnabled(true);
-			btnRescale.setSelected(cube.shouldRescale());
+			for (int i = 0; i < 3; i++) {
+				rotationFields[i].setEnabled(true);
+				rotationSliders[i].setEnabled(true);
+			}
+			
+			rotationSliders[0].setValue((int) (cube.getRotationX()));
+			rotationSliders[1].setValue((int) (cube.getRotationY()));
+			rotationSliders[2].setValue((int) (cube.getRotationZ()));
+
+			
+			//btnRescale.setEnabled(true);
+			//btnRescale.setSelected(cube.shouldRescale());
 		}
 		else
 		{
-			rotation.setValue(0);
-			rotation.setEnabled(false);
-			btnRescale.setSelected(false);
-			btnRescale.setEnabled(false);
+			for (int i = 0; i < 3; i++) {
+				rotationFields[i].setEnabled(false);
+				rotationSliders[i].setValue(0);
+				rotationSliders[i].setEnabled(false);
+			}
+			
+			
+			//btnRescale.setSelected(false);
+			//btnRescale.setEnabled(false);
 		}
 	}
 }
