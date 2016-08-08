@@ -36,7 +36,6 @@ import org.newdawn.slick.util.BufferedImageUtil;
 import com.mrcrayfish.modelcreator.ModelCreator;
 import com.mrcrayfish.modelcreator.element.ElementManager;
 import com.mrcrayfish.modelcreator.panels.SidebarPanel;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 public class TextureManager
 {
@@ -237,7 +236,7 @@ public class TextureManager
 		JButton btnImport = new JButton("Import");
 		btnImport.addActionListener(a ->
 		{
-			JFileChooser chooser = new JFileChooser();
+			JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("texturePath",""));
 			if (lastLocation != null)
 				chooser.setCurrentDirectory(lastLocation);
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Images", "png");

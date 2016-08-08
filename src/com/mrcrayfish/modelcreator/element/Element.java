@@ -7,6 +7,7 @@ import static org.lwjgl.opengl.GL11.GL_LINES;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 
+import com.mrcrayfish.modelcreator.BlockFacing;
 import com.mrcrayfish.modelcreator.ModelCreator;
 import com.mrcrayfish.modelcreator.texture.ClipboardTexture;
 import com.mrcrayfish.modelcreator.util.FaceDimension;
@@ -35,6 +36,29 @@ public class Element
 	// Rotation Point Indicator
 	private Sphere sphere = new Sphere();
 
+    /// <summary>
+    /// Top, Front/Left, Back/Right, Bottom
+    /// </summary>
+    public static float[] DefaultBlockSideShadings = new float[] {
+        1f,
+        0.8f,
+        0.55f,
+        0.45f
+    };
+
+    /// <summary>
+    /// Shadings by Blockfacing index
+    /// </summary>
+    public static float[] DefaultBlockSideShadingsByFacing = new float[] {
+        DefaultBlockSideShadings[2],
+        DefaultBlockSideShadings[1],
+        DefaultBlockSideShadings[2],
+        DefaultBlockSideShadings[1],
+        DefaultBlockSideShadings[0],
+        DefaultBlockSideShadings[3],
+    };
+    
+    
 	public Element(double width, double height, double depth)
 	{
 		this.width = width;
@@ -174,22 +198,24 @@ public class Element
 			face.setTextureLocation(location);
 		}
 	}
+	
+	
 
 	public void draw()
 	{
 		GL11.glPushMatrix();
 		{
-			if(ModelCreator.transparent)
-				GL11.glEnable(GL_BLEND);
+			GL11.glEnable(GL_BLEND);
 			GL11.glDisable(GL_CULL_FACE);
 			GL11.glTranslated(getOriginX(), getOriginY(), getOriginZ());
 			rotateAxis();
 			GL11.glTranslated(-getOriginX(), -getOriginY(), -getOriginZ());
-
+			
 			// North
 			if (faces[0].isEnabled())
 			{
 				GL11.glColor3f(1, 0, 0);
+								
 				faces[0].renderNorth();
 			}
 

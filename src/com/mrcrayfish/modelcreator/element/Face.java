@@ -289,7 +289,10 @@ public class Face
 		GL11.glPushMatrix();
 		{
 			startRender(pass);
-
+			
+			GL11.glDisable(GL11.GL_LIGHTING);
+			if (binded) GL11.glColor4f(0.5f, 0.5f, 0.5f, 1f);
+			
 			GL11.glBegin(GL11.GL_QUADS);
 			{
 				if (binded)

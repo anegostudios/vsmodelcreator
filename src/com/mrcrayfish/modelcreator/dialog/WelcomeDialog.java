@@ -7,8 +7,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
-
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -26,17 +24,15 @@ public class WelcomeDialog
 		JPanel container = new JPanel(new BorderLayout(20, 10));
 		container.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-		ImageIcon crayfish = new ImageIcon(parent.getClass().getClassLoader().getResource("sticker.png"));
-		container.add(new JLabel(crayfish), BorderLayout.EAST);
-
 		JPanel leftPanel = new JPanel(new BorderLayout());
 
-		JLabel title = new JLabel("<html><div style=\"font-size:16px;\"><b>Model Creator</b> by MrCrayfish<div></html>");
+		JLabel title = new JLabel("<html><span style=\"font-size:16px;\"><b>Vintage Story Model Creator</b></span><br>based on MrCrayfishs Model Creator for Minecraft</html>");
 		leftPanel.add(title, BorderLayout.NORTH);
 
 		JLabel message = new JLabel();
-		message.setText("<html>Thank you for downloading my program. I hope it encourages" + " you to create awesome models. If you do create something awesome, I" + " would love to see it. You can post your screenshots to me via Twitter" + " or Facebook. If you are unsure how to use anything works, hover your " + "mouse over the component and it will tell you what it does." + "<br><br>I've put a lot of work into this program, so if you are "
-				+ "feeling generious, you can donate by clicking the button below. Thank you!</html>");
+		message.setText("<html>All praise for this program should go to MrCrayFish for making this awesome and simply to use tool "
+				+ "originally for Minecraft. He open sourced it and so Tyron took the freedom to adjust it to his needs for Vintage Story. "
+				+ "If you like this program, show some love to MrCrayFish! &lt;3</html>");
 		leftPanel.add(message, BorderLayout.CENTER);
 
 		container.add(leftPanel, BorderLayout.CENTER);
@@ -82,7 +78,7 @@ public class WelcomeDialog
 		// container.add(header, BorderLayout.NORTH);
 		container.add(btnGrid, BorderLayout.SOUTH);
 
-		JDialog dialog = new JDialog(parent, "Welcome", false);
+		JDialog dialog = new JDialog(parent, "Credits", false);
 		// dialog.setLayout(new BorderLayout());
 		dialog.setResizable(false);
 		dialog.setPreferredSize(new Dimension(500, 290));

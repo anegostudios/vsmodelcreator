@@ -68,6 +68,6 @@ public class Start
 			e.printStackTrace();
 		}
 
-		new ModelCreator("Model Creator");
+		new ModelCreator("Vintage Story Model Creator");
 	}
 }

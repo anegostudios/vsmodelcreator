@@ -35,20 +35,13 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -79,13 +72,14 @@ import com.mrcrayfish.modelcreator.sidebar.Sidebar;
 import com.mrcrayfish.modelcreator.sidebar.UVSidebar;
 import com.mrcrayfish.modelcreator.texture.PendingTexture;
 import com.mrcrayfish.modelcreator.util.FontManager;
+import java.util.prefs.Preferences;
 
 public class ModelCreator extends JFrame
 {
+	public static Preferences prefs;
+	
 	private static final long serialVersionUID = 1L;
 
-	// TODO remove static instance
-	public static String texturePath = ".";
 	public static boolean transparent = true;
 	public static boolean unlockAngles = false;
 
@@ -113,6 +107,12 @@ public class ModelCreator extends JFrame
 	public Sidebar activeSidebar = null;
 	public static Sidebar uvSidebar;
 
+	
+	static {
+		prefs = Preferences.systemNodeForPackage(ModelCreator.class);
+	}
+	
+	
 	public ModelCreator(String title)
 	{
 		super(title);
@@ -371,7 +371,7 @@ public class ModelCreator extends JFrame
 			GL11.glTranslated(0, 0, 16);
 			GL11.glScaled(0.018, 0.018, 0.018);
 			GL11.glRotated(90, 1, 0, 0);
-			FontManager.BEBAS_NEUE_50.drawString(8, 0, "Model Creator by MrCrayfish", new Color(0.5F, 0.5F, 0.6F));
+			FontManager.BEBAS_NEUE_50.drawString(8, 0, "VS Model Creator", new Color(0.5F, 0.5F, 0.6F));
 
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glShadeModel(GL11.GL_SMOOTH);

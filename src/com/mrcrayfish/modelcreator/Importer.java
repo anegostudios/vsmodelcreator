@@ -178,9 +178,11 @@ public class Importer
 			}
 		}
 
-		if (new File(ModelCreator.texturePath + File.separator + texture + ".png").exists())
+		String texturePath = ModelCreator.prefs.get("texturePath", ".");
+		
+		if (new File(texturePath + File.separator + texture + ".png").exists())
 		{
-			manager.addPendingTexture(new PendingTexture(new File(ModelCreator.texturePath + File.separator + texture + ".png")));
+			manager.addPendingTexture(new PendingTexture(new File(texturePath + File.separator + texture + ".png")));
 		}
 	}
 
