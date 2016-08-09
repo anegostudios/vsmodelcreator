@@ -8,9 +8,12 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 
 import com.mrcrayfish.modelcreator.BlockFacing;
+import com.mrcrayfish.modelcreator.GameMath;
 import com.mrcrayfish.modelcreator.ModelCreator;
 import com.mrcrayfish.modelcreator.texture.ClipboardTexture;
 import com.mrcrayfish.modelcreator.util.FaceDimension;
+import com.mrcrayfish.modelcreator.util.Mat4f;
+import com.sun.javafx.geom.Vec3f;
 
 public class Element
 {
@@ -35,27 +38,29 @@ public class Element
 
 	// Rotation Point Indicator
 	private Sphere sphere = new Sphere();
+	
+	float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 };
 
     /// <summary>
     /// Top, Front/Left, Back/Right, Bottom
     /// </summary>
-    public static float[] DefaultBlockSideShadings = new float[] {
+    public static float[] DefaultBlockSideBrightness = new float[] {
         1f,
-        0.8f,
-        0.55f,
-        0.45f
+        0.7f,
+        0.6f,
+        0.4f
     };
 
     /// <summary>
     /// Shadings by Blockfacing index
     /// </summary>
-    public static float[] DefaultBlockSideShadingsByFacing = new float[] {
-        DefaultBlockSideShadings[2],
-        DefaultBlockSideShadings[1],
-        DefaultBlockSideShadings[2],
-        DefaultBlockSideShadings[1],
-        DefaultBlockSideShadings[0],
-        DefaultBlockSideShadings[3],
+    public static float[] DefaultBlockSideBrightnessByFacing = new float[] {
+        DefaultBlockSideBrightness[2],
+        DefaultBlockSideBrightness[1],
+        DefaultBlockSideBrightness[2],
+        DefaultBlockSideBrightness[1],
+        DefaultBlockSideBrightness[0],
+        DefaultBlockSideBrightness[3],
     };
     
     
@@ -66,6 +71,7 @@ public class Element
 		this.depth = depth;
 		initFaces();
 		updateUV();
+		recalculateBrightnessValues();
 	}
 	
 	public Element(double width, double height) {
@@ -79,6 +85,7 @@ public class Element
 		}
 
 		updateUV();
+		recalculateBrightnessValues();
 	}
 
 	public Element(Element cuboid)
@@ -116,6 +123,7 @@ public class Element
 			faces[i].setRotation(oldFace.getRotation());
 		}
 		updateUV();
+		recalculateBrightnessValues();
 	}
 
 	public void initFaces()
@@ -201,9 +209,47 @@ public class Element
 	}
 	
 	
+	
+	public void recalculateBrightnessValues() {
+		for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
+			if (shade) {
+				brightnessByFace[i] = getFaceBrightness(BlockFacing.ALLFACES[i], (float)rotationX, (float)rotationY, (float)rotationZ);	
+			} else {
+				brightnessByFace[i] = 1;
+			}
+			
+		}
+	}
+	
+	public float getFaceBrightness(BlockFacing facing, float rotX, float rotY, float rotZ) {
+		float[] matrix = Mat4f.Create();
+        
+        Mat4f.RotateX(matrix, matrix, rotX * GameMath.DEG2RAD);            
+        Mat4f.RotateY(matrix, matrix, rotY * GameMath.DEG2RAD);
+        Mat4f.RotateZ(matrix, matrix, rotZ * GameMath.DEG2RAD);
+        
+        float[] pos = new float[] { facing.GetFacingVector().X, facing.GetFacingVector().Y, facing.GetFacingVector().Z, 1 };
+        pos = Mat4f.MulWithVec4(matrix, pos);
+        
+        float brightness = 0;
+        
+        for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
+        	BlockFacing f = BlockFacing.ALLFACES[i];
+        	float angle = (float)Math.acos(f.GetFacingVector().Dot(pos));
+        	
+        	if (angle >= GameMath.PIHALF) continue;
+        	
+        	brightness += (1 - angle / GameMath.PIHALF) * DefaultBlockSideBrightnessByFacing[f.GetIndex()]; 
+        }
+		
+		return brightness;
+	}
+	
 
 	public void draw()
 	{
+		float b;
+		
 		GL11.glPushMatrix();
 		{
 			GL11.glEnable(GL_BLEND);
@@ -215,44 +261,56 @@ public class Element
 			// North
 			if (faces[0].isEnabled())
 			{
-				GL11.glColor3f(1, 0, 0);
+				b = brightnessByFace[BlockFacing.NORTH.GetIndex()];
+				
+				GL11.glColor3f(b, 0, 0);
 								
-				faces[0].renderNorth();
+				faces[0].renderNorth(b);
 			}
 
 			// East
 			if (faces[1].isEnabled())
 			{
-				GL11.glColor3f(0, 1, 0);
-				faces[1].renderEast();
+				b = brightnessByFace[BlockFacing.EAST.GetIndex()];
+				
+				GL11.glColor3f(0, b, 0);
+				faces[1].renderEast(b);
 			}
 
 			// South
 			if (faces[2].isEnabled())
 			{
-				GL11.glColor3f(0, 0, 1);
-				faces[2].renderSouth();
+				b = brightnessByFace[BlockFacing.SOUTH.GetIndex()];
+				
+				GL11.glColor3f(0, 0, b);
+				faces[2].renderSouth(b);
 			}
 
 			// West
 			if (faces[3].isEnabled())
 			{
-				GL11.glColor3f(1, 1, 0);
-				faces[3].renderWest();
+				b = brightnessByFace[BlockFacing.WEST.GetIndex()];
+				
+				GL11.glColor3f(b, b, 0);
+				faces[3].renderWest(b);
 			}
 
 			// Top
 			if (faces[4].isEnabled())
 			{
-				GL11.glColor3f(0, 1, 1);
-				faces[4].renderUp();
+				b = brightnessByFace[BlockFacing.UP.GetIndex()];
+				
+				GL11.glColor3f(0, b, b);
+				faces[4].renderUp(b);
 			}
 
 			// Bottom
 			if (faces[5].isEnabled())
 			{
-				GL11.glColor3f(1, 0, 1);
-				faces[5].renderDown();
+				b = brightnessByFace[BlockFacing.DOWN.GetIndex()];
+				
+				GL11.glColor3f(b, 0, b);
+				faces[5].renderDown(b);
 			}
 		}
 		GL11.glPopMatrix();
@@ -440,16 +498,19 @@ public class Element
 	public void setRotationX(double rotation)
 	{
 		this.rotationX = rotation;
+		recalculateBrightnessValues();
 	}
 
 	public void setRotationY(double rotation)
 	{
 		this.rotationY = rotation;
+		recalculateBrightnessValues();
 	}
 	
 	public void setRotationZ(double rotation)
 	{
 		this.rotationZ = rotation;
+		recalculateBrightnessValues();
 	}
 	
 
@@ -471,6 +532,7 @@ public class Element
 	public void setShade(boolean shade)
 	{
 		this.shade = shade;
+		recalculateBrightnessValues();
 	}
 
 	public void setName(String name)

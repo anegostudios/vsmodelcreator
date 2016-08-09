@@ -27,6 +27,11 @@ public class Vec3f
     {
         return X * a.X + Y * a.Y + Z * a.Z;
     }
+    
+    public float Dot(float[] vec3)
+    {
+        return X * vec3[0] + Y * vec3[1] + Z * vec3[2];
+    }
 
     public void Add(float x, float y, float z)
     {

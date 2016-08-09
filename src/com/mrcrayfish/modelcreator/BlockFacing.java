@@ -9,14 +9,14 @@ public class BlockFacing
 
     // Right Handed Coordinate System
     // http://www.matrix44.net/cms/notes/opengl-3d-graphics/coordinate-systems-in-opengl
-    public static BlockFacing NORTH = new BlockFacing("north", 1, 0, 2, 90f, new Vec3f(0, 0, -1), new Vec3f(0.5f, 0.5f, 0f), EnumAxis.Z);
-    public static BlockFacing EAST = new BlockFacing("east", 2, 1, 3, 0f, new Vec3f(1, 0, 0), new Vec3f(1f, 0.5f, 0.5f), EnumAxis.X);
-    public static BlockFacing SOUTH = new BlockFacing("south", 4, 2, 0, 270f, new Vec3f(0, 0, 1), new Vec3f(0.5f, 0.5f, 1f), EnumAxis.Z);
-    public static BlockFacing WEST = new BlockFacing("west", 8, 3, 1, 180f, new Vec3f(-1, 0, 0), new Vec3f(0, 0.5f, 0.5f), EnumAxis.X);
+    public static BlockFacing NORTH = new BlockFacing("north", 1, 0, 2, new Vec3f(0, 0, -1), new Vec3f(0.5f, 0.5f, 0f), EnumAxis.Z);
+    public static BlockFacing EAST = new BlockFacing("east", 2, 1, 3, new Vec3f(1, 0, 0), new Vec3f(1f, 0.5f, 0.5f), EnumAxis.X);
+    public static BlockFacing SOUTH = new BlockFacing("south", 4, 2, 0, new Vec3f(0, 0, 1), new Vec3f(0.5f, 0.5f, 1f), EnumAxis.Z);
+    public static BlockFacing WEST = new BlockFacing("west", 8, 3, 1, new Vec3f(-1, 0, 0), new Vec3f(0, 0.5f, 0.5f), EnumAxis.X);
 
 
-    public static BlockFacing UP = new BlockFacing("up",      16, 4, 5, 0f, new Vec3f(0, 1, 0), new Vec3f(0.5f, 1, 0.5f), EnumAxis.Y);
-    public static BlockFacing DOWN = new BlockFacing("down",  32, 5, 4, 0f, new Vec3f(0, -1, 0), new Vec3f(0.5f, 0, 0.5f), EnumAxis.Y);
+    public static BlockFacing UP = new BlockFacing("up",      16, 4, 5, new Vec3f(0, 1, 0), new Vec3f(0.5f, 1, 0.5f), EnumAxis.Y);
+    public static BlockFacing DOWN = new BlockFacing("down",  32, 5, 4, new Vec3f(0, -1, 0), new Vec3f(0.5f, 0, 0.5f), EnumAxis.Y);
 
     /// <summary>
     /// All block faces in the order of N, E, S, W, U, D
@@ -34,7 +34,9 @@ public class BlockFacing
     Vec3f planeCenter;
     String code;
     EnumAxis axis;
-    float rotY;
+    
+    float angleP;
+    float angleT;
 
     public byte GetFlag() { return flag; } 
     public int GetIndex() { return index; }
@@ -44,8 +46,11 @@ public class BlockFacing
     public boolean GetIsHorizontal() { return index <= 3; }
     public boolean GetIsVertical() { return index >= 4; }
     public EnumAxis GetAxis() { return axis; }
+    
+    public float GetPAngle() { return angleP; }
+    public float GetTAngle() { return angleT; }
 
-    private BlockFacing(String code, int flag, int index, int oppositeIndex, float rotY, Vec3f facingVector, Vec3f planeCenter, EnumAxis axis)
+    private BlockFacing(String code, int flag, int index, int oppositeIndex, Vec3f facingVector, Vec3f planeCenter, EnumAxis axis)
     {
         this.index = index;
         this.flag = (byte)flag;
@@ -54,10 +59,9 @@ public class BlockFacing
         this.facingVector = facingVector;
         this.planeCenter = planeCenter;
         this.axis = axis;
-        this.rotY = rotY;
-
-
-
+        
+        angleP = (float)Math.acos(facingVector.Y);
+        angleT = (float)Math.atan(facingVector.Z / facingVector.X);
     }
 
     public BlockFacing GetOpposite()
