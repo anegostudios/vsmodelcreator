@@ -153,7 +153,7 @@ public class ModelCreator extends JFrame
 		});
 		//setTransferHandler(new JsonTransferHandler());
 		setPreferredSize(new Dimension(1200, 715));
-		setMinimumSize(new Dimension(1200, 500));
+		setMinimumSize(new Dimension(800, 500));
 		setLayout(new BorderLayout(10, 0));
 		setIconImages(getIcons());
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
