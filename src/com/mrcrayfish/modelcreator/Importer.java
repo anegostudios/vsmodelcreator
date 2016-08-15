@@ -263,6 +263,7 @@ public class Importer
 			for (Face face : element.getAllFaces())
 			{
 				face.setEnabled(false);
+				face.setExists(false);
 			}
 
 			if (obj.has("faces") && obj.get("faces").isJsonObject())
@@ -295,6 +296,7 @@ public class Importer
 
 		if (face != null)
 		{
+			face.setExists(true);
 			face.setEnabled(true);
 
 			// automatically set uv if not specified
@@ -347,6 +349,11 @@ public class Importer
 				{
 					face.setCullface(true);
 				}
+			}
+			
+			if (obj.has("enabled")) {
+				boolean enabled = obj.get("enabled").getAsBoolean();
+				face.setEnabled(enabled);
 			}
 		}
 	}

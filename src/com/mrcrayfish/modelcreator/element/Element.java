@@ -157,7 +157,7 @@ public class Element
 		int id = 0;
 		for (Face face : faces)
 		{
-			if (face.isEnabled())
+			if (face.getExists())
 			{
 				id = face.getSide();
 			}
