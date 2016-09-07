@@ -38,7 +38,7 @@ public class FacePanel extends JPanel implements IValueUpdater
 	private JPanel sliderPanel;
 	private JSlider rotation;
 	private TexturePanel panelTexture;
-	private FaceExtrasPanel panelProperties;
+	private FaceExtrasPanel panelFaceExtras;
 
 	private JPanel panelModId;
 	private JTextField modidField;
@@ -89,7 +89,7 @@ public class FacePanel extends JPanel implements IValueUpdater
 
 		panelTexture = new TexturePanel(manager);
 		panelUV = new UVPanel(manager);
-		panelProperties = new FaceExtrasPanel(manager);
+		panelFaceExtras = new FaceExtrasPanel(manager);
 
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 		labelTable.put(new Integer(0), new JLabel("0\u00b0"));
@@ -153,7 +153,7 @@ public class FacePanel extends JPanel implements IValueUpdater
 		add(panelUV);
 		add(sliderPanel);
 		add(panelModId);
-		add(panelProperties);
+		add(panelFaceExtras);
 	}
 
 	@Override
@@ -175,6 +175,6 @@ public class FacePanel extends JPanel implements IValueUpdater
 			rotation.setValue(0);
 		}
 		panelUV.updateValues(cube);
-		panelProperties.updateValues(cube);
+		panelFaceExtras.updateValues(cube);
 	}
 }

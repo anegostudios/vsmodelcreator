@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.JOptionPane;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -56,8 +58,9 @@ public class Importer
 				reader.close();
 				fr.close();
 			}
-			catch (IOException e)
+			catch (Exception e)
 			{
+				JOptionPane.showMessageDialog(null, "Couldn't open this file: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -338,6 +341,11 @@ public class Importer
 			if (obj.has("rotation") && obj.get("rotation").isJsonPrimitive())
 			{
 				face.setRotation((int) obj.get("rotation").getAsDouble() / 90);
+			}
+			
+			if (obj.has("glow") && obj.get("glow").isJsonPrimitive())
+			{
+				face.setGlow(((int) obj.get("glow").getAsInt()));
 			}
 
 			// TODO cullface with different direction than face,tintindex

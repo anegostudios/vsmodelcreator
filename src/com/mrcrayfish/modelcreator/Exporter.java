@@ -189,6 +189,9 @@ public class Exporter
 					writer.write(", \"rotation\": " + (int) face.getRotation() * 90);
 				if (face.isCullfaced())
 					writer.write(", \"cullface\": \"" + Face.getFaceName(face.getSide()) + "\"");
+				if (face.getGlow() > 0) {
+					writer.write(", \"glow\": " + face.getGlow());
+				}
 				if (!face.isEnabled()) {
 					writer.write(", \"enabled\": false");
 				}

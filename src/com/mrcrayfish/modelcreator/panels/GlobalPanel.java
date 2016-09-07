@@ -22,7 +22,7 @@ public class GlobalPanel extends JPanel implements IValueUpdater
 	private ElementManager manager;
 
 	private JRadioButton ambientOcc;
-	private JButton btnParticle;
+	//private JButton btnParticle;
 
 	public GlobalPanel(ElementManager manager)
 	{
@@ -36,11 +36,11 @@ public class GlobalPanel extends JPanel implements IValueUpdater
 
 	public void initComponents()
 	{
-		ambientOcc = ComponentUtil.createRadioButton("Ambient Occulusion", "Determine the light for each element");
+		ambientOcc = ComponentUtil.createRadioButton("Ambient Occlusion", "Determine the light for each element");
 		ambientOcc.setSelected(true);
 		ambientOcc.addActionListener(a -> manager.setAmbientOcc(ambientOcc.isSelected()));
 
-		btnParticle = new JButton("Particle");
+		/*btnParticle = new JButton("Particle");
 		btnParticle.setIcon(Icons.texture);
 		btnParticle.addActionListener(a ->
 		{
@@ -50,26 +50,26 @@ public class GlobalPanel extends JPanel implements IValueUpdater
 				manager.setParticle(texture);
 				btnParticle.setText(texture);
 			}
-		});
+		});*/
 	}
 
 	public void addComponents()
 	{
 		add(ambientOcc);
-		add(btnParticle);
+		//add(btnParticle);
 	}
 
 	@Override
 	public void updateValues(Element cube)
 	{
 		ambientOcc.setSelected(manager.getAmbientOcc());
-		if (manager.getParticle() == null)
+		/*if (manager.getParticle() == null)
 		{
 			btnParticle.setText("Particle");
 		}
 		else
 		{
 			btnParticle.setText(manager.getParticle());
-		}
+		}*/
 	}
 }

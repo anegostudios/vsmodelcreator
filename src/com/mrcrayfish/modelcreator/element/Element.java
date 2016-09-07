@@ -80,9 +80,10 @@ public class Element
 		this.height = height;
 		this.depth = 1;
 		initFaces();
-		for (int i = 1; i < faces.length; i++) {
+		for (int i = 0; i < faces.length; i++) {
 			faces[i].setEnabled(false);
 		}
+		faces[2].setEnabled(true);
 
 		updateUV();
 		recalculateBrightnessValues();

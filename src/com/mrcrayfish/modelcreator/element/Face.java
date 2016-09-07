@@ -39,6 +39,7 @@ public class Face
 
 	private Element cuboid;
 	private int side;
+	private int glow;
 
 	public Face(Element cuboid, int side)
 	{
@@ -616,6 +617,14 @@ public class Face
 		return RED;
 	}
 
+	public int getGlow() {
+		return glow;
+	}
+	
+	public void setGlow(int glow) {
+		this.glow = glow;
+	}
+	
 	public int getRotation()
 	{
 		return rotation;
