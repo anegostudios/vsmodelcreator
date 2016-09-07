@@ -84,7 +84,7 @@ public class FacePanel extends JPanel implements IValueUpdater
 				updateValues(manager.getSelectedElement());
 			}
 		});
-		menuPanel.setPreferredSize(new Dimension(186, 50));
+		menuPanel.setPreferredSize(new Dimension(186, 40));
 		menuPanel.add(menuList);
 
 		panelTexture = new TexturePanel(manager);

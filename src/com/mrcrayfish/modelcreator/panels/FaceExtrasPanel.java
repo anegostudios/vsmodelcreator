@@ -78,10 +78,12 @@ public class FaceExtrasPanel extends JPanel implements IValueUpdater
 		horizontalBox.add(boxEnabled);
 		horizontalBox.add(boxAutoUV);
 		horizontalBox.add(new JLabel(""));
-		horizontalBox.add(new JLabel("Glow"));
-		
+		horizontalBox.add(new JLabel("Glowiness"));
 		horizontalBox.add(glowValue);
-		horizontalBox.add(new JLabel(""));
+		/*JPanel glowPanel = new JPanel(new GridLayout(1, 1));
+		horizontalBox.add(glowPanel);
+		glowPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Glow</b></html>"));
+		glowPanel.add(glowValue);*/
 	}
 
 	public void addComponents()

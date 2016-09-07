@@ -55,7 +55,7 @@ public class SidebarPanel extends JPanel implements ElementManager
 	{
 		this.creator = creator;
 		setLayout(layout = new SpringLayout());
-		setPreferredSize(new Dimension(200, 760));
+		setPreferredSize(new Dimension(200, 800));
 		initComponents();
 		setLayoutConstaints();
 	}
@@ -155,7 +155,7 @@ public class SidebarPanel extends JPanel implements ElementManager
 		tabbedPane.add("Element", new ElementPanel(this));
 		tabbedPane.add("Rotation", new RotationPanel(this));
 		tabbedPane.add("Faces", new FacePanel(this));
-		tabbedPane.setPreferredSize(new Dimension(190, 500));
+		tabbedPane.setPreferredSize(new Dimension(190, 540));
 		tabbedPane.setTabPlacement(JTabbedPane.TOP);
 		tabbedPane.addChangeListener(c ->
 		{
