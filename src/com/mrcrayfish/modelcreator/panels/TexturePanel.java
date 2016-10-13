@@ -126,7 +126,7 @@ public class TexturePanel extends JPanel implements TextureCallback
 	}
 
 	@Override
-	public void callback(boolean success, String texture)
+	public void callback(boolean success, String errormessage, String texture)
 	{
 		if (success)
 			if (manager.getSelectedElement() != null)

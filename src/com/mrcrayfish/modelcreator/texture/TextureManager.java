@@ -46,7 +46,7 @@ public class TextureManager
 
 	public static File lastLocation = null;
 
-	public static boolean loadExternalTexture(File image, File meta) throws IOException
+	public static String loadExternalTexture(File image, File meta) throws IOException
 	{
 		TextureMeta textureMeta = TextureMeta.parse(meta);
 
@@ -83,8 +83,9 @@ public class TextureManager
 				}
 				String imageName = image.getName();
 				textureCache.add(new TextureEntry(image.getName().substring(0, imageName.indexOf(".png")), textures, icon, image.getAbsolutePath(), textureMeta, meta.getAbsolutePath()));
-				return true;
+				return null;
 			}
+			
 			return loadTexture(image, textureMeta, meta.getAbsolutePath());
 		}
 		return loadTexture(image, null, null);
@@ -116,20 +117,21 @@ public class TextureManager
 	}
 	
 
-	private static boolean loadTexture(File image, TextureMeta meta, String location) throws IOException
+	private static String loadTexture(File image, TextureMeta meta, String location) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
 		Texture texture = TextureLoader.getTexture("PNG", is);
 		is.close();
 
-		if (texture.getImageHeight() % 16 != 0 | texture.getImageWidth() % 16 != 0)
+		if (texture.getImageHeight() % 16 != 0 || texture.getImageWidth() % 16 != 0)
 		{
 			texture.release();
-			return false;
+			return "Not a multiple of 16 ("+texture.getImageHeight()+","+texture.getImageWidth()+")";
 		}
+		
 		ImageIcon icon = upscale(new ImageIcon(image.getAbsolutePath()), 256);
-		textureCache.add(new TextureEntry(image.getName().replace(".png", "").replaceAll("\\d*$", ""), texture, icon, image.getAbsolutePath(), meta, location));
-		return true;
+		textureCache.add(new TextureEntry(image.getName().replace(".png", ""), texture, icon, image.getAbsolutePath(), meta, location));
+		return null;
 	}
 
 	public static ImageIcon upscale(ImageIcon source, int length)
@@ -252,16 +254,17 @@ public class TextureManager
 					manager.addPendingTexture(new PendingTexture(chooser.getSelectedFile(), meta, new TextureCallback()
 					{
 						@Override
-						public void callback(boolean success, String texture)
+						public void callback(boolean isnew, String errormessage, String texture)
 						{
-							if (success)
+							if (isnew)
 							{
 								model.insertElementAt(texture.replace(".png", ""), 0);
 							}
-							else
+							
+							if (errormessage != null)
 							{
 								JOptionPane error = new JOptionPane();
-								error.setMessage("Width and height must be a multiple of 16.");
+								error.setMessage(errormessage);
 								JDialog dialog = error.createDialog(btnImport, "Texture Error");
 								dialog.setLocationRelativeTo(null);
 								dialog.setModal(false);

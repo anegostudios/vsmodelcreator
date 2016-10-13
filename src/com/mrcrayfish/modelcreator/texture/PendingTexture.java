@@ -52,7 +52,8 @@ public class PendingTexture
 				return;
 			}
 			
-			boolean result = false;
+			String errormessge = null;
+			boolean isnew = false;
 			
 			String fileName = this.texture.getName().replace(".png", "").replaceAll("\\d*$", "");
 			Texture texture = TextureManager.getTexture(fileName);
@@ -61,12 +62,15 @@ public class PendingTexture
 			{
 				FileInputStream is = new FileInputStream(this.texture);
 				texture = TextureLoader.getTexture("PNG", is);
-				result = TextureManager.loadExternalTexture(this.texture, this.meta);
+				errormessge = TextureManager.loadExternalTexture(this.texture, this.meta);
 				is.close();
+				isnew = true;
 			}
 			
-			if (callback != null)
-				callback.callback(result, fileName);
+			if (callback != null) {
+				callback.callback(isnew, errormessge, fileName);
+			}
+				
 		}
 		catch (IOException e)
 		{

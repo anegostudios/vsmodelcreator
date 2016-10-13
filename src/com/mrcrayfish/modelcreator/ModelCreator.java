@@ -50,7 +50,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.BorderFactory;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -71,6 +73,7 @@ import com.mrcrayfish.modelcreator.screenshot.Screenshot;
 import com.mrcrayfish.modelcreator.sidebar.Sidebar;
 import com.mrcrayfish.modelcreator.sidebar.UVSidebar;
 import com.mrcrayfish.modelcreator.texture.PendingTexture;
+import com.mrcrayfish.modelcreator.texture.TextureCallback;
 import com.mrcrayfish.modelcreator.util.FontManager;
 import java.util.prefs.Preferences;
 
@@ -134,8 +137,32 @@ public class ModelCreator extends JFrame
 						if (elem instanceof File) {
 							File file = (File)elem;
 							
-							Importer importer = new Importer(getElementManager(), file.getAbsolutePath());
-							importer.importFromJSON();
+							if (file.getName().endsWith(".json")) {								
+								Importer importer = new Importer(getElementManager(), file.getAbsolutePath());
+								importer.importFromJSON();
+							}
+							
+							if (file.getName().endsWith(".png")) {								
+								File meta = new File(file.getAbsolutePath() + ".mcmeta");
+								
+								getElementManager().addPendingTexture(new PendingTexture(file, meta, new TextureCallback()
+								{
+									@Override
+									public void callback(boolean isnew, String errormessage, String texture)
+									{										
+										if (errormessage != null)
+										{
+											JOptionPane error = new JOptionPane();
+											error.setMessage(errormessage);
+											JDialog dialog = error.createDialog(canvas, "Texture Error");
+											dialog.setLocationRelativeTo(null);
+											dialog.setModal(false);
+											dialog.setVisible(true);
+										}
+									}
+								}));
+							}
+							
 							
 							return;
 						}
