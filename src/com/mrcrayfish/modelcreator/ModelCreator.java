@@ -377,6 +377,10 @@ public class ModelCreator extends JFrame
 		glClearColor(0.92F, 0.92F, 0.93F, 1.0F);
 		drawGrid();
 
+		GL11.glEnable(GL11.GL_ALPHA_TEST);
+		GL11.glAlphaFunc(GL11.GL_GREATER, 0.05f);
+		
+
 		glTranslatef(-8, 0, -8);
 		for (int i = 0; i < manager.getElementCount(); i++)
 		{
@@ -387,6 +391,9 @@ public class ModelCreator extends JFrame
 			cube.drawExtras(manager);
 		}
 
+		GL11.glDisable(GL11.GL_ALPHA_TEST);
+
+		
 		GL11.glPushMatrix();
 		{
 			GL11.glEnable(GL11.GL_TEXTURE_2D);

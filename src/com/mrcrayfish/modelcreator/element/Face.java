@@ -556,6 +556,13 @@ public class Face
 			textureVEnd = textureV + cuboid.getFaceDimension(side).getHeight();
 		}
 	}
+	
+	public boolean isCompatibleToAutoUV() {
+		return 
+				textureUEnd == textureU + cuboid.getFaceDimension(side).getWidth() && 
+				textureVEnd == textureV + cuboid.getFaceDimension(side).getHeight()
+		;
+	}
 
 	public static String getFaceName(int face)
 	{

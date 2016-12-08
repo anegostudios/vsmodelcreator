@@ -320,7 +320,7 @@ public class Importer
 				face.setStartV(vStart);
 				face.setEndU(uEnd);
 				face.setEndV(vEnd);
-				face.setAutoUVEnabled(false);
+				face.setAutoUVEnabled(face.isCompatibleToAutoUV());
 			}
 
 			if (obj.has("texture") && obj.get("texture").isJsonPrimitive())
