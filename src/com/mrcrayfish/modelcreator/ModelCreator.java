@@ -771,7 +771,46 @@ public class ModelCreator extends JFrame
 					glVertex3i(16, 0, i);
 				}
 			}
+						
 			glEnd();
+			
+			
+			// Thin half transparent line to show block size
+			glLineWidth(1F);
+			glColor3f(0.8F, 0.8F, 0.8F);
+			
+			
+			glBegin(GL_LINES);
+			{
+				glVertex3i(0, 0, 0);
+				glVertex3i(0, 16, 0);
+				
+				glVertex3i(16, 0, 0);
+				glVertex3i(16, 16, 0);
+
+				glVertex3i(16, 0, 16);
+				glVertex3i(16, 16, 16);
+				
+				glVertex3i(0, 0, 16);
+				glVertex3i(0, 16, 16);
+				
+				glVertex3i(0, 16, 0);
+				glVertex3i(16, 16, 0);
+				
+				glVertex3i(16, 16, 0);
+				glVertex3i(16, 16, 16);
+				
+				glVertex3i(16, 16, 16);
+				glVertex3i(0, 16, 16);
+				
+				glVertex3i(0, 16, 16);
+				glVertex3i(0, 16, 0);
+			}
+			glEnd();
+			
+			
+
+			
 		}
 		glPopMatrix();
 	}
