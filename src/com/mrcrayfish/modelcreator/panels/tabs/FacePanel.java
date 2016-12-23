@@ -104,10 +104,13 @@ public class FacePanel extends JPanel implements IValueUpdater
 		rotation.setPaintTicks(true);
 		rotation.setPaintLabels(true);
 		rotation.setLabelTable(labelTable);
+		
 		rotation.addChangeListener(e ->
 		{
 			manager.getSelectedElement().getSelectedFace().setRotation(rotation.getValue());
+			manager.updateValues();
 		});
+		
 		rotation.setToolTipText("<html>The rotation of the texture<br>Default: 0\u00b0</html>");
 		sliderPanel.setMaximumSize(new Dimension(190, 80));
 		sliderPanel.add(rotation);

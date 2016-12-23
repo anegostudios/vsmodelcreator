@@ -552,15 +552,29 @@ public class Face
 	{
 		if (autoUV)
 		{
-			textureUEnd = textureU + cuboid.getFaceDimension(side).getWidth();
-			textureVEnd = textureV + cuboid.getFaceDimension(side).getHeight();
+			if (rotation == 0 || rotation == 2) {
+				textureUEnd = textureU + cuboid.getFaceDimension(side).getWidth();
+				textureVEnd = textureV + cuboid.getFaceDimension(side).getHeight();	
+			} else {
+				textureUEnd = textureU + cuboid.getFaceDimension(side).getHeight();
+				textureVEnd = textureV + cuboid.getFaceDimension(side).getWidth();
+			}
+			
 		}
 	}
 	
 	public boolean isCompatibleToAutoUV() {
-		return 
-				textureUEnd == textureU + cuboid.getFaceDimension(side).getWidth() && 
-				textureVEnd == textureV + cuboid.getFaceDimension(side).getHeight()
+		return
+				(
+					(rotation == 0 || rotation == 2) &&
+					textureUEnd == textureU + cuboid.getFaceDimension(side).getWidth() && 
+					textureVEnd == textureV + cuboid.getFaceDimension(side).getHeight()
+				) ||
+				(
+					(rotation == 1 || rotation == 3) &&
+					textureUEnd == textureU + cuboid.getFaceDimension(side).getHeight() && 
+					textureVEnd == textureV + cuboid.getFaceDimension(side).getWidth()
+				)
 		;
 	}
 
@@ -640,6 +654,7 @@ public class Face
 	public void setRotation(int rotation)
 	{
 		this.rotation = rotation;
+		updateUV();
 	}
 
 	public void setExists(boolean exists)
