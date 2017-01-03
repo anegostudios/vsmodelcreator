@@ -1,4 +1,4 @@
-package at.vintagestory.modelcreator.gui;
+package at.vintagestory.modelcreator.gui.left;
 
 import java.awt.Component;
 

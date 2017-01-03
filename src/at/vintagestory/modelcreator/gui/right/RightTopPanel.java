@@ -1,4 +1,4 @@
-package at.vintagestory.modelcreator.gui;
+package at.vintagestory.modelcreator.gui.right;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -21,6 +21,8 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.gui.CuboidTabbedPane;
+import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.gui.right.element.ElementPanel;
 import at.vintagestory.modelcreator.gui.right.face.FacePanel;
 import at.vintagestory.modelcreator.gui.right.rotation.RotationPanel;
@@ -28,7 +30,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.PendingTexture;
 
-public class SidebarPanel extends JPanel implements IElementManager
+public class RightTopPanel extends JPanel implements IElementManager
 {
 	private static final long serialVersionUID = 1L;
 
@@ -50,7 +52,7 @@ public class SidebarPanel extends JPanel implements IElementManager
 	//private String particleLocation = null;
 	private boolean ambientOcc = true;
 
-	public SidebarPanel(ModelCreator creator)
+	public RightTopPanel(ModelCreator creator)
 	{
 		this.creator = creator;
 		setLayout(layout = new SpringLayout());

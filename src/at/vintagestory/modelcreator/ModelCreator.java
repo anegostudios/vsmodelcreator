@@ -39,10 +39,10 @@ import org.lwjgl.util.glu.GLU;
 
 import at.vintagestory.modelcreator.gui.GuiMain;
 import at.vintagestory.modelcreator.gui.Icons;
-import at.vintagestory.modelcreator.gui.SidebarPanel;
 import at.vintagestory.modelcreator.gui.left.LeftSidebar;
 import at.vintagestory.modelcreator.gui.left.LeftUVSidebar;
 import at.vintagestory.modelcreator.gui.middle.ModelRenderer;
+import at.vintagestory.modelcreator.gui.right.RightTopPanel;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.Element;
@@ -235,7 +235,7 @@ public class ModelCreator extends JFrame
 		canvas.setVisible(true);
 		canvas.requestFocus();
 
-		manager = new SidebarPanel(this);
+		manager = new RightTopPanel(this);
 		renderer = new ModelRenderer(manager);
 		scroll = new JScrollPane((JPanel) manager);
 		scroll.setBorder(BorderFactory.createEmptyBorder());

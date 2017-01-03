@@ -33,8 +33,8 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.BufferedImageUtil;
 
-import at.vintagestory.modelcreator.gui.SidebarPanel;
-import at.vintagestory.modelcreator.gui.TextureCellRenderer;
+import at.vintagestory.modelcreator.gui.left.TextureCellRenderer;
+import at.vintagestory.modelcreator.gui.right.RightTopPanel;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.PendingTexture;
@@ -295,7 +295,7 @@ public class TextureManager
 		btnClose.setFont(defaultFont);
 		panel.add(btnClose);
 
-		JDialog dialog = new JDialog(((SidebarPanel) manager).getCreator(), "Texture Manager", false);
+		JDialog dialog = new JDialog(((RightTopPanel) manager).getCreator(), "Texture Manager", false);
 		dialog.setLayout(new BorderLayout());
 		dialog.setResizable(false);
 		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);

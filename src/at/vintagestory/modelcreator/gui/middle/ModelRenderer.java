@@ -51,6 +51,9 @@ public class ModelRenderer
 	}
 	
 	public void Render(int leftSpacing, int width, int height, int frameHeight) {
+		this.width = width;
+		this.height = height;
+		
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		GLU.gluPerspective(60F, (float) (width - leftSpacing) / (float) height, 0.3F, 1000F);
