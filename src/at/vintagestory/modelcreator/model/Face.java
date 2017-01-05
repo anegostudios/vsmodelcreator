@@ -5,22 +5,64 @@ import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
-
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
-
 import at.vintagestory.modelcreator.TextureManager;
+import at.vintagestory.modelcreator.enums.BlockFacing;
 
 public class Face
 {
-	private static final Color RED = new Color(1, 0, 0);
-	private static final Color GREEN = new Color(0, 1, 0);
-	private static final Color BLUE = new Color(0, 0, 1);
-	private static final Color YELLOW = new Color(1, 1, 0);
-	private static final Color MAGENTA = new Color(1, 0, 1);
-	private static final Color CYAN = new Color(0, 1, 1);
+	// NS = Z
+	// WE = X
+	// UD = Y
+	public static final Color[] ColorsByFace = new Color[] {
+			new Color(179, 193, 255),
+			new Color(255, 179, 179),
+			new Color(179, 193, 255), 
+			new Color(255, 179, 179),
+			new Color(187, 255, 179),
+			new Color(187, 255, 179)
+	};
+	
+	public static float[] CubeVertices = {
+        // North face
+        0, 0, 0,
+        0,  1, 0,
+        1,  1, 0,
+        1, 0, 0,
+
+        // East face
+        1, 0, 0,     // bot left
+        1,  1, 0,     // top left
+        1,  1,  1,     // top right
+        1, 0,  1,     // bot right
+
+        // South face
+        0, 0,  1,
+        1, 0,  1,
+        1,  1,  1,
+        0,  1,  1,
+
+        // West face
+        0, 0, 0,
+        0, 0,  1,
+        0,  1,  1,
+        0,  1, 0,
+        
+        // Top face
+        0,  1, 0,
+        0,  1,  1,
+        1,  1,  1,
+        1,  1, 0,
+                      
+        // Bottom face
+        0, 0, 0,
+        1, 0, 0,
+        1, 0,  1,
+        0, 0,  1
+    };
 
 	private String texture = null;
 	private String textureLocation = "blocks/";
@@ -45,22 +87,23 @@ public class Face
 		this.cuboid = cuboid;
 		this.side = side;
 	}
-
-	public void renderNorth(float brightness)
-	{
+	
+	public void renderFace(BlockFacing blockFacing, float brightness) {
 		TextureEntry entry = TextureManager.getTextureEntry(texture);
 		int passes = 1;
 
-		if (entry != null)
+		if (entry != null) {
 			passes = entry.getPasses();
+		}
 
 		for (int i = 0; i < passes; i++)
 		{
-			renderNorth(i, brightness);
+			renderFace(blockFacing, i, brightness);
 		}
 	}
+	
 
-	private void renderNorth(int pass, float brightness)
+	public void renderFace(BlockFacing blockFacing, int pass, float brightness)
 	{
 		GL11.glPushMatrix();
 		{
@@ -68,23 +111,14 @@ public class Face
 
 			if (binded) GL11.glColor3f(brightness, brightness, brightness);
 			
+			int i = blockFacing.GetIndex() * 12;
+			
 			GL11.glBegin(GL11.GL_QUADS);
 			{
-				if (binded)
-					setTexCoord(0);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY(), cuboid.getStartZ());
-
-				if (binded)
-					setTexCoord(1);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY(), cuboid.getStartZ());
-
-				if (binded)
-					setTexCoord(2);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ());
-
-				if (binded)
-					setTexCoord(3);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ());
+				for (int j = 0; j < 4; j++) {
+					if (binded) setTexCoord(j);
+					GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth() * CubeVertices[i++], cuboid.getStartY() + cuboid.getHeight() * CubeVertices[i++], cuboid.getStartZ() + cuboid.getDepth() * CubeVertices[i++]);					
+				}
 			}
 			GL11.glEnd();
 
@@ -92,242 +126,7 @@ public class Face
 		}
 		GL11.glPopMatrix();
 	}
-
-	public void renderEast(float brightness)
-	{
-		TextureEntry entry = TextureManager.getTextureEntry(texture);
-		int passes = 1;
-
-		if (entry != null)
-			passes = entry.getPasses();
-
-		for (int i = 0; i < passes; i++)
-		{
-			renderEast(i, brightness);
-		}
-	}
-
-	private void renderEast(int pass, float brightness)
-	{
-		GL11.glPushMatrix();
-		{
-			startRender(pass);
-
-			if (binded) GL11.glColor3f(brightness, brightness, brightness);
-			
-			GL11.glBegin(GL11.GL_QUADS);
-			{
-				if (binded)
-					setTexCoord(0);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY(), cuboid.getStartZ() + cuboid.getDepth());
-
-				if (binded)
-					setTexCoord(1);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY(), cuboid.getStartZ());
-
-				if (binded)
-					setTexCoord(2);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ());
-
-				if (binded)
-					setTexCoord(3);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ() + cuboid.getDepth());
-			}
-			GL11.glEnd();
-
-			finishRender();
-		}
-		GL11.glPopMatrix();
-	}
-
-	public void renderSouth(float brightness)
-	{
-		TextureEntry entry = TextureManager.getTextureEntry(texture);
-		int passes = 1;
-
-		if (entry != null)
-			passes = entry.getPasses();
-
-		for (int i = 0; i < passes; i++)
-		{
-			renderSouth(i, brightness);
-		}
-	}
-
-	private void renderSouth(int pass, float brightness)
-	{
-		GL11.glPushMatrix();
-		{
-			startRender(pass);
-			
-			if (binded) GL11.glColor3f(brightness, brightness, brightness);
-			
-			GL11.glBegin(GL11.GL_QUADS);
-			{
-				if (binded)
-					setTexCoord(0);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY(), cuboid.getStartZ() + cuboid.getDepth());
-
-				if (binded)
-					setTexCoord(1);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY(), cuboid.getStartZ() + cuboid.getDepth());
-
-				if (binded)
-					setTexCoord(2);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ() + cuboid.getDepth());
-
-				if (binded)
-					setTexCoord(3);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ() + cuboid.getDepth());
-			}
-			GL11.glEnd();
-
-			finishRender();
-		}
-		GL11.glPopMatrix();
-	}
-
-	public void renderWest(float brightness)
-	{
-		TextureEntry entry = TextureManager.getTextureEntry(texture);
-		int passes = 1;
-
-		if (entry != null)
-			passes = entry.getPasses();
-
-		for (int i = 0; i < passes; i++)
-		{
-			renderWest(i, brightness);
-		}
-	}
-
-	private void renderWest(int pass, float brightness)
-	{
-		GL11.glPushMatrix();
-		{
-			startRender(pass);
-			
-			if (binded) GL11.glColor3f(brightness, brightness, brightness);
-
-			GL11.glBegin(GL11.GL_QUADS);
-			{
-				if (binded)
-					setTexCoord(0);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY(), cuboid.getStartZ());
-
-				if (binded)
-					setTexCoord(1);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY(), cuboid.getStartZ() + cuboid.getDepth());
-
-				if (binded)
-					setTexCoord(2);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ() + cuboid.getDepth());
-
-				if (binded)
-					setTexCoord(3);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ());
-			}
-			GL11.glEnd();
-
-			finishRender();
-		}
-		GL11.glPopMatrix();
-	}
-
-	public void renderUp(float brightness)
-	{
-		TextureEntry entry = TextureManager.getTextureEntry(texture);
-		int passes = 1;
-
-		if (entry != null)
-			passes = entry.getPasses();
-
-		for (int i = 0; i < passes; i++)
-		{
-			renderUp(i, brightness);
-		}
-	}
-
-	private void renderUp(int pass, float brightness)
-	{
-		GL11.glPushMatrix();
-		{
-			startRender(pass);
-			
-			if (binded) GL11.glColor3f(brightness, brightness, brightness);
-
-			GL11.glBegin(GL11.GL_QUADS);
-			{
-				
-				if (binded)
-					setTexCoord(0);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ() + cuboid.getDepth());
-
-				if (binded)
-					setTexCoord(1);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ() + cuboid.getDepth());
-
-				if (binded)
-					setTexCoord(2);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ());
-
-				if (binded)
-					setTexCoord(3);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY() + cuboid.getHeight(), cuboid.getStartZ());
-			}
-			GL11.glEnd();
-
-			finishRender();
-		}
-		GL11.glPopMatrix();
-	}
-
-	public void renderDown(float brightness)
-	{
-		TextureEntry entry = TextureManager.getTextureEntry(texture);
-		int passes = 1;
-
-		if (entry != null)
-			passes = entry.getPasses();
-
-		for (int i = 0; i < passes; i++)
-		{
-			renderDown(i, brightness);
-		}
-	}
-
-	public void renderDown(int pass, float brightness)
-	{
-		GL11.glPushMatrix();
-		{
-			startRender(pass);
-			
-			if (binded) GL11.glColor3f(brightness, brightness, brightness);
-			
-			GL11.glBegin(GL11.GL_QUADS);
-			{
-				if (binded)
-					setTexCoord(0);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY(), cuboid.getStartZ());
-
-				if (binded)
-					setTexCoord(1);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY(), cuboid.getStartZ());
-
-				if (binded)
-					setTexCoord(2);
-				GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth(), cuboid.getStartY(), cuboid.getStartZ() + cuboid.getDepth());
-
-				if (binded)
-					setTexCoord(3);
-				GL11.glVertex3d(cuboid.getStartX(), cuboid.getStartY(), cuboid.getStartZ() + cuboid.getDepth());
-			}
-			GL11.glEnd();
-
-			finishRender();
-		}
-		GL11.glPopMatrix();
-	}
+	
 
 	public void setTexCoord(int corner)
 	{
@@ -619,22 +418,7 @@ public class Face
 
 	public static Color getFaceColour(int side)
 	{
-		switch (side)
-		{
-		case 0:
-			return RED;
-		case 1:
-			return GREEN;
-		case 2:
-			return BLUE;
-		case 3:
-			return YELLOW;
-		case 4:
-			return CYAN;
-		case 5:
-			return MAGENTA;
-		}
-		return RED;
+		return ColorsByFace[side];
 	}
 
 	public int getGlow() {
@@ -665,4 +449,5 @@ public class Face
 	public boolean getExists() {
 		return exists;
 	}
+
 }

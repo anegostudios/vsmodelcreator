@@ -9,6 +9,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
@@ -16,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
@@ -55,15 +58,15 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 
 	public void initComponents()
 	{
-		btnPlusX = new JButton(Icons.arrow_up);
-		btnPlusY = new JButton(Icons.arrow_up);
-		btnPlusZ = new JButton(Icons.arrow_up);
+		btnPlusX = new JButton(Icons.arrow_up_x);
+		btnPlusY = new JButton(Icons.arrow_up_y);
+		btnPlusZ = new JButton(Icons.arrow_up_z);
 		xPositionField = new JTextField();
 		yPositionField = new JTextField();
 		zPositionField = new JTextField();
-		btnNegX = new JButton(Icons.arrow_down);
-		btnNegY = new JButton(Icons.arrow_down);
-		btnNegZ = new JButton(Icons.arrow_down);
+		btnNegX = new JButton(Icons.arrow_down_x);
+		btnNegY = new JButton(Icons.arrow_down_y);
+		btnNegZ = new JButton(Icons.arrow_down_z);
 	}
 
 	public void initProperties()
@@ -104,6 +107,17 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+		xPositionField.addMouseWheelListener(new MouseWheelListener()
+		{
+			
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				int notches = e.getWheelRotation();
+				modifyPosition(EnumAxis.X, (notches > 0 ? 1 : -1), e.getModifiers());
+			}
+		});
+
 
 		yPositionField.setSize(new Dimension(62, 30));
 		yPositionField.setFont(defaultFont);
@@ -140,6 +154,16 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+		yPositionField.addMouseWheelListener(new MouseWheelListener()
+		{
+			
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				int notches = e.getWheelRotation();
+				modifyPosition(EnumAxis.Y, (notches > 0 ? 1 : -1), e.getModifiers());
+			}
+		});
 
 		zPositionField.setSize(new Dimension(62, 30));
 		zPositionField.setFont(defaultFont);
@@ -162,6 +186,7 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+		
 		zPositionField.addFocusListener(new FocusAdapter()
 		{
 			@Override
@@ -176,126 +201,98 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+		
+		zPositionField.addMouseWheelListener(new MouseWheelListener()
+		{
+			
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				int notches = e.getWheelRotation();
+				modifyPosition(EnumAxis.Z, (notches > 0 ? 1 : -1), e.getModifiers());
+			}
+		});
+
 
 		btnPlusX.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addStartX(0.1F);
-				}
-				else
-				{
-					cube.addStartX(1.0F);
-				}
-				xPositionField.setText(df.format(cube.getStartX()));
-			}
+			modifyPosition(EnumAxis.X, 1, e.getModifiers());
 		});
 		btnPlusX.setPreferredSize(new Dimension(62, 30));
 		btnPlusX.setFont(defaultFont);
-		btnPlusX.setToolTipText("<html>Increases the X position.<br><b>Hold shift for decimals</b></html>");
+		btnPlusX.setToolTipText("<html>Increases the X position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
 
 		btnPlusY.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addStartY(0.1F);
-				}
-				else
-				{
-					cube.addStartY(1.0F);
-				}
-				yPositionField.setText(df.format(cube.getStartY()));
-			}
+			modifyPosition(EnumAxis.Y, 1, e.getModifiers());
 		});
 		btnPlusY.setPreferredSize(new Dimension(62, 30));
 		btnPlusY.setFont(defaultFont);
-		btnPlusY.setToolTipText("<html>Increases the Y position.<br><b>Hold shift for decimals</b></html>");
+		btnPlusY.setToolTipText("<html>Increases the Y position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
 
 		btnPlusZ.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addStartZ(0.1F);
-				}
-				else
-				{
-					cube.addStartZ(1.0F);
-				}
-				zPositionField.setText(df.format(cube.getStartZ()));
-			}
+			modifyPosition(EnumAxis.Z, 1, e.getModifiers());
 		});
 		btnPlusZ.setPreferredSize(new Dimension(62, 30));
 		btnPlusZ.setFont(defaultFont);
-		btnPlusZ.setToolTipText("<html>Increases the Z position.<br><b>Hold shift for decimals</b></html>");
+		btnPlusZ.setToolTipText("<html>Increases the Z position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
 
 		btnNegX.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addStartX(-0.1F);
-				}
-				else
-				{
-					cube.addStartX(-1.0F);
-				}
-				xPositionField.setText(df.format(cube.getStartX()));
-			}
+			modifyPosition(EnumAxis.X, -1, e.getModifiers());
 		});
 		btnNegX.setPreferredSize(new Dimension(62, 30));
 		btnNegX.setFont(defaultFont);
-		btnNegX.setToolTipText("<html>Decreases the X position.<br><b>Hold shift for decimals</b></html>");
+		btnNegX.setToolTipText("<html>Decreases the X position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
 
 		btnNegY.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addStartY(-0.1F);
-				}
-				else
-				{
-					cube.addStartY(-1.0F);
-				}
-				yPositionField.setText(df.format(cube.getStartY()));
-			}
+			modifyPosition(EnumAxis.Y, -1, e.getModifiers());
 		});
 		btnNegY.setPreferredSize(new Dimension(62, 30));
 		btnNegY.setFont(defaultFont);
-		btnNegY.setToolTipText("<html>Decreases the Y position.<br><b>Hold shift for decimals</b></html>");
+		btnNegY.setToolTipText("<html>Decreases the Y position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
 
 		btnNegZ.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addStartZ(-0.1F);
-				}
-				else
-				{
-					cube.addStartZ(-1.0F);
-				}
-				zPositionField.setText(df.format(cube.getStartZ()));
-			}
+			modifyPosition(EnumAxis.Z, -1, e.getModifiers());
 		});
 		btnNegZ.setPreferredSize(new Dimension(62, 30));
 		btnNegZ.setFont(defaultFont);
-		btnNegZ.setToolTipText("<html>Decreases the Z position.<br><b>Hold shift for decimals</b></html>");
+		btnNegZ.setToolTipText("<html>Decreases the Z position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
+	}
+	
+	
+	public void modifyPosition(EnumAxis axis, int direction, int modifiers) {
+		Element cube = manager.getSelectedElement();
+		if (cube == null) return;
+		
+		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
+		boolean ctrl = (modifiers & ActionEvent.CTRL_MASK) > 0;
+		
+		switch (axis) {
+		case X:
+			cube.addStartX(size);
+			if (ctrl) cube.addOriginX(size);
+			
+			xPositionField.setText(df.format(cube.getStartX()));
+			
+			break;
+		case Y:
+			cube.addStartY(size);
+			if (ctrl) cube.addOriginY(size);
+			
+			yPositionField.setText(df.format(cube.getStartY()));
+			break;
+		default:
+			cube.addStartZ(size);
+			if (ctrl) cube.addOriginZ(size);
+			
+			zPositionField.setText(df.format(cube.getStartZ()));
+			
+			break;
+		}
 	}
 
 	public void addComponents()

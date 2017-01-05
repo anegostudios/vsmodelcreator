@@ -139,6 +139,7 @@ public class RightTopPanel extends JPanel implements IElementManager
 		list.addListSelectionListener(e ->
 		{
 			Element cube = getSelectedElement();
+			
 			if (cube != null)
 			{
 				tabbedPane.updateValues();
@@ -230,7 +231,7 @@ public class RightTopPanel extends JPanel implements IElementManager
 		Element cube = getSelectedElement();
 		if (cube != null)
 		{
-			cube.setName(newName);
+			cube.name = newName;
 			name.setText(newName);
 			list.updateUI();
 		}

@@ -81,12 +81,6 @@ public class LeftUVSidebar extends LeftSidebar
 
 					if (faces != null)
 					{
-						//TextureEntry entry = TextureManager.getTextureEntry(faces[i].getTextureName());
-
-						/*int passes = 1;
-						if (entry != null)
-							passes = entry.getPasses();*/
-
 						faces[i].bindTexture(0);
 
 						glBegin(GL_QUADS);

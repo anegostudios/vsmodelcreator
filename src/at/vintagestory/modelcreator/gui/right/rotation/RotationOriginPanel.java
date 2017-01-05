@@ -9,6 +9,9 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
@@ -16,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
@@ -53,15 +57,15 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 
 	public void initComponents()
 	{
-		btnPlusX = new JButton(Icons.arrow_up);
-		btnPlusY = new JButton(Icons.arrow_up);
-		btnPlusZ = new JButton(Icons.arrow_up);
+		btnPlusX = new JButton(Icons.arrow_up_x);
+		btnPlusY = new JButton(Icons.arrow_up_y);
+		btnPlusZ = new JButton(Icons.arrow_up_z);
 		xOriginField = new JTextField();
 		yOriginField = new JTextField();
 		zOriginField = new JTextField();
-		btnNegX = new JButton(Icons.arrow_down);
-		btnNegY = new JButton(Icons.arrow_down);
-		btnNegZ = new JButton(Icons.arrow_down);
+		btnNegX = new JButton(Icons.arrow_down_x);
+		btnNegY = new JButton(Icons.arrow_down_y);
+		btnNegZ = new JButton(Icons.arrow_down_z);
 	}
 
 	public void initProperties()
@@ -99,6 +103,14 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+		xOriginField.addMouseWheelListener(new MouseWheelListener()
+		{
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				modifyPosition(EnumAxis.X, e.getWheelRotation() > 0 ? 1 : -1, e.getModifiers());
+			}
+		});
 
 		yOriginField.setSize(new Dimension(62, 30));
 		yOriginField.setFont(defaultFont);
@@ -132,6 +144,14 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+		yOriginField.addMouseWheelListener(new MouseWheelListener()
+		{
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				modifyPosition(EnumAxis.Y, e.getWheelRotation() > 0 ? 1 : -1, e.getModifiers());
+			}
+		});
 
 		zOriginField.setSize(new Dimension(62, 30));
 		zOriginField.setFont(defaultFont);
@@ -152,6 +172,7 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+		
 		zOriginField.addFocusListener(new FocusAdapter()
 		{
 			@Override
@@ -165,42 +186,27 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+		zOriginField.addMouseWheelListener(new MouseWheelListener()
+		{
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				modifyPosition(EnumAxis.Z, e.getWheelRotation() > 0 ? 1 : -1, e.getModifiers());				
+			}
+		});
 
 		btnPlusX.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addOriginX(0.1F);
-				}
-				else
-				{
-					cube.addOriginX(1.0F);
-				}
-				xOriginField.setText(df.format(cube.getOriginX()));
-			}
+			modifyPosition(EnumAxis.X, 1, e.getModifiers());
 		});
 		btnPlusX.setPreferredSize(new Dimension(62, 30));
 		btnPlusX.setFont(defaultFont);
 		btnPlusX.setToolTipText("<html>Increases the X origin.<br><b>Hold shift for decimals</b></html>");
 
+		
 		btnPlusY.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addOriginY(0.1F);
-				}
-				else
-				{
-					cube.addOriginY(1.0F);
-				}
-				yOriginField.setText(df.format(cube.getOriginY()));
-			}
+			modifyPosition(EnumAxis.Y, 1, e.getModifiers());
 		});
 		btnPlusY.setPreferredSize(new Dimension(62, 30));
 		btnPlusY.setFont(defaultFont);
@@ -208,19 +214,7 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 
 		btnPlusZ.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addOriginZ(0.1F);
-				}
-				else
-				{
-					cube.addOriginZ(1.0F);
-				}
-				zOriginField.setText(df.format(cube.getOriginZ()));
-			}
+			modifyPosition(EnumAxis.Z, 1, e.getModifiers());
 		});
 		btnPlusZ.setPreferredSize(new Dimension(62, 30));
 		btnPlusZ.setFont(defaultFont);
@@ -228,19 +222,7 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 
 		btnNegX.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addOriginX(-0.1F);
-				}
-				else
-				{
-					cube.addOriginX(-1.0F);
-				}
-				xOriginField.setText(df.format(cube.getOriginX()));
-			}
+			modifyPosition(EnumAxis.X, -1, e.getModifiers());
 		});
 		btnNegX.setPreferredSize(new Dimension(62, 30));
 		btnNegX.setFont(defaultFont);
@@ -248,19 +230,7 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 
 		btnNegY.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addOriginY(-0.1F);
-				}
-				else
-				{
-					cube.addOriginY(-1.0F);
-				}
-				yOriginField.setText(df.format(cube.getOriginY()));
-			}
+			modifyPosition(EnumAxis.Y, -1, e.getModifiers());
 		});
 		btnNegY.setPreferredSize(new Dimension(62, 30));
 		btnNegY.setFont(defaultFont);
@@ -268,19 +238,7 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 
 		btnNegZ.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addOriginZ(-0.1F);
-				}
-				else
-				{
-					cube.addOriginZ(-1.0F);
-				}
-				zOriginField.setText(df.format(cube.getOriginZ()));
-			}
+			modifyPosition(EnumAxis.Z, -1, e.getModifiers());
 		});
 		btnNegZ.setPreferredSize(new Dimension(62, 30));
 		btnNegZ.setFont(defaultFont);
@@ -320,6 +278,28 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 			xOriginField.setText("");
 			yOriginField.setText("");
 			zOriginField.setText("");
+		}
+	}
+	
+
+	public void modifyPosition(EnumAxis axis, int direction, int modifiers) {
+		Element cube = manager.getSelectedElement();
+		if (cube == null) return;		
+		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
+		
+		switch (axis) {
+		case X:
+			cube.addOriginX(size);
+			zOriginField.setText(df.format(cube.getOriginX()));
+			break;
+		case Y:
+			cube.addOriginY(size);
+			zOriginField.setText(df.format(cube.getOriginY()));
+			break;
+		default:
+			cube.addOriginZ(size);
+			zOriginField.setText(df.format(cube.getOriginZ()));			
+			break;
 		}
 	}
 }

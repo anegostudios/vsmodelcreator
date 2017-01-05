@@ -3,47 +3,46 @@ package at.vintagestory.modelcreator.model;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_LINES;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
-
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.util.GameMath;
 import at.vintagestory.modelcreator.util.Mat4f;
+import org.newdawn.slick.Color;
 
 public class Element
 {
-	private String name = "Cube";
+	public  String name = "Cube";
 
 	// Face Variables
-	private int selectedFace = 0;
-	private Face[] faces = new Face[6];
+	protected int selectedFace = 0;
+	protected Face[] faces = new Face[6];
 
 	// Element Variables
-	private double startX = 0.0, startY = 0.0, startZ = 0.0;
-	private double width = 16.0, height = 1.0, depth = 1.0;
+	protected double startX = 0.0, startY = 0.0, startZ = 0.0;
+	protected double width = 16.0, height = 1.0, depth = 1.0;
 
 	// Rotation Variables
-	private double originX = 8, originY = 8, originZ = 8;
-	private double rotationX = 0, rotationY = 0, rotationZ = 0;
+	protected double originX = 0, originY = 0, originZ = 0;
+	protected double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
-	private boolean rescale = false;
+	protected boolean rescale = false;
 
 	// Extra Variables
-	private boolean shade = true;
+	protected boolean shade = true;
 
 	// Rotation Point Indicator
-	private Sphere sphere = new Sphere();
+	protected Sphere sphere = new Sphere();
 	
-	float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 };
+	protected float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 };
 
     /// <summary>
     /// Top, Front/Left, Back/Right, Bottom
     /// </summary>
-    public static float[] DefaultBlockSideBrightness = new float[] {
+	protected static float[] DefaultBlockSideBrightness = new float[] {
         1f,
-        0.7f,
+        0.8f,
         0.6f,
         0.4f
     };
@@ -54,8 +53,8 @@ public class Element
     public static float[] DefaultBlockSideBrightnessByFacing = new float[] {
         DefaultBlockSideBrightness[2],
         DefaultBlockSideBrightness[1],
-        DefaultBlockSideBrightness[2],
         DefaultBlockSideBrightness[1],
+        DefaultBlockSideBrightness[2],
         DefaultBlockSideBrightness[0],
         DefaultBlockSideBrightness[3],
     };
@@ -88,21 +87,21 @@ public class Element
 
 	public Element(Element cuboid)
 	{
-		this.width = cuboid.getWidth();
-		this.height = cuboid.getHeight();
-		this.depth = cuboid.getDepth();
-		this.startX = cuboid.getStartX();
-		this.startY = cuboid.getStartY();
-		this.startZ = cuboid.getStartZ();
-		this.originX = cuboid.getOriginX();
-		this.originY = cuboid.getOriginY();
-		this.originZ = cuboid.getOriginZ();
-		this.rotationX = cuboid.getRotationX();
-		this.rotationY = cuboid.getRotationY();
-		this.rotationZ = cuboid.getRotationZ();
+		this.width = cuboid.width;
+		this.height = cuboid.height;
+		this.depth = cuboid.depth;
+		this.startX = cuboid.startX;
+		this.startY = cuboid.startY;
+		this.startZ = cuboid.startZ;
+		this.originX = cuboid.originX;
+		this.originY = cuboid.originY;
+		this.originZ = cuboid.originZ;
+		this.rotationX = cuboid.rotationX;
+		this.rotationY = cuboid.rotationY;
+		this.rotationZ = cuboid.rotationZ;
 		
-		this.rescale = cuboid.shouldRescale();
-		this.shade = cuboid.isShaded();
+		this.rescale = cuboid.rescale;
+		this.shade = cuboid.shade;
 		this.selectedFace = cuboid.getSelectedFaceIndex();
 		initFaces();
 		for (int i = 0; i < faces.length; i++)
@@ -168,17 +167,17 @@ public class Element
 		switch (side)
 		{
 		case 0:
-			return new FaceDimension(getWidth(), getHeight());
+			return new FaceDimension(width, height);
 		case 1:
-			return new FaceDimension(getDepth(), getHeight());
+			return new FaceDimension(depth, height);
 		case 2:
-			return new FaceDimension(getWidth(), getHeight());
+			return new FaceDimension(width, height);
 		case 3:
-			return new FaceDimension(getDepth(), getHeight());
+			return new FaceDimension(depth, height);
 		case 4:
-			return new FaceDimension(getWidth(), getDepth());
+			return new FaceDimension(width, depth);
 		case 5:
-			return new FaceDimension(getWidth(), getDepth());
+			return new FaceDimension(width, depth);
 		}
 		return null;
 	}
@@ -252,63 +251,18 @@ public class Element
 		{
 			GL11.glEnable(GL_BLEND);
 			GL11.glDisable(GL_CULL_FACE);
-			GL11.glTranslated(getOriginX(), getOriginY(), getOriginZ());
+			GL11.glTranslated(originX, originY, originZ);
 			rotateAxis();
-			GL11.glTranslated(-getOriginX(), -getOriginY(), -getOriginZ());
+			GL11.glTranslated(-originX, -originY, -originZ);
 			
-			// North
-			if (faces[0].isEnabled())
-			{
-				b = brightnessByFace[BlockFacing.NORTH.GetIndex()];
+			for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
+				if (!faces[i].isEnabled()) continue;
 				
-				GL11.glColor3f(b, 0, 0);
+				b = brightnessByFace[BlockFacing.ALLFACES[i].GetIndex()];
+				Color c = Face.ColorsByFace[i];
+				GL11.glColor3f(c.r * b, c.g * b, c.b * b);
 								
-				faces[0].renderNorth(b);
-			}
-
-			// East
-			if (faces[1].isEnabled())
-			{
-				b = brightnessByFace[BlockFacing.EAST.GetIndex()];
-				
-				GL11.glColor3f(0, b, 0);
-				faces[1].renderEast(b);
-			}
-
-			// South
-			if (faces[2].isEnabled())
-			{
-				b = brightnessByFace[BlockFacing.SOUTH.GetIndex()];
-				
-				GL11.glColor3f(0, 0, b);
-				faces[2].renderSouth(b);
-			}
-
-			// West
-			if (faces[3].isEnabled())
-			{
-				b = brightnessByFace[BlockFacing.WEST.GetIndex()];
-				
-				GL11.glColor3f(b, b, 0);
-				faces[3].renderWest(b);
-			}
-
-			// Top
-			if (faces[4].isEnabled())
-			{
-				b = brightnessByFace[BlockFacing.UP.GetIndex()];
-				
-				GL11.glColor3f(0, b, b);
-				faces[4].renderUp(b);
-			}
-
-			// Bottom
-			if (faces[5].isEnabled())
-			{
-				b = brightnessByFace[BlockFacing.DOWN.GetIndex()];
-				
-				GL11.glColor3f(b, 0, b);
-				faces[5].renderDown(b);
+				faces[i].renderFace(BlockFacing.ALLFACES[i], b);
 			}
 		}
 		GL11.glPopMatrix();
@@ -318,30 +272,148 @@ public class Element
 	{
 		if (manager.getSelectedElement() == this)
 		{
+			/*GL11.glEnable(GL_BLEND);
+			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			GL11.glLineWidth(0.5f);
+			GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);*/
+			GL11.glLineWidth(1f);
 			GL11.glPushMatrix();
 			{
-				GL11.glTranslated(getOriginX(), getOriginY(), getOriginZ());
+				GL11.glTranslated(originX, originY, originZ);
 				GL11.glColor3f(0.25F, 0.25F, 0.25F);
 				sphere.draw(0.2F, 16, 16);
 				rotateAxis();
-				GL11.glLineWidth(2F);
 				GL11.glBegin(GL_LINES);
 				{
+					// 3 Axes
 					GL11.glColor3f(1, 0, 0);
-					GL11.glVertex3i(-4, 0, 0);
-					GL11.glVertex3i(4, 0, 0);
+					GL11.glVertex3f(-4, 0, 0);
+					GL11.glVertex3f(4, 0, 0);
+					
+					GL11.glVertex3f(4, 0, 0);
+					GL11.glVertex3f(3.6f, 0, 0.4f);
+					GL11.glVertex3f(4, 0, 0);
+					GL11.glVertex3f(3.6f, 0, -0.4f);
+					
 					GL11.glColor3f(0, 1, 0);
-					GL11.glVertex3i(0, -4, 0);
-					GL11.glVertex3i(0, 4, 0);
+					GL11.glVertex3f(0, -4, 0);
+					GL11.glVertex3f(0, 4, 0);
+					
+					GL11.glVertex3f(0, 4, 0);
+					GL11.glVertex3f(0, 3.6f, 0.4f);
+					
+					GL11.glVertex3f(0, 4, 0);
+					GL11.glVertex3f(0, 3.6f, -0.4f);
+					
 					GL11.glColor3f(0, 0, 1);
-					GL11.glVertex3i(0, 0, -4);
-					GL11.glVertex3i(0, 0, 4);
+					GL11.glVertex3f(0, 0, -4);
+					GL11.glVertex3f(0, 0, 4);
+					
+					GL11.glVertex3f(0, 0, 4);
+					GL11.glVertex3f(0.4f, 0, 3.6f);
+					
+					GL11.glVertex3f(0, 0, 4);
+					GL11.glVertex3f(-0.4f, 0, 3.6f);
 				}
 				GL11.glEnd();
 			}
 			GL11.glPopMatrix();
+
+			// Cube highlight
+			GL11.glPushMatrix();
+			{
+				GL11.glTranslated(originX, originY, originZ);
+				rotateAxis();
+				GL11.glTranslated(-originX, -originY, -originZ);
+				
+				GL11.glTranslated(startX, startY, startZ);
+				
+				GL11.glDisable(GL11.GL_DEPTH_TEST);
+				GL11.glBegin(GL11.GL_LINES);
+				{
+					GL11.glColor4f(0F, 0F, 0F, 0.5f);
+					
+					float w = (float)width;
+					float h = (float)height;
+					float d = (float)depth;
+					
+					GL11.glVertex3f(0, 0, 0);
+					GL11.glVertex3f(0, h, 0);
+					
+					GL11.glVertex3f(w, 0, 0);
+					GL11.glVertex3f(w, h, 0);
+
+					GL11.glVertex3f(w, 0, d);
+					GL11.glVertex3f(w, h, d);
+					
+					GL11.glVertex3f(0, 0, d);
+					GL11.glVertex3f(0, h, d);
+					
+					GL11.glVertex3f(0, h, 0);
+					GL11.glVertex3f(w, h, 0);
+					
+					GL11.glVertex3f(w, h, 0);
+					GL11.glVertex3f(w, h, d);
+					
+					GL11.glVertex3f(w, h, d);
+					GL11.glVertex3f(0, h, d);
+					
+					GL11.glVertex3f(0, h, d);
+					GL11.glVertex3f(0, h, 0);
+					
+					
+					GL11.glVertex3f(0, 0, 0);
+					GL11.glVertex3f(w, 0, 0);
+					
+					GL11.glVertex3f(w, 0, 0);
+					GL11.glVertex3f(w, 0, d);
+					
+					GL11.glVertex3f(w, 0, d);
+					GL11.glVertex3f(0, 0, d);
+					
+					GL11.glVertex3f(0, 0, d);
+					GL11.glVertex3f(0, 0, 0);
+				}
+				
+				GL11.glEnd();
+				GL11.glEnable(GL11.GL_DEPTH_TEST);
+			
+			}
+			GL11.glPopMatrix();
+			
+
+			
+
 		}
 	}
+
+	@Override
+	public String toString()
+	{
+		return name;
+	}
+
+	public void updateUV()
+	{
+		for (Face face : faces)
+		{
+			face.updateUV();
+		}
+	}
+
+	public void rotateAxis()
+	{
+		GL11.glRotated(rotationX, 1, 0, 0);
+		GL11.glRotated(rotationY, 0, 1, 0);
+		GL11.glRotated(rotationZ, 0, 0, 1);
+	}
+
+
+	public Element copy()
+	{
+		return new Element(width, height, depth);
+	}
+	
 
 	public void addStartX(double amt)
 	{
@@ -538,30 +610,4 @@ public class Element
 		this.name = name;
 	}
 
-	@Override
-	public String toString()
-	{
-		return name;
-	}
-
-	public void updateUV()
-	{
-		for (Face face : faces)
-		{
-			face.updateUV();
-		}
-	}
-
-	public void rotateAxis()
-	{
-		GL11.glRotated(getRotationX(), 1, 0, 0);
-		GL11.glRotated(getRotationY(), 0, 1, 0);
-		GL11.glRotated(getRotationZ(), 0, 0, 1);
-	}
-
-
-	public Element copy()
-	{
-		return new Element(getWidth(), getHeight(), getDepth());
-	}
 }

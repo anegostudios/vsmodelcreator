@@ -9,6 +9,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
@@ -16,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
@@ -53,15 +56,15 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 
 	public void initComponents()
 	{
-		btnPlusX = new JButton(Icons.arrow_up);
-		btnPlusY = new JButton(Icons.arrow_up);
-		btnPlusZ = new JButton(Icons.arrow_up);
+		btnPlusX = new JButton(Icons.arrow_up_x);
+		btnPlusY = new JButton(Icons.arrow_up_y);
+		btnPlusZ = new JButton(Icons.arrow_up_z);
 		xSizeField = new JTextField();
 		ySizeField = new JTextField();
 		zSizeField = new JTextField();
-		btnNegX = new JButton(Icons.arrow_down);
-		btnNegY = new JButton(Icons.arrow_down);
-		btnNegZ = new JButton(Icons.arrow_down);
+		btnNegX = new JButton(Icons.arrow_down_x);
+		btnNegY = new JButton(Icons.arrow_down_y);
+		btnNegZ = new JButton(Icons.arrow_down_z);
 	}
 
 	public void initProperties()
@@ -102,6 +105,14 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+		xSizeField.addMouseWheelListener(new MouseWheelListener()
+		{
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				modifySize(EnumAxis.X, e.getWheelRotation() > 0 ? 1 : -1, e.getModifiers());				
+			}
+		});
 
 		ySizeField.setSize(new Dimension(62, 30));
 		ySizeField.setFont(defaultFont);
@@ -138,6 +149,15 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+		ySizeField.addMouseWheelListener(new MouseWheelListener()
+		{
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				modifySize(EnumAxis.Y, e.getWheelRotation() > 0 ? 1 : -1, e.getModifiers());				
+			}
+		});
+
 
 		zSizeField.setSize(new Dimension(62, 30));
 		zSizeField.setFont(defaultFont);
@@ -174,23 +194,19 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 				}
 			}
 		});
+		zSizeField.addMouseWheelListener(new MouseWheelListener()
+		{
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				modifySize(EnumAxis.Z, e.getWheelRotation() > 0 ? 1 : -1, e.getModifiers());				
+			}
+		});
+
 
 		btnPlusX.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addWidth(0.1F);
-				}
-				else
-				{
-					cube.addWidth(1.0F);
-				}
-				cube.updateUV();
-				manager.updateValues();
-			}
+			modifySize(EnumAxis.X, 1, e.getModifiers());
 		});
 		btnPlusX.setPreferredSize(new Dimension(62, 30));
 		btnPlusX.setFont(defaultFont);
@@ -198,20 +214,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 
 		btnPlusY.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addHeight(0.1F);
-				}
-				else
-				{
-					cube.addHeight(1.0F);
-				}
-				cube.updateUV();
-				manager.updateValues();
-			}
+			modifySize(EnumAxis.Y, 1, e.getModifiers());
 		});
 		btnPlusY.setPreferredSize(new Dimension(62, 30));
 		btnPlusY.setFont(defaultFont);
@@ -219,20 +222,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 
 		btnPlusZ.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addDepth(0.1F);
-				}
-				else
-				{
-					cube.addDepth(1.0F);
-				}
-				cube.updateUV();
-				manager.updateValues();
-			}
+			modifySize(EnumAxis.Z, 1, e.getModifiers());
 		});
 		btnPlusZ.setPreferredSize(new Dimension(62, 30));
 		btnPlusZ.setFont(defaultFont);
@@ -240,20 +230,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 
 		btnNegX.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addWidth(-0.1F);
-				}
-				else
-				{
-					cube.addWidth(-1.0F);
-				}
-				cube.updateUV();
-				manager.updateValues();
-			}
+			modifySize(EnumAxis.X, -1, e.getModifiers());
 		});
 		btnNegX.setPreferredSize(new Dimension(62, 30));
 		btnNegX.setFont(defaultFont);
@@ -261,20 +238,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 
 		btnNegY.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addHeight(-0.1F);
-				}
-				else
-				{
-					cube.addHeight(-1.0F);
-				}
-				cube.updateUV();
-				manager.updateValues();
-			}
+			modifySize(EnumAxis.Y, -1, e.getModifiers());
 		});
 		btnNegY.setPreferredSize(new Dimension(62, 30));
 		btnNegY.setFont(defaultFont);
@@ -282,20 +246,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 
 		btnNegZ.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
-			{
-				Element cube = manager.getSelectedElement();
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					cube.addDepth(-0.1F);
-				}
-				else
-				{
-					cube.addDepth(-1.0F);
-				}
-				cube.updateUV();
-				manager.updateValues();
-			}
+			modifySize(EnumAxis.Z, -1, e.getModifiers());
 		});
 		btnNegZ.setPreferredSize(new Dimension(62, 30));
 		btnNegZ.setFont(defaultFont);
@@ -314,6 +265,30 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		add(btnNegY);
 		add(btnNegZ);
 	}
+	
+	
+	public void modifySize(EnumAxis axis, int direction, int modifiers) {
+		Element cube = manager.getSelectedElement();
+		if (cube == null) return;
+		
+		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
+		
+		switch (axis) {
+		case X:
+			cube.addWidth(size);
+			break;
+		case Y:
+			cube.addHeight(size);
+			break;
+		default:
+			cube.addDepth(size);			
+			break;
+		}
+		
+		cube.updateUV();
+		manager.updateValues();
+	}
+
 
 	@Override
 	public void updateValues(Element cube)

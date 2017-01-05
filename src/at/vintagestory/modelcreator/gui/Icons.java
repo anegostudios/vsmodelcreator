@@ -27,6 +27,14 @@ public class Icons
 	public static Icon light_off;
 	public static Icon arrow_up;
 	public static Icon arrow_down;
+	
+	public static Icon arrow_up_x;
+	public static Icon arrow_down_x;
+	public static Icon arrow_up_y;
+	public static Icon arrow_down_y;
+	public static Icon arrow_up_z;
+	public static Icon arrow_down_z;
+	
 	public static Icon facebook;
 	public static Icon twitter;
 	public static Icon reddit;
@@ -64,6 +72,15 @@ public class Icons
 		
 		arrow_up = new ImageIcon(loader.getResource("icons/arrow_up.png"));
 		arrow_down = new ImageIcon(loader.getResource("icons/arrow_down.png"));
+		
+		arrow_up_x = new ImageIcon(loader.getResource("icons/arrow_up_x.png"));
+		arrow_down_x = new ImageIcon(loader.getResource("icons/arrow_down_x.png"));
+		
+		arrow_up_y = new ImageIcon(loader.getResource("icons/arrow_up_y.png"));
+		arrow_down_y = new ImageIcon(loader.getResource("icons/arrow_down_y.png"));
+		
+		arrow_up_z = new ImageIcon(loader.getResource("icons/arrow_up_z.png"));
+		arrow_down_z = new ImageIcon(loader.getResource("icons/arrow_down_z.png"));
 		
 		facebook = new ImageIcon(loader.getResource("icons/facebook.png"));
 		twitter = new ImageIcon(loader.getResource("icons/twitter.png"));

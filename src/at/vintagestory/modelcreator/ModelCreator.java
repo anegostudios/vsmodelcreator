@@ -511,7 +511,7 @@ public class ModelCreator extends JFrame
 			GLU.gluPickMatrix(x, y, 1, 1, IntBuffer.wrap(viewport));
 			GLU.gluPerspective(60F, (float) (width) / (float) height, 0.3F, 1000F);
 
-			renderer.draw();
+			renderer.drawGridAndElements();
 		}
 		GL11.glPopMatrix();
 		hits = GL11.glRenderMode(GL11.GL_RENDER);

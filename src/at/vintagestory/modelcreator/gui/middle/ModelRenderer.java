@@ -58,7 +58,7 @@ public class ModelRenderer
 		glLoadIdentity();
 		GLU.gluPerspective(60F, (float) (width - leftSpacing) / (float) height, 0.3F, 1000F);
 
-		draw();
+		drawGridAndElements();
 
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
@@ -76,7 +76,7 @@ public class ModelRenderer
 	}
 	
 	
-	public void draw()
+	public void drawGridAndElements()
 	{
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -85,28 +85,21 @@ public class ModelRenderer
 		glLoadIdentity();
 		
 		camera.useView();
-
-		drawPerspective();
-	}
-	
-
-	public void drawPerspective()
-	{
+		
 		glClearColor(0.92F, 0.92F, 0.93F, 1.0F);
 		drawPerspectiveGrid();
 
 		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		GL11.glAlphaFunc(GL11.GL_GREATER, 0.05f);
 		
-
 		glTranslatef(-8, 0, -8);
 		for (int i = 0; i < manager.getElementCount(); i++)
 		{
 			GL11.glLoadName(i + 1);
-			Element cube = manager.getElement(i);
-			cube.draw();
+			Element element = manager.getElement(i);
+			element.draw();
 			GL11.glLoadName(0);
-			cube.drawExtras(manager);
+			element.drawExtras(manager);
 		}
 
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
