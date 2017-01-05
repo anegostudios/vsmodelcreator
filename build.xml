@@ -10,7 +10,7 @@
         <jar destfile="${dir.jarfile}/modelcreator.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
-                <attribute name="Rsrc-Main-Class" value="com.mrcrayfish.modelcreator.Start"/>
+                <attribute name="Rsrc-Main-Class" value="at.vintagestory.modelcreator.Start"/>
                 <attribute name="Class-Path" value="."/>
                 <attribute name="Rsrc-Class-Path" value="./ gson-2.3.1.jar JTattoo-1.6.11.jar lwjgl_util.jar slick-util.jar lwjgl.jar"/>
             </manifest>

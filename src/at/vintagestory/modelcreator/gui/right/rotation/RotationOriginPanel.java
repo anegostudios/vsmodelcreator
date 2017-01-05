@@ -9,7 +9,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
@@ -290,11 +289,11 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 		switch (axis) {
 		case X:
 			cube.addOriginX(size);
-			zOriginField.setText(df.format(cube.getOriginX()));
+			xOriginField.setText(df.format(cube.getOriginX()));
 			break;
 		case Y:
 			cube.addOriginY(size);
-			zOriginField.setText(df.format(cube.getOriginY()));
+			yOriginField.setText(df.format(cube.getOriginY()));
 			break;
 		default:
 			cube.addOriginZ(size);
