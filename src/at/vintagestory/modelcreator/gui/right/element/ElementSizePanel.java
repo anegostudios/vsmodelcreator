@@ -46,9 +46,9 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 	public ElementSizePanel(IElementManager manager)
 	{
 		this.manager = manager;
-		setLayout(new GridLayout(3, 3, 4, 4));
+		setLayout(new GridLayout(3, 3, 4, 0));
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Size</b></html>"));
-		setMaximumSize(new Dimension(186, 124));
+		setMaximumSize(new Dimension(186, 104));
 		initComponents();
 		initProperties();
 		addComponents();
@@ -208,7 +208,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		{
 			modifySize(EnumAxis.X, 1, e.getModifiers());
 		});
-		btnPlusX.setPreferredSize(new Dimension(62, 30));
+		btnPlusX.setPreferredSize(new Dimension(62, 20));
 		btnPlusX.setFont(defaultFont);
 		btnPlusX.setToolTipText("<html>Increases the width.<br><b>Hold shift for decimals</b></html>");
 
@@ -216,7 +216,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		{
 			modifySize(EnumAxis.Y, 1, e.getModifiers());
 		});
-		btnPlusY.setPreferredSize(new Dimension(62, 30));
+		btnPlusY.setPreferredSize(new Dimension(62, 20));
 		btnPlusY.setFont(defaultFont);
 		btnPlusY.setToolTipText("<html>Increases the height.<br><b>Hold shift for decimals</b></html>");
 
@@ -224,7 +224,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		{
 			modifySize(EnumAxis.Z, 1, e.getModifiers());
 		});
-		btnPlusZ.setPreferredSize(new Dimension(62, 30));
+		btnPlusZ.setPreferredSize(new Dimension(62, 20));
 		btnPlusZ.setFont(defaultFont);
 		btnPlusZ.setToolTipText("<html>Increases the depth.<br><b>Hold shift for decimals</b></html>");
 
@@ -232,7 +232,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		{
 			modifySize(EnumAxis.X, -1, e.getModifiers());
 		});
-		btnNegX.setPreferredSize(new Dimension(62, 30));
+		btnNegX.setPreferredSize(new Dimension(62, 20));
 		btnNegX.setFont(defaultFont);
 		btnNegX.setToolTipText("<html>Decreases the width.<br><b>Hold shift for decimals</b></html>");
 
@@ -240,7 +240,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		{
 			modifySize(EnumAxis.Y, -1, e.getModifiers());
 		});
-		btnNegY.setPreferredSize(new Dimension(62, 30));
+		btnNegY.setPreferredSize(new Dimension(62, 20));
 		btnNegY.setFont(defaultFont);
 		btnNegY.setToolTipText("<html>Decreases the height.<br><b>Hold shift for decimals</b></html>");
 
@@ -248,7 +248,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		{
 			modifySize(EnumAxis.Z, -1, e.getModifiers());
 		});
-		btnNegZ.setPreferredSize(new Dimension(62, 30));
+		btnNegZ.setPreferredSize(new Dimension(62, 20));
 		btnNegZ.setFont(defaultFont);
 		btnNegZ.setToolTipText("<html>Decreases the depth.<br><b>Hold shift for decimals</b></html>");
 	}

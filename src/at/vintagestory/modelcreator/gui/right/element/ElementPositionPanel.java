@@ -47,9 +47,9 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 	public ElementPositionPanel(IElementManager manager)
 	{
 		this.manager = manager;
-		setLayout(new GridLayout(3, 3, 4, 4));
+		setLayout(new GridLayout(3, 3, 4, 0));
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Position</b></html>"));
-		setMaximumSize(new Dimension(186, 124));
+		setMaximumSize(new Dimension(186, 104));
 		setAlignmentX(JPanel.CENTER_ALIGNMENT);
 		initComponents();
 		initProperties();
@@ -218,7 +218,7 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 		{
 			modifyPosition(EnumAxis.X, 1, e.getModifiers());
 		});
-		btnPlusX.setPreferredSize(new Dimension(62, 30));
+		btnPlusX.setPreferredSize(new Dimension(62, 20));
 		btnPlusX.setFont(defaultFont);
 		btnPlusX.setToolTipText("<html>Increases the X position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
 
@@ -226,7 +226,7 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 		{
 			modifyPosition(EnumAxis.Y, 1, e.getModifiers());
 		});
-		btnPlusY.setPreferredSize(new Dimension(62, 30));
+		btnPlusY.setPreferredSize(new Dimension(62, 20));
 		btnPlusY.setFont(defaultFont);
 		btnPlusY.setToolTipText("<html>Increases the Y position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
 
@@ -234,7 +234,7 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 		{
 			modifyPosition(EnumAxis.Z, 1, e.getModifiers());
 		});
-		btnPlusZ.setPreferredSize(new Dimension(62, 30));
+		btnPlusZ.setPreferredSize(new Dimension(62, 20));
 		btnPlusZ.setFont(defaultFont);
 		btnPlusZ.setToolTipText("<html>Increases the Z position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
 
@@ -242,7 +242,7 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 		{
 			modifyPosition(EnumAxis.X, -1, e.getModifiers());
 		});
-		btnNegX.setPreferredSize(new Dimension(62, 30));
+		btnNegX.setPreferredSize(new Dimension(62, 20));
 		btnNegX.setFont(defaultFont);
 		btnNegX.setToolTipText("<html>Decreases the X position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
 
@@ -250,7 +250,7 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 		{
 			modifyPosition(EnumAxis.Y, -1, e.getModifiers());
 		});
-		btnNegY.setPreferredSize(new Dimension(62, 30));
+		btnNegY.setPreferredSize(new Dimension(62, 20));
 		btnNegY.setFont(defaultFont);
 		btnNegY.setToolTipText("<html>Decreases the Y position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
 
@@ -258,7 +258,7 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 		{
 			modifyPosition(EnumAxis.Z, -1, e.getModifiers());
 		});
-		btnNegZ.setPreferredSize(new Dimension(62, 30));
+		btnNegZ.setPreferredSize(new Dimension(62, 20));
 		btnNegZ.setFont(defaultFont);
 		btnNegZ.setToolTipText("<html>Decreases the Z position.<br><b>Hold shift for decimals</b><br><b>Hold ctrl to also move the rotation origin</b></html>");
 	}

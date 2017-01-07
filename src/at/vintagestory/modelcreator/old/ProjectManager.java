@@ -129,7 +129,7 @@ public class ProjectManager
 	private static String[] getTextureLocations(IElementManager manager)
 	{
 		List<String> locations = new ArrayList<String>();
-		for (Element cuboid : manager.getAllElements())
+		for (Element cuboid : manager.getRootElements())
 		{
 			for (Face face : cuboid.getAllFaces())
 			{
@@ -146,7 +146,7 @@ public class ProjectManager
 	private static String[] getMetaLocations(IElementManager manager)
 	{
 		List<String> locations = new ArrayList<String>();
-		for (Element cuboid : manager.getAllElements())
+		for (Element cuboid : manager.getRootElements())
 		{
 			for (Face face : cuboid.getAllFaces())
 			{

@@ -9,17 +9,11 @@ public interface IElementManager
 {
 	public Element getSelectedElement();
 
-	public void setSelectedElement(int pos);
+	public void selectElementByOpenGLName(int pos);
 
-	public List<Element> getAllElements();
-
-	public Element getElement(int index);
-
-	public int getElementCount();
+	public List<Element> getRootElements();
 
 	public void clearElements();
-
-	public void updateName();
 
 	public void updateValues();
 
@@ -29,11 +23,9 @@ public interface IElementManager
 
 	public void setAmbientOcc(boolean occ);
 
-	public void addElement(Element e);
+	public void addElementAsChild(Element e);
 	
-	public void setParticle(String texture);
-	
-	public String getParticle();
-	
+	public void addRootElement(Element e);
+		
 	public void reset();
 }

@@ -3,18 +3,29 @@ package at.vintagestory.modelcreator.model;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_LINES;
+
+import java.util.ArrayList;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import at.vintagestory.modelcreator.enums.BlockFacing;
-import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.util.GameMath;
+import at.vintagestory.modelcreator.util.IntRef;
 import at.vintagestory.modelcreator.util.Mat4f;
 import org.newdawn.slick.Color;
 
 public class Element
 {
-	public  String name = "Cube";
-
+	static int nextOpenGlName = 0;
+	
+	public Element ParentElement;
+	public ArrayList<Element> ChildElements = new ArrayList<Element>();
+	
+	
+	public String name = "Cube";
+	
+	public int openGlName = 0;
+	
 	// Face Variables
 	protected int selectedFace = 0;
 	protected Face[] faces = new Face[6];
@@ -35,7 +46,7 @@ public class Element
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();
 	
-	protected float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 };
+	public float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 };
 
     /// <summary>
     /// Top, Front/Left, Back/Right, Bottom
@@ -60,11 +71,13 @@ public class Element
     };
     
     
+    
 	public Element(double width, double height, double depth)
 	{
 		this.width = width;
 		this.height = height;
 		this.depth = depth;
+		openGlName = nextOpenGlName++;
 		initFaces();
 		updateUV();
 		recalculateBrightnessValues();
@@ -72,6 +85,7 @@ public class Element
 	
 	public Element(double width, double height) {
 		name = "Face";
+		openGlName = nextOpenGlName++;
 		this.width = width;
 		this.height = height;
 		this.depth = 1;
@@ -84,9 +98,33 @@ public class Element
 		updateUV();
 		recalculateBrightnessValues();
 	}
+	
+	public Element(Element cuboid) {
+		this(cuboid, false);
+	}
 
-	public Element(Element cuboid)
+	public Element(Element cuboid, boolean keepName)
 	{
+		if (keepName) {
+			this.name = cuboid.name;
+		} else {	
+			String numberStr = "";
+			int pos = cuboid.name.length() - 1;
+			while (pos > 0) {
+				if (Character.isDigit(cuboid.name.charAt(pos))) {
+					numberStr = cuboid.name.charAt(pos) + numberStr;
+				} else break;
+				pos--;
+			}
+			
+			int number = numberStr.length() > 0 ? Integer.parseInt(numberStr) : 2;
+			
+			this.name = cuboid.name.substring(0, cuboid.name.length() - numberStr.length()) + number;
+		}
+		
+		
+		openGlName = nextOpenGlName++;
+		
 		this.width = cuboid.width;
 		this.height = cuboid.height;
 		this.depth = cuboid.depth;
@@ -119,8 +157,15 @@ public class Element
 			faces[i].setAutoUVEnabled(oldFace.isAutoUVEnabled());
 			faces[i].setRotation(oldFace.getRotation());
 		}
+		
+		for (Element child : cuboid.ChildElements) {
+			ChildElements.add(new Element(child, true));
+		}
+		
 		updateUV();
 		recalculateBrightnessValues();
+		
+		
 	}
 
 	public void initFaces()
@@ -243,17 +288,20 @@ public class Element
 	}
 	
 
-	public void draw()
+	public void draw(Element selectedEleme)
 	{
 		float b;
 		
 		GL11.glPushMatrix();
 		{
+			GL11.glLoadName(openGlName);
 			GL11.glEnable(GL_BLEND);
 			GL11.glDisable(GL_CULL_FACE);
 			GL11.glTranslated(originX, originY, originZ);
 			rotateAxis();
 			GL11.glTranslated(-originX, -originY, -originZ);
+			
+			GL11.glTranslated(startX, startY, startZ);
 			
 			for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
 				if (!faces[i].isEnabled()) continue;
@@ -264,127 +312,127 @@ public class Element
 								
 				faces[i].renderFace(BlockFacing.ALLFACES[i], b);
 			}
+			GL11.glLoadName(0);
+			
+			for (int i = 0; i < ChildElements.size(); i++) {
+				ChildElements.get(i).draw(selectedEleme);
+			}
+
 		}
 		GL11.glPopMatrix();
+		
+		if (selectedEleme == this) {
+			drawSelectionExtras();
+		}
+		
 	}
 
-	public void drawExtras(IElementManager manager)
+	public void drawSelectionExtras()
 	{
-		if (manager.getSelectedElement() == this)
+		GL11.glLineWidth(1f);
+		GL11.glPushMatrix();
 		{
-			/*GL11.glEnable(GL_BLEND);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			GL11.glLineWidth(0.5f);
-			GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);*/
-			GL11.glLineWidth(1f);
-			GL11.glPushMatrix();
+			GL11.glTranslated(originX, originY, originZ);
+			GL11.glColor3f(0.25F, 0.25F, 0.25F);
+			sphere.draw(0.2F, 16, 16);
+			rotateAxis();
+			GL11.glBegin(GL_LINES);
 			{
-				GL11.glTranslated(originX, originY, originZ);
-				GL11.glColor3f(0.25F, 0.25F, 0.25F);
-				sphere.draw(0.2F, 16, 16);
-				rotateAxis();
-				GL11.glBegin(GL_LINES);
-				{
-					// 3 Axes
-					GL11.glColor3f(1, 0, 0);
-					GL11.glVertex3f(-4, 0, 0);
-					GL11.glVertex3f(4, 0, 0);
-					
-					GL11.glVertex3f(4, 0, 0);
-					GL11.glVertex3f(3.6f, 0, 0.4f);
-					GL11.glVertex3f(4, 0, 0);
-					GL11.glVertex3f(3.6f, 0, -0.4f);
-					
-					GL11.glColor3f(0, 1, 0);
-					GL11.glVertex3f(0, -4, 0);
-					GL11.glVertex3f(0, 4, 0);
-					
-					GL11.glVertex3f(0, 4, 0);
-					GL11.glVertex3f(0, 3.6f, 0.4f);
-					
-					GL11.glVertex3f(0, 4, 0);
-					GL11.glVertex3f(0, 3.6f, -0.4f);
-					
-					GL11.glColor3f(0, 0, 1);
-					GL11.glVertex3f(0, 0, -4);
-					GL11.glVertex3f(0, 0, 4);
-					
-					GL11.glVertex3f(0, 0, 4);
-					GL11.glVertex3f(0.4f, 0, 3.6f);
-					
-					GL11.glVertex3f(0, 0, 4);
-					GL11.glVertex3f(-0.4f, 0, 3.6f);
-				}
-				GL11.glEnd();
+				// 3 Axes
+				GL11.glColor3f(1, 0, 0);
+				GL11.glVertex3f(-4, 0, 0);
+				GL11.glVertex3f(4, 0, 0);
+				
+				GL11.glVertex3f(4, 0, 0);
+				GL11.glVertex3f(3.6f, 0, 0.4f);
+				GL11.glVertex3f(4, 0, 0);
+				GL11.glVertex3f(3.6f, 0, -0.4f);
+				
+				GL11.glColor3f(0, 1, 0);
+				GL11.glVertex3f(0, -4, 0);
+				GL11.glVertex3f(0, 4, 0);
+				
+				GL11.glVertex3f(0, 4, 0);
+				GL11.glVertex3f(0, 3.6f, 0.4f);
+				
+				GL11.glVertex3f(0, 4, 0);
+				GL11.glVertex3f(0, 3.6f, -0.4f);
+				
+				GL11.glColor3f(0, 0, 1);
+				GL11.glVertex3f(0, 0, -4);
+				GL11.glVertex3f(0, 0, 4);
+				
+				GL11.glVertex3f(0, 0, 4);
+				GL11.glVertex3f(0.4f, 0, 3.6f);
+				
+				GL11.glVertex3f(0, 0, 4);
+				GL11.glVertex3f(-0.4f, 0, 3.6f);
 			}
-			GL11.glPopMatrix();
-
-			// Cube highlight
-			GL11.glPushMatrix();
-			{
-				GL11.glTranslated(originX, originY, originZ);
-				rotateAxis();
-				GL11.glTranslated(-originX, -originY, -originZ);
-				
-				GL11.glTranslated(startX, startY, startZ);
-				
-				GL11.glDisable(GL11.GL_DEPTH_TEST);
-				GL11.glBegin(GL11.GL_LINES);
-				{
-					GL11.glColor4f(0F, 0F, 0F, 0.5f);
-					
-					float w = (float)width;
-					float h = (float)height;
-					float d = (float)depth;
-					
-					GL11.glVertex3f(0, 0, 0);
-					GL11.glVertex3f(0, h, 0);
-					
-					GL11.glVertex3f(w, 0, 0);
-					GL11.glVertex3f(w, h, 0);
-
-					GL11.glVertex3f(w, 0, d);
-					GL11.glVertex3f(w, h, d);
-					
-					GL11.glVertex3f(0, 0, d);
-					GL11.glVertex3f(0, h, d);
-					
-					GL11.glVertex3f(0, h, 0);
-					GL11.glVertex3f(w, h, 0);
-					
-					GL11.glVertex3f(w, h, 0);
-					GL11.glVertex3f(w, h, d);
-					
-					GL11.glVertex3f(w, h, d);
-					GL11.glVertex3f(0, h, d);
-					
-					GL11.glVertex3f(0, h, d);
-					GL11.glVertex3f(0, h, 0);
-					
-					
-					GL11.glVertex3f(0, 0, 0);
-					GL11.glVertex3f(w, 0, 0);
-					
-					GL11.glVertex3f(w, 0, 0);
-					GL11.glVertex3f(w, 0, d);
-					
-					GL11.glVertex3f(w, 0, d);
-					GL11.glVertex3f(0, 0, d);
-					
-					GL11.glVertex3f(0, 0, d);
-					GL11.glVertex3f(0, 0, 0);
-				}
-				
-				GL11.glEnd();
-				GL11.glEnable(GL11.GL_DEPTH_TEST);
-			
-			}
-			GL11.glPopMatrix();
-			
-
-			
-
+			GL11.glEnd();
 		}
+		GL11.glPopMatrix();
+
+		// Cube highlight
+		GL11.glPushMatrix();
+		{
+			GL11.glTranslated(originX, originY, originZ);
+			rotateAxis();
+			GL11.glTranslated(-originX, -originY, -originZ);
+			
+			GL11.glTranslated(startX, startY, startZ);
+			
+			GL11.glDisable(GL11.GL_DEPTH_TEST);
+			GL11.glBegin(GL11.GL_LINES);
+			{
+				GL11.glColor4f(0F, 0F, 0F, 0.5f);
+				
+				float w = (float)width;
+				float h = (float)height;
+				float d = (float)depth;
+				
+				GL11.glVertex3f(0, 0, 0);
+				GL11.glVertex3f(0, h, 0);
+				
+				GL11.glVertex3f(w, 0, 0);
+				GL11.glVertex3f(w, h, 0);
+
+				GL11.glVertex3f(w, 0, d);
+				GL11.glVertex3f(w, h, d);
+				
+				GL11.glVertex3f(0, 0, d);
+				GL11.glVertex3f(0, h, d);
+				
+				GL11.glVertex3f(0, h, 0);
+				GL11.glVertex3f(w, h, 0);
+				
+				GL11.glVertex3f(w, h, 0);
+				GL11.glVertex3f(w, h, d);
+				
+				GL11.glVertex3f(w, h, d);
+				GL11.glVertex3f(0, h, d);
+				
+				GL11.glVertex3f(0, h, d);
+				GL11.glVertex3f(0, h, 0);
+				
+				
+				GL11.glVertex3f(0, 0, 0);
+				GL11.glVertex3f(w, 0, 0);
+				
+				GL11.glVertex3f(w, 0, 0);
+				GL11.glVertex3f(w, 0, d);
+				
+				GL11.glVertex3f(w, 0, d);
+				GL11.glVertex3f(0, 0, d);
+				
+				GL11.glVertex3f(0, 0, d);
+				GL11.glVertex3f(0, 0, 0);
+			}
+			
+			GL11.glEnd();
+			GL11.glEnable(GL11.GL_DEPTH_TEST);
+		
+		}
+		GL11.glPopMatrix();		
 	}
 
 	@Override
@@ -429,7 +477,7 @@ public class Element
 	{
 		this.startZ += amt;
 	}
-
+	
 	public double getStartX()
 	{
 		return startX;
@@ -444,6 +492,8 @@ public class Element
 	{
 		return startZ;
 	}
+
+	
 
 	public void setStartX(double amt)
 	{
@@ -609,5 +659,6 @@ public class Element
 	{
 		this.name = name;
 	}
+	
 
 }

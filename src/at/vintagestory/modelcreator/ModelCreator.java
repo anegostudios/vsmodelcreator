@@ -228,7 +228,7 @@ public class ModelCreator extends JFrame
 		Icons.init(getClass());
 		setupMenuBar();
 
-		canvas.setPreferredSize(new Dimension(1000, 790));
+		canvas.setPreferredSize(new Dimension(1000, 850));
 		add(canvas, BorderLayout.CENTER);
 
 		canvas.setFocusable(true);
@@ -351,11 +351,11 @@ public class ModelCreator extends JFrame
 				{
 					if (Mouse.isButtonDown(0) | Mouse.isButtonDown(1))
 					{
-						int sel = select(Mouse.getX(), Mouse.getY());
-						if (sel >= 0)
+						int openGlName = getElementGLNameAtPos(Mouse.getX(), Mouse.getY());
+						if (openGlName >= 0)
 						{
-							grabbed = manager.getAllElements().get(sel);
-							manager.setSelectedElement(sel);
+							manager.selectElementByOpenGLName(openGlName);
+							grabbed = manager.getSelectedElement();
 						}
 					}
 				}
@@ -488,7 +488,7 @@ public class ModelCreator extends JFrame
 		}
 	}
 
-	public int select(int x, int y)
+	public int getElementGLNameAtPos(int x, int y)
 	{
 		IntBuffer selBuffer = ByteBuffer.allocateDirect(1024).order(ByteOrder.nativeOrder()).asIntBuffer();
 		int[] buffer = new int[256];
@@ -519,22 +519,19 @@ public class ModelCreator extends JFrame
 		selBuffer.get(buffer);
 		if (hits > 0)
 		{
-			int choose = buffer[3];
+			int name = buffer[3];
 			int depth = buffer[1];
-
+			
 			for (int i = 1; i < hits; i++)
 			{
-				if ((buffer[i * 4 + 1] < depth || choose == 0) && buffer[i * 4 + 3] != 0)
+				if ((buffer[i * 4 + 1] < depth || name == 0) && buffer[i * 4 + 3] != 0)
 				{
-					choose = buffer[i * 4 + 3];
+					name = buffer[i * 4 + 3];
 					depth = buffer[i * 4 + 1];
 				}
 			}
 
-			if (choose > 0)
-			{
-				return choose - 1;
-			}
+			return name;
 		}
 
 		return -1;

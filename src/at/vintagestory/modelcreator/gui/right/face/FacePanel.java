@@ -29,7 +29,7 @@ public class FacePanel extends JPanel implements IValueUpdater
 	private JPanel sliderPanel;
 	private JSlider rotation;
 	private FaceTexturePanel panelTexture;
-	private FaceExtrasPanel panelFaceExtras;
+	private FacePropertiesPanel panelFaceExtras;
 
 	//private JPanel panelModId;
 	//private JTextField modidField;
@@ -80,7 +80,7 @@ public class FacePanel extends JPanel implements IValueUpdater
 
 		panelTexture = new FaceTexturePanel(manager);
 		panelUV = new FaceUVPanel(manager);
-		panelFaceExtras = new FaceExtrasPanel(manager);
+		panelFaceExtras = new FacePropertiesPanel(manager);
 
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 		labelTable.put(new Integer(0), new JLabel("0\u00b0"));

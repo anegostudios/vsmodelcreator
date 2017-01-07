@@ -65,6 +65,8 @@ public class Importer
 				e.printStackTrace();
 			}
 		}
+		
+		manager.updateValues();
 	}
 
 	private void readComponents(BufferedReader reader, IElementManager manager, File dir) throws IOException
@@ -114,9 +116,11 @@ public class Importer
 
 				for (int i = 0; i < elements.size(); i++)
 				{
-					if (elements.get(i).isJsonObject())
-					{
-						readElement(elements.get(i).getAsJsonObject(), manager);
+					if (!elements.get(i).isJsonObject()) continue;
+					
+					Element elem = readElement(elements.get(i).getAsJsonObject(), manager);
+					if (elem != null) {
+						manager.addRootElement(elem);
 					}
 				}
 			}
@@ -127,6 +131,8 @@ public class Importer
 				manager.setAmbientOcc(obj.get("ambientocclusion").getAsBoolean());
 			}
 		}
+		
+		
 	}
 
 	private void loadTextures(File file, JsonObject obj)
@@ -146,15 +152,8 @@ public class Importer
 						textureMap.put(entry.getKey(), textureMap.get(texture.replace("#", "")));
 					}
 					else
-					{
-						if (entry.getKey().equals("particle"))
-						{
-							manager.setParticle(texture);
-						}
-						else
-						{
-							textureMap.put(entry.getKey().replace("#", ""), texture);
-						}
+					{						
+						textureMap.put(entry.getKey().replace("#", ""), texture);
 					}
 					loadTexture(file, texture);
 				}
@@ -165,15 +164,15 @@ public class Importer
 	private void loadTexture(File dir, String texture)
 	{
 		File assets = dir.getParentFile().getParentFile();
-		System.out.println("1." + assets.getAbsolutePath());
+		//System.out.println("1." + assets.getAbsolutePath());
 		if (assets != null)
 		{
 			File textureDir = new File(assets, "textures/");
-			System.out.println("3." + textureDir.getAbsolutePath());
+			//System.out.println("3." + textureDir.getAbsolutePath());
 			if (textureDir.exists() && textureDir.isDirectory())
 			{
 				File textureFile = new File(textureDir, texture + ".png");
-				System.out.println("4." + textureFile.getAbsolutePath());
+				//System.out.println("4." + textureFile.getAbsolutePath());
 				if (textureFile.exists() && textureFile.isFile())
 				{
 					manager.addPendingTexture(new PendingTexture(textureFile));
@@ -190,7 +189,7 @@ public class Importer
 		}
 	}
 
-	private void readElement(JsonObject obj, IElementManager manager)
+	private Element readElement(JsonObject obj, IElementManager manager)
 	{
 		String name = "Element";
 		JsonArray from = null;
@@ -283,9 +282,22 @@ public class Importer
 				}
 			}
 
-			manager.addElement(element);
+			if (obj.has("children") && obj.get("children").isJsonArray()) {
+				JsonArray children = obj.get("children").getAsJsonArray();
+				for(JsonElement child : children) {
+					if (child.isJsonObject()) {
+						element.ChildElements.add(readElement(child.getAsJsonObject(), manager));
+					}
+				}
+			
+			}
+			
+			return element;
 		}
+		
+		return null;
 	}
+	
 
 	private void readFace(JsonObject obj, String name, Element element)
 	{

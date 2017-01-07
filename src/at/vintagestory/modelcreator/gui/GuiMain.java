@@ -155,7 +155,7 @@ public class GuiMain extends JMenuBar
 			int returnVal = chooser.showOpenDialog(null);
 			if (returnVal == JFileChooser.APPROVE_OPTION)
 			{
-				if (creator.getElementManager().getElementCount() > 0)
+				if (creator.getElementManager().getRootElements().size() > 0)
 				{
 					returnVal = JOptionPane.showConfirmDialog(null, "Your current project will be cleared, are you sure you want to continue?", "Warning", JOptionPane.YES_NO_OPTION);
 				}
@@ -325,12 +325,12 @@ public class GuiMain extends JMenuBar
 		
 		itemAddCube.addActionListener(a ->
 		{
-			creator.getElementManager().addElement(new Element(1, 1, 1));
+			creator.getElementManager().addElementAsChild(new Element(1, 1, 1));
 		});
 		
 		itemAddFace.addActionListener(a ->
 		{
-			creator.getElementManager().addElement(new Element(1, 1));
+			creator.getElementManager().addElementAsChild(new Element(1, 1));
 		});
 
 	}

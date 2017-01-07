@@ -23,6 +23,7 @@ public class Icons
 	public static Icon disk;
 	public static Icon exit;
 	public static Icon cube;
+	public static Icon smallcube;
 	public static Icon light_on;
 	public static Icon light_off;
 	public static Icon arrow_up;
@@ -50,6 +51,7 @@ public class Icons
 		ClassLoader loader = clazz.getClassLoader();
 		
 		cube = new ImageIcon(loader.getResource("icons/cube.png"));
+		smallcube = new ImageIcon(loader.getResource("icons/smallcube.png"));
 		bin = new ImageIcon(loader.getResource("icons/bin.png"));
 		bin_open = new ImageIcon(loader.getResource("icons/bin_open.png"));
 		add = new ImageIcon(loader.getResource("icons/add.png"));

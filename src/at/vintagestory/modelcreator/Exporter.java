@@ -60,21 +60,30 @@ public class Exporter
 
 	private void compileTextureList()
 	{
-		for (Element cuboid : manager.getAllElements())
+		for (Element cuboid : manager.getRootElements())
 		{
-			for (Face face : cuboid.getAllFaces())
+			compileTextureList(cuboid);
+		}
+	}
+	
+	private void compileTextureList(Element elem) {
+		for (Face face : elem.getAllFaces())
+		{
+			if (face.getTextureName() != null && !face.getTextureName().equals("null"))
 			{
-				System.out.println(face.getTextureLocation() + " " + face.getTextureName());
-				if (face.getTextureName() != null && !face.getTextureName().equals("null"))
+				if (!textureList.contains(face.getTextureLocation() + face.getTextureName()))
 				{
-					if (!textureList.contains(face.getTextureLocation() + face.getTextureName()))
-					{
-						textureList.add(face.getTextureLocation() + face.getTextureName());
-					}
+					textureList.add(face.getTextureLocation() + face.getTextureName());
 				}
 			}
 		}
+		
+		for (Element childelem : elem.ChildElements) {
+			compileTextureList(childelem);
+		}
 	}
+	
+	
 
 	private void writeComponents(BufferedWriter writer, IElementManager manager) throws IOException
 	{
@@ -88,16 +97,16 @@ public class Exporter
 		writeTextures(writer);
 		writer.newLine();
 		writer.write(space(1) + "\"elements\": [");
-		for (int i = 0; i < manager.getElementCount(); i++)
+		
+		List<Element> elems = manager.getRootElements();
+		
+		for (int i = 0; i < elems.size(); i++)
 		{
-			writer.newLine();
-			writer.write(space(2) + "{");
-			writer.newLine();
-			writeElement(writer, manager.getElement(i));
-			writer.newLine();
-			writer.write(space(2) + "}");
-			if (i != manager.getElementCount() - 1)
+			writeElement(writer, elems.get(i), 2);
+			
+			if (i != elems.size() - 1) {
 				writer.write(",");
+			}
 		}
 		writer.newLine();
 		writer.write(space(1) + "]");
@@ -109,15 +118,7 @@ public class Exporter
 	{
 		writer.write(space(1) + "\"textures\": {");
 		writer.newLine();
-		if (manager.getParticle() != null)
-		{
-			writer.write(space(2) + "\"particle\": \"blocks/" + manager.getParticle() + "\"");
-			if (textureList.size() > 0)
-			{
-				writer.write(",");
-			}
-			writer.newLine();
-		}
+		
 		for (String texture : textureList)
 		{
 			writer.write(space(2) + "\"" + textureList.indexOf(texture) + "\": \"" + texture + "\"");
@@ -130,59 +131,79 @@ public class Exporter
 		writer.write(space(1) + "},");
 	}
 
-	private void writeElement(BufferedWriter writer, Element cuboid) throws IOException
+	private void writeElement(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
-		writer.write(space(3) + "\"name\": \"" + cuboid.toString() + "\",");
 		writer.newLine();
-		writeBounds(writer, cuboid);
+		writer.write(space(indentation) + "{");
+		writer.newLine();
+		
+		indentation++;
+		
+		writer.write(space(indentation) + "\"name\": \"" + cuboid.toString() + "\",");
+		writer.newLine();
+		writeBounds(writer, cuboid, indentation);
 		writer.newLine();
 		if (!cuboid.isShaded())
 		{
-			writeShade(writer, cuboid);
+			writeShade(writer, cuboid, indentation);
 			writer.newLine();
 		}
 		if (cuboid.getRotationX() != 0 || cuboid.getRotationY() != 0 || cuboid.getRotationZ() != 0)
 		{
-			writeRotation(writer, cuboid);
+			writeRotation(writer, cuboid, indentation);
 		}
-		writeFaces(writer, cuboid);
-
-	}
-
-	private void writeBounds(BufferedWriter writer, Element cuboid) throws IOException
-	{
-		writer.write(space(3) + "\"from\": [ " + cuboid.getStartX() + ", " + cuboid.getStartY() + ", " + cuboid.getStartZ() + " ], ");
+		writeFaces(writer, cuboid, indentation);
+		
+		if (cuboid.ChildElements.size() > 0) {
+			writer.write(",");
+			writer.newLine();
+			writer.write(space(indentation) + "\"children\": [");
+			
+			for (int i = 0; i < cuboid.ChildElements.size(); i++) {
+				if (i > 0) writer.write(",");
+				writeElement(writer, cuboid.ChildElements.get(i), indentation + 1);
+			}
+			
+			writer.newLine();
+			writer.write(space(indentation) + "]");
+		}
+		
+		indentation--;
+		
 		writer.newLine();
-		writer.write(space(3) + "\"to\": [ " + (cuboid.getStartX() + cuboid.getWidth()) + ", " + (cuboid.getStartY() + cuboid.getHeight()) + ", " + (cuboid.getStartZ() + cuboid.getDepth()) + " ], ");
+		writer.write(space(indentation) + "}");
+
 	}
 
-	private void writeShade(BufferedWriter writer, Element cuboid) throws IOException
+	private void writeBounds(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
-		writer.write(space(3) + "\"shade\": " + cuboid.isShaded() + ",");
-	}
-
-	private void writeRotation(BufferedWriter writer, Element cuboid) throws IOException
-	{
-		writer.write(space(3) + "\"rotationOrigin\": [ " + cuboid.getOriginX() + ", " + cuboid.getOriginY() + ", " + cuboid.getOriginZ() + " ],");
+		writer.write(space(indentation) + "\"from\": [ " + cuboid.getStartX() + ", " + cuboid.getStartY() + ", " + cuboid.getStartZ() + " ], ");
 		writer.newLine();
-		if (cuboid.getRotationX() != 0) { writer.write(space(3) + "\"rotationX\": " + cuboid.getRotationX() + ","); writer.newLine(); }
-		if (cuboid.getRotationY() != 0) { writer.write(space(3) + "\"rotationY\": " + cuboid.getRotationY() + ","); writer.newLine(); }
-		if (cuboid.getRotationZ() != 0) { writer.write(space(3) + "\"rotationZ\": " + cuboid.getRotationZ() + ","); writer.newLine(); }
-
-		/*if (cuboid.shouldRescale())
-		{
-			writer.write(", \"rescale\": " + cuboid.shouldRescale());
-		}*/
+		writer.write(space(indentation) + "\"to\": [ " + (cuboid.getStartX() + cuboid.getWidth()) + ", " + (cuboid.getStartY() + cuboid.getHeight()) + ", " + (cuboid.getStartZ() + cuboid.getDepth()) + " ], ");
 	}
 
-	private void writeFaces(BufferedWriter writer, Element cuboid) throws IOException
+	private void writeShade(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
-		writer.write(space(3) + "\"faces\": {");
+		writer.write(space(indentation) + "\"shade\": " + cuboid.isShaded() + ",");
+	}
+
+	private void writeRotation(BufferedWriter writer, Element cuboid, int indentation) throws IOException
+	{
+		writer.write(space(indentation) + "\"rotationOrigin\": [ " + cuboid.getOriginX() + ", " + cuboid.getOriginY() + ", " + cuboid.getOriginZ() + " ],");
+		writer.newLine();
+		if (cuboid.getRotationX() != 0) { writer.write(space(indentation) + "\"rotationX\": " + cuboid.getRotationX() + ","); writer.newLine(); }
+		if (cuboid.getRotationY() != 0) { writer.write(space(indentation) + "\"rotationY\": " + cuboid.getRotationY() + ","); writer.newLine(); }
+		if (cuboid.getRotationZ() != 0) { writer.write(space(indentation) + "\"rotationZ\": " + cuboid.getRotationZ() + ","); writer.newLine(); }
+	}
+
+	private void writeFaces(BufferedWriter writer, Element cuboid, int indentation) throws IOException
+	{
+		writer.write(space(indentation) + "\"faces\": {");
 		writer.newLine();
 		for (Face face : cuboid.getAllFaces())
 		{
 			if (face.getExists()) {
-				writer.write(space(4) + "\"" + Face.getFaceName(face.getSide()) + "\": { ");
+				writer.write(space(indentation + 1) + "\"" + Face.getFaceName(face.getSide()) + "\": { ");
 				writer.write("\"texture\": \"#" + textureList.indexOf(face.getTextureLocation() + face.getTextureName()) + "\"");
 				writer.write(", \"uv\": [ " + face.getStartU() + ", " + face.getStartV() + ", " + face.getEndU() + ", " + face.getEndV() + " ]");
 				if (face.getRotation() > 0)
@@ -205,7 +226,7 @@ public class Exporter
 			}
 		}
 		writer.newLine();
-		writer.write(space(3) + "}");
+		writer.write(space(indentation) + "}");
 	}
 
 	/*

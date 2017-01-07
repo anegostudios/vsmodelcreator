@@ -13,7 +13,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
 
-public class ElementExtraPanel extends JPanel implements IValueUpdater
+public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 {
 	private static final long serialVersionUID = 1L;
 
@@ -21,11 +21,11 @@ public class ElementExtraPanel extends JPanel implements IValueUpdater
 
 	private JRadioButton btnShade;
 
-	public ElementExtraPanel(IElementManager manager)
+	public ElementPropertiesPanel(IElementManager manager)
 	{
 		this.manager = manager;
 		setLayout(new GridLayout(1, 2));
-		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Extras</b></html>"));
+		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Element Properties</b></html>"));
 		setMaximumSize(new Dimension(186, 50));
 		initComponents();
 		addComponents();

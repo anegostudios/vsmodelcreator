@@ -16,7 +16,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
 
-public class FaceExtrasPanel extends JPanel implements IValueUpdater
+public class FacePropertiesPanel extends JPanel implements IValueUpdater
 {
 	private static final long serialVersionUID = 1L;
 
@@ -27,11 +27,11 @@ public class FaceExtrasPanel extends JPanel implements IValueUpdater
 	private JRadioButton boxAutoUV;
 	private JTextField glowValue;
 
-	public FaceExtrasPanel(IElementManager manager)
+	public FacePropertiesPanel(IElementManager manager)
 	{
 		this.manager = manager;
 		setLayout(new BorderLayout(0, 5));
-		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Extras</b></html>"));
+		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Properties</b></html>"));
 		setMaximumSize(new Dimension(186, 100));
 		initComponents();
 		addComponents();

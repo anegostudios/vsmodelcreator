@@ -34,10 +34,10 @@ public class Face
         1, 0, 0,
 
         // East face
+        1, 0,  1,     // bot right
         1, 0, 0,     // bot left
         1,  1, 0,     // top left
         1,  1,  1,     // top right
-        1, 0,  1,     // bot right
 
         // South face
         0, 0,  1,
@@ -52,10 +52,10 @@ public class Face
         0,  1, 0,
         
         // Top face
-        0,  1, 0,
         0,  1,  1,
         1,  1,  1,
         1,  1, 0,
+        0,  1, 0,
                       
         // Bottom face
         0, 0, 0,
@@ -117,7 +117,7 @@ public class Face
 			{
 				for (int j = 0; j < 4; j++) {
 					if (binded) setTexCoord(j);
-					GL11.glVertex3d(cuboid.getStartX() + cuboid.getWidth() * CubeVertices[i++], cuboid.getStartY() + cuboid.getHeight() * CubeVertices[i++], cuboid.getStartZ() + cuboid.getDepth() * CubeVertices[i++]);					
+					GL11.glVertex3d(cuboid.getWidth() * CubeVertices[i++], cuboid.getHeight() * CubeVertices[i++], cuboid.getDepth() * CubeVertices[i++]);					
 				}
 			}
 			GL11.glEnd();

@@ -46,9 +46,9 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 	public RotationOriginPanel(IElementManager manager)
 	{
 		this.manager = manager;
-		setLayout(new GridLayout(3, 3, 4, 4));
+		setLayout(new GridLayout(3, 3, 4, 0));
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Origin</b></html>"));
-		setMaximumSize(new Dimension(186, 124));
+		setMaximumSize(new Dimension(186, 104));
 		initComponents();
 		initProperties();
 		addComponents();
@@ -193,12 +193,13 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 				modifyPosition(EnumAxis.Z, e.getWheelRotation() > 0 ? 1 : -1, e.getModifiers());				
 			}
 		});
+		
 
 		btnPlusX.addActionListener(e ->
 		{
 			modifyPosition(EnumAxis.X, 1, e.getModifiers());
 		});
-		btnPlusX.setPreferredSize(new Dimension(62, 30));
+		btnPlusX.setPreferredSize(new Dimension(62, 20));
 		btnPlusX.setFont(defaultFont);
 		btnPlusX.setToolTipText("<html>Increases the X origin.<br><b>Hold shift for decimals</b></html>");
 
@@ -207,7 +208,7 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 		{
 			modifyPosition(EnumAxis.Y, 1, e.getModifiers());
 		});
-		btnPlusY.setPreferredSize(new Dimension(62, 30));
+		btnPlusY.setPreferredSize(new Dimension(62, 20));
 		btnPlusY.setFont(defaultFont);
 		btnPlusY.setToolTipText("<html>Increases the Y origin.<br><b>Hold shift for decimals</b></html>");
 
@@ -215,7 +216,7 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 		{
 			modifyPosition(EnumAxis.Z, 1, e.getModifiers());
 		});
-		btnPlusZ.setPreferredSize(new Dimension(62, 30));
+		btnPlusZ.setPreferredSize(new Dimension(62, 20));
 		btnPlusZ.setFont(defaultFont);
 		btnPlusZ.setToolTipText("<html>Increases the Z origin.<br><b>Hold shift for decimals</b></html>");
 
@@ -223,7 +224,7 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 		{
 			modifyPosition(EnumAxis.X, -1, e.getModifiers());
 		});
-		btnNegX.setPreferredSize(new Dimension(62, 30));
+		btnNegX.setPreferredSize(new Dimension(62, 20));
 		btnNegX.setFont(defaultFont);
 		btnNegX.setToolTipText("<html>Decreases the X origin.<br><b>Hold shift for decimals</b></html>");
 
@@ -231,7 +232,7 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 		{
 			modifyPosition(EnumAxis.Y, -1, e.getModifiers());
 		});
-		btnNegY.setPreferredSize(new Dimension(62, 30));
+		btnNegY.setPreferredSize(new Dimension(62, 20));
 		btnNegY.setFont(defaultFont);
 		btnNegY.setToolTipText("<html>Decreases the Y origin.<br><b>Hold shift for decimals</b></html>");
 
@@ -239,7 +240,7 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 		{
 			modifyPosition(EnumAxis.Z, -1, e.getModifiers());
 		});
-		btnNegZ.setPreferredSize(new Dimension(62, 30));
+		btnNegZ.setPreferredSize(new Dimension(62, 20));
 		btnNegZ.setFont(defaultFont);
 		btnNegZ.setToolTipText("<html>Decreases the Z origin.<br><b>Hold shift for decimals</b></html>");
 	}

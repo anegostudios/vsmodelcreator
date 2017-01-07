@@ -1,45 +1,36 @@
 package at.vintagestory.modelcreator.gui.right;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.*;
+import javax.swing.tree.*;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.gui.CuboidTabbedPane;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.gui.right.element.ElementPanel;
 import at.vintagestory.modelcreator.gui.right.face.FacePanel;
-import at.vintagestory.modelcreator.gui.right.rotation.RotationPanel;
+import at.vintagestory.modelcreator.gui.right.keyframes.KeyFramesPanel;
+import at.vintagestory.modelcreator.gui.right.rotation.ElementRotationPanel;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.PendingTexture;
 
-public class RightTopPanel extends JPanel implements IElementManager
-{
+public class RightTopPanel extends JPanel implements IElementManager {
 	private static final long serialVersionUID = 1L;
 
 	private ModelCreator creator;
 
 	// Swing Variables
 	private SpringLayout layout;
-	private DefaultListModel<Element> model = new DefaultListModel<Element>();
-	private JList<Element> list = new JList<Element>();
 	private JScrollPane scrollPane;
 	private JPanel btnContainer;
 	private JButton btnAdd = new JButton();
@@ -47,33 +38,34 @@ public class RightTopPanel extends JPanel implements IElementManager
 	private JButton btnDuplicate = new JButton();
 	private JTextField name = new JTextField();
 	private CuboidTabbedPane tabbedPane = new CuboidTabbedPane(this);
-
-	private String particle = null;
-	//private String particleLocation = null;
 	private boolean ambientOcc = true;
 
+	public ElementTree tree;
+	
 	public RightTopPanel(ModelCreator creator)
 	{
 		this.creator = creator;
 		setLayout(layout = new SpringLayout());
-		setPreferredSize(new Dimension(200, 800));
+		setPreferredSize(new Dimension(215, 900));
 		initComponents();
 		setLayoutConstaints();
 	}
 
 	public void initComponents()
 	{
+		tree = new ElementTree();
+		
 		Font defaultFont = new Font("SansSerif", Font.BOLD, 14);
 
 		btnContainer = new JPanel(new GridLayout(1, 3, 4, 0));
-		btnContainer.setPreferredSize(new Dimension(190, 30));
+		btnContainer.setPreferredSize(new Dimension(205, 30));
 
 		btnAdd.setIcon(Icons.cube);
 		btnAdd.setToolTipText("New Element");
 		btnAdd.addActionListener(e ->
 		{
-			model.addElement(new Element(1, 1, 1));
-			list.setSelectedIndex(model.size() - 1);
+			tree.addElementAsChild(new Element(1,1,1));
+			updateValues();
 		});
 		btnAdd.setPreferredSize(new Dimension(30, 30));
 		btnContainer.add(btnAdd);
@@ -82,15 +74,8 @@ public class RightTopPanel extends JPanel implements IElementManager
 		btnRemove.setToolTipText("Remove Element");
 		btnRemove.addActionListener(e ->
 		{
-			int selected = list.getSelectedIndex();
-			if (selected != -1)
-			{
-				model.remove(selected);
-				name.setText("");
-				name.setEnabled(false);
-				tabbedPane.updateValues();
-				list.setSelectedIndex(selected);
-			}
+			tree.removeCurrentElement();
+			updateValues();
 		});
 		btnRemove.setPreferredSize(new Dimension(30, 30));
 		btnContainer.add(btnRemove);
@@ -99,11 +84,9 @@ public class RightTopPanel extends JPanel implements IElementManager
 		btnDuplicate.setToolTipText("Duplicate Element");
 		btnDuplicate.addActionListener(e ->
 		{
-			int selected = list.getSelectedIndex();
-			if (selected != -1)
-			{
-				model.addElement(new Element(model.getElementAt(selected)));
-				list.setSelectedIndex(model.getSize() - 1);
+			Element elem = tree.getSelectedElement();
+			if (elem != null) {
+				tree.addElementAsSibling(new Element(elem));
 			}
 		});
 		btnDuplicate.setFont(defaultFont);
@@ -111,53 +94,47 @@ public class RightTopPanel extends JPanel implements IElementManager
 		btnContainer.add(btnDuplicate);
 		add(btnContainer);
 
-		name.setPreferredSize(new Dimension(190, 30));
+		name.setPreferredSize(new Dimension(205, 25));
 		name.setToolTipText("Element Name");
 		name.setEnabled(false);
+
 		name.addKeyListener(new KeyAdapter()
 		{
 			@Override
-			public void keyPressed(KeyEvent e)
+			public void keyReleased(KeyEvent e)
 			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					updateName();
+				Element elem = tree.getSelectedElement();
+				if (elem != null) {
+					elem.name = name.getText();
 				}
-			}
-		});
-		name.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				updateName();
+				tree.jtree.updateUI();
 			}
 		});
 		add(name);
+		
 
-		list.setModel(model);
-		list.addListSelectionListener(e ->
+		tree.jtree.addTreeSelectionListener(new TreeSelectionListener()
 		{
-			Element cube = getSelectedElement();
-			
-			if (cube != null)
+			@Override
+			public void valueChanged(TreeSelectionEvent e)
 			{
-				tabbedPane.updateValues();
-				name.setEnabled(true);
-				name.setText(cube.toString());
+				updateValues();
 			}
 		});
+		
 
-		scrollPane = new JScrollPane(list);
-		scrollPane.setPreferredSize(new Dimension(190, 170));
+		add(tree.jtree);
+
+		scrollPane = new JScrollPane(tree.jtree);
+		scrollPane.setPreferredSize(new Dimension(205, 240));
 		add(scrollPane);
 
 		tabbedPane.setBackground(new Color(127, 132, 145));
 		tabbedPane.setForeground(Color.WHITE);
 		tabbedPane.add("Element", new ElementPanel(this));
-		tabbedPane.add("Rotation", new RotationPanel(this));
 		tabbedPane.add("Faces", new FacePanel(this));
-		tabbedPane.setPreferredSize(new Dimension(190, 540));
+		tabbedPane.add("Keyframes", new KeyFramesPanel(this));
+		tabbedPane.setPreferredSize(new Dimension(205, 600));
 		tabbedPane.setTabPlacement(JTabbedPane.TOP);
 		tabbedPane.addChangeListener(c ->
 		{
@@ -175,72 +152,42 @@ public class RightTopPanel extends JPanel implements IElementManager
 
 	public void setLayoutConstaints()
 	{
-		layout.putConstraint(SpringLayout.NORTH, name, 212, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.NORTH, btnContainer, 176, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.NORTH, tabbedPane, 250, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, name, 212 + 70, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, btnContainer, 176 + 70, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, tabbedPane, 250 + 70, SpringLayout.NORTH, this);
 	}
 
 	@Override
 	public Element getSelectedElement()
 	{
-		int i = list.getSelectedIndex();
-		if (i != -1)
-			return (Element) model.getElementAt(i);
-		return null;
+		return tree.getSelectedElement();
 	}
 
 	@Override
-	public void setSelectedElement(int pos)
+	public void selectElementByOpenGLName(int pos)
 	{
-		if (pos < model.size())
-		{
-			list.setSelectedIndex(pos);
-			updateValues();
-		}
+		tree.selectElementByOpenGLName(pos);
+		updateValues();
 	}
 
 	@Override
-	public List<Element> getAllElements()
+	public List<Element> getRootElements()
 	{
-		List<Element> list = new ArrayList<Element>();
-		for (int i = 0; i < model.size(); i++)
-		{
-			list.add(model.getElementAt(i));
-		}
-		return list;
+		return tree.GetRootElements();
 	}
 
-	@Override
-	public Element getElement(int index)
-	{
-		return model.getElementAt(index);
-	}
 
-	@Override
-	public int getElementCount()
-	{
-		return model.size();
-	}
-
-	@Override
-	public void updateName()
-	{
-		String newName = name.getText();
-		if (newName.isEmpty())
-			newName = "Cuboid";
-		Element cube = getSelectedElement();
-		if (cube != null)
-		{
-			cube.name = newName;
-			name.setText(newName);
-			list.updateUI();
-		}
-	}
 
 	@Override
 	public void updateValues()
 	{
 		tabbedPane.updateValues();
+		Element cube = getSelectedElement();
+		if (cube != null)
+		{
+			name.setText(cube.name);
+		}
+		name.setEnabled(cube != null);
 	}
 
 	@Override
@@ -269,32 +216,31 @@ public class RightTopPanel extends JPanel implements IElementManager
 	@Override
 	public void clearElements()
 	{
-		model.clear();
+		tree.clearElements();
+		updateValues();
 	}
 
 	@Override
-	public void addElement(Element e)
+	public void addElementAsChild(Element e)
 	{
-		model.addElement(e);
+		tree.addElementAsChild(e);
+		updateValues();
+		tree.jtree.updateUI();
+	}
+	
+	@Override
+	public void addRootElement(Element e)
+	{
+		tree.addRootElement(e);
+		updateValues();
+		tree.jtree.updateUI();
 	}
 
-	@Override
-	public void setParticle(String texture)
-	{
-		this.particle = texture;
-	}
-
-	@Override
-	public String getParticle()
-	{
-		return particle;
-	}
 
 	@Override
 	public void reset()
 	{
 		clearElements();
 		ambientOcc = true;
-		particle = null;
 	}
 }

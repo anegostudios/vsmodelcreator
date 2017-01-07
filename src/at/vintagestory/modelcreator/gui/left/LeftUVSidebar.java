@@ -24,6 +24,7 @@ import org.newdawn.slick.opengl.TextureImpl;
 
 import at.vintagestory.modelcreator.enums.EnumFonts;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
+import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
 
 public class LeftUVSidebar extends LeftSidebar
@@ -37,6 +38,8 @@ public class LeftUVSidebar extends LeftSidebar
 	private int[] startX = { 0, 0, 0, 0, 0, 0 };
 	private int[] startY = { 0, 0, 0, 0, 0, 0 };
 
+	float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 }; 
+	
 	public LeftUVSidebar(String title, IElementManager manager)
 	{
 		super(title);
@@ -48,18 +51,19 @@ public class LeftUVSidebar extends LeftSidebar
 	{
 		super.draw(sidebarWidth, canvasWidth, canvasHeight, frameHeight);
 
+		Element elem = manager.getSelectedElement();
+		
+		float[] bright = elem != null ? elem.brightnessByFace : brightnessByFace;
+		
 		glPushMatrix();
 		{
 			glTranslatef(10, 30, 0);
 
 			int count = 0;
 
-			for (int i = 0; i < 6; i++)
-			{
-				glPushMatrix();
-				{
-					if (30 + i * (LENGTH + 10) + (LENGTH + 10) > canvasHeight)
-					{
+			for (int i = 0; i < 6; i++) {
+				glPushMatrix(); {
+					if (30 + i * (LENGTH + 10) + (LENGTH + 10) > canvasHeight) {
 						glTranslatef(10 + LENGTH, count * (LENGTH + 10), 0);
 						startX[i] = 20 + LENGTH;
 						startY[i] = count * (LENGTH + 10) + 40;
@@ -73,11 +77,12 @@ public class LeftUVSidebar extends LeftSidebar
 					}
 
 					Color color = Face.getFaceColour(i);
-					glColor3f(color.getRed(), color.getGreen(), color.getBlue());
+					glColor3f(color.r * bright[i], color.g * bright[i], color.b * bright[i]);
 
 					Face[] faces = null;
-					if (manager.getSelectedElement() != null)
-						faces = manager.getSelectedElement().getAllFaces();
+					if (elem != null) {
+						faces = elem.getAllFaces();
+					}
 
 					if (faces != null)
 					{

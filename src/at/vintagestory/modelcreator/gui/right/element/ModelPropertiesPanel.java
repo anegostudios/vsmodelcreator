@@ -12,7 +12,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
 
-public class ElementGlobalPanel extends JPanel implements IValueUpdater
+public class ModelPropertiesPanel extends JPanel implements IValueUpdater
 {
 	private static final long serialVersionUID = 1L;
 
@@ -21,11 +21,11 @@ public class ElementGlobalPanel extends JPanel implements IValueUpdater
 	private JRadioButton ambientOcc;
 	//private JButton btnParticle;
 
-	public ElementGlobalPanel(IElementManager manager)
+	public ModelPropertiesPanel(IElementManager manager)
 	{
 		this.manager = manager;
 		setLayout(new GridLayout(2, 1, 0, 5));
-		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Global Properties</b></html>"));
+		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Model Properties</b></html>"));
 		setMaximumSize(new Dimension(186, 80));
 		initComponents();
 		addComponents();

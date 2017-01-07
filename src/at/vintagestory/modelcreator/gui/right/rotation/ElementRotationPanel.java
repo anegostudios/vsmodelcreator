@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -17,9 +18,10 @@ import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.util.Parser;
 
-public class RotationPanel extends JPanel implements IValueUpdater
+public class ElementRotationPanel extends JPanel implements IValueUpdater
 {
 	private static final long serialVersionUID = 1L;
 
@@ -40,14 +42,14 @@ public class RotationPanel extends JPanel implements IValueUpdater
 	
 	static double multiplier = 22.5;
 
-	public RotationPanel(IElementManager manager)
+	public ElementRotationPanel(IElementManager manager)
 	{
 		rotationFields = new JTextField[3];
 		rotationSliders = new JSlider[3];
 		
 		this.manager = manager;
+		setMaximumSize(new Dimension(186, 270));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		//setAlignmentY(TOP_ALIGNMENT);
 		initComponents();
 	}
 
@@ -56,33 +58,26 @@ public class RotationPanel extends JPanel implements IValueUpdater
 	public void initComponents()
 	{
 		panelOrigin = new RotationOriginPanel(manager);
-
-		add(Box.createRigidArea(new Dimension(188, 5)));
 		add(panelOrigin);
 		
-		JPanel sliderPanel = new JPanel(new GridBagLayout());
-		sliderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>XYZ Rotation</b></html>"));
+		JPanel slidersPanel = new JPanel(new GridBagLayout());
+		
+		slidersPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>XYZ Rotation</b></html>"));
 		
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
 		cons.gridheight = 1;
 		cons.anchor = GridBagConstraints.NORTH;
+	
 		
 		cons.gridy = 0;
-		AddRotationPanel("X", 0, sliderPanel, cons);
+		AddRotationPanel("X", 0, slidersPanel, cons);
 		cons.gridy = 1;
-		AddRotationPanel("Y", 1, sliderPanel, cons);
+		AddRotationPanel("Y", 1, slidersPanel, cons);
 		cons.gridy = 2;
-		AddRotationPanel("Z", 2, sliderPanel, cons);
+		AddRotationPanel("Z", 2, slidersPanel, cons);
 		
-		cons.gridy = 3;
-		cons.fill = GridBagConstraints.BOTH;
-		cons.weightx=1;
-		cons.weighty=1;
-		cons.gridwidth = 2;
-		sliderPanel.add(new JLabel(" "), cons);
-
-		add(sliderPanel);
+		add(slidersPanel);
 	}
 	
 	
@@ -92,6 +87,10 @@ public class RotationPanel extends JPanel implements IValueUpdater
 		Font defaultFont = new Font("SansSerif", Font.PLAIN, 10);
 		rotationFields[num].setFont(defaultFont);
 		rotationFields[num].setHorizontalAlignment(JTextField.CENTER);
+		
+		int colIndex = num == 1 ? 4 : (num == 0 ? 1 : 2);
+		
+		rotationFields[num].setBackground(new Color(Face.ColorsByFace[colIndex].r, Face.ColorsByFace[colIndex].g, Face.ColorsByFace[colIndex].b));
 		
 		
 		rotationFields[num].addKeyListener(new KeyAdapter()
