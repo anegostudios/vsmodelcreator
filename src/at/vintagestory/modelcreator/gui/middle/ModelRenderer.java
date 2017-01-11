@@ -29,6 +29,7 @@ import static org.lwjgl.opengl.GL11.glVertex2i;
 import static org.lwjgl.opengl.GL11.glVertex3i;
 import static org.lwjgl.opengl.GL11.glViewport;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.opengl.GL11;
@@ -36,17 +37,17 @@ import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.Color;
 
 import at.vintagestory.modelcreator.Camera;
+import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.EnumFonts;
 import at.vintagestory.modelcreator.gui.left.LeftSidebar;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.Element;
-import at.vintagestory.modelcreator.util.IntRef;
 
 public class ModelRenderer
 {
 	public Camera camera;
 	private int width = 990, height = 700;
-	public LeftSidebar activeSidebar = null;
+	public LeftSidebar renderedLeftSidebar = null;
 	
 	public IElementManager manager;
 	
@@ -98,8 +99,8 @@ public class ModelRenderer
 		
 		glTranslatef(-8, 0, -8);
 		
-		List<Element> rootelems = manager.getRootElements();
-		Element selectedElem = manager.getSelectedElement();
+		ArrayList<Element> rootelems = ModelCreator.currentProject.RootElements;
+		Element selectedElem = manager.getCurrentElement();
 
 		for (int i = 0; i < rootelems.size(); i++)
 		{
@@ -234,8 +235,8 @@ public class ModelRenderer
 		}
 		glPopMatrix();
 
-		if (activeSidebar != null)
-			activeSidebar.draw(offset, width, height, frameHeight);
+		if (renderedLeftSidebar != null)
+			renderedLeftSidebar.draw(offset, width, height, frameHeight);
 
 		glPushMatrix();
 		{

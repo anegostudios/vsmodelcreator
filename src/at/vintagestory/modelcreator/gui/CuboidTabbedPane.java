@@ -6,13 +6,12 @@ import javax.swing.JTabbedPane;
 
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
-import at.vintagestory.modelcreator.model.Element;
 
 public class CuboidTabbedPane extends JTabbedPane
 {
 	private static final long serialVersionUID = 1L;
 
-	private IElementManager manager;
+	protected IElementManager manager;
 
 	public CuboidTabbedPane(IElementManager manager)
 	{
@@ -29,8 +28,7 @@ public class CuboidTabbedPane extends JTabbedPane
 				if (component instanceof IValueUpdater)
 				{
 					IValueUpdater updater = (IValueUpdater) component;
-					Element cube = manager.getSelectedElement();
-					updater.updateValues(cube);
+					updater.updateValues();
 				}
 			}
 		}

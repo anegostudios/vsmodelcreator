@@ -20,7 +20,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import at.vintagestory.modelcreator.Exporter;
 import at.vintagestory.modelcreator.Importer;
 import at.vintagestory.modelcreator.ModelCreator;
-import at.vintagestory.modelcreator.TextureManager;
+import at.vintagestory.modelcreator.gui.texturedialog.TextureDialog;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCallback;
@@ -136,8 +136,7 @@ public class GuiMain extends JMenuBar
 			int returnVal = JOptionPane.showConfirmDialog(creator, "You current work will be cleared, are you sure?", "Note", JOptionPane.YES_NO_OPTION);
 			if (returnVal == JOptionPane.YES_OPTION)
 			{
-				creator.getElementManager().reset();
-				creator.getElementManager().updateValues();
+				ModelCreator.currentProject.clear();
 			}
 		});
 
@@ -155,7 +154,7 @@ public class GuiMain extends JMenuBar
 			int returnVal = chooser.showOpenDialog(null);
 			if (returnVal == JFileChooser.APPROVE_OPTION)
 			{
-				if (creator.getElementManager().getRootElements().size() > 0)
+				if (ModelCreator.currentProject.RootElements.size() > 0)
 				{
 					returnVal = JOptionPane.showConfirmDialog(null, "Your current project will be cleared, are you sure you want to continue?", "Warning", JOptionPane.YES_NO_OPTION);
 				}
@@ -163,10 +162,10 @@ public class GuiMain extends JMenuBar
 				{
 					String filePath = chooser.getSelectedFile().getAbsolutePath();
 					ModelCreator.prefs.put("filePath", filePath);
-					Importer importer = new Importer(creator.getElementManager(), filePath);
-					importer.importFromJSON();
+					Importer importer = new Importer(filePath);
+					ModelCreator.currentProject = importer.loadFromJSON();
 				}
-				creator.getElementManager().updateValues();
+				ModelCreator.updateValues();
 			}
 		});
 
@@ -195,7 +194,7 @@ public class GuiMain extends JMenuBar
 					if (!filePath.endsWith(".json")) {
 						chooser.setSelectedFile(new File(filePath + ".json"));
 					}
-					Exporter exporter = new Exporter(creator.getElementManager());
+					Exporter exporter = new Exporter(ModelCreator.currentProject);
 					exporter.export(chooser.getSelectedFile());
 				}
 			}
@@ -226,12 +225,12 @@ public class GuiMain extends JMenuBar
 		itemUnlockAngles.addActionListener(a ->
 		{
 			ModelCreator.unlockAngles = itemUnlockAngles.isSelected();
-			creator.getElementManager().updateValues();
+			ModelCreator.updateValues();
 		});
 
 		
 		reloadTextures.addActionListener(a -> {
-			TextureManager.reloadTextures(creator);
+			TextureDialog.reloadTextures(creator);
 		});
 
 		itemSaveToDisk.addActionListener(a ->
@@ -261,7 +260,7 @@ public class GuiMain extends JMenuBar
 					
 					ModelCreator.prefs.put("filePath", filePath);
 					
-					creator.renderer.activeSidebar = null;
+					creator.modelrenderer.renderedLeftSidebar = null;
 					creator.startScreenshot(new PendingScreenshot(chooser.getSelectedFile(), null));
 				}
 			}
@@ -271,7 +270,7 @@ public class GuiMain extends JMenuBar
 
 		itemImgurLink.addActionListener(a ->
 		{
-			creator.renderer.activeSidebar = null;
+			creator.modelrenderer.renderedLeftSidebar = null;
 			creator.startScreenshot(new PendingScreenshot(null, new ScreenshotCallback()
 			{
 				@Override
@@ -325,12 +324,12 @@ public class GuiMain extends JMenuBar
 		
 		itemAddCube.addActionListener(a ->
 		{
-			creator.getElementManager().addElementAsChild(new Element(1, 1, 1));
+			ModelCreator.currentProject.addElementAsChild(new Element(1, 1, 1));
 		});
 		
 		itemAddFace.addActionListener(a ->
 		{
-			creator.getElementManager().addElementAsChild(new Element(1, 1));
+			ModelCreator.currentProject.addElementAsChild(new Element(1, 1));
 		});
 
 	}

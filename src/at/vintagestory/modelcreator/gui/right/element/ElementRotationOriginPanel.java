@@ -1,6 +1,5 @@
-package at.vintagestory.modelcreator.gui.right.rotation;
+package at.vintagestory.modelcreator.gui.right.element;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -18,6 +17,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
@@ -25,7 +26,7 @@ import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.util.Parser;
 
-public class RotationOriginPanel extends JPanel implements IValueUpdater
+public class ElementRotationOriginPanel extends JPanel implements IValueUpdater
 {
 	private static final long serialVersionUID = 1L;
 
@@ -42,12 +43,14 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 	private JButton btnNegZ;
 
 	private DecimalFormat df = new DecimalFormat("#.#");
+	
+	boolean enabled = true;
 
-	public RotationOriginPanel(IElementManager manager)
+	public ElementRotationOriginPanel(IElementManager manager)
 	{
 		this.manager = manager;
 		setLayout(new GridLayout(3, 3, 4, 0));
-		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Origin</b></html>"));
+		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Origin</b></html>"));
 		setMaximumSize(new Dimension(186, 104));
 		initComponents();
 		initProperties();
@@ -80,11 +83,11 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					Element element = manager.getSelectedElement();
+					Element element = manager.getCurrentElement();
 					if (element != null)
 					{
 						element.setOriginX((Parser.parseDouble(xOriginField.getText(), element.getOriginX())));
-						manager.updateValues();
+						ModelCreator.updateValues();
 					}
 				}
 			}
@@ -94,11 +97,11 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Element element = manager.getSelectedElement();
+				Element element = manager.getCurrentElement();
 				if (element != null)
 				{
 					element.setOriginX((Parser.parseDouble(xOriginField.getText(), element.getOriginX())));
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		});
@@ -121,11 +124,11 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					Element element = manager.getSelectedElement();
+					Element element = manager.getCurrentElement();
 					if (element != null)
 					{
 						element.setOriginY((Parser.parseDouble(yOriginField.getText(), element.getOriginY())));
-						manager.updateValues();
+						ModelCreator.updateValues();
 					}
 				}
 			}
@@ -135,11 +138,11 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Element element = manager.getSelectedElement();
+				Element element = manager.getCurrentElement();
 				if (element != null)
 				{
 					element.setOriginY((Parser.parseDouble(yOriginField.getText(), element.getOriginY())));
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		});
@@ -162,11 +165,11 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					Element element = manager.getSelectedElement();
+					Element element = manager.getCurrentElement();
 					if (element != null)
 					{
 						element.setOriginZ((Parser.parseDouble(zOriginField.getText(), element.getOriginZ())));
-						manager.updateValues();
+						ModelCreator.updateValues();
 					}
 				}
 			}
@@ -177,11 +180,11 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Element element = manager.getSelectedElement();
+				Element element = manager.getCurrentElement();
 				if (element != null)
 				{
 					element.setOriginZ((Parser.parseDouble(zOriginField.getText(), element.getOriginZ())));
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		});
@@ -259,31 +262,29 @@ public class RotationOriginPanel extends JPanel implements IValueUpdater
 	}
 
 	@Override
-	public void updateValues(Element cube)
+	public void updateValues()
 	{
-		if (cube != null)
-		{
-			xOriginField.setEnabled(true);
-			yOriginField.setEnabled(true);
-			zOriginField.setEnabled(true);
-			xOriginField.setText(df.format(cube.getOriginX()));
-			yOriginField.setText(df.format(cube.getOriginY()));
-			zOriginField.setText(df.format(cube.getOriginZ()));
-		}
-		else
-		{
-			xOriginField.setEnabled(false);
-			yOriginField.setEnabled(false);
-			zOriginField.setEnabled(false);
-			xOriginField.setText("");
-			yOriginField.setText("");
-			zOriginField.setText("");
-		}
+		Element cube = manager.getCurrentElement();
+		boolean enabled = cube != null && this.enabled;
+		
+		btnPlusX.setEnabled(enabled);
+		btnPlusY.setEnabled(enabled);
+		btnPlusZ.setEnabled(enabled);
+		btnNegX.setEnabled(enabled);
+		btnNegY.setEnabled(enabled);
+		btnNegZ.setEnabled(enabled);
+		
+		xOriginField.setEnabled(enabled);
+		yOriginField.setEnabled(enabled);
+		zOriginField.setEnabled(enabled);
+		xOriginField.setText(enabled ? df.format(cube.getOriginX()) : "");
+		yOriginField.setText(enabled ? df.format(cube.getOriginY()) : "");
+		zOriginField.setText(enabled ? df.format(cube.getOriginZ()) : "");
 	}
 	
 
 	public void modifyPosition(EnumAxis axis, int direction, int modifiers) {
-		Element cube = manager.getSelectedElement();
+		Element cube = manager.getCurrentElement();
 		if (cube == null) return;		
 		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
 		

@@ -6,8 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
 
@@ -15,12 +13,11 @@ public class Exporter
 {
 	private List<String> textureList = new ArrayList<String>();
 
-	// Model Variables
-	private IElementManager manager;
-
-	public Exporter(IElementManager manager)
+	Project project;
+	
+	public Exporter(Project project)
 	{
-		this.manager = manager;
+		this.project = project;
 		compileTextureList();
 	}
 
@@ -46,7 +43,7 @@ public class Exporter
 			}
 			fw = new FileWriter(file);
 			writer = new BufferedWriter(fw);
-			writeComponents(writer, manager);
+			writeComponents(writer);
 			writer.close();
 			fw.close();
 			return file;
@@ -60,7 +57,7 @@ public class Exporter
 
 	private void compileTextureList()
 	{
-		for (Element cuboid : manager.getRootElements())
+		for (Element cuboid : project.RootElements)
 		{
 			compileTextureList(cuboid);
 		}
@@ -85,20 +82,20 @@ public class Exporter
 	
 	
 
-	private void writeComponents(BufferedWriter writer, IElementManager manager) throws IOException
+	private void writeComponents(BufferedWriter writer) throws IOException
 	{
 		writer.write("{");
 		writer.newLine();
-		if (!manager.getAmbientOcc())
+		if (!project.AmbientOcclusion)
 		{
-			writer.write("\"ambientocclusion\": " + manager.getAmbientOcc() + ",");
+			writer.write("\"ambientocclusion\": " + project.AmbientOcclusion + ",");
 			writer.newLine();
 		}
 		writeTextures(writer);
 		writer.newLine();
 		writer.write(space(1) + "\"elements\": [");
 		
-		List<Element> elems = manager.getRootElements();
+		List<Element> elems = project.RootElements;
 		
 		for (int i = 0; i < elems.size(); i++)
 		{

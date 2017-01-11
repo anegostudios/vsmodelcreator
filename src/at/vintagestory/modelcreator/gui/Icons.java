@@ -46,6 +46,14 @@ public class Icons
 	public static Icon model_cauldron;
 	public static Icon model_chair;
 	
+		
+	public static Icon play;
+	public static Icon pause;
+	public static Icon previous;
+	public static Icon next;
+	public static Icon addremove;
+
+	
 	public static void init(Class<?> clazz)
 	{	
 		ClassLoader loader = clazz.getClassLoader();
@@ -83,6 +91,12 @@ public class Icons
 		
 		arrow_up_z = new ImageIcon(loader.getResource("icons/arrow_up_z.png"));
 		arrow_down_z = new ImageIcon(loader.getResource("icons/arrow_down_z.png"));
+		
+		play = new ImageIcon(loader.getResource("icons/play.png"));
+		pause = new ImageIcon(loader.getResource("icons/pause.png"));
+		previous = new ImageIcon(loader.getResource("icons/prev.png"));
+		next = new ImageIcon(loader.getResource("icons/next.png"));
+		addremove = new ImageIcon(loader.getResource("icons/addremove.png"));
 		
 		facebook = new ImageIcon(loader.getResource("icons/facebook.png"));
 		twitter = new ImageIcon(loader.getResource("icons/twitter.png"));

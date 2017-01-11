@@ -10,7 +10,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.util.GameMath;
-import at.vintagestory.modelcreator.util.IntRef;
 import at.vintagestory.modelcreator.util.Mat4f;
 import org.newdawn.slick.Color;
 

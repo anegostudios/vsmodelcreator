@@ -1,16 +1,14 @@
 package at.vintagestory.modelcreator.model;
 
-import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
-import at.vintagestory.modelcreator.TextureManager;
 import at.vintagestory.modelcreator.enums.BlockFacing;
+import at.vintagestory.modelcreator.gui.texturedialog.TextureDialog;
 
 public class Face
 {
@@ -88,26 +86,13 @@ public class Face
 		this.side = side;
 	}
 	
-	public void renderFace(BlockFacing blockFacing, float brightness) {
-		TextureEntry entry = TextureManager.getTextureEntry(texture);
-		int passes = 1;
-
-		if (entry != null) {
-			passes = entry.getPasses();
-		}
-
-		for (int i = 0; i < passes; i++)
-		{
-			renderFace(blockFacing, i, brightness);
-		}
-	}
-	
-
-	public void renderFace(BlockFacing blockFacing, int pass, float brightness)
+	public void renderFace(BlockFacing blockFacing, float brightness)
 	{
 		GL11.glPushMatrix();
 		{
-			startRender(pass);
+			GL11.glEnable(GL_TEXTURE_2D);
+			GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			bindTexture();
 
 			if (binded) GL11.glColor3f(brightness, brightness, brightness);
 			
@@ -122,7 +107,7 @@ public class Face
 			}
 			GL11.glEnd();
 
-			finishRender();
+			GL11.glDisable(GL_TEXTURE_2D);
 		}
 		GL11.glPopMatrix();
 	}
@@ -146,56 +131,23 @@ public class Face
 			GL11.glTexCoord2d(fitTexture | forceFit ? 0 : (textureU / 16), fitTexture | forceFit ? 0 : (textureV / 16));
 	}
 
-	public void startRender(int pass)
-	{
-		GL11.glEnable(GL_TEXTURE_2D);
-		GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		bindTexture(pass);
-	}
-
-	public void finishRender()
-	{
-		GL11.glDisable(GL_TEXTURE_2D);
-	}
-
 	public void setTexture(String texture)
 	{
 		this.texture = texture;
 	}
 
-	public void bindTexture(int pass)
+	public void bindTexture()
 	{
 		TextureImpl.bindNone();
 		if (texture != null)
 		{
-			TextureEntry entry = TextureManager.getTextureEntry(texture);
+			TextureEntry entry = TextureDialog.getTextureEntry(texture);
 			if (entry != null)
 			{
-				if (pass == 0)
+				if (entry.getTexture() != null)
 				{
-					if (entry.getTexture() != null)
-					{
-						GL11.glColor3f(1.0F, 1.0F, 1.0F);
-						entry.getTexture().bind();
-					}
-				}
-				else if (pass == 1)
-				{
-					if (entry.isAnimated() && entry.getNextTexture() != null)
-					{
-						GL11.glEnable(GL11.GL_BLEND);
-						GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-						GL11.glDepthFunc(GL11.GL_EQUAL);
-
-						entry.getNextTexture().bind();
-						GL11.glColor4d(1.0D, 1.0D, 1.0D, entry.getAnimation().getFrameInterpolation());
-					}
-				}
-
-				if (entry.hasProperties() && entry.getProperties().isBlurred())
-				{
-					GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-					GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					GL11.glColor3f(1.0F, 1.0F, 1.0F);
+					entry.getTexture().bind();
 				}
 
 				binded = true;
@@ -282,7 +234,7 @@ public class Face
 
 	public Texture getTexture()
 	{
-		return TextureManager.getTexture(texture);
+		return TextureDialog.getTexture(texture);
 	}
 
 	public String getTextureLocation()

@@ -1,6 +1,5 @@
 package at.vintagestory.modelcreator.gui.right.face;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -10,8 +9,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import at.vintagestory.modelcreator.TextureManager;
+import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.gui.Icons;
+import at.vintagestory.modelcreator.gui.texturedialog.TextureDialog;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.ClipboardTexture;
@@ -33,7 +33,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 	{
 		this.manager = manager;
 		setLayout(new GridLayout(2, 2, 4, 4));
-		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Texture</b></html>"));
+		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Texture</b></html>"));
 		setMaximumSize(new Dimension(186, 90));
 		initComponents();
 		addComponents();
@@ -47,12 +47,12 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		btnSelect.setIcon(Icons.texture);
 		btnSelect.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				String texture = TextureManager.display(manager);
+				String texture = TextureDialog.display(manager);
 				if (texture != null)
 				{
-					manager.getSelectedElement().getSelectedFace().setTexture(texture);
+					manager.getCurrentElement().getSelectedFace().setTexture(texture);
 				}
 			}
 		});
@@ -63,15 +63,15 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		btnClear.setIcon(Icons.clear);
 		btnClear.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
-					manager.getSelectedElement().setAllTextures(null, null);
+					manager.getCurrentElement().setAllTextures(null, null);
 				}
 				else
 				{
-					manager.getSelectedElement().getSelectedFace().setTexture(null);
+					manager.getCurrentElement().getSelectedFace().setTexture(null);
 				}
 			}
 		});
@@ -82,9 +82,9 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		btnCopy.setIcon(Icons.copy);
 		btnCopy.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				Face face = manager.getSelectedElement().getSelectedFace();
+				Face face = manager.getCurrentElement().getSelectedFace();
 				Clipboard.copyTexture(face.getTextureLocation(), face.getTextureName());
 			}
 		});
@@ -95,18 +95,18 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		btnPaste.setIcon(Icons.clipboard);
 		btnPaste.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
 				ClipboardTexture texture = Clipboard.getTexture();
 				if (texture != null)
 				{
 					if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 					{
-						manager.getSelectedElement().setAllTextures(texture);
+						manager.getCurrentElement().setAllTextures(texture);
 					}
 					else
 					{
-						Face face = manager.getSelectedElement().getSelectedFace();
+						Face face = manager.getCurrentElement().getSelectedFace();
 						face.setTexture(texture.getTexture());
 						face.setTextureLocation(texture.getLocation());
 					}
@@ -129,9 +129,9 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 	public void callback(boolean success, String errormessage, String texture)
 	{
 		if (success)
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				manager.getSelectedElement().getSelectedFace().setTexture(texture);
+				manager.getCurrentElement().getSelectedFace().setTexture(texture);
 			}
 	}
 }

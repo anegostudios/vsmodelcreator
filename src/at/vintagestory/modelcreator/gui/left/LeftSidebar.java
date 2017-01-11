@@ -27,7 +27,7 @@ public class LeftSidebar
 
 	public void draw(int sidebarWidth, int canvasWidth, int canvasHeight, int frameHeight)
 	{
-		glColor3f(0.866F, 0.866F, 0.894F);
+		glColor3f(0.266F, 0.266F, 0.294F);
 		glBegin(GL_QUADS);
 		{
 			glVertex2i(0, 0);

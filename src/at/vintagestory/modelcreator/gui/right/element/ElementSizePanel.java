@@ -1,6 +1,5 @@
 package at.vintagestory.modelcreator.gui.right.element;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -18,6 +17,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
@@ -40,6 +41,8 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 	private JButton btnNegX;
 	private JButton btnNegY;
 	private JButton btnNegZ;
+	
+	boolean enabled = true;
 
 	private DecimalFormat df = new DecimalFormat("#.#");
 
@@ -47,7 +50,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 	{
 		this.manager = manager;
 		setLayout(new GridLayout(3, 3, 4, 0));
-		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Size</b></html>"));
+		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Size</b></html>"));
 		setMaximumSize(new Dimension(186, 104));
 		initComponents();
 		initProperties();
@@ -80,12 +83,12 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					Element element = manager.getSelectedElement();
+					Element element = manager.getCurrentElement();
 					if (element != null)
 					{
 						element.setWidth(Parser.parseDouble(xSizeField.getText(), element.getWidth()));
 						element.updateUV();
-						manager.updateValues();
+						ModelCreator.updateValues();
 					}
 
 				}
@@ -96,12 +99,12 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Element element = manager.getSelectedElement();
+				Element element = manager.getCurrentElement();
 				if (element != null)
 				{
 					element.setWidth(Parser.parseDouble(xSizeField.getText(), element.getWidth()));
 					element.updateUV();
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		});
@@ -124,12 +127,12 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					Element element = manager.getSelectedElement();
+					Element element = manager.getCurrentElement();
 					if (element != null)
 					{
 						element.setHeight(Parser.parseDouble(ySizeField.getText(), element.getHeight()));
 						element.updateUV();
-						manager.updateValues();
+						ModelCreator.updateValues();
 					}
 
 				}
@@ -140,12 +143,12 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Element element = manager.getSelectedElement();
+				Element element = manager.getCurrentElement();
 				if (element != null)
 				{
 					element.setHeight(Parser.parseDouble(ySizeField.getText(), element.getHeight()));
 					element.updateUV();
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		});
@@ -169,12 +172,12 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					Element element = manager.getSelectedElement();
+					Element element = manager.getCurrentElement();
 					if (element != null)
 					{
 						element.setDepth(Parser.parseDouble(zSizeField.getText(), element.getDepth()));
 						element.updateUV();
-						manager.updateValues();
+						ModelCreator.updateValues();
 					}
 
 				}
@@ -185,12 +188,12 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Element element = manager.getSelectedElement();
+				Element element = manager.getCurrentElement();
 				if (element != null)
 				{
 					element.setDepth(Parser.parseDouble(zSizeField.getText(), element.getDepth()));
 					element.updateUV();
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		});
@@ -268,7 +271,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 	
 	
 	public void modifySize(EnumAxis axis, int direction, int modifiers) {
-		Element cube = manager.getSelectedElement();
+		Element cube = manager.getCurrentElement();
 		if (cube == null) return;
 		
 		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
@@ -286,30 +289,27 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		}
 		
 		cube.updateUV();
-		manager.updateValues();
+		ModelCreator.updateValues();
 	}
 
 
 	@Override
-	public void updateValues(Element cube)
+	public void updateValues()
 	{
-		if (cube != null)
-		{
-			xSizeField.setEnabled(true);
-			ySizeField.setEnabled(true);
-			zSizeField.setEnabled(true);
-			xSizeField.setText(df.format(cube.getWidth()));
-			ySizeField.setText(df.format(cube.getHeight()));
-			zSizeField.setText(df.format(cube.getDepth()));
-		}
-		else
-		{
-			xSizeField.setEnabled(false);
-			ySizeField.setEnabled(false);
-			zSizeField.setEnabled(false);
-			xSizeField.setText("");
-			ySizeField.setText("");
-			zSizeField.setText("");
-		}
+		Element cube = manager.getCurrentElement();
+		boolean enabled = cube != null && this.enabled;
+		btnPlusX.setEnabled(enabled);
+		btnPlusY.setEnabled(enabled);
+		btnPlusZ.setEnabled(enabled);
+		btnNegX.setEnabled(enabled);
+		btnNegY.setEnabled(enabled);
+		btnNegZ.setEnabled(enabled);
+		
+		xSizeField.setEnabled(enabled);
+		ySizeField.setEnabled(enabled);
+		zSizeField.setEnabled(enabled);
+		xSizeField.setText(enabled ? df.format(cube.getWidth()) : "");
+		ySizeField.setText(enabled ? df.format(cube.getHeight()) : "");
+		zSizeField.setText(enabled ? df.format(cube.getDepth()) : "");
 	}
 }

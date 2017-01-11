@@ -1,16 +1,10 @@
 package at.vintagestory.modelcreator.gui.right.element;
 
 import java.awt.Dimension;
-
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
-
-import at.vintagestory.modelcreator.gui.right.rotation.ElementRotationPanel;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
-import at.vintagestory.modelcreator.model.Element;
 
 public class ElementPanel extends JPanel implements IValueUpdater
 {
@@ -20,16 +14,17 @@ public class ElementPanel extends JPanel implements IValueUpdater
 
 	private ElementSizePanel panelSize;
 	private ElementPositionPanel panelPosition;
+	private ElementRotationOriginPanel panelOrigin;
 	private ElementRotationPanel panelRotation;
-	private ElementPropertiesPanel panelExtras;
+	private ElementPropertiesPanel panelElementProperties;
 	
-	private ModelPropertiesPanel panelGlobal;
+//	private ModelPropertiesPanel panelGlobal;
 	
 
 	public ElementPanel(IElementManager manager)
 	{
 		this.manager = manager;
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		//setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		initComponents();
 		addComponents();
 	}
@@ -38,9 +33,10 @@ public class ElementPanel extends JPanel implements IValueUpdater
 	{
 		panelSize = new ElementSizePanel(manager);
 		panelPosition = new ElementPositionPanel(manager);
+		panelOrigin = new ElementRotationOriginPanel(manager);
 		panelRotation = new ElementRotationPanel(manager);
-		panelExtras = new ElementPropertiesPanel(manager);
-		panelGlobal = new ModelPropertiesPanel(manager);
+		panelElementProperties = new ElementPropertiesPanel(manager);
+//		panelGlobal = new ModelPropertiesPanel(manager);
 		
 	}
 
@@ -48,26 +44,22 @@ public class ElementPanel extends JPanel implements IValueUpdater
 	{
 		add(Box.createRigidArea(new Dimension(188, 5)));
 		add(panelSize);
-		//add(Box.createRigidArea(new Dimension(188, 5)));
 		add(panelPosition);
-		//add(Box.createRigidArea(new Dimension(188, 5)));
+		add(panelOrigin);
 		add(panelRotation);
-		//add(Box.createRigidArea(new Dimension(188, 5)));
-
-		add(panelExtras);
-		//add(Box.createRigidArea(new Dimension(188, 5)));
-
+		add(panelElementProperties);
 		//add(new JSeparator(JSeparator.HORIZONTAL));
 		//add(panelGlobal);
 	}
 
 	@Override
-	public void updateValues(Element cube)
+	public void updateValues()
 	{
-		panelSize.updateValues(cube);
-		panelPosition.updateValues(cube);
-		panelExtras.updateValues(cube);
-		panelRotation.updateValues(cube);
-		//panelGlobal.updateValues(cube);
+		panelSize.updateValues();
+		panelPosition.updateValues();
+		panelElementProperties.updateValues();
+		panelOrigin.updateValues();
+		panelRotation.updateValues();
+		//panelGlobal.updateValues();
 	}
 }

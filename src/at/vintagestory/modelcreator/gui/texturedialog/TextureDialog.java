@@ -1,4 +1,4 @@
-package at.vintagestory.modelcreator;
+package at.vintagestory.modelcreator.gui.texturedialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -7,15 +7,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -28,76 +23,27 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
-import org.newdawn.slick.util.BufferedImageUtil;
 
-import at.vintagestory.modelcreator.gui.left.TextureCellRenderer;
+import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.gui.right.RightTopPanel;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.PendingTexture;
 import at.vintagestory.modelcreator.model.TextureEntry;
-import at.vintagestory.modelcreator.model.TextureMeta;
 
-public class TextureManager
+public class TextureDialog
 {
-	private static List<TextureEntry> textureCache = new ArrayList<TextureEntry>();
-
-	public static Texture cobblestone;
-	public static Texture dirt;
-
 	public static File lastLocation = null;
 
-	public static String loadExternalTexture(File image, File meta) throws IOException
+	public static String loadExternalTexture(File image) throws IOException
 	{
-		TextureMeta textureMeta = TextureMeta.parse(meta);
-
-		if (textureMeta != null)
-		{
-			if (textureMeta.getAnimation() != null)
-			{
-				System.out.println("Loading Animated Texture!");
-				BufferedImage bimage = ImageIO.read(image);
-
-				int fWidth = textureMeta.getAnimation().getWidth();
-				int fHeight = textureMeta.getAnimation().getHeight();
-
-				ImageIcon icon = null;
-
-				List<Texture> textures = new ArrayList<Texture>();
-
-				int xpos = 0;
-				while (xpos + fWidth <= bimage.getWidth())
-				{
-					int ypos = 0;
-					while (ypos + fHeight <= bimage.getHeight())
-					{
-						BufferedImage subImage = bimage.getSubimage(xpos, ypos, fWidth, fHeight);
-						if (icon == null)
-						{
-							icon = TextureManager.upscale(new ImageIcon(subImage), 256);
-						}
-						Texture texture = BufferedImageUtil.getTexture("", subImage);
-						textures.add(texture);
-						ypos += fHeight;
-					}
-					xpos += fWidth;
-				}
-				String imageName = image.getName();
-				textureCache.add(new TextureEntry(image.getName().substring(0, imageName.indexOf(".png")), textures, icon, image.getAbsolutePath(), textureMeta, meta.getAbsolutePath()));
-				return null;
-			}
-			
-			return loadTexture(image, textureMeta, meta.getAbsolutePath());
-		}
-		return loadTexture(image, null, null);
+		return loadTexture(image, null);
 	}
 	
-	
 	public static void reloadTextures(ModelCreator creator) {
-		for (TextureEntry entry : textureCache) {
+		for (TextureEntry entry : ModelCreator.currentProject.Textures) {
 			try {
 				creator.pendingTextures.add(new PendingTexture(entry));
 			} catch (Exception e) {}
@@ -121,7 +67,7 @@ public class TextureManager
 	}
 	
 
-	private static String loadTexture(File image, TextureMeta meta, String location) throws IOException
+	private static String loadTexture(File image, String location) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
 		Texture texture = TextureLoader.getTexture("PNG", is);
@@ -134,7 +80,7 @@ public class TextureManager
 		}
 		
 		ImageIcon icon = upscale(new ImageIcon(image.getAbsolutePath()), 256);
-		textureCache.add(new TextureEntry(image.getName().replace(".png", ""), texture, icon, image.getAbsolutePath(), meta, location));
+		ModelCreator.currentProject.Textures.add(new TextureEntry(image.getName().replace(".png", ""), texture, icon, image.getAbsolutePath()));
 		return null;
 	}
 
@@ -147,7 +93,7 @@ public class TextureManager
 
 	public static TextureEntry getTextureEntry(String name)
 	{
-		for (TextureEntry entry : textureCache)
+		for (TextureEntry entry : ModelCreator.currentProject.Textures)
 		{
 			if (entry.getName().equalsIgnoreCase(name))
 			{
@@ -159,7 +105,7 @@ public class TextureManager
 
 	public static Texture getTexture(String name)
 	{
-		for (TextureEntry entry : textureCache)
+		for (TextureEntry entry : ModelCreator.currentProject.Textures)
 		{
 			if (entry.getName().equalsIgnoreCase(name))
 			{
@@ -171,7 +117,7 @@ public class TextureManager
 
 	public static String getTextureLocation(String name)
 	{
-		for (TextureEntry entry : textureCache)
+		for (TextureEntry entry : ModelCreator.currentProject.Textures)
 		{
 			if (entry.getName().equalsIgnoreCase(name))
 			{
@@ -181,21 +127,10 @@ public class TextureManager
 		return null;
 	}
 	
-	public static String getMetaLocation(String name)
-	{
-		for (TextureEntry entry : textureCache)
-		{
-			if (entry.getName().equalsIgnoreCase(name))
-			{
-				return entry.getMetaLocation();
-			}
-		}
-		return null;
-	}
 
 	public static ImageIcon getIcon(String name)
 	{
-		for (TextureEntry entry : textureCache)
+		for (TextureEntry entry : ModelCreator.currentProject.Textures)
 		{
 			if (entry.getName().equalsIgnoreCase(name))
 			{
@@ -295,7 +230,7 @@ public class TextureManager
 		btnClose.setFont(defaultFont);
 		panel.add(btnClose);
 
-		JDialog dialog = new JDialog(((RightTopPanel) manager).getCreator(), "Texture Manager", false);
+		JDialog dialog = new JDialog(manager.getCreator(), "Texture Manager", false);
 		dialog.setLayout(new BorderLayout());
 		dialog.setResizable(false);
 		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
@@ -312,7 +247,7 @@ public class TextureManager
 	private static DefaultListModel<String> generate()
 	{
 		DefaultListModel<String> model = new DefaultListModel<String>();
-		for (TextureEntry entry : textureCache)
+		for (TextureEntry entry : ModelCreator.currentProject.Textures)
 		{
 			model.addElement(entry.getName());
 		}

@@ -15,7 +15,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.PendingTexture;
@@ -27,16 +26,13 @@ public class Importer
 
 	// Input File
 	private String inputPath;
+	
+	Project project;
 
-	// Model Variables
-	private IElementManager manager;
 
-	//private boolean ignoreTextures = false;
-
-	public Importer(IElementManager manager, String outputPath)
+	public Importer(String path)
 	{
-		this.manager = manager;
-		this.inputPath = outputPath;
+		this.inputPath = path;
 	}
 
 	public void ignoreTextureLoading()
@@ -44,8 +40,10 @@ public class Importer
 		//this.ignoreTextures = true;
 	}
 
-	public void importFromJSON()
+	public Project loadFromJSON()
 	{
+		project = new Project();
+		
 		File path = new File(inputPath);
 		if (path.exists() && path.isFile())
 		{
@@ -55,7 +53,7 @@ public class Importer
 			{
 				fr = new FileReader(path);
 				reader = new BufferedReader(fr);
-				readComponents(reader, manager, path.getParentFile());
+				readComponents(reader, path.getParentFile());
 				reader.close();
 				fr.close();
 			}
@@ -66,13 +64,11 @@ public class Importer
 			}
 		}
 		
-		manager.updateValues();
+		return project;
 	}
 
-	private void readComponents(BufferedReader reader, IElementManager manager, File dir) throws IOException
+	private void readComponents(BufferedReader reader, File dir) throws IOException
 	{
-		manager.clearElements();
-
 		JsonParser parser = new JsonParser();
 		JsonElement read = parser.parse(reader);
 
@@ -98,7 +94,7 @@ public class Importer
 					// Load Parent
 					FileReader fr = new FileReader(file);
 					reader = new BufferedReader(fr);
-					readComponents(reader, manager, file.getParentFile());
+					readComponents(reader, file.getParentFile());
 					reader.close();
 					fr.close();
 				}
@@ -118,17 +114,18 @@ public class Importer
 				{
 					if (!elements.get(i).isJsonObject()) continue;
 					
-					Element elem = readElement(elements.get(i).getAsJsonObject(), manager);
+					Element elem = readElement(elements.get(i).getAsJsonObject());
 					if (elem != null) {
-						manager.addRootElement(elem);
+						project.RootElements.add(elem);
 					}
 				}
 			}
 
-			manager.setAmbientOcc(true);
+			project.AmbientOcclusion = true; 
+			
 			if (obj.has("ambientocclusion") && obj.get("ambientocclusion").isJsonPrimitive())
 			{
-				manager.setAmbientOcc(obj.get("ambientocclusion").getAsBoolean());
+				project.AmbientOcclusion = obj.get("ambientocclusion").getAsBoolean();
 			}
 		}
 		
@@ -175,7 +172,7 @@ public class Importer
 				//System.out.println("4." + textureFile.getAbsolutePath());
 				if (textureFile.exists() && textureFile.isFile())
 				{
-					manager.addPendingTexture(new PendingTexture(textureFile));
+					project.PendingTextures.add(new PendingTexture(textureFile));
 					return;
 				}
 			}
@@ -185,11 +182,11 @@ public class Importer
 		
 		if (new File(texturePath + File.separator + texture + ".png").exists())
 		{
-			manager.addPendingTexture(new PendingTexture(new File(texturePath + File.separator + texture + ".png")));
+			project.PendingTextures.add(new PendingTexture(new File(texturePath + File.separator + texture + ".png")));
 		}
 	}
 
-	private Element readElement(JsonObject obj, IElementManager manager)
+	private Element readElement(JsonObject obj)
 	{
 		String name = "Element";
 		JsonArray from = null;
@@ -286,7 +283,7 @@ public class Importer
 				JsonArray children = obj.get("children").getAsJsonArray();
 				for(JsonElement child : children) {
 					if (child.isJsonObject()) {
-						element.ChildElements.add(readElement(child.getAsJsonObject(), manager));
+						element.ChildElements.add(readElement(child.getAsJsonObject()));
 					}
 				}
 			
@@ -361,17 +358,6 @@ public class Importer
 				face.setGlow(((int) obj.get("glow").getAsInt()));
 			}
 
-			// TODO cullface with different direction than face,tintindex
-			if (obj.has("cullface") && obj.get("cullface").isJsonPrimitive())
-			{
-				String cullface = obj.get("cullface").getAsString();
-
-				if (cullface.equals(Face.getFaceName(face.getSide())))
-				{
-					face.setCullface(true);
-				}
-			}
-			
 			if (obj.has("enabled")) {
 				boolean enabled = obj.get("enabled").getAsBoolean();
 				face.setEnabled(enabled);

@@ -7,13 +7,12 @@ import java.io.IOException;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 
-import at.vintagestory.modelcreator.TextureManager;
+import at.vintagestory.modelcreator.gui.texturedialog.TextureDialog;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 
 public class PendingTexture
 {
 	public File texture;
-	public File meta;
 	public ITextureCallback callback;
 	
 	public TextureEntry entry;
@@ -37,7 +36,6 @@ public class PendingTexture
 	public PendingTexture(File texture, File meta, ITextureCallback callback)
 	{
 		this.texture = texture;
-		this.meta = meta;
 		this.callback = callback;
 	}
 
@@ -51,7 +49,7 @@ public class PendingTexture
 		try
 		{
 			if (entry != null) {
-				TextureManager.reloadExternalTexture(entry);
+				TextureDialog.reloadExternalTexture(entry);
 				return;
 			}
 			
@@ -59,13 +57,13 @@ public class PendingTexture
 			boolean isnew = false;
 			
 			String fileName = this.texture.getName().replace(".png", "").replaceAll("\\d*$", "");
-			Texture texture = TextureManager.getTexture(fileName);
+			Texture texture = TextureDialog.getTexture(fileName);
 			
 			if (texture == null)
 			{
 				FileInputStream is = new FileInputStream(this.texture);
 				texture = TextureLoader.getTexture("PNG", is);
-				errormessge = TextureManager.loadExternalTexture(this.texture, this.meta);
+				errormessge = TextureDialog.loadExternalTexture(this.texture);
 				is.close();
 				isnew = true;
 			}

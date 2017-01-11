@@ -1,6 +1,5 @@
 package at.vintagestory.modelcreator.gui.right.element;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
@@ -8,6 +7,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.gui.ComponentUtil;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
@@ -25,8 +25,9 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 	{
 		this.manager = manager;
 		setLayout(new GridLayout(1, 2));
-		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Element Properties</b></html>"));
-		setMaximumSize(new Dimension(186, 50));
+		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Element Properties</b></html>"));
+		setPreferredSize(new Dimension(200, 50));
+		setAlignmentX(JPanel.LEFT_ALIGNMENT);
 		initComponents();
 		addComponents();
 	}
@@ -36,7 +37,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 		btnShade = ComponentUtil.createRadioButton("Shade", "<html>Determines if shadows should be rendered<br>Default: On</html>");
 		btnShade.addActionListener(e ->
 		{
-			Element elem = manager.getSelectedElement();
+			Element elem = manager.getCurrentElement();
 			if (elem != null) elem.setShade(btnShade.isSelected());
 		});
 	}
@@ -47,8 +48,9 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 	}
 
 	@Override
-	public void updateValues(Element cube)
+	public void updateValues()
 	{
+		Element cube = manager.getCurrentElement();
 		if (cube != null)
 		{
 			btnShade.setEnabled(true);

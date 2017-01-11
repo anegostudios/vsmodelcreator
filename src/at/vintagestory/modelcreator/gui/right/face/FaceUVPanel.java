@@ -1,6 +1,5 @@
 package at.vintagestory.modelcreator.gui.right.face;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -16,6 +15,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
@@ -48,7 +49,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 	{
 		this.manager = manager;
 		setLayout(new GridLayout(3, 4, 4, 4));
-		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>UV</b></html>"));
+		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>UV</b></html>"));
 		setMaximumSize(new Dimension(186, 124));
 		initComponents();
 		initProperties();
@@ -85,12 +86,12 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					if (manager.getSelectedElement() != null)
+					if (manager.getCurrentElement() != null)
 					{
-						Face face = manager.getSelectedElement().getSelectedFace();
+						Face face = manager.getCurrentElement().getSelectedFace();
 						face.setStartU(Parser.parseDouble(xStartField.getText(), face.getStartU()));
 						face.updateUV();
-						manager.updateValues();
+						ModelCreator.updateValues();
 					}
 
 				}
@@ -101,12 +102,12 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				if (manager.getSelectedElement() != null)
+				if (manager.getCurrentElement() != null)
 				{
-					Face face = manager.getSelectedElement().getSelectedFace();
+					Face face = manager.getCurrentElement().getSelectedFace();
 					face.setStartU(Parser.parseDouble(xStartField.getText(), face.getStartU()));
 					face.updateUV();
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		});
@@ -121,12 +122,12 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					if (manager.getSelectedElement() != null)
+					if (manager.getCurrentElement() != null)
 					{
-						Face face = manager.getSelectedElement().getSelectedFace();
+						Face face = manager.getCurrentElement().getSelectedFace();
 						face.setStartV(Parser.parseDouble(yStartField.getText(), face.getStartV()));
 						face.updateUV();
-						manager.updateValues();
+						ModelCreator.updateValues();
 					}
 				}
 			}
@@ -136,12 +137,12 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				if (manager.getSelectedElement() != null)
+				if (manager.getCurrentElement() != null)
 				{
-					Face face = manager.getSelectedElement().getSelectedFace();
+					Face face = manager.getCurrentElement().getSelectedFace();
 					face.setStartV(Parser.parseDouble(yStartField.getText(), face.getStartV()));
 					face.updateUV();
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		});
@@ -156,12 +157,12 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					if (manager.getSelectedElement() != null)
+					if (manager.getCurrentElement() != null)
 					{
-						Face face = manager.getSelectedElement().getSelectedFace();
+						Face face = manager.getCurrentElement().getSelectedFace();
 						face.setEndU(Parser.parseDouble(xEndField.getText(), face.getEndU()));
 						face.updateUV();
-						manager.updateValues();
+						ModelCreator.updateValues();
 					}
 				}
 			}
@@ -171,12 +172,12 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				if (manager.getSelectedElement() != null)
+				if (manager.getCurrentElement() != null)
 				{
-					Face face = manager.getSelectedElement().getSelectedFace();
+					Face face = manager.getCurrentElement().getSelectedFace();
 					face.setEndU(Parser.parseDouble(xEndField.getText(), face.getEndU()));
 					face.updateUV();
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		});
@@ -191,12 +192,12 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					if (manager.getSelectedElement() != null)
+					if (manager.getCurrentElement() != null)
 					{
-						Face face = manager.getSelectedElement().getSelectedFace();
+						Face face = manager.getCurrentElement().getSelectedFace();
 						face.setEndV(Parser.parseDouble(yEndField.getText(), face.getEndV()));
 						face.updateUV();
-						manager.updateValues();
+						ModelCreator.updateValues();
 					}
 				}
 			}
@@ -206,21 +207,21 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				if (manager.getSelectedElement() != null)
+				if (manager.getCurrentElement() != null)
 				{
-					Face face = manager.getSelectedElement().getSelectedFace();
+					Face face = manager.getCurrentElement().getSelectedFace();
 					face.setEndV(Parser.parseDouble(yEndField.getText(), face.getEndV()));
 					face.updateUV();
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		});
 
 		btnPlusX.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				Element cube = manager.getSelectedElement();
+				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
@@ -231,7 +232,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureX(1.0);
 				}
 				cube.updateUV();
-				manager.updateValues();
+				ModelCreator.updateValues();
 			}
 		});
 
@@ -241,9 +242,9 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 
 		btnPlusY.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				Element cube = manager.getSelectedElement();
+				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
@@ -254,7 +255,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureY(1.0);
 				}
 				cube.updateUV();
-				manager.updateValues();
+				ModelCreator.updateValues();
 			}
 		});
 		btnPlusY.setPreferredSize(new Dimension(62, 30));
@@ -263,9 +264,9 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 
 		btnNegX.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				Element cube = manager.getSelectedElement();
+				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
@@ -276,7 +277,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureX(-1.0);
 				}
 				cube.updateUV();
-				manager.updateValues();
+				ModelCreator.updateValues();
 			}
 		});
 		btnNegX.setSize(new Dimension(62, 30));
@@ -285,9 +286,9 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 
 		btnNegY.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				Element cube = manager.getSelectedElement();
+				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
@@ -298,7 +299,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureY(-1.0);
 				}
 				cube.updateUV();
-				manager.updateValues();
+				ModelCreator.updateValues();
 			}
 		});
 		btnNegY.setSize(new Dimension(62, 30));
@@ -307,9 +308,9 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 
 		btnPlusXEnd.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				Element cube = manager.getSelectedElement();
+				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
@@ -320,7 +321,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureXEnd(1.0);
 				}
 				face.setAutoUVEnabled(false);
-				manager.updateValues();
+				ModelCreator.updateValues();
 			}
 		});
 		btnPlusXEnd.setSize(new Dimension(62, 30));
@@ -329,9 +330,9 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 
 		btnPlusYEnd.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				Element cube = manager.getSelectedElement();
+				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
@@ -342,7 +343,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureYEnd(1.0);
 				}
 				face.setAutoUVEnabled(false);
-				manager.updateValues();
+				ModelCreator.updateValues();
 			}
 		});
 		btnPlusYEnd.setPreferredSize(new Dimension(62, 30));
@@ -351,9 +352,9 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 
 		btnNegXEnd.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				Element cube = manager.getSelectedElement();
+				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
@@ -364,7 +365,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureXEnd(-1.0);
 				}
 				face.setAutoUVEnabled(false);
-				manager.updateValues();
+				ModelCreator.updateValues();
 			}
 		});
 		btnNegXEnd.setSize(new Dimension(62, 30));
@@ -373,9 +374,9 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 
 		btnNegYEnd.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				Element cube = manager.getSelectedElement();
+				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
@@ -386,7 +387,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureYEnd(-1.0);
 				}
 				face.setAutoUVEnabled(false);
-				manager.updateValues();
+				ModelCreator.updateValues();
 			}
 		});
 		btnNegYEnd.setSize(new Dimension(62, 30));
@@ -411,8 +412,9 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 	}
 
 	@Override
-	public void updateValues(Element cube)
+	public void updateValues()
 	{
+		Element cube = manager.getCurrentElement();
 		if (cube != null)
 		{
 			xStartField.setEnabled(true);

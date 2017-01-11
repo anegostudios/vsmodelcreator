@@ -36,9 +36,9 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
-
 import at.vintagestory.modelcreator.gui.GuiMain;
 import at.vintagestory.modelcreator.gui.Icons;
+import at.vintagestory.modelcreator.gui.left.LeftKeyFramesPanel;
 import at.vintagestory.modelcreator.gui.left.LeftSidebar;
 import at.vintagestory.modelcreator.gui.left.LeftUVSidebar;
 import at.vintagestory.modelcreator.gui.middle.ModelRenderer;
@@ -54,9 +54,12 @@ import java.util.prefs.Preferences;
 
 public class ModelCreator extends JFrame
 {
+	private static final long serialVersionUID = 1L;
+	
 	public static Preferences prefs;
 	
-	private static final long serialVersionUID = 1L;
+	public static Project currentProject;
+	
 
 	public static boolean transparent = true;
 	public static boolean unlockAngles = false;
@@ -68,7 +71,7 @@ public class ModelCreator extends JFrame
 
 	// Swing Components
 	private JScrollPane scroll;
-	private IElementManager manager;
+	public static IElementManager manager;
 	private Element grabbed = null;
 
 	// Texture Loading Cache
@@ -82,10 +85,15 @@ public class ModelCreator extends JFrame
 	/* Sidebar Variables */
 	private final int SIDEBAR_WIDTH = 130;
 	
-	public static LeftSidebar uvSidebar;
+	public LeftSidebar uvSidebar;
+	
+	public static LeftKeyFramesPanel leftKeyframesPanel;
 
 	
-	public ModelRenderer renderer;
+	public ModelRenderer modelrenderer;
+	
+	public long prevFrameMillisec;
+	
 	
 	static {
 		prefs = Preferences.systemNodeForPackage(ModelCreator.class);
@@ -96,66 +104,9 @@ public class ModelCreator extends JFrame
 	{
 		super(title);
 		
-		setDropTarget(new DropTarget() {
-			private static final long serialVersionUID = 1L;
-			
-			@Override
-		    public synchronized void drop(DropTargetDropEvent evt) {
-				DataFlavor flavor = evt.getCurrentDataFlavors()[0];
-		        evt.acceptDrop(evt.getDropAction());
-				
-		        
-		        
-				try {
-					@SuppressWarnings("rawtypes")
-					List data = (List)evt.getTransferable().getTransferData(flavor);
-					
-					for (Object elem : data) {
-						if (elem instanceof File) {
-							File file = (File)elem;
-							
-							if (file.getName().endsWith(".json")) {								
-								Importer importer = new Importer(getElementManager(), file.getAbsolutePath());
-								importer.importFromJSON();
-							}
-							
-							if (file.getName().endsWith(".png")) {								
-								File meta = new File(file.getAbsolutePath() + ".mcmeta");
-								
-								getElementManager().addPendingTexture(new PendingTexture(file, meta, new ITextureCallback()
-								{
-									@Override
-									public void callback(boolean isnew, String errormessage, String texture)
-									{										
-										if (errormessage != null)
-										{
-											JOptionPane error = new JOptionPane();
-											error.setMessage(errormessage);
-											JDialog dialog = error.createDialog(canvas, "Texture Error");
-											dialog.setLocationRelativeTo(null);
-											dialog.setModal(false);
-											dialog.setVisible(true);
-										}
-									}
-								}));
-							}
-							
-							
-							return;
-						}
-							
-					}
-					
-					
-				} catch (Exception e) {
-					System.out.println(e);
-				}
-		        		        
-		        evt.dropComplete(true);
-		    }
-			
-		});
-		//setTransferHandler(new JsonTransferHandler());
+		currentProject = new Project();
+		
+		setDropTarget(getCustomDropTarget());		
 		setPreferredSize(new Dimension(1200, 715));
 		setMinimumSize(new Dimension(800, 500));
 		setLayout(new BorderLayout(10, 0));
@@ -163,10 +114,9 @@ public class ModelCreator extends JFrame
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
 		canvas = new Canvas();
-
+		
 		initComponents();
 
-		uvSidebar = new LeftUVSidebar("UV Editor", manager);
 
 		canvas.addComponentListener(new ComponentAdapter()
 		{
@@ -195,8 +145,7 @@ public class ModelCreator extends JFrame
 			}
 		});
 
-		manager.updateValues();
-
+		
 		pack();
 		setVisible(true);
 		setLocationRelativeTo(null);
@@ -205,11 +154,15 @@ public class ModelCreator extends JFrame
 
 		
 		
+		currentProject.LoadIntoEditor(getElementManager());
+		updateValues();
+
+		
+		prevFrameMillisec = System.currentTimeMillis();
+		
 		try
 		{
 			Display.create();
-
-			//WelcomeDialog.show(ModelCreator.this);
 
 			loop();
 
@@ -217,7 +170,7 @@ public class ModelCreator extends JFrame
 			dispose();
 			System.exit(0);
 		}
-		catch (LWJGLException e1)
+		catch (Exception e1)
 		{
 			e1.printStackTrace();
 		}
@@ -227,6 +180,12 @@ public class ModelCreator extends JFrame
 	{
 		Icons.init(getClass());
 		setupMenuBar();
+		
+		manager = new RightTopPanel(this);
+
+		leftKeyframesPanel = new LeftKeyFramesPanel(manager);
+		leftKeyframesPanel.setVisible(false);
+		add(leftKeyframesPanel, BorderLayout.WEST);
 
 		canvas.setPreferredSize(new Dimension(1000, 850));
 		add(canvas, BorderLayout.CENTER);
@@ -235,13 +194,16 @@ public class ModelCreator extends JFrame
 		canvas.setVisible(true);
 		canvas.requestFocus();
 
-		manager = new RightTopPanel(this);
-		renderer = new ModelRenderer(manager);
+		modelrenderer = new ModelRenderer(manager);
+		
 		scroll = new JScrollPane((JPanel) manager);
 		scroll.setBorder(BorderFactory.createEmptyBorder());
 		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		add(scroll, BorderLayout.EAST);
+		
+		uvSidebar = new LeftUVSidebar("UV Editor", manager);
+		
 	}
 
 	private List<Image> getIcons()
@@ -260,6 +222,24 @@ public class ModelCreator extends JFrame
 		setJMenuBar(new GuiMain(this));
 	}
 
+	
+	
+	public static void updateValues()
+	{
+	 	((RightTopPanel)manager).updateValues();
+	 	leftKeyframesPanel.updateValues();
+	 	updateFrame();
+	}
+	
+	public static void updateFrame() {
+		leftKeyframesPanel.updateFrame();
+		((RightTopPanel)manager).updateFrame();
+	}
+
+
+	
+	
+	
 	public void initDisplay()
 	{
 		try
@@ -274,9 +254,9 @@ public class ModelCreator extends JFrame
 		}
 	}
 
-	private void loop() throws LWJGLException
+	private void loop() throws Exception
 	{
-		renderer.camera = new Camera(60F, (float) Display.getWidth() / (float) Display.getHeight(), 0.3F, 1000F);		
+		modelrenderer.camera = new Camera(60F, (float) Display.getWidth() / (float) Display.getHeight(), 0.3F, 1000F);		
 
 		Dimension newDim;
 
@@ -296,13 +276,13 @@ public class ModelCreator extends JFrame
 				height = newDim.height;
 			}
 
-			int leftSpacing = renderer.activeSidebar == null ? 0 : getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
+			int leftSpacing = modelrenderer.renderedLeftSidebar == null ? 0 : getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
 
 			glViewport(leftSpacing, 0, width - leftSpacing, height);
 
 			handleInput(leftSpacing);
 
-			renderer.Render(leftSpacing, width, height, getHeight());
+			modelrenderer.Render(leftSpacing, width, height, getHeight());
 			
 
 			Display.update();
@@ -315,13 +295,24 @@ public class ModelCreator extends JFrame
 					Screenshot.getScreenshot(width, height, screenshot.getCallback());
 				screenshot = null;
 			}
+			
+			
+			if (currentProject != null && currentProject.SelectedAnimation != null && currentProject.PlayAnimation) {
+				currentProject.SelectedAnimation.NextFrame();
+				updateFrame();
+			}
+			
+			// Don't run faster than ~30 FPS (1000 / 30 = 33ms)
+			long duration = System.currentTimeMillis() - prevFrameMillisec; 
+			Thread.sleep(Math.max(33 - duration, 0));
+			prevFrameMillisec = System.currentTimeMillis();
 		}
 	}
 
 	
 	public void handleInput(int offset)
 	{
-		final float cameraMod = Math.abs(renderer.camera.getZ());
+		final float cameraMod = Math.abs(modelrenderer.camera.getZ());
 
 		if (Mouse.isButtonDown(0) | Mouse.isButtonDown(1))
 		{
@@ -340,7 +331,7 @@ public class ModelCreator extends JFrame
 
 		if (Mouse.getX() < offset)
 		{
-			renderer.activeSidebar.handleInput(getHeight());
+			modelrenderer.renderedLeftSidebar.handleInput(getHeight());
 		}
 		else
 		{
@@ -354,15 +345,15 @@ public class ModelCreator extends JFrame
 						int openGlName = getElementGLNameAtPos(Mouse.getX(), Mouse.getY());
 						if (openGlName >= 0)
 						{
-							manager.selectElementByOpenGLName(openGlName);
-							grabbed = manager.getSelectedElement();
+							currentProject.selectElementByOpenGLName(openGlName);
+							grabbed = manager.getCurrentElement();
 						}
 					}
 				}
 				else
 				{
 					Element element = grabbed;
-					int state = getCameraState(renderer.camera);
+					int state = getCameraState(modelrenderer.camera);
 
 					int newMouseX = Mouse.getX();
 					int newMouseY = Mouse.getY();
@@ -458,7 +449,7 @@ public class ModelCreator extends JFrame
 						if (yMovement != 0)
 							lastMouseY = newMouseY;
 
-						manager.updateValues();
+						updateValues();
 						element.updateUV();
 					}
 				}
@@ -468,21 +459,21 @@ public class ModelCreator extends JFrame
 				if (Mouse.isButtonDown(0))
 				{
 					final float modifier = (cameraMod * 0.05f);
-					renderer.camera.addX((float) (Mouse.getDX() * 0.01F) * modifier);
-					renderer.camera.addY((float) (Mouse.getDY() * 0.01F) * modifier);
+					modelrenderer.camera.addX((float) (Mouse.getDX() * 0.01F) * modifier);
+					modelrenderer.camera.addY((float) (Mouse.getDY() * 0.01F) * modifier);
 				}
 				else if (Mouse.isButtonDown(1))
 				{
 					final float modifier = applyLimit(cameraMod * 0.1f);
-					renderer.camera.rotateX(-(float) (Mouse.getDY() * 0.5F) * modifier);
-					final float rxAbs = Math.abs(renderer.camera.getRX());
-					renderer.camera.rotateY((rxAbs >= 90 && rxAbs < 270 ? -1 : 1) * (float) (Mouse.getDX() * 0.5F) * modifier);
+					modelrenderer.camera.rotateX(-(float) (Mouse.getDY() * 0.5F) * modifier);
+					final float rxAbs = Math.abs(modelrenderer.camera.getRX());
+					modelrenderer.camera.rotateY((rxAbs >= 90 && rxAbs < 270 ? -1 : 1) * (float) (Mouse.getDX() * 0.5F) * modifier);
 				}
 
 				final float wheel = Mouse.getDWheel();
 				if (wheel != 0)
 				{
-					renderer.camera.addZ(wheel * (cameraMod / 5000F));
+					modelrenderer.camera.addZ(wheel * (cameraMod / 5000F));
 				}
 			}
 		}
@@ -511,7 +502,7 @@ public class ModelCreator extends JFrame
 			GLU.gluPickMatrix(x, y, 1, 1, IntBuffer.wrap(viewport));
 			GLU.gluPerspective(60F, (float) (width) / (float) height, 0.3F, 1000F);
 
-			renderer.drawGridAndElements();
+			modelrenderer.drawGridAndElements();
 		}
 		GL11.glPopMatrix();
 		hits = GL11.glRenderMode(GL11.GL_RENDER);
@@ -574,7 +565,16 @@ public class ModelCreator extends JFrame
 
 	public void setSidebar(LeftSidebar s)
 	{
-		renderer.activeSidebar = s;
+		modelrenderer.renderedLeftSidebar = s;
+	}
+	
+	
+	public List<Element> getRootElementsForRender() {
+		if (leftKeyframesPanel.isVisible()) {
+			return currentProject.getAnimatedRootElements();
+		} else {
+			return currentProject.RootElements;
+		}
 	}
 
 	public IElementManager getElementManager()
@@ -594,4 +594,70 @@ public class ModelCreator extends JFrame
 
 	
 
+	
+	
+
+	private DropTarget getCustomDropTarget()
+	{
+		 return new DropTarget() {
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+		    public synchronized void drop(DropTargetDropEvent evt) {
+				DataFlavor flavor = evt.getCurrentDataFlavors()[0];
+		        evt.acceptDrop(evt.getDropAction());
+				
+		        
+		        
+				try {
+					@SuppressWarnings("rawtypes")
+					List data = (List)evt.getTransferable().getTransferData(flavor);
+					
+					for (Object elem : data) {
+						if (elem instanceof File) {
+							File file = (File)elem;
+							
+							if (file.getName().endsWith(".json")) {								
+								Importer importer = new Importer(file.getAbsolutePath());
+								currentProject = importer.loadFromJSON();
+								currentProject.LoadIntoEditor(getElementManager());
+								ModelCreator.updateValues();
+							}
+							
+							if (file.getName().endsWith(".png")) {								
+								File meta = new File(file.getAbsolutePath() + ".mcmeta");
+								
+								getElementManager().addPendingTexture(new PendingTexture(file, meta, new ITextureCallback()
+								{
+									@Override
+									public void callback(boolean isnew, String errormessage, String texture)
+									{										
+										if (errormessage != null)
+										{
+											JOptionPane error = new JOptionPane();
+											error.setMessage(errormessage);
+											JDialog dialog = error.createDialog(canvas, "Texture Error");
+											dialog.setLocationRelativeTo(null);
+											dialog.setModal(false);
+											dialog.setVisible(true);
+										}
+									}
+								}));
+							}
+							
+							
+							return;
+						}
+							
+					}
+					
+					
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+		        		        
+		        evt.dropComplete(true);
+		    }
+		 };
+	}
 }

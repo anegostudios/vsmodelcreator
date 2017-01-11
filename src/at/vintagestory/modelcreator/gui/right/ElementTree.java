@@ -1,17 +1,19 @@
 package at.vintagestory.modelcreator.gui.right;
 
-import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.model.Element;
 
 public class ElementTree
@@ -20,9 +22,7 @@ public class ElementTree
 	public DefaultMutableTreeNode rootNode;
 	public DefaultTreeModel treeModel;
 	private Toolkit toolkit = Toolkit.getDefaultToolkit();
-	
-	ArrayList<Element> rootElements = new ArrayList<Element>();
-	
+		
 	public ElementTree() {
 		rootNode = new DefaultMutableTreeNode("Root");
 		treeModel = new DefaultTreeModel(rootNode);
@@ -31,14 +31,26 @@ public class ElementTree
         jtree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jtree.setShowsRootHandles(true);
         jtree.setCellRenderer(new ElementTreeCellRenderer());
+        
+		jtree.addTreeSelectionListener(new TreeSelectionListener()
+		{
+			@Override
+			public void valueChanged(TreeSelectionEvent e)
+			{
+				ModelCreator.currentProject.SelectedElement = getSelectedElement();
+				ModelCreator.updateValues();
+			}
+		});
+		
 	}
 	
 
 	public void clearElements()
 	{
+		jtree.clearSelection();
 		rootNode.removeAllChildren();
 		jtree.removeAll();
-		rootElements.clear();
+		jtree.updateUI();
 	}
 
 	
@@ -84,16 +96,6 @@ public class ElementTree
 		}
 	}
 	
-	
-	public List<Element> GetRootElements() {
-		Enumeration e = rootNode.children();		
-		rootElements.clear();
-		while (e.hasMoreElements()) {
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement(); 
-			rootElements.add((Element)node.getUserObject());
-		}
-		return rootElements;
-	}
 	
 	
     /** Remove the currently selected node. */
@@ -199,6 +201,13 @@ public class ElementTree
         
         return childNode;
     }
+
+
+	public void updateUI()
+	{
+		jtree.updateUI();
+		
+	}
 
 
 	

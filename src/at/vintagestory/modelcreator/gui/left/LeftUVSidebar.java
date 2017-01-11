@@ -22,6 +22,7 @@ import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.TextureImpl;
 
+import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.EnumFonts;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.Element;
@@ -51,7 +52,7 @@ public class LeftUVSidebar extends LeftSidebar
 	{
 		super.draw(sidebarWidth, canvasWidth, canvasHeight, frameHeight);
 
-		Element elem = manager.getSelectedElement();
+		Element elem = manager.getCurrentElement();
 		
 		float[] bright = elem != null ? elem.brightnessByFace : brightnessByFace;
 		
@@ -86,7 +87,7 @@ public class LeftUVSidebar extends LeftSidebar
 
 					if (faces != null)
 					{
-						faces[i].bindTexture(0);
+						faces[i].bindTexture();
 
 						glBegin(GL_QUADS);
 						{
@@ -172,9 +173,9 @@ public class LeftUVSidebar extends LeftSidebar
 			int side = getFace(canvasHeight, newMouseX, newMouseY);
 			if (side != -1 | selected != -1)
 			{
-				if (manager.getSelectedElement() != null)
+				if (manager.getCurrentElement() != null)
 				{
-					Face face = manager.getSelectedElement().getAllFaces()[(selected != -1 ? selected : side)];
+					Face face = manager.getCurrentElement().getAllFaces()[(selected != -1 ? selected : side)];
 
 					int xMovement = (int) ((newMouseX - this.lastMouseX) / 6);
 					int yMovement = (int) ((newMouseY - this.lastMouseY) / 6);
@@ -206,7 +207,7 @@ public class LeftUVSidebar extends LeftSidebar
 						if (yMovement != 0)
 							this.lastMouseY = newMouseY;
 					}
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		}

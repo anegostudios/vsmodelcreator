@@ -1,11 +1,8 @@
-package at.vintagestory.modelcreator.gui.right.rotation;
+package at.vintagestory.modelcreator.gui.right.element;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -15,6 +12,8 @@ import java.util.Hashtable;
 import javax.swing.*;
 
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Start;
+import at.vintagestory.modelcreator.interfaces.IBasicElementManager;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
@@ -25,9 +24,9 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 {
 	private static final long serialVersionUID = 1L;
 
-	private IElementManager manager;
+	private IBasicElementManager manager;
 
-	private RotationOriginPanel panelOrigin;
+	
 	
 	
 	private JTextField[] rotationFields;
@@ -40,53 +39,47 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 	
 	boolean ignoreSliderChanges;
 	
+	public boolean enabled = true;
+	
 	static double multiplier = 22.5;
 
-	public ElementRotationPanel(IElementManager manager)
+	public ElementRotationPanel(IBasicElementManager manager)
 	{
 		rotationFields = new JTextField[3];
 		rotationSliders = new JSlider[3];
 		
 		this.manager = manager;
 		setMaximumSize(new Dimension(186, 270));
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		
 		initComponents();
 	}
-
 	
 
 	public void initComponents()
 	{
-		panelOrigin = new RotationOriginPanel(manager);
-		add(panelOrigin);
 		
-		JPanel slidersPanel = new JPanel(new GridBagLayout());
+		SpringLayout layout = new SpringLayout();
 		
-		slidersPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>XYZ Rotation</b></html>"));
+		JPanel slidersPanel = new JPanel(layout);
 		
-		GridBagConstraints cons = new GridBagConstraints();
-		cons.fill = GridBagConstraints.HORIZONTAL;
-		cons.gridheight = 1;
-		cons.anchor = GridBagConstraints.NORTH;
-	
+		slidersPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html>&nbsp;&nbsp;&nbsp;<b>XYZ Rotation</b></html>"));		
 		
-		cons.gridy = 0;
-		AddRotationPanel("X", 0, slidersPanel, cons);
-		cons.gridy = 1;
-		AddRotationPanel("Y", 1, slidersPanel, cons);
-		cons.gridy = 2;
-		AddRotationPanel("Z", 2, slidersPanel, cons);
+		AddRotationPanel("X", 0, slidersPanel, layout);
+		AddRotationPanel("Y", 1, slidersPanel, layout);
+		AddRotationPanel("Z", 2, slidersPanel, layout);
 		
-		add(slidersPanel);
+		add(slidersPanel);		
 	}
 	
 	
 	
-	void AddRotationPanel(String axis, int num, JPanel sliderPanel, GridBagConstraints cons) {
+	void AddRotationPanel(String axis, int num, JPanel sliderPanel, SpringLayout layout) {
 		rotationFields[num] = new JTextField();
-		Font defaultFont = new Font("SansSerif", Font.PLAIN, 10);
+		Font defaultFont = new Font("SansSerif", Font.PLAIN, 12);
 		rotationFields[num].setFont(defaultFont);
+		rotationFields[num].setForeground(new Color(0,0,0));
 		rotationFields[num].setHorizontalAlignment(JTextField.CENTER);
+		rotationFields[num].setPreferredSize(new Dimension(38, 20));
 		
 		int colIndex = num == 1 ? 4 : (num == 0 ? 1 : 2);
 		
@@ -100,13 +93,13 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					Element element = manager.getSelectedElement();
+					Element element = manager.getCurrentElement();
 					if (element != null)
 					{
 						if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
 						if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
 						if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
-						manager.updateValues();
+						ModelCreator.updateValues();
 					}
 				}
 			}
@@ -117,22 +110,20 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Element element = manager.getSelectedElement();
+				Element element = manager.getCurrentElement();
 				if (element != null)
 				{
 					if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
 					if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
 					if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
-					manager.updateValues();
+					ModelCreator.updateValues();
 				}
 			}
 		});
 
 		
 		
-		cons.gridx = 0;
-		cons.weightx = 0.5f;
-		sliderPanel.add(rotationFields[num], cons);
+		sliderPanel.add(rotationFields[num]);
 		
 		
 		rotationSliders[num] = new JSlider(JSlider.HORIZONTAL, ROTATION_MIN, ROTATION_MAX, ROTATION_INIT);
@@ -140,6 +131,7 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		rotationSliders[num].setPaintTicks(true);
 		rotationSliders[num].setPaintLabels(true);
 		rotationSliders[num].setLabelTable(getLabelTable());
+		rotationSliders[num].setPreferredSize(new Dimension(160, 40));
 		
 		
 		rotationSliders[num].addChangeListener(e ->
@@ -150,7 +142,7 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			
 			rotationFields[num].setText(""+newValue);
 			
-			Element elem = manager.getSelectedElement();
+			Element elem = manager.getCurrentElement();
 			if (elem == null) return;
 			
 			if (num == 0) {
@@ -165,18 +157,27 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		});
 		
 
-		cons.gridx = 1;
-		cons.weightx = 1.3f;
-				
-		sliderPanel.add(rotationSliders[num], cons);
+		sliderPanel.add(rotationSliders[num]);
+		
+		layout.putConstraint(SpringLayout.WEST, rotationFields[num], 10, SpringLayout.WEST, sliderPanel);
+		layout.putConstraint(SpringLayout.NORTH, rotationFields[num], 5 + num * 45, SpringLayout.NORTH, sliderPanel);
+		
+		layout.putConstraint(SpringLayout.WEST, rotationSliders[num], 50, SpringLayout.WEST, sliderPanel);
+		layout.putConstraint(SpringLayout.NORTH, rotationSliders[num], 5 + num * 45, SpringLayout.NORTH, sliderPanel);
+		
+		layout.putConstraint(SpringLayout.EAST, sliderPanel, 5, SpringLayout.EAST, rotationSliders[num]);
+		layout.putConstraint(SpringLayout.SOUTH, sliderPanel, 5, SpringLayout.SOUTH, rotationSliders[num]);
 	}
 
 
 	@Override
-	public void updateValues(Element cube)
+	public void updateValues()
 	{
-		panelOrigin.updateValues(cube);
-		
+		Element cube = manager.getCurrentElement();
+		toggleFields(cube);
+	}
+	
+	public void toggleFields(Element cube) {
 		ignoreSliderChanges = true;
 		
 		if (ModelCreator.unlockAngles) {
@@ -210,31 +211,20 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			}
 		}
 		
+	
+		
+		boolean enabled = cube != null && this.enabled;
+		
+		for (int i = 0; i < 3; i++) {
+			rotationFields[i].setEnabled(enabled);
+			rotationSliders[i].setEnabled(enabled);
+		}
+		
+		rotationSliders[0].setValue(enabled ? (int) Math.round(cube.getRotationX() / multiplier) : 0);
+		rotationSliders[1].setValue(enabled ? (int) Math.round(cube.getRotationY() / multiplier) : 0);
+		rotationSliders[2].setValue(enabled ? (int) Math.round(cube.getRotationZ() / multiplier) : 0);
 		
 		ignoreSliderChanges = false;
-		
-		
-		if (cube != null)
-		{
-			for (int i = 0; i < 3; i++) {
-				rotationFields[i].setEnabled(true);
-				rotationSliders[i].setEnabled(true);
-			}
-			
-			rotationSliders[0].setValue((int) Math.round(cube.getRotationX() / multiplier));
-			rotationSliders[1].setValue((int) Math.round(cube.getRotationY() / multiplier));
-			rotationSliders[2].setValue((int) Math.round(cube.getRotationZ() / multiplier));
-		}
-		else
-		{
-			for (int i = 0; i < 3; i++) {
-				rotationFields[i].setEnabled(false);
-				rotationSliders[i].setValue(0);
-				rotationSliders[i].setEnabled(false);
-			}
-		}
-		
-
 	}
 	
 	

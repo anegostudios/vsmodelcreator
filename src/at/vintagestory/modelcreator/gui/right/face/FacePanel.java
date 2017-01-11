@@ -1,6 +1,5 @@
 package at.vintagestory.modelcreator.gui.right.face;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.Hashtable;
@@ -13,6 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
+import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
@@ -30,9 +31,6 @@ public class FacePanel extends JPanel implements IValueUpdater
 	private JSlider rotation;
 	private FaceTexturePanel panelTexture;
 	private FacePropertiesPanel panelFaceExtras;
-
-	//private JPanel panelModId;
-	//private JTextField modidField;
 
 	private final int ROTATION_MIN = 0;
 	private final int ROTATION_MAX = 3;
@@ -63,16 +61,16 @@ public class FacePanel extends JPanel implements IValueUpdater
 	public void initComponents()
 	{
 		menuPanel = new JPanel(new GridLayout(1, 1));
-		menuPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Side</b></html>"));
+		menuPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Side</b></html>"));
 		menuList = new JComboBox<String>();
 		menuList.setModel(model);
 		menuList.setToolTipText("The face to edit.");
 		menuList.addActionListener(e ->
 		{
-			if (manager.getSelectedElement() != null)
+			if (manager.getCurrentElement() != null)
 			{
-				manager.getSelectedElement().setSelectedFace(menuList.getSelectedIndex());
-				updateValues(manager.getSelectedElement());
+				manager.getCurrentElement().setSelectedFace(menuList.getSelectedIndex());
+				updateValues();
 			}
 		});
 		menuPanel.setMaximumSize(new Dimension(186, 50));
@@ -89,54 +87,23 @@ public class FacePanel extends JPanel implements IValueUpdater
 		labelTable.put(new Integer(3), new JLabel("270\u00b0"));
 
 		sliderPanel = new JPanel(new GridLayout(1, 1));
-		sliderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Rotation</b></html>"));
+		sliderPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Rotation</b></html>"));
 		rotation = new JSlider(JSlider.HORIZONTAL, ROTATION_MIN, ROTATION_MAX, ROTATION_INIT);
 		rotation.setMajorTickSpacing(4);
 		rotation.setPaintTicks(true);
 		rotation.setPaintLabels(true);
 		rotation.setLabelTable(labelTable);
 		
+		
 		rotation.addChangeListener(e ->
 		{
-			manager.getSelectedElement().getSelectedFace().setRotation(rotation.getValue());
-			manager.updateValues();
+			manager.getCurrentElement().getSelectedFace().setRotation(rotation.getValue());
+			ModelCreator.updateValues();
 		});
 		
 		rotation.setToolTipText("<html>The rotation of the texture<br>Default: 0\u00b0</html>");
 		sliderPanel.setMaximumSize(new Dimension(190, 80));
 		sliderPanel.add(rotation);
-
-		/*panelModId = new JPanel(new GridLayout(1, 1));
-		panelModId.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(221, 221, 228), 5), "<html><b>Location</b></html>"));
-		modidField = new JTextField();
-		modidField.setSize(new Dimension(190, 30));
-		modidField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					if (manager.getSelectedElement() != null)
-					{
-						manager.getSelectedElement().getSelectedFace().setTextureLocation(modidField.getText());
-					}
-				}
-			}
-		});
-		modidField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				if (manager.getSelectedElement() != null)
-				{
-					manager.getSelectedElement().getSelectedFace().setTextureLocation(modidField.getText());
-				}
-			}
-		});
-		modidField.setToolTipText("<html>The specific location of the texture. If you have the<br>" + "texture in a sub folder, write the custom directory<br>" + "here. Can include Mod ID prefix.<br>Default: 'blocks/'</html>");
-		panelModId.add(modidField);*/
 	}
 
 	public void addComponents()
@@ -151,8 +118,9 @@ public class FacePanel extends JPanel implements IValueUpdater
 	}
 
 	@Override
-	public void updateValues(Element cube)
+	public void updateValues()
 	{
+		Element cube = manager.getCurrentElement();
 		if (cube != null)
 		{
 			menuList.setSelectedIndex(cube.getSelectedFaceIndex());
@@ -168,7 +136,7 @@ public class FacePanel extends JPanel implements IValueUpdater
 			rotation.setEnabled(false);
 			rotation.setValue(0);
 		}
-		panelUV.updateValues(cube);
-		panelFaceExtras.updateValues(cube);
+		panelUV.updateValues();
+		panelFaceExtras.updateValues();
 	}
 }

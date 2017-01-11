@@ -1,12 +1,10 @@
-package at.vintagestory.modelcreator.gui.left;
+package at.vintagestory.modelcreator.gui.texturedialog;
 
 import java.awt.Component;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
-
-import at.vintagestory.modelcreator.TextureManager;
 
 public class TextureCellRenderer extends DefaultListCellRenderer
 {
@@ -17,7 +15,7 @@ public class TextureCellRenderer extends DefaultListCellRenderer
 	@Override
 	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus)
 	{
-		lbl.setIcon(TextureManager.getIcon((String) list.getModel().getElementAt(index)));
+		lbl.setIcon(TextureDialog.getIcon((String) list.getModel().getElementAt(index)));
 		lbl.revalidate();
 		if (isSelected)
 		{
