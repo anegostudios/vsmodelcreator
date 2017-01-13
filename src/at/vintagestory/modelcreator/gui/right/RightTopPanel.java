@@ -27,7 +27,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 	private JButton btnAdd = new JButton();
 	private JButton btnRemove = new JButton();
 	private JButton btnDuplicate = new JButton();
-	private JTextField name = new JTextField();
+	private JTextField nameField = new JTextField();
 	private CuboidTabbedPane tabbedPane = new CuboidTabbedPane(this);
 	
 	RightKeyFramesPanel rightKeyFramesPanel;
@@ -71,23 +71,29 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		btnContainer.add(btnDuplicate);
 		add(btnContainer);
 
-		name.setPreferredSize(new Dimension(205, 25));
-		name.setToolTipText("Element Name");
-		name.setEnabled(false);
+		nameField.setPreferredSize(new Dimension(205, 25));
+		nameField.setToolTipText("Element Name");
+		nameField.setEnabled(false);
 
-		name.addKeyListener(new KeyAdapter()
+		nameField.addKeyListener(new KeyAdapter()
 		{
 			@Override
 			public void keyReleased(KeyEvent e)
 			{
 				Element elem = tree.getSelectedElement();
 				if (elem != null) {
-					elem.name = name.getText();
+					if (ModelCreator.currentProject.IsElementNameUsed(nameField.getText())) {
+						nameField.setBackground(new Color(50, 0, 0));
+					} else {
+						elem.name = nameField.getText();
+						nameField.setBackground(getBackground());
+					}
+					
 				}
 				tree.updateUI();
 			}
 		});
-		add(name);
+		add(nameField);
 		
 
 		add(tree.jtree);
@@ -120,7 +126,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 
 	public void setLayoutConstaints()
 	{
-		layout.putConstraint(SpringLayout.NORTH, name, 212 + 70, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, nameField, 212 + 70, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.NORTH, btnContainer, 176 + 70, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.NORTH, tabbedPane, 250 + 70, SpringLayout.NORTH, this);
 	}
@@ -150,10 +156,10 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		Element cube = getCurrentElement();
 		if (cube != null)
 		{
-			name.setText(cube.name);
+			nameField.setText(cube.name);
 		}
 		
-		name.setEnabled(cube != null);
+		nameField.setEnabled(cube != null);
 		btnRemove.setEnabled(cube != null);
 		btnDuplicate.setEnabled(cube != null);
 		

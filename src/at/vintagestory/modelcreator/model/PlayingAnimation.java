@@ -7,7 +7,7 @@ public class PlayingAnimation
 	
 	public int CurrentFrame;
 	
-	public KeyFrameElement[] InterpolatedFrame;
+	public KeyframeElement[] InterpolatedFrame;
 	
 	
 

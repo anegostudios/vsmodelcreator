@@ -5,15 +5,18 @@ import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import at.vintagestory.modelcreator.enums.BlockFacing;
+import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.util.GameMath;
 import at.vintagestory.modelcreator.util.Mat4f;
 import org.newdawn.slick.Color;
 
-public class Element
+public class Element implements IDrawable
 {
 	static int nextOpenGlName = 0;
 	
@@ -21,7 +24,7 @@ public class Element
 	public ArrayList<Element> ChildElements = new ArrayList<Element>();
 	
 	
-	public String name = "Cube";
+	public String name = "Cube1";
 	
 	public int openGlName = 0;
 	
@@ -98,32 +101,12 @@ public class Element
 		recalculateBrightnessValues();
 	}
 	
-	public Element(Element cuboid) {
-		this(cuboid, false);
-	}
 
-	public Element(Element cuboid, boolean keepName)
+	public Element(Element cuboid)
 	{
-		if (keepName) {
-			this.name = cuboid.name;
-		} else {	
-			String numberStr = "";
-			int pos = cuboid.name.length() - 1;
-			while (pos > 0) {
-				if (Character.isDigit(cuboid.name.charAt(pos))) {
-					numberStr = cuboid.name.charAt(pos) + numberStr;
-				} else break;
-				pos--;
-			}
-			
-			int number = numberStr.length() > 0 ? Integer.parseInt(numberStr) : 2;
-			
-			this.name = cuboid.name.substring(0, cuboid.name.length() - numberStr.length()) + number;
-		}
-		
-		
 		openGlName = nextOpenGlName++;
 		
+		this.name = cuboid.name;
 		this.width = cuboid.width;
 		this.height = cuboid.height;
 		this.depth = cuboid.depth;
@@ -158,7 +141,7 @@ public class Element
 		}
 		
 		for (Element child : cuboid.ChildElements) {
-			ChildElements.add(new Element(child, true));
+			ChildElements.add(new Element(child));
 		}
 		
 		updateUV();
@@ -287,7 +270,7 @@ public class Element
 	}
 	
 
-	public void draw(Element selectedEleme)
+	public void draw(IDrawable selectedElem)
 	{
 		float b;
 		
@@ -314,13 +297,13 @@ public class Element
 			GL11.glLoadName(0);
 			
 			for (int i = 0; i < ChildElements.size(); i++) {
-				ChildElements.get(i).draw(selectedEleme);
+				ChildElements.get(i).draw(selectedElem);
 			}
 
 		}
 		GL11.glPopMatrix();
 		
-		if (selectedEleme == this) {
+		if (selectedElem == this) {
 			drawSelectionExtras();
 		}
 		
@@ -461,7 +444,7 @@ public class Element
 		return new Element(width, height, depth);
 	}
 	
-
+	
 	public void addStartX(double amt)
 	{
 		this.startX += amt;
@@ -659,5 +642,16 @@ public class Element
 		this.name = name;
 	}
 	
+	
+	public List<Element> GetParentPath() {
+		ArrayList<Element> path = new ArrayList<Element>();
+		Element parentElem = this.ParentElement;
+		while (parentElem != null) {
+			path.add(parentElem);			
+			parentElem = parentElem.ParentElement;
+		}		
+		Collections.reverse(path);
+		return path;
+	}
 
 }

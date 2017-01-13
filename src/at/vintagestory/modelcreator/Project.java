@@ -5,6 +5,7 @@ import java.util.List;
 
 import at.vintagestory.modelcreator.gui.right.ElementTree;
 import at.vintagestory.modelcreator.gui.right.RightTopPanel;
+import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.*;
 
@@ -14,7 +15,9 @@ public class Project
 	public boolean AmbientOcclusion;
 	public ArrayList<PendingTexture> PendingTextures = new ArrayList<PendingTexture>();
 	public ArrayList<TextureEntry> Textures = new ArrayList<TextureEntry>();
-	public ArrayList<Element> RootElements = new ArrayList<Element>();
+	public ArrayList<Element> rootElements = new ArrayList<Element>();
+	
+	
 	public ArrayList<Animation> Animations = new ArrayList<Animation>();
 	
 	
@@ -53,35 +56,40 @@ public class Project
 		return -1;
 	}
 	
-	public KeyFrameElement getSelectedKeyFrameElement() {
+	public KeyframeElement getSelectedKeyFrameElement() {
 		if (SelectedAnimation == null || SelectedElement == null) return null;
 		
 		return SelectedAnimation.GetOrCreateKeyFrameElement(SelectedElement);
 	}
 	
+	
 	public Keyframe GetKeyFrame(int frameNumber) {
 		if (SelectedAnimation == null) return null;
-		return SelectedAnimation.KeyFrames[frameNumber];
+		return SelectedAnimation.keyframes[frameNumber];
 	}
 	
-	public KeyFrameElement GetKeyFrameElement(Element elem, int frameNumber) {
-		if (SelectedAnimation == null) return null;
-		Keyframe keyFrame = SelectedAnimation.KeyFrames[frameNumber];
+	
+	public KeyframeElement GetKeyFrameElement(Element elem, int index) {
+		if (SelectedAnimation == null) return null;		
+		Keyframe keyFrame = SelectedAnimation.keyframes[index];
 		if (keyFrame == null) return null;
 		
 		return keyFrame.GetKeyFrameElement(elem);
 	}
 	
+	
 	public int[] GetFrameNumbers() {
 		if (SelectedAnimation == null) return null;
-		return SelectedAnimation.FrameNumbers;
+		return SelectedAnimation.frameNumbers;
 	}
+	
 	
 	public int GetKeyFrameCount() {
 		if (SelectedAnimation == null) return 0;
-		return SelectedAnimation.FrameNumbers == null ? 0 : SelectedAnimation.FrameNumbers.length;
+		return SelectedAnimation.frameNumbers == null ? 0 : SelectedAnimation.frameNumbers.length;
 	}
 
+	
 	public int GetFrameCount()
 	{
 		if (SelectedAnimation == null) return 0;
@@ -90,43 +98,67 @@ public class Project
 
 
 
+	public void calculateCurrentFrameElements() {
+		if (SelectedAnimation == null) return;
+		Keyframe keyFrame = SelectedAnimation.keyframes[SelectedAnimation.currentFrame];
+		if (keyFrame == null) return;
+		
+		
+	}
 
-	public List<Element> getAnimatedRootElements()
+	public List<IDrawable> getCurrentFrameRootElements()
 	{
-		return RootElements;	
+		if (SelectedAnimation == null || SelectedAnimation.keyframes.length == 0) return new ArrayList<IDrawable>(rootElements);
+		
+		if (SelectedAnimation.allFrames.size() == 0) {
+			SelectedAnimation.calculateAllFrames(this);
+		}
+		
+		return SelectedAnimation.allFrames.get(SelectedAnimation.currentFrame).Elements;
 	}
 	
 	
 
 	public void addElementAsChild(Element elem)
 	{
-		tree.addElementAsChild(elem);
+		elem.ParentElement = SelectedElement;
+		EnsureUniqueElementName(elem);
+		
 		if (elem.ParentElement == null) {
-			RootElements.add(elem);
-		}		
+			rootElements.add(elem);
+		}
+		
+		tree.addElementAsChild(elem);
 		SelectedElement = elem;
 		ModelCreator.updateValues();
 		tree.updateUI();
 	}
 	
+	
 	public void addRootElement(Element e)
 	{
-		RootElements.add(e);
+		e.ParentElement = null;
+		EnsureUniqueElementName(e);
+		
+		rootElements.add(e);
 		tree.addRootElement(e);
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.updateValues();
 		tree.jtree.updateUI();
 	}
 	
+	
 	public void duplicateCurrentElement() {
-		Element elem = tree.getSelectedElement();
-		if (elem != null) {
-			Element newElem = new Element(elem);
+		if (SelectedElement != null) {
+			Element newElem = new Element(SelectedElement);
+			newElem.ParentElement = SelectedElement.ParentElement;
+			EnsureUniqueElementName(newElem);
+			
 			tree.addElementAsSibling(newElem);
 			tree.SelectElement(newElem);
 			
 			if (newElem.ParentElement == null) {
-				RootElements.add(newElem);
+				rootElements.add(newElem);
 			}
 		}
 		
@@ -134,22 +166,26 @@ public class Project
 		ModelCreator.updateValues();
 	}
 	
+	
 	public void removeCurrentElement() {
 		Element curElem = SelectedElement;
 		tree.removeCurrentElement();
 		
 		if (curElem.ParentElement == null) {
-			RootElements.remove(curElem);
+			rootElements.remove(curElem);
 		}
+		
+		if (SelectedAnimation != null) SelectedAnimation.RemoveElement(curElem);
 		
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.updateValues();
 	}
+	
 
 	public void clear()
 	{
 		AmbientOcclusion = true;
-		RootElements.clear();
+		rootElements.clear();
 		Animations.clear();
 		SelectedElement = null;
 		PendingTextures.clear();
@@ -158,15 +194,82 @@ public class Project
 		ModelCreator.updateValues();
 	}
 	
+	
 	public void selectElementByOpenGLName(int pos)
 	{
 		tree.selectElementByOpenGLName(pos);
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.updateValues();
 	}
-
 	
 
+	void EnsureUniqueElementName(Element elem) {
+		IntRef tq = new IntRef();
+		EnsureUniqueElementName(elem, tq);
+	}
+	
+	
+	void EnsureUniqueElementName(Element elem, IntRef totalQuantityElems) {
+		if (IsElementNameUsed(elem.name)) {
+			
+			String numberStr = "";
+			int pos = elem.name.length() - 1;
+			while (pos > 0) {
+				if (Character.isDigit(elem.name.charAt(pos))) {
+					numberStr = elem.name.charAt(pos) + numberStr;
+				} else break;
+				pos--;
+			}
+			
+			int nextNumber = TotalQuantityElements() + 1 + totalQuantityElems.value;
+			String baseName = elem.name.substring(0, elem.name.length() - numberStr.length());
+			
+			elem.name = baseName + nextNumber;
+			while(IsElementNameUsed(elem.name)) {
+				nextNumber++;
+				elem.name = baseName + nextNumber;
+			}
+			
+			totalQuantityElems.value++;
+		}
+		
+		for (Element childElem : elem.ChildElements) {
+			EnsureUniqueElementName(childElem, totalQuantityElems);
+		}
+	}
+
+	
+	public boolean IsElementNameUsed(String name) {
+		return IsElementNameUsed(name, rootElements);
+	}
+	
+	
+	boolean IsElementNameUsed(String name, ArrayList<Element> elems) {
+		for (Element elem : elems) {
+			if (elem.name.equals(name)) return true;
+			if (IsElementNameUsed(name, elem.ChildElements)) return true;
+		}
+		
+		return false;
+	}
+	
+	
+	int TotalQuantityElements() {
+		return TotalQuantityElements(rootElements);
+	}
+	
+	
+	int TotalQuantityElements(ArrayList<Element> elems) {
+		int quantity = 0;
+		for (Element elem : elems) {
+			quantity++;
+			quantity+= TotalQuantityElements(elem.ChildElements);
+		}
+		return quantity;
+	}
+	
+	
+	
 	
 	
 }

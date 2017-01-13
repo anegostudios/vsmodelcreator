@@ -40,6 +40,7 @@ import at.vintagestory.modelcreator.Camera;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.EnumFonts;
 import at.vintagestory.modelcreator.gui.left.LeftSidebar;
+import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.Element;
 
@@ -99,7 +100,7 @@ public class ModelRenderer
 		
 		glTranslatef(-8, 0, -8);
 		
-		ArrayList<Element> rootelems = ModelCreator.currentProject.RootElements;
+		List<IDrawable> rootelems = ModelCreator.getRootElementsForRender();
 		Element selectedElem = manager.getCurrentElement();
 
 		for (int i = 0; i < rootelems.size(); i++)

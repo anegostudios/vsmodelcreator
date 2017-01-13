@@ -1,34 +1,59 @@
 package at.vintagestory.modelcreator.model;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import at.vintagestory.modelcreator.interfaces.IDrawable;
 
 public class Keyframe
 {
-	private ArrayList<KeyFrameElement> Elements = new ArrayList<KeyFrameElement>();
+	public int FrameNumber;
 	
-	private ArrayList<KeyFrameElement> InterpolatedElements = new ArrayList<KeyFrameElement>();
+	public ArrayList<IDrawable> Elements = new ArrayList<IDrawable>();
 	
-	
-	public void AddElement(KeyFrameElement element) {
-		Elements.add(element);
-		InterpolatedElements.add(new KeyFrameElement(element));
+	public void AddElement(KeyframeElement keyfElem) {
+		Elements.add(keyfElem);
 	}
 	
-	public void RemoveElement(KeyFrameElement element) {
-		int index = Elements.indexOf(element);
-		Elements.remove(element);
-		if (index > 0) InterpolatedElements.remove(index);
+	public void RemoveElement(KeyframeElement element) {
+		KeyframeElement walkElem = (KeyframeElement)element.ParentElement;
+		
+		if (walkElem == null) {
+			Elements.remove(element);
+			return;
+		}
+		
+		while (walkElem.ParentElement != null) {
+			 walkElem = (KeyframeElement)walkElem.ParentElement;
+		}
+		Elements.remove(walkElem);
 	}
+	
 	
 	public boolean HasElements() {
 		return Elements.size() > 0;
 	}
 	
-	public KeyFrameElement GetKeyFrameElement(Element elem) {
-		KeyFrameElement keyframeElem;
-		for (int i = 0; i < Elements.size(); i++) {
-			keyframeElem = Elements.get(i);
-			if (keyframeElem != null && keyframeElem.AnimatedElement == elem) return keyframeElem;
+	public KeyframeElement GetKeyFrameElement(Element forElem) {
+		if (forElem == null) return null;
+		List<Element> path = forElem.GetParentPath();
+		
+		List<IDrawable> elems = Elements;		
+		while (path.size() > 0) {
+			KeyframeElement kelem = findChildElement(elems, path.get(0));
+			if (kelem == null) return null;
+			path.remove(0);
+			elems = kelem.ChildElements;
+		}
+		
+		return findChildElement(elems, forElem);
+	}
+	
+	KeyframeElement findChildElement(List<IDrawable> elems, Element forElem) {
+		KeyframeElement keyframeElem;
+		for (int i = 0; i < elems.size(); i++) {
+			keyframeElem = (KeyframeElement)elems.get(i);
+			if (keyframeElem != null && keyframeElem.AnimatedElement == forElem) return keyframeElem;
 		}
 		
 		return null;

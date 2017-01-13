@@ -8,18 +8,17 @@ import javax.swing.JToggleButton;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.gui.right.element.ElementPositionPanel;
 import at.vintagestory.modelcreator.gui.right.element.ElementRotationPanel;
-import at.vintagestory.modelcreator.interfaces.IBasicElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
-import at.vintagestory.modelcreator.model.KeyFrameElement;
+import at.vintagestory.modelcreator.model.KeyframeElement;
 
-public class RightKeyFramesPanel extends JPanel implements IValueUpdater, IBasicElementManager
+public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 {
 	private static final long serialVersionUID = 1L;
 	
 	
-	private ElementPositionPanel panelPosition;
-	private ElementRotationPanel panelRotation;
+	private ElementKeyFrameOffsetPanel panelPosition;
+	private ElementKeyFrameRotationPanel panelRotation;
 	//private ElementSizePanel panelSize;
 	
 	
@@ -36,8 +35,8 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater, IBasic
 
 	private void initComponents()
 	{
-		panelPosition = new ElementPositionPanel(this);
-		panelRotation = new ElementRotationPanel(this);
+		panelPosition = new ElementKeyFrameOffsetPanel(this);
+		panelRotation = new ElementKeyFrameRotationPanel(this);
 		//panelSize = new ElementSizePanel(manager);
 	}
 
@@ -47,7 +46,18 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater, IBasic
 		JPanel btnContainer = new JPanel(new GridLayout(1, 3, 4, 0));
 		btnContainer.setPreferredSize(new Dimension(196, 30));
 		
-		Font defaultFont = new Font("SansSerif", Font.BOLD, 12);
+		Font defaultFont = new Font("SansSerif", Font.BOLD, 11);
+		
+
+		btnRot = new JToggleButton("Rotation");
+		btnRot.setFont(defaultFont);
+		btnRot.addActionListener(a ->
+		{
+			ModelCreator.currentProject.SelectedAnimation.ToggleRotation(ModelCreator.manager.getCurrentElement(), btnRot.isSelected());
+			ModelCreator.updateValues();
+		});
+		btnContainer.add(btnRot);
+		
 		
 		btnPos = new JToggleButton("Position");
 		btnPos.setFont(defaultFont);
@@ -58,15 +68,6 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater, IBasic
 		});
 		btnContainer.add(btnPos);
 		
-		
-		btnRot = new JToggleButton("Rotation");
-		btnRot.setFont(defaultFont);
-		btnRot.addActionListener(a ->
-		{
-			ModelCreator.currentProject.SelectedAnimation.ToggleRotation(ModelCreator.manager.getCurrentElement(), btnRot.isSelected());
-			ModelCreator.updateValues();
-		});
-		btnContainer.add(btnRot);
 		
 		
 		btnStretch = new JToggleButton("Stretch");
@@ -104,7 +105,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater, IBasic
 		if (ModelCreator.currentProject.PlayAnimation) return;
 		
 		
-		KeyFrameElement keyframeElem = enabled ? ModelCreator.currentProject.SelectedAnimation.GetKeyFrameElement(elem) : null;
+		KeyframeElement keyframeElem = enabled ? ModelCreator.currentProject.SelectedAnimation.GetKeyFrameElement(elem, ModelCreator.currentProject.SelectedAnimation.currentFrame) : null;
 		
 		panelPosition.enabled = enabled && keyframeElem != null && keyframeElem.PositionSet;
 		panelRotation.enabled = enabled && keyframeElem != null && keyframeElem.RotationSet;
@@ -124,8 +125,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater, IBasic
 	}
 	
 
-	@Override
-	public Element getCurrentElement()
+	public KeyframeElement getCurrentElement()
 	{
 		if (ModelCreator.manager==null) return null;
 		

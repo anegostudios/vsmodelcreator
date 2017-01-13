@@ -5,9 +5,6 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -18,9 +15,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import at.vintagestory.modelcreator.ModelCreator;
@@ -31,7 +31,8 @@ import at.vintagestory.modelcreator.gui.animationsdialog.AnimationSelector;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Animation;
-import at.vintagestory.modelcreator.model.KeyFrameElement;
+import at.vintagestory.modelcreator.model.Keyframe;
+import at.vintagestory.modelcreator.model.KeyframeElement;
 
 public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 {
@@ -56,6 +57,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	JTable keyFramesTable;
 
 	String[] columnNames = {"#", "", "", ""};
+	
+	
 	
 	public LeftKeyFramesPanel(IElementManager manager)
 	{
@@ -90,11 +93,15 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			public Object getValueAt(int rowIndex, int columnIndex)
 			{
 				int[] frameNumbers = ModelCreator.currentProject.GetFrameNumbers();
-				if (frameNumbers==null) return "";
+				if (frameNumbers==null || ModelCreator.currentProject.SelectedAnimation == null) return "";
 				
 				if (columnIndex == 0) return frameNumbers[rowIndex];
 				
-				KeyFrameElement keyframElem = ModelCreator.currentProject.GetKeyFrameElement(ModelCreator.currentProject.SelectedElement, frameNumbers[rowIndex]);
+				Keyframe keyFrame = ModelCreator.currentProject.SelectedAnimation.keyframes[rowIndex];
+				
+				if (keyFrame == null) return "";
+				
+				KeyframeElement keyframElem = keyFrame.GetKeyFrameElement(ModelCreator.currentProject.SelectedElement);
 				
 				if (keyframElem == null) return "";
 
@@ -128,6 +135,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		        return String.class; //getValueAt(0, c).getClass();
 		    }
 		};
+		
 		keyFramesTable.setModel(tableModel);
 	}
 	
@@ -203,7 +211,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 				if (max > 0) frameSlider.setMaximum(max - 1);
 				frameSlider.setEnabled(max > 0);
 				
-				ModelCreator.currentProject.SelectedAnimation.SetQuantityFrames(max);
+				ModelCreator.currentProject.SelectedAnimation.SetQuantityFrames(max, ModelCreator.currentProject);
 				ModelCreator.updateFrame();	
 			}
 		});
@@ -232,7 +240,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			@Override
 			public void stateChanged(ChangeEvent e)
 			{
-				ModelCreator.currentProject.SelectedAnimation.CurrentFrame = frameSlider.getValue();
+				ModelCreator.currentProject.SelectedAnimation.currentFrame = frameSlider.getValue();
 				ModelCreator.updateFrame();		
 			}
 		});
@@ -306,6 +314,24 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		label.setPreferredSize(new Dimension(205, 30));
 		add(label);
 		
+		ListSelectionModel cellSelectionModel = keyFramesTable.getSelectionModel();
+	    cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+	    cellSelectionModel.addListSelectionListener(new ListSelectionListener()
+		{
+			@Override
+			public void valueChanged(ListSelectionEvent e)
+			{
+				int row = keyFramesTable.getSelectedRow();
+				if (ModelCreator.currentProject.SelectedAnimation != null) {
+				 	Keyframe keyframe = ModelCreator.currentProject.SelectedAnimation.keyframes[row];
+				 	
+				 	ModelCreator.currentProject.SelectedAnimation.SetFrame(keyframe.FrameNumber);
+				 	ModelCreator.updateFrame();
+				}
+			}
+		});
+		
 		JScrollPane scrollPane = new JScrollPane(keyFramesTable);
 		keyFramesTable.setFillsViewportHeight(true);
 		
@@ -324,7 +350,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		animationsListModel = new DefaultComboBoxModel<String>();
 		Project project = ModelCreator.currentProject;
 		for (Animation anim : project.Animations) {
-			animationsListModel.addElement("<html><b>"+ anim.Name +"</b></html>");	
+			animationsListModel.addElement("<html><b>"+ anim.name +"</b></html>");	
 		}
 		animationsList.setModel(animationsListModel);
 		
@@ -345,7 +371,6 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	public void updateValues()
 	{
 		loadAnimationList();	
-		keyFramesTable.updateUI();
 		
 		boolean enabled = ModelCreator.currentProject.SelectedAnimation != null; 
 		
@@ -356,16 +381,21 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		prevFrameButton.setEnabled(enabled);
 		nextFrameButton.setEnabled(enabled);
 		
-		currentFrameLabel.setText(enabled ? ("" + ModelCreator.currentProject.SelectedAnimation.CurrentFrame) : "");
+		currentFrameLabel.setText(enabled ? ("" + ModelCreator.currentProject.SelectedAnimation.currentFrame) : "");
+		
+		keyFramesTable.updateUI();
+		
+		frameSlider.setEnabled(enabled);
+		if (enabled) frameSlider.setMaximum(ModelCreator.currentProject.SelectedAnimation.GetQuantityFrames() - 1);
 	}
 
 	public void updateFrame()
 	{
 		if (ModelCreator.currentProject.SelectedAnimation == null) return;
 		
-		frameSlider.setValue(ModelCreator.currentProject.SelectedAnimation.CurrentFrame);
+		frameSlider.setValue(ModelCreator.currentProject.SelectedAnimation.currentFrame);
 		
-		currentFrameLabel.setText("" + ModelCreator.currentProject.SelectedAnimation.CurrentFrame);
+		currentFrameLabel.setText("" + ModelCreator.currentProject.SelectedAnimation.currentFrame);
 	}
 	
 }

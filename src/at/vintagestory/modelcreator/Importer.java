@@ -116,7 +116,7 @@ public class Importer
 					
 					Element elem = readElement(elements.get(i).getAsJsonObject());
 					if (elem != null) {
-						project.RootElements.add(elem);
+						project.rootElements.add(elem);
 					}
 				}
 			}

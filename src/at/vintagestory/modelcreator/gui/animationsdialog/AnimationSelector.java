@@ -51,7 +51,7 @@ public class AnimationSelector
 		 
 		if (ModelCreator.currentProject.SelectedAnimation != null) {
 			list.setSelectedIndex(ModelCreator.currentProject.getSelectedAnimationIndex());
-			nameField.setText(ModelCreator.currentProject.SelectedAnimation.Name);
+			nameField.setText(ModelCreator.currentProject.SelectedAnimation.name);
 		}
 		
 		list.addListSelectionListener(new ListSelectionListener()
@@ -63,7 +63,7 @@ public class AnimationSelector
 				ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.Animations.get(selectedIndex);
 				ModelCreator.updateValues();
 				
-				nameField.setText(ModelCreator.currentProject.SelectedAnimation.Name);
+				nameField.setText(ModelCreator.currentProject.SelectedAnimation.name);
 			}
 		});
 		
@@ -75,7 +75,7 @@ public class AnimationSelector
 			public void keyReleased(KeyEvent e)
 			{
 				if (ModelCreator.currentProject.SelectedAnimation == null) return;
-				ModelCreator.currentProject.SelectedAnimation.Name = nameField.getText();
+				ModelCreator.currentProject.SelectedAnimation.name = nameField.getText();
 				
 				model.set(list.getSelectedIndex(), nameField.getText());
 				ModelCreator.updateValues();
@@ -95,15 +95,16 @@ public class AnimationSelector
 		{
 			Project project = ModelCreator.currentProject;
 			Animation anim = new Animation();
-			anim.Name = "Animation " + (project.Animations.size() + 1);
+			anim.name = "Animation " + (project.Animations.size() + 1);
 			project.Animations.add(anim);
 			project.SelectedAnimation = anim;
 			
-			model.addElement(anim.Name);
+			model.addElement(anim.name);
 			list.setSelectedIndex(project.getSelectedAnimationIndex());
+			
 			ModelCreator.updateValues();
 			
-			nameField.setText(ModelCreator.currentProject.SelectedAnimation.Name);
+			nameField.setText(ModelCreator.currentProject.SelectedAnimation.name);
 		});
 		
 		btnSelect.setFont(defaultFont);
@@ -133,7 +134,7 @@ public class AnimationSelector
 				if (ModelCreator.currentProject.SelectedAnimation == null) {
 					nameField.setText("");
 				} else {
-					nameField.setText(ModelCreator.currentProject.SelectedAnimation.Name);	
+					nameField.setText(ModelCreator.currentProject.SelectedAnimation.name);	
 				}
 				
 			}		
@@ -188,7 +189,7 @@ public class AnimationSelector
 		Project project = ModelCreator.currentProject;
 		if (project != null) {
 			for (Animation anim : project.Animations) {
-				model.addElement("<html><b>"+ anim.Name +"</b></html>");	
+				model.addElement("<html><b>"+ anim.name +"</b></html>");	
 			}
 		}
 		

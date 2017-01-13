@@ -154,7 +154,7 @@ public class GuiMain extends JMenuBar
 			int returnVal = chooser.showOpenDialog(null);
 			if (returnVal == JFileChooser.APPROVE_OPTION)
 			{
-				if (ModelCreator.currentProject.RootElements.size() > 0)
+				if (ModelCreator.currentProject.rootElements.size() > 0)
 				{
 					returnVal = JOptionPane.showConfirmDialog(null, "Your current project will be cleared, are you sure you want to continue?", "Warning", JOptionPane.YES_NO_OPTION);
 				}

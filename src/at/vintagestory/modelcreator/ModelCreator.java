@@ -43,6 +43,7 @@ import at.vintagestory.modelcreator.gui.left.LeftSidebar;
 import at.vintagestory.modelcreator.gui.left.LeftUVSidebar;
 import at.vintagestory.modelcreator.gui.middle.ModelRenderer;
 import at.vintagestory.modelcreator.gui.right.RightTopPanel;
+import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.Element;
@@ -59,8 +60,9 @@ public class ModelCreator extends JFrame
 	public static Preferences prefs;
 	
 	public static Project currentProject;
+	public static boolean updatingValues = false;
 	
-
+	
 	public static boolean transparent = true;
 	public static boolean unlockAngles = false;
 
@@ -176,6 +178,7 @@ public class ModelCreator extends JFrame
 		}
 	}
 
+	
 	public void initComponents()
 	{
 		Icons.init(getClass());
@@ -203,7 +206,6 @@ public class ModelCreator extends JFrame
 		add(scroll, BorderLayout.EAST);
 		
 		uvSidebar = new LeftUVSidebar("UV Editor", manager);
-		
 	}
 
 	private List<Image> getIcons()
@@ -226,9 +228,19 @@ public class ModelCreator extends JFrame
 	
 	public static void updateValues()
 	{
+		if (updatingValues) return;
+		
+		updatingValues = true;
+		
+		if (currentProject.SelectedAnimation != null) {
+			currentProject.SelectedAnimation.calculateAllFrames(currentProject);
+		}
+		
 	 	((RightTopPanel)manager).updateValues();
 	 	leftKeyframesPanel.updateValues();
 	 	updateFrame();
+	 	
+	 	updatingValues = false;
 	}
 	
 	public static void updateFrame() {
@@ -569,11 +581,11 @@ public class ModelCreator extends JFrame
 	}
 	
 	
-	public List<Element> getRootElementsForRender() {
+	public static List<IDrawable> getRootElementsForRender() {
 		if (leftKeyframesPanel.isVisible()) {
-			return currentProject.getAnimatedRootElements();
+			return currentProject.getCurrentFrameRootElements();
 		} else {
-			return currentProject.RootElements;
+			return new ArrayList<IDrawable>(currentProject.rootElements);
 		}
 	}
 

@@ -57,7 +57,7 @@ public class Exporter
 
 	private void compileTextureList()
 	{
-		for (Element cuboid : project.RootElements)
+		for (Element cuboid : project.rootElements)
 		{
 			compileTextureList(cuboid);
 		}
@@ -95,7 +95,7 @@ public class Exporter
 		writer.newLine();
 		writer.write(space(1) + "\"elements\": [");
 		
-		List<Element> elems = project.RootElements;
+		List<Element> elems = project.rootElements;
 		
 		for (int i = 0; i < elems.size(); i++)
 		{

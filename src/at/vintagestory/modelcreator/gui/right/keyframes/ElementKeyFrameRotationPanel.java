@@ -1,4 +1,4 @@
-package at.vintagestory.modelcreator.gui.right.element;
+package at.vintagestory.modelcreator.gui.right.keyframes;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -9,21 +9,26 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Hashtable;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
-import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.model.KeyframeElement;
 import at.vintagestory.modelcreator.util.Parser;
 
-public class ElementRotationPanel extends JPanel implements IValueUpdater
+public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdater
 {
 	private static final long serialVersionUID = 1L;
 
-	private IElementManager manager;
+	private RightKeyFramesPanel keyFramesPanel;
 
 	
 	
@@ -42,12 +47,12 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 	
 	static double multiplier = 22.5;
 
-	public ElementRotationPanel(IElementManager manager)
+	public ElementKeyFrameRotationPanel(RightKeyFramesPanel keyFramesPanel)
 	{
 		rotationFields = new JTextField[3];
 		rotationSliders = new JSlider[3];
 		
-		this.manager = manager;
+		this.keyFramesPanel = keyFramesPanel;
 		setMaximumSize(new Dimension(186, 270));
 		
 		initComponents();
@@ -92,12 +97,12 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					Element element = manager.getCurrentElement();
+					KeyframeElement element = keyFramesPanel.getCurrentElement();
 					if (element != null)
 					{
-						if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
-						if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
-						if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
+						if (num == 0) element.rotationX = Parser.parseDouble(rotationFields[num].getText(), element.rotationX);
+						if (num == 1) element.rotationY = Parser.parseDouble(rotationFields[num].getText(), element.rotationY);
+						if (num == 2) element.rotationZ = Parser.parseDouble(rotationFields[num].getText(), element.rotationZ);
 						ModelCreator.updateValues();
 					}
 				}
@@ -109,12 +114,12 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Element element = manager.getCurrentElement();
+				KeyframeElement element = keyFramesPanel.getCurrentElement();
 				if (element != null)
 				{
-					if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
-					if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
-					if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
+					if (num == 0) element.rotationX = Parser.parseDouble(rotationFields[num].getText(), element.rotationX);
+					if (num == 1) element.rotationY = Parser.parseDouble(rotationFields[num].getText(), element.rotationY);
+					if (num == 2) element.rotationZ = Parser.parseDouble(rotationFields[num].getText(), element.rotationZ);
 					ModelCreator.updateValues();
 				}
 			}
@@ -141,18 +146,20 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			
 			rotationFields[num].setText(""+newValue);
 			
-			Element elem = manager.getCurrentElement();
+			KeyframeElement elem = keyFramesPanel.getCurrentElement();
 			if (elem == null) return;
 			
 			if (num == 0) {
-				elem.setRotationX(newValue);
+				elem.rotationX = newValue;
 			}
 			if (num == 1) {
-				elem.setRotationY(newValue);
+				elem.rotationY = newValue;
 			}
 			if (num == 2) {
-				elem.setRotationZ(newValue);
+				elem.rotationZ = newValue;
 			}
+			
+			ModelCreator.updateValues();
 		});
 		
 
@@ -172,11 +179,11 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 	@Override
 	public void updateValues()
 	{
-		Element cube = manager.getCurrentElement();
-		toggleFields(cube);
+		KeyframeElement element = keyFramesPanel.getCurrentElement();
+		toggleFields(element);
 	}
 	
-	public void toggleFields(Element cube) {
+	public void toggleFields(KeyframeElement element) {
 		ignoreSliderChanges = true;
 		
 		if (ModelCreator.unlockAngles) {
@@ -212,16 +219,20 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		
 	
 		
-		boolean enabled = cube != null && this.enabled;
+		boolean enabled = element != null && this.enabled;
 		
 		for (int i = 0; i < 3; i++) {
 			rotationFields[i].setEnabled(enabled);
 			rotationSliders[i].setEnabled(enabled);
 		}
 		
-		rotationSliders[0].setValue(enabled ? (int) Math.round(cube.getRotationX() / multiplier) : 0);
-		rotationSliders[1].setValue(enabled ? (int) Math.round(cube.getRotationY() / multiplier) : 0);
-		rotationSliders[2].setValue(enabled ? (int) Math.round(cube.getRotationZ() / multiplier) : 0);
+		rotationSliders[0].setValue(enabled ? (int) Math.round(element.rotationX / multiplier) : 0);
+		rotationSliders[1].setValue(enabled ? (int) Math.round(element.rotationY / multiplier) : 0);
+		rotationSliders[2].setValue(enabled ? (int) Math.round(element.rotationZ / multiplier) : 0);
+		
+		rotationFields[0].setText(enabled ? "" + element.rotationX : "");
+		rotationFields[1].setText(enabled ? "" + element.rotationY : "");
+		rotationFields[2].setText(enabled ? "" + element.rotationZ : "");
 		
 		ignoreSliderChanges = false;
 	}
@@ -248,6 +259,7 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			labelTable.put(new Integer(8), new JLabel("180\u00b0"));
 			
 			return labelTable;
+			
 		}
 	}
 	

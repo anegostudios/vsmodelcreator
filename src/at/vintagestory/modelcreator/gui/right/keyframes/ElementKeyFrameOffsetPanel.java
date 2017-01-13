@@ -1,4 +1,4 @@
-package at.vintagestory.modelcreator.gui.right.element;
+package at.vintagestory.modelcreator.gui.right.keyframes;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -21,16 +21,16 @@ import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
-import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.model.KeyframeElement;
 import at.vintagestory.modelcreator.util.Parser;
 
-public class ElementPositionPanel extends JPanel implements IValueUpdater
+public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 {
 	private static final long serialVersionUID = 1L;
 
-	private IElementManager manager;
+	private RightKeyFramesPanel keyFramesPanel;
 
 	private JButton btnPlusX;
 	private JButton btnPlusY;
@@ -46,9 +46,9 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 	
 	public boolean enabled = true;
 
-	public ElementPositionPanel(IElementManager manager)
+	public ElementKeyFrameOffsetPanel(RightKeyFramesPanel keyFramesPanel)
 	{
-		this.manager = manager;
+		this.keyFramesPanel = keyFramesPanel;
 		setLayout(new GridLayout(3, 3, 4, 0));
 		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Position</b></html>"));
 		setMaximumSize(new Dimension(186, 104));
@@ -84,11 +84,10 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					Element element = manager.getCurrentElement();
+					KeyframeElement element = keyFramesPanel.getCurrentElement();
 					if (element != null)
 					{
-						element.setStartX(Parser.parseDouble(xPositionField.getText(), element.getStartX()));
-						element.updateUV();
+						element.offsetX = Parser.parseDouble(xPositionField.getText(), element.offsetX);
 						ModelCreator.updateValues();
 					}
 
@@ -100,11 +99,10 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Element element = manager.getCurrentElement();
+				KeyframeElement element = keyFramesPanel.getCurrentElement();
 				if (element != null)
 				{
-					element.setStartX(Parser.parseDouble(xPositionField.getText(), element.getStartX()));
-					element.updateUV();
+					element.offsetX = Parser.parseDouble(xPositionField.getText(), element.offsetX);
 					ModelCreator.updateValues();
 				}
 			}
@@ -131,11 +129,10 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					Element element = manager.getCurrentElement();
+					KeyframeElement element = keyFramesPanel.getCurrentElement();
 					if (element != null)
 					{
-						element.setStartY(Parser.parseDouble(yPositionField.getText(), element.getStartY()));
-						element.updateUV();
+						element.offsetY = Parser.parseDouble(yPositionField.getText(), element.offsetY);
 						ModelCreator.updateValues();
 					}
 
@@ -147,11 +144,10 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Element element = manager.getCurrentElement();
+				KeyframeElement element = keyFramesPanel.getCurrentElement();
 				if (element != null)
 				{
-					element.setStartY(Parser.parseDouble(yPositionField.getText(), element.getStartY()));
-					element.updateUV();
+					element.offsetY = Parser.parseDouble(yPositionField.getText(), element.offsetY);
 					ModelCreator.updateValues();
 				}
 			}
@@ -177,11 +173,10 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					Element element = manager.getCurrentElement();
+					KeyframeElement element = keyFramesPanel.getCurrentElement();
 					if (element != null)
 					{
-						element.setStartZ(Parser.parseDouble(zPositionField.getText(), element.getStartZ()));
-						element.updateUV();
+						element.offsetZ = Parser.parseDouble(zPositionField.getText(), element.offsetZ);
 						ModelCreator.updateValues();
 					}
 
@@ -194,11 +189,10 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Element element = manager.getCurrentElement();
+				KeyframeElement element = keyFramesPanel.getCurrentElement();
 				if (element != null)
 				{
-					element.setStartZ(Parser.parseDouble(zPositionField.getText(), element.getStartZ()));
-					element.updateUV();
+					element.offsetZ = Parser.parseDouble(zPositionField.getText(), element.offsetZ);
 					ModelCreator.updateValues();
 				}
 			}
@@ -267,32 +261,31 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 	
 	
 	public void modifyPosition(EnumAxis axis, int direction, int modifiers) {
-		Element cube = manager.getCurrentElement();
+		KeyframeElement cube = keyFramesPanel.getCurrentElement();
 		if (cube == null) return;
 		
-		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
-		boolean ctrl = (modifiers & ActionEvent.CTRL_MASK) > 0;
+		//float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
+		//boolean ctrl = (modifiers & ActionEvent.CTRL_MASK) > 0;
 		
 		switch (axis) {
 		case X:
-			cube.addStartX(size);
-			if (ctrl) cube.addOriginX(size);
+			cube.offsetX += direction;
+			//if (ctrl) cube.addOriginX(size);
 			
-			xPositionField.setText(df.format(cube.getStartX()));
+			xPositionField.setText(df.format(cube.offsetX));
 			
 			break;
 		case Y:
-			cube.addStartY(size);
-			if (ctrl) cube.addOriginY(size);
+			cube.offsetY += direction;
+			//if (ctrl) cube.addOriginY(size);
 			
-			yPositionField.setText(df.format(cube.getStartY()));
+			yPositionField.setText(df.format(cube.offsetY));
 			break;
 		default:
-			cube.addStartZ(size);
-			if (ctrl) cube.addOriginZ(size);
+			cube.offsetZ += direction;
+			//if (ctrl) cube.addOriginZ(size);
 			
-			zPositionField.setText(df.format(cube.getStartZ()));
-			
+			zPositionField.setText(df.format(cube.offsetZ));
 			break;
 		}
 		
@@ -315,12 +308,12 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 	@Override
 	public void updateValues()
 	{
-		Element cube = manager.getCurrentElement();
+		KeyframeElement cube = keyFramesPanel.getCurrentElement();
 		toggleFields(cube);
 	}
 	
 	
-	public void toggleFields(Element cube) {
+	public void toggleFields(KeyframeElement cube) {
 		boolean enabled = cube != null && this.enabled;
 		btnPlusX.setEnabled(enabled);
 		btnPlusY.setEnabled(enabled);
@@ -332,8 +325,8 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 		xPositionField.setEnabled(enabled);
 		yPositionField.setEnabled(enabled);
 		zPositionField.setEnabled(enabled);
-		xPositionField.setText(enabled ? df.format(cube.getStartX()) : "");
-		yPositionField.setText(enabled ? df.format(cube.getStartY()) : "");
-		zPositionField.setText(enabled ? df.format(cube.getStartZ()) : "");
+		xPositionField.setText(enabled ? df.format(cube.offsetX) : "");
+		yPositionField.setText(enabled ? df.format(cube.offsetY) : "");
+		zPositionField.setText(enabled ? df.format(cube.offsetZ) : "");
 	}
 }
