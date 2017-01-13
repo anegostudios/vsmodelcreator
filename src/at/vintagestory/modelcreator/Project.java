@@ -37,15 +37,26 @@ public class Project
 	
 	public void LoadIntoEditor(IElementManager manager)
 	{
-		clear();
+		for (Animation anim : Animations) {
+			anim.ResolveRelations(this);
+		}
 		
 		for (PendingTexture ptex : PendingTextures) {
 			manager.addPendingTexture(ptex);	
-		}		
-	}
-
-
-
+		}
+		
+		tree.clearElements();
+		
+		for (Element elem : rootElements) {
+			tree.addRootElement(elem);
+		}
+		
+		if (Animations.size() > 0) {
+			SelectedAnimation = Animations.get(0);
+			SelectedAnimation.calculateAllFrames(this);
+		}
+		
+	}	
 	
 	public int getSelectedAnimationIndex()
 	{
@@ -269,7 +280,19 @@ public class Project
 	}
 	
 	
+	public Element findElement(String elementName) {
+		return findElement(elementName, rootElements);
+	}
 	
-	
-	
+	public Element findElement(String elementName, List<Element> list) {
+		for (Element elem : list) {
+			if (elem.name.equals(elementName)) return elem;
+			
+			Element foundElem = findElement(elementName, elem.ChildElements);
+			if (foundElem != null) return foundElem;
+		}
+		
+		return null;
+	}
+		
 }

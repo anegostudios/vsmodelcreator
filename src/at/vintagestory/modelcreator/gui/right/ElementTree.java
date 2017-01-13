@@ -1,9 +1,7 @@
 package at.vintagestory.modelcreator.gui.right;
 
 import java.awt.Toolkit;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -27,7 +25,7 @@ public class ElementTree
 		rootNode = new DefaultMutableTreeNode("Root");
 		treeModel = new DefaultTreeModel(rootNode);
         jtree = new JTree(treeModel);
-        jtree.setEditable(true);
+        jtree.setEditable(false);
         jtree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jtree.setShowsRootHandles(true);
         jtree.setCellRenderer(new ElementTreeCellRenderer());
@@ -47,10 +45,10 @@ public class ElementTree
 
 	public void clearElements()
 	{
-		jtree.clearSelection();
 		rootNode.removeAllChildren();
 		jtree.removeAll();
 		jtree.updateUI();
+		jtree.clearSelection();
 	}
 
 	

@@ -7,9 +7,10 @@ import at.vintagestory.modelcreator.interfaces.IDrawable;
 
 public class Keyframe
 {
-	public int FrameNumber;
-	
+	public int FrameNumber;	
 	public ArrayList<IDrawable> Elements = new ArrayList<IDrawable>();
+
+	
 	
 	public void AddElement(KeyframeElement keyfElem) {
 		Elements.add(keyfElem);

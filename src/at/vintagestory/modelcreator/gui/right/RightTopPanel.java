@@ -161,8 +161,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		
 		nameField.setEnabled(cube != null);
 		btnRemove.setEnabled(cube != null);
-		btnDuplicate.setEnabled(cube != null);
-		
+		btnDuplicate.setEnabled(cube != null);		
 	}
 
 	

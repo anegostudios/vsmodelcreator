@@ -1,4 +1,4 @@
-package at.vintagestory.modelcreator.gui.left;
+	package at.vintagestory.modelcreator.gui.left;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -130,6 +130,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 				return false;
 			}
 			
+			@SuppressWarnings("unchecked")
 			@Override
 			public Class getColumnClass(int c) {
 		        return String.class; //getValueAt(0, c).getClass();

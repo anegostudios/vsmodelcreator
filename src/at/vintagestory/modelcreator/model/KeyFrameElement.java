@@ -14,21 +14,31 @@ import at.vintagestory.modelcreator.interfaces.IDrawable;
 
 public class KeyframeElement implements IDrawable
 {
-	public Element AnimatedElement;
-	public int FrameNumber;
+	// Persistent kf-elem data
+	public String AnimatedElementName;
 	
 	public boolean PositionSet;
 	public boolean RotationSet;
 	public boolean StretchSet;
-	
+
 	public double offsetX = 0.0, offsetY = 0.0, offsetZ = 0.0;
 	public double stretchX = 0.0, stretchY = 0.0, stretchZ = 0.0;
 	public double rotationX = 0, rotationY = 0, rotationZ = 0;
 	public double originX = 0, originY = 0, originZ = 0;
 
-	IDrawable ParentElement;
 	public List<IDrawable> ChildElements = new ArrayList<IDrawable>();
+
 	
+	// Non-persistent kf-elem data 
+	
+	public Element AnimatedElement;
+	public int FrameNumber;
+	IDrawable ParentElement;
+
+	
+	public KeyframeElement() {
+		
+	}
 	
 	
 	public KeyframeElement GetOrCreateChildElement(Element forElement) {

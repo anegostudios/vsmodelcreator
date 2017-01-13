@@ -20,6 +20,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import at.vintagestory.modelcreator.Exporter;
 import at.vintagestory.modelcreator.Importer;
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.gui.texturedialog.TextureDialog;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
@@ -136,7 +137,8 @@ public class GuiMain extends JMenuBar
 			int returnVal = JOptionPane.showConfirmDialog(creator, "You current work will be cleared, are you sure?", "Note", JOptionPane.YES_NO_OPTION);
 			if (returnVal == JOptionPane.YES_OPTION)
 			{
-				ModelCreator.currentProject.clear();
+				ModelCreator.currentProject = new Project();
+				ModelCreator.updateValues();
 			}
 		});
 
@@ -158,6 +160,7 @@ public class GuiMain extends JMenuBar
 				{
 					returnVal = JOptionPane.showConfirmDialog(null, "Your current project will be cleared, are you sure you want to continue?", "Warning", JOptionPane.YES_NO_OPTION);
 				}
+				
 				if (returnVal != JOptionPane.NO_OPTION && returnVal != JOptionPane.CLOSED_OPTION)
 				{
 					String filePath = chooser.getSelectedFile().getAbsolutePath();
@@ -165,6 +168,7 @@ public class GuiMain extends JMenuBar
 					Importer importer = new Importer(filePath);
 					ModelCreator.currentProject = importer.loadFromJSON();
 				}
+				
 				ModelCreator.updateValues();
 			}
 		});

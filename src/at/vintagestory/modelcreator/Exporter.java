@@ -6,8 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import at.vintagestory.modelcreator.interfaces.IDrawable;
+import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.model.Keyframe;
+import at.vintagestory.modelcreator.model.KeyframeElement;
 
 public class Exporter
 {
@@ -92,6 +97,7 @@ public class Exporter
 			writer.newLine();
 		}
 		writeTextures(writer);
+		
 		writer.newLine();
 		writer.write(space(1) + "\"elements\": [");
 		
@@ -105,11 +111,159 @@ public class Exporter
 				writer.write(",");
 			}
 		}
+		
 		writer.newLine();
 		writer.write(space(1) + "]");
-		writer.newLine();
+		
+		if (project.Animations.size() > 0) {
+			writer.write(",");
+			writer.newLine();
+			writer.write(space(1) + "\"animations\": [");
+
+			for (int i = 0; i < project.Animations.size(); i++)
+			{
+				writeAnimation(writer, project.Animations.get(i));
+				
+				if (i != project.Animations.size() - 1) {
+					writer.write(",");
+					writer.newLine();
+				}
+			}
+			
+			writer.newLine();
+			writer.write(space(1) + "]");
+			writer.newLine();
+		}
+		
 		writer.write("}");
 	}
+	
+	
+	private void writeAnimation(BufferedWriter writer, Animation animation) throws IOException
+	{
+		writer.newLine();
+		writer.write(space(2) + "{");
+		writer.newLine();
+
+		writer.write(space(3) + "\"name\": \"" + animation.name + "\",");
+		writer.newLine();
+		writer.write(space(3) + "\"quantityframes\": " + animation.GetQuantityFrames() + ",");
+		writer.newLine();
+		writer.write(space(3) + "\"keyframes\": [");
+		writer.newLine();
+		for (int i = 0; i < animation.keyframes.length; i++) {
+			writeKeyFrame(writer, animation.keyframes[i]);
+			
+			if (i != animation.keyframes.length - 1) {
+				writer.write(",");
+				writer.newLine();
+			}
+		}
+		writer.newLine();
+		writer.write(space(3) + "]");
+		writer.newLine();
+		writer.write(space(2) + "}");
+	}
+
+
+	
+
+	private void writeKeyFrame(BufferedWriter writer, Keyframe keyframe) throws IOException
+	{
+		writer.write(space(4) + "{");
+		writer.newLine();
+		
+		writer.write(space(5) + "\"frame\": " + keyframe.FrameNumber + ",");
+		writer.newLine();
+		writer.write(space(5) + "\"elements\": [");
+		writer.newLine();
+		
+		for (int i = 0; i < keyframe.Elements.size(); i++) {
+			writeKeyFrameElement(writer, (KeyframeElement)keyframe.Elements.get(i), 6);
+			
+			if (i != keyframe.Elements.size() - 1) {
+				writer.write(",");
+				writer.newLine();
+			}
+		}
+		
+		writer.newLine();
+		writer.write(space(5) + "]");
+		writer.newLine();
+		writer.write(space(4) + "}");
+	}
+	
+	
+
+	private void writeKeyFrameElement(BufferedWriter writer, KeyframeElement kElem, int indent) throws IOException
+	{
+		writer.write(space(indent) + "{ ");
+		writer.newLine();
+		
+		indent++;
+		
+		writer.write(space(indent) + "\"animatedElement\": \""+ kElem.AnimatedElement.name + "\"");
+		
+		if (kElem.PositionSet) {
+			writer.write(", ");
+			writer.newLine();
+			writer.write(space(indent));
+			
+			writer.write("\"offsetX\": " + kElem.offsetX);
+			writer.write(", \"offsetY\": " + kElem.offsetY);
+			writer.write(", \"offsetZ\": " + kElem.offsetZ);
+		}
+		
+		if (kElem.RotationSet) {
+			writer.write(", ");
+			writer.newLine();
+			writer.write(space(indent));
+			
+			writer.write("\"rotationX\": " + kElem.rotationX);
+			writer.write(", \"rotationY\": " + kElem.rotationY);
+			writer.write(", \"rotationZ\": " + kElem.rotationZ);	
+		}
+		
+		if (kElem.StretchSet) {
+			writer.write(", ");
+			writer.newLine();
+			writer.write(space(indent));
+
+			writer.write("\"stretchX\": " + kElem.stretchX);
+			writer.write(", \"stretchY\": " + kElem.stretchY);
+			writer.write(", \"stretchZ\": " + kElem.stretchZ);
+		}
+		
+		
+		
+		if (kElem.ChildElements.size() > 0) {
+			writer.write(", ");
+			writer.newLine();
+			writer.write(space(indent) + "\"children\": [");
+			writer.newLine();
+			
+			for (int i = 0; i < kElem.ChildElements.size(); i++)
+			{
+				writeKeyFrameElement(writer, (KeyframeElement)kElem.ChildElements.get(i), indent + 1);
+				
+				if (i != kElem.ChildElements.size() - 1) {
+					writer.write(",");
+					writer.newLine();
+				}
+			}
+			
+			writer.newLine();
+			writer.write(space(indent) + "]");
+			writer.newLine();
+		} else {
+			writer.newLine();
+		}
+		
+		indent--;
+				
+		writer.write(space(indent) + "}");
+	}
+	
 
 	private void writeTextures(BufferedWriter writer) throws IOException
 	{
@@ -226,23 +380,14 @@ public class Exporter
 		writer.write(space(indentation) + "}");
 	}
 
-	/*
-	 * private void writeChild(BufferedWriter writer) throws IOException {
-	 * writer.write("{"); writer.newLine(); writer.write(space(1) +
-	 * "\"parent\": \"block/" + modelName + "\","); writer.newLine();
-	 * writer.write(space(1) + "\"textures\": {"); writer.newLine(); for (int i
-	 * = 0; i < textureList.size(); i++) { writer.write(space(2) + "\"" + i +
-	 * "\": \"block/" + textureList.get(i) + "\""); if (i != textureList.size()
-	 * - 1) { writer.write(","); } writer.newLine(); } writer.write(space(1) +
-	 * "}"); writer.write("}"); }
-	 */
-
+	
+	
 	private String space(int size)
 	{
 		String space = "";
 		for (int i = 0; i < size; i++)
 		{
-			space += "    ";
+			space += "\t";
 		}
 		return space;
 	}

@@ -24,7 +24,6 @@ import javax.swing.event.ListSelectionListener;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
-import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Animation;
 
 public class AnimationSelector

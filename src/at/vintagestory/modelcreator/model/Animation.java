@@ -9,35 +9,25 @@ import at.vintagestory.modelcreator.util.Vec3f;
 
 public class Animation
 {
-	// Persistent project data
+	// Persistent animation data
 	int quantityFrames;
 	public String name;
-	
 	public Keyframe[] keyframes = new Keyframe[0];
-	public int[] frameNumbers = new int[0];
 	
-	
-	
-	// Non-persistent project data 
+		
+	// Non-persistent animation data 
 	public int currentFrame;
 	public ArrayList<Keyframe> allFrames = new ArrayList<Keyframe>();
+	public int[] frameNumbers = new int[0];
 	
 	
 	public Animation() {
 		quantityFrames = 30;
 	}
 	
-	
-	public void Export() {
-		
+	public Animation(int quantityFrames) {
+		this.quantityFrames = quantityFrames;
 	}
-	
-	
-	public void Import() {
-		
-	}
-	
-
 
 	
 	public void calculateAllFrames(Project project) {
@@ -75,15 +65,16 @@ public class Animation
 			for (IDrawable drawable : keyframes[i].Elements) {
 				KeyframeElement prevkelem = (KeyframeElement)drawable;
 				
-				lerkKeyFrameElement(i, prevkelem);
+				lerpKeyFrameElement(i, prevkelem);
 			}
 		}
 		
 		//System.out.println("calc all frames done");
 	}
 	
-	// Bug prevkelem might have no relevancy at this point in time
-	void lerkKeyFrameElement(int keyFrameIndex, KeyframeElement prevkelem) {
+
+	
+	void lerpKeyFrameElement(int keyFrameIndex, KeyframeElement prevkelem) {
 		//System.out.println("lerp key frame element " + prevkelem.AnimatedElement.name + " for frame " + prevkelem.FrameNumber);
 		
 		for (int flag = 0; flag < 3; flag++) {
@@ -116,7 +107,7 @@ public class Animation
 		
 		
 		for (IDrawable childKelem : prevkelem.ChildElements) {
-			lerkKeyFrameElement(keyFrameIndex, (KeyframeElement)childKelem);
+			lerpKeyFrameElement(keyFrameIndex, (KeyframeElement)childKelem);
 		}
 	}
 	
@@ -411,6 +402,33 @@ public class Animation
 		
 		return false;
 	}
-	
+
+	public void ResolveRelations(Project project)
+	{
+		ReloadFrameNumbers();
+		
+		for (int i = 0; i < keyframes.length; i++) {
+			Keyframe keyframe = keyframes[i];
+			
+			for (IDrawable kElem : keyframe.Elements) {
+				ResolveElem(project, keyframe, (KeyframeElement)kElem);
+			}
+		}
+	}
+
+
+	private void ResolveElem(Project project, Keyframe keyframe, KeyframeElement kElem)
+	{
+		kElem.AnimatedElement = project.findElement(kElem.AnimatedElementName);
+		kElem.FrameNumber = keyframe.FrameNumber;
+		
+		for (IDrawable childElem : kElem.ChildElements) {
+			((KeyframeElement)childElem).ParentElement = kElem.AnimatedElement;
+			((KeyframeElement)childElem).FrameNumber = keyframe.FrameNumber;
+			
+			ResolveElem(project, keyframe, (KeyframeElement)childElem);
+		}
+	}
+
 	
 }

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,8 +16,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import at.vintagestory.modelcreator.interfaces.IDrawable;
+import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.model.Keyframe;
+import at.vintagestory.modelcreator.model.KeyframeElement;
 import at.vintagestory.modelcreator.model.PendingTexture;
 
 public class Importer
@@ -24,7 +29,7 @@ public class Importer
 	private Map<String, String> textureMap = new HashMap<String, String>();
 	private String[] faceNames = { "north", "east", "south", "west", "up", "down" };
 
-	// Input File
+	
 	private String inputPath;
 	
 	Project project;
@@ -75,37 +80,8 @@ public class Importer
 		if (read.isJsonObject())
 		{
 			JsonObject obj = read.getAsJsonObject();
-
-			if (obj.has("parent") && obj.get("parent").isJsonPrimitive())
-			{
-				String parent = obj.get("parent").getAsString();
-				File file = new File(dir, parent + ".json");
-				if (!file.exists())
-				{
-					parent = parent.substring(parent.lastIndexOf('/') + 1, parent.length());
-					file = new File(dir, parent + ".json");
-				}
-
-				if (file.exists())
-				{
-					// load textures
-					loadTextures(dir, obj);
-
-					// Load Parent
-					FileReader fr = new FileReader(file);
-					reader = new BufferedReader(fr);
-					readComponents(reader, file.getParentFile());
-					reader.close();
-					fr.close();
-				}
-
-				return;
-			}
-
-			// load textures
 			loadTextures(dir, obj);
-
-			// load elements
+			
 			if (obj.has("elements") && obj.get("elements").isJsonArray())
 			{
 				JsonArray elements = obj.get("elements").getAsJsonArray();
@@ -120,6 +96,7 @@ public class Importer
 					}
 				}
 			}
+			
 
 			project.AmbientOcclusion = true; 
 			
@@ -127,10 +104,23 @@ public class Importer
 			{
 				project.AmbientOcclusion = obj.get("ambientocclusion").getAsBoolean();
 			}
+			
+			if (obj.has("animations") && obj.get("animations").isJsonArray()) {
+				JsonArray animations = obj.get("animations").getAsJsonArray();
+
+				for (int i = 0; i < animations.size(); i++)
+				{
+					if (!animations.get(i).isJsonObject()) continue;
+					
+					Animation animation = readAnimation(animations.get(i).getAsJsonObject());
+					if (animation != null) {
+						project.Animations.add(animation);
+					}
+				}
+			}
 		}
-		
-		
 	}
+
 
 	private void loadTextures(File file, JsonObject obj)
 	{
@@ -184,6 +174,94 @@ public class Importer
 		{
 			project.PendingTextures.add(new PendingTexture(new File(texturePath + File.separator + texture + ".png")));
 		}
+	}
+
+	private Animation readAnimation(JsonObject obj)
+	{
+		Animation anim = new Animation(obj.get("quantityframes").getAsInt());
+		anim.name = obj.get("name").getAsString();
+		
+		if (obj.has("keyframes") && obj.get("keyframes").isJsonArray()) {
+			JsonArray keyframes = obj.get("keyframes").getAsJsonArray();
+
+			anim.keyframes = new Keyframe[keyframes.size()];
+			
+			for (int i = 0; i < keyframes.size(); i++)
+			{
+				if (!keyframes.get(i).isJsonObject()) continue;
+				
+				anim.keyframes[i] = readKeyframe(keyframes.get(i).getAsJsonObject());
+			}
+		}
+		
+		return anim;
+	}
+
+	
+	private Keyframe readKeyframe(JsonObject obj)
+	{
+		Keyframe keyframe = new Keyframe();
+		keyframe.FrameNumber = obj.get("frame").getAsInt();
+		
+		if (obj.has("elements") && obj.get("elements").isJsonArray()) {
+			JsonArray keyframeelems = obj.get("elements").getAsJsonArray();
+
+			keyframe.Elements = new ArrayList<IDrawable>();
+			
+			for (int i = 0; i < keyframeelems.size(); i++)
+			{
+				if (!keyframeelems.get(i).isJsonObject()) continue;
+				
+				keyframe.Elements.add(readKeyframeElemenet(keyframeelems.get(i).getAsJsonObject()));
+			}
+		}
+		
+		return keyframe;
+	}
+	
+	
+
+	private IDrawable readKeyframeElemenet(JsonObject obj)
+	{
+		KeyframeElement kelem = new KeyframeElement();
+		
+		kelem.AnimatedElementName = obj.get("animatedElement").getAsString();
+		
+		if (obj.has("offsetX") || obj.has("offsetY") || obj.has("offsetZ")) {
+			kelem.PositionSet = true;
+			kelem.offsetX = obj.get("offsetX").getAsDouble();
+			kelem.offsetY = obj.get("offsetY").getAsDouble();
+			kelem.offsetZ = obj.get("offsetZ").getAsDouble();
+		}
+		
+		if (obj.has("rotationX") || obj.has("rotationY") || obj.has("rotationZ")) {
+			kelem.RotationSet = true;
+			kelem.rotationX = obj.get("rotationX").getAsDouble();
+			kelem.rotationY = obj.get("rotationY").getAsDouble();
+			kelem.rotationZ = obj.get("rotationZ").getAsDouble();
+		}
+		
+		if (obj.has("stretchX") || obj.has("stretchY") || obj.has("stretchZ")) {
+			kelem.StretchSet = true;
+			kelem.stretchX = obj.get("stretchX").getAsDouble();
+			kelem.stretchY = obj.get("stretchY").getAsDouble();
+			kelem.stretchZ = obj.get("stretchZ").getAsDouble();
+		}
+		
+		if (obj.has("children") && obj.get("children").isJsonArray()) {
+			JsonArray children = obj.get("children").getAsJsonArray();
+
+			kelem.ChildElements = new ArrayList<IDrawable>();
+			
+			for (int i = 0; i < children.size(); i++)
+			{
+				if (!children.get(i).isJsonObject()) continue;
+				
+				kelem.ChildElements.add(readKeyframeElemenet(children.get(i).getAsJsonObject()));
+			}
+		}
+		
+		return kelem;
 	}
 
 	private Element readElement(JsonObject obj)
@@ -278,6 +356,7 @@ public class Importer
 					}
 				}
 			}
+			
 
 			if (obj.has("children") && obj.get("children").isJsonArray()) {
 				JsonArray children = obj.get("children").getAsJsonArray();
@@ -288,6 +367,7 @@ public class Importer
 				}
 			
 			}
+			
 			
 			return element;
 		}
