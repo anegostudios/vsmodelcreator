@@ -42,7 +42,7 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 	{
 		horizontalBox = new JPanel(new GridLayout(0, 2));
 		
-		boxEnabled = ComponentUtil.createRadioButton("Enable","<html>Determines if face should be rendered<br>Default: On</html>");
+		boxEnabled = ComponentUtil.createRadioButton("Enabled","<html>Determines if face should be rendered<br>Default: On</html>");
 		boxEnabled.addActionListener(e ->
 		{
 			manager.getCurrentElement().getSelectedFace().setEnabled(boxEnabled.isSelected());

@@ -47,7 +47,7 @@ public class Importer
 
 	public Project loadFromJSON()
 	{
-		project = new Project();
+		project = new Project(inputPath);
 		
 		File path = new File(inputPath);
 		if (path.exists() && path.isFile())
@@ -179,7 +179,7 @@ public class Importer
 	private Animation readAnimation(JsonObject obj)
 	{
 		Animation anim = new Animation(obj.get("quantityframes").getAsInt());
-		anim.name = obj.get("name").getAsString();
+		anim.setName(obj.get("name").getAsString());
 		
 		if (obj.has("keyframes") && obj.get("keyframes").isJsonArray()) {
 			JsonArray keyframes = obj.get("keyframes").getAsJsonArray();
@@ -201,7 +201,7 @@ public class Importer
 	private Keyframe readKeyframe(JsonObject obj)
 	{
 		Keyframe keyframe = new Keyframe();
-		keyframe.FrameNumber = obj.get("frame").getAsInt();
+		keyframe.setFrameNumber(obj.get("frame").getAsInt());
 		
 		if (obj.has("elements") && obj.get("elements").isJsonArray()) {
 			JsonArray keyframeelems = obj.get("elements").getAsJsonArray();
@@ -229,23 +229,23 @@ public class Importer
 		
 		if (obj.has("offsetX") || obj.has("offsetY") || obj.has("offsetZ")) {
 			kelem.PositionSet = true;
-			kelem.offsetX = obj.get("offsetX").getAsDouble();
-			kelem.offsetY = obj.get("offsetY").getAsDouble();
-			kelem.offsetZ = obj.get("offsetZ").getAsDouble();
+			kelem.setOffsetX(obj.get("offsetX").getAsDouble());
+			kelem.setOffsetY(obj.get("offsetY").getAsDouble());
+			kelem.setOffsetZ(obj.get("offsetZ").getAsDouble());
 		}
 		
 		if (obj.has("rotationX") || obj.has("rotationY") || obj.has("rotationZ")) {
 			kelem.RotationSet = true;
-			kelem.rotationX = obj.get("rotationX").getAsDouble();
-			kelem.rotationY = obj.get("rotationY").getAsDouble();
-			kelem.rotationZ = obj.get("rotationZ").getAsDouble();
+			kelem.setRotationX(obj.get("rotationX").getAsDouble());
+			kelem.setRotationY(obj.get("rotationY").getAsDouble());
+			kelem.setRotationZ(obj.get("rotationZ").getAsDouble());
 		}
 		
 		if (obj.has("stretchX") || obj.has("stretchY") || obj.has("stretchZ")) {
 			kelem.StretchSet = true;
-			kelem.stretchX = obj.get("stretchX").getAsDouble();
-			kelem.stretchY = obj.get("stretchY").getAsDouble();
-			kelem.stretchZ = obj.get("stretchZ").getAsDouble();
+			kelem.setStretchX(obj.get("stretchX").getAsDouble());
+			kelem.setStretchY(obj.get("stretchY").getAsDouble());
+			kelem.setStretchZ(obj.get("stretchZ").getAsDouble());
 		}
 		
 		if (obj.has("children") && obj.get("children").isJsonArray()) {
@@ -337,11 +337,17 @@ public class Importer
 			{
 				element.setShade(obj.get("shade").getAsBoolean());
 			}
+			
+			if (obj.has("tintIndex") && obj.get("tintIndex").isJsonPrimitive())
+			{
+				element.setTintIndex(obj.get("tintIndex").getAsInt());
+			}
+			
+			
 
 			for (Face face : element.getAllFaces())
 			{
 				face.setEnabled(false);
-				face.setExists(false);
 			}
 
 			if (obj.has("faces") && obj.get("faces").isJsonObject())
@@ -389,7 +395,6 @@ public class Importer
 
 		if (face != null)
 		{
-			face.setExists(true);
 			face.setEnabled(true);
 
 			// automatically set uv if not specified

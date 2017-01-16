@@ -70,6 +70,6 @@ public class Start
 			e.printStackTrace();
 		}
 
-		new ModelCreator("Vintage Story Model Creator");
+		new ModelCreator("(untitled) - " + ModelCreator.windowTitle);
 	}
 }

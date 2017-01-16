@@ -72,7 +72,6 @@ public class Face
 	private boolean binded = false;
 	private boolean cullface = false;
 	private boolean enabled = true;
-	private boolean exists = true;
 	private boolean autoUV = true;
 	private int rotation;
 
@@ -280,7 +279,6 @@ public class Face
 	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
-		if (enabled) exists = true;
 	}
 
 	public boolean isAutoUVEnabled()
@@ -390,16 +388,6 @@ public class Face
 	{
 		this.rotation = rotation;
 		updateUV();
-	}
-
-	public void setExists(boolean exists)
-	{
-		this.exists = exists;
-		if (!exists) enabled = false;
-	}
-	
-	public boolean getExists() {
-		return exists;
 	}
 
 }

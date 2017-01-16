@@ -24,11 +24,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
@@ -55,13 +57,17 @@ import java.util.prefs.Preferences;
 
 public class ModelCreator extends JFrame
 {
+	public static String windowTitle = "Vintage Story Model Creator"; 
 	private static final long serialVersionUID = 1L;
+	
+	public static ModelCreator Instance;
 	
 	public static Preferences prefs;
 	
 	public static Project currentProject;
 	public static boolean updatingValues = false;
-	
+	public static boolean projectWasModified;
+
 	
 	public static boolean transparent = true;
 	public static boolean unlockAngles = false;
@@ -105,8 +111,9 @@ public class ModelCreator extends JFrame
 	public ModelCreator(String title)
 	{
 		super(title);
+		Instance = this;
 		
-		currentProject = new Project();
+		currentProject = new Project(null);
 		
 		setDropTarget(getCustomDropTarget());		
 		setPreferredSize(new Dimension(1200, 715));
@@ -143,6 +150,24 @@ public class ModelCreator extends JFrame
 			@Override
 			public void windowClosing(WindowEvent e)
 			{
+				if (projectWasModified) {
+					int	returnVal = JOptionPane.showConfirmDialog(null, "You have not saved your changes yet, would you like to save now?", "Warning", JOptionPane.YES_NO_CANCEL_OPTION);
+					
+					if (returnVal == JOptionPane.YES_OPTION) {
+						if (ModelCreator.currentProject.filePath == null) {
+							SaveProjectAs();
+						} else {
+							SaveProject(new File(ModelCreator.currentProject.filePath));	
+						}
+						
+					}
+					
+					if (returnVal == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+
+				}
+				
 				closeRequested = true;
 			}
 		});
@@ -177,12 +202,16 @@ public class ModelCreator extends JFrame
 			e1.printStackTrace();
 		}
 	}
+	
+
+	public static void DidModify() {
+		projectWasModified = true;
+	}
 
 	
 	public void initComponents()
 	{
 		Icons.init(getClass());
-		setupMenuBar();
 		
 		manager = new RightTopPanel(this);
 
@@ -206,6 +235,9 @@ public class ModelCreator extends JFrame
 		add(scroll, BorderLayout.EAST);
 		
 		uvSidebar = new LeftUVSidebar("UV Editor", manager);
+		
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+		setJMenuBar(new GuiMain(this));
 	}
 
 	private List<Image> getIcons()
@@ -216,12 +248,6 @@ public class ModelCreator extends JFrame
 		icons.add(Toolkit.getDefaultToolkit().getImage("res/icons/set/icon_64x.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("res/icons/set/icon_128x.png"));
 		return icons;
-	}
-
-	private void setupMenuBar()
-	{
-		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-		setJMenuBar(new GuiMain(this));
 	}
 
 	
@@ -239,6 +265,14 @@ public class ModelCreator extends JFrame
 	 	((RightTopPanel)manager).updateValues();
 	 	leftKeyframesPanel.updateValues();
 	 	updateFrame();
+	 	
+	 	String dash = ModelCreator.projectWasModified ? " * " : " - ";
+	 	if (currentProject.filePath == null) {
+	 		Instance.setTitle("(untitled)" + dash + windowTitle);
+		} else {
+			Instance.setTitle(new File(currentProject.filePath).getName() + dash + windowTitle);
+		}
+		
 	 	
 	 	updatingValues = false;
 	}
@@ -629,11 +663,8 @@ public class ModelCreator extends JFrame
 						if (elem instanceof File) {
 							File file = (File)elem;
 							
-							if (file.getName().endsWith(".json")) {								
-								Importer importer = new Importer(file.getAbsolutePath());
-								currentProject = importer.loadFromJSON();
-								currentProject.LoadIntoEditor(getElementManager());
-								ModelCreator.updateValues();
+							if (file.getName().endsWith(".json")) {		
+								LoadFile(file.getAbsolutePath());
 							}
 							
 							if (file.getName().endsWith(".png")) {								
@@ -663,7 +694,6 @@ public class ModelCreator extends JFrame
 							
 					}
 					
-					
 				} catch (Exception e) {
 					System.out.println(e);
 				}
@@ -671,5 +701,69 @@ public class ModelCreator extends JFrame
 		        evt.dropComplete(true);
 		    }
 		 };
+	}
+
+
+	public void LoadFile(String filePath)
+	{
+		if (filePath == null) {
+			setTitle("(untitled) - " + windowTitle);
+			currentProject.clear();
+			currentProject = new Project(null);
+			
+		} else {
+			prefs.put("filePath", filePath);
+			Importer importer = new Importer(filePath);			
+			currentProject = importer.loadFromJSON();
+			currentProject.LoadIntoEditor(ModelCreator.manager);
+			setTitle(new File(currentProject.filePath).getName() + " - " + windowTitle);
+		}
+		
+		projectWasModified = false;
+		ModelCreator.updateValues();
+		currentProject.tree.jtree.updateUI();
+		
+	}
+	
+
+	public void SaveProject(File file)
+	{
+		Exporter exporter = new Exporter(ModelCreator.currentProject);
+		exporter.export(file);
+		
+		ModelCreator.currentProject.filePath = file.getAbsolutePath(); 
+		ModelCreator.projectWasModified = false;
+		ModelCreator.updateValues();
+	}
+	
+
+	public void SaveProjectAs()
+	{
+		JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
+		chooser.setDialogTitle("Output Directory");
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setApproveButtonText("Save");
+
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON (.json)", "json");
+		chooser.setFileFilter(filter);
+
+		int returnVal = chooser.showOpenDialog(null);
+		if (returnVal == JFileChooser.APPROVE_OPTION)
+		{
+			if (chooser.getSelectedFile().exists())
+			{
+				returnVal = JOptionPane.showConfirmDialog(null, "A file already exists with that name, are you sure you want to override?", "Warning", JOptionPane.YES_NO_OPTION);
+			}
+			if (returnVal != JOptionPane.NO_OPTION && returnVal != JOptionPane.CLOSED_OPTION)
+			{
+				String filePath = chooser.getSelectedFile().getAbsolutePath();
+				ModelCreator.prefs.put("filePath", filePath);
+				
+				if (!filePath.endsWith(".json")) {
+					chooser.setSelectedFile(new File(filePath + ".json"));
+				}
+				SaveProject(chooser.getSelectedFile());
+			}
+		}
 	}
 }

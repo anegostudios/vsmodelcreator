@@ -3,6 +3,7 @@ package at.vintagestory.modelcreator.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.util.Vec3f;
@@ -11,7 +12,7 @@ public class Animation
 {
 	// Persistent animation data
 	int quantityFrames;
-	public String name;
+	private String name;
 	public Keyframe[] keyframes = new Keyframe[0];
 	
 		
@@ -44,7 +45,7 @@ public class Animation
 		
 		for (int frame = 0; frame < quantityFrames; frame++) {
 			Keyframe keyframe = new Keyframe();
-			keyframe.FrameNumber = frame;
+			keyframe.setFrameNumber(frame);
 			
 			for (Element elem : project.rootElements) {
 				keyframe.AddElement(createEmptyFrameForElement(elem, frame));
@@ -143,6 +144,8 @@ public class Animation
 			elem.ChildElements.add(childKeyFrameElem);
 		}
 		
+		ModelCreator.DidModify();
+		
 		return elem;
 	}
 	
@@ -160,19 +163,19 @@ public class Animation
 		}
 		
 		if (forFlag == 0) {
-			keyFrameElem.offsetX = lerp(t, prev.offsetX, next.offsetX);
-			keyFrameElem.offsetY = lerp(t, prev.offsetY, next.offsetY);
-			keyFrameElem.offsetZ = lerp(t, prev.offsetZ, next.offsetZ);		
+			keyFrameElem.setOffsetX(lerp(t, prev.getOffsetX(), next.getOffsetX()));
+			keyFrameElem.setOffsetY(lerp(t, prev.getOffsetY(), next.getOffsetY()));
+			keyFrameElem.setOffsetZ(lerp(t, prev.getOffsetZ(), next.getOffsetZ()));		
 			keyFrameElem.PositionSet = true;
 		} else if(forFlag == 1) {			
-			keyFrameElem.rotationX = lerp(t, prev.rotationX, next.rotationX);
-			keyFrameElem.rotationY = lerp(t, prev.rotationY, next.rotationY);
-			keyFrameElem.rotationZ = lerp(t, prev.rotationZ, next.rotationZ);
+			keyFrameElem.setRotationX(lerp(t, prev.getRotationX(), next.getRotationX()));
+			keyFrameElem.setRotationY(lerp(t, prev.getRotationY(), next.getRotationY()));
+			keyFrameElem.setRotationZ(lerp(t, prev.getRotationZ(), next.getRotationZ()));
 			keyFrameElem.RotationSet = true;
 		} else {
-			keyFrameElem.stretchX = lerp(t, prev.rotationX, next.rotationX);
-			keyFrameElem.stretchY = lerp(t, prev.rotationY, next.rotationY);
-			keyFrameElem.stretchZ = lerp(t, prev.rotationZ, next.rotationZ);
+			keyFrameElem.setStretchX(lerp(t, prev.getRotationX(), next.getRotationX()));
+			keyFrameElem.setStretchY(lerp(t, prev.getRotationY(), next.getRotationY()));
+			keyFrameElem.setStretchZ(lerp(t, prev.getRotationZ(), next.getRotationZ()));
 			keyFrameElem.StretchSet = true;
 		}
 	}
@@ -188,6 +191,7 @@ public class Animation
 	public void SetQuantityFrames(int quantity, Project project) {
 		quantityFrames = quantity;
 		calculateAllFrames(project);
+		ModelCreator.DidModify();
 	}
 	
 	public int GetQuantityFrames() {
@@ -208,40 +212,43 @@ public class Animation
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
 		keyframe.PositionSet = on;
 		if (keyframe.IsUseless()) RemoveKeyFrameElement(keyframe, currentFrame);
+		ModelCreator.DidModify();
 	}
 
 	public void ToggleRotation(Element elem, boolean on) {
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
 		keyframe.RotationSet = on;
 		if (keyframe.IsUseless()) RemoveKeyFrameElement(keyframe, currentFrame);
+		ModelCreator.DidModify();
 	}
 
 	public void ToggleStretch(Element elem, boolean on) {
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
 		keyframe.StretchSet = on;
 		if (keyframe.IsUseless()) RemoveKeyFrameElement(keyframe, currentFrame);
+		ModelCreator.DidModify();
 	}
 
 	
 	public void SetOffset(Element elem, Vec3f position) {
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
-		keyframe.offsetX = position.X;
-		keyframe.offsetY = position.Y;
-		keyframe.offsetZ = position.Z;
+		keyframe.setOffsetX(position.X);
+		keyframe.setOffsetY(position.Y);
+		keyframe.setOffsetZ(position.Z);
 	}
 	
 	public void SetRotation(Element elem, Vec3f xyzRotation) {
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
-		keyframe.rotationX = xyzRotation.X;
-		keyframe.rotationY = xyzRotation.Y;
-		keyframe.rotationZ = xyzRotation.Z;
+		keyframe.setRotationX(xyzRotation.X);
+		keyframe.setRotationY(xyzRotation.Y);
+		keyframe.setRotationZ(xyzRotation.Z);
 	}
 	
 	public void SetStretch(Element elem, Vec3f stretch) {
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
-		keyframe.stretchX = stretch.X;
-		keyframe.stretchY = stretch.Y;
-		keyframe.stretchZ = stretch.Z;
+		keyframe.setStretchX(stretch.X);
+		keyframe.setStretchY(stretch.Y);
+		keyframe.setStretchZ(stretch.Z);
 	}
 
 
@@ -251,7 +258,7 @@ public class Animation
 		
 		if (keyframe == null) {
 			keyframe = new Keyframe();
-			keyframe.FrameNumber = currentFrame;
+			keyframe.setFrameNumber(currentFrame);
 			
 			// Grow array by 1. Insert new keyframe at the right spot
 			if (keyframes.length == 0) {
@@ -261,7 +268,7 @@ public class Animation
 				int j = 0;
 				boolean inserted = false;
 				for (int i = 0; i < keyframes.length; i++) {
-					if (inserted || keyframes[i].FrameNumber < currentFrame) {
+					if (inserted || keyframes[i].getFrameNumber() < currentFrame) {
 						newkeyframes[j++] = keyframes[i];
 					} else {
 						newkeyframes[j++] = keyframe;
@@ -298,6 +305,7 @@ public class Animation
 		if (path.size() == 0) {
 			keyframeElem = new KeyframeElement(forElem);
 			keyframe.AddElement(keyframeElem);	
+			ModelCreator.DidModify();
 			
 		} else if (path.size() == 1) {
 			KeyframeElement parent = GetOrCreateKeyFrameElement(path.get(0), keyframe);
@@ -334,7 +342,7 @@ public class Animation
 		if (keyframes == null) return null;
 		
 		for (int i = 0; i < keyframes.length; i++) {
-			if (keyframes[i].FrameNumber == frameNumber) return keyframes[i];
+			if (keyframes[i].getFrameNumber() == frameNumber) return keyframes[i];
 		}
 		
 		return null;
@@ -345,7 +353,7 @@ public class Animation
 		frameNumbers = new int[keyframes.length];
 		
 		for (int i = 0; i < keyframes.length; i++) {
-			frameNumbers[i] = keyframes[i].FrameNumber;
+			frameNumbers[i] = keyframes[i].getFrameNumber();
 		}
 	}
 
@@ -403,6 +411,7 @@ public class Animation
 		return false;
 	}
 
+	
 	public void ResolveRelations(Project project)
 	{
 		ReloadFrameNumbers();
@@ -420,14 +429,25 @@ public class Animation
 	private void ResolveElem(Project project, Keyframe keyframe, KeyframeElement kElem)
 	{
 		kElem.AnimatedElement = project.findElement(kElem.AnimatedElementName);
-		kElem.FrameNumber = keyframe.FrameNumber;
+		kElem.FrameNumber = keyframe.getFrameNumber();
 		
 		for (IDrawable childElem : kElem.ChildElements) {
 			((KeyframeElement)childElem).ParentElement = kElem.AnimatedElement;
-			((KeyframeElement)childElem).FrameNumber = keyframe.FrameNumber;
+			((KeyframeElement)childElem).FrameNumber = keyframe.getFrameNumber();
 			
 			ResolveElem(project, keyframe, (KeyframeElement)childElem);
 		}
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+		ModelCreator.DidModify();
 	}
 
 	

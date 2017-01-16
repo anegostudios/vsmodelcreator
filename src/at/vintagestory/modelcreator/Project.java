@@ -27,13 +27,17 @@ public class Project
 	public boolean PlayAnimation = false;
 	public ElementTree tree;
 	
+	public String filePath;
 	
-	public Project() {
+	
+	public Project(String filePath) {
+		this.filePath = filePath;
+		
 		if (ModelCreator.manager != null) {
 			tree = ((RightTopPanel)ModelCreator.manager).tree;	
-		}
-		
+		}	
 	}
+	
 	
 	public void LoadIntoEditor(IElementManager manager)
 	{
@@ -141,6 +145,8 @@ public class Project
 		
 		tree.addElementAsChild(elem);
 		SelectedElement = elem;
+		
+		ModelCreator.DidModify();
 		ModelCreator.updateValues();
 		tree.updateUI();
 	}
@@ -154,6 +160,8 @@ public class Project
 		rootElements.add(e);
 		tree.addRootElement(e);
 		SelectedElement = tree.getSelectedElement();
+		
+		ModelCreator.DidModify();
 		ModelCreator.updateValues();
 		tree.jtree.updateUI();
 	}
@@ -174,6 +182,7 @@ public class Project
 		}
 		
 		SelectedElement = tree.getSelectedElement();
+		ModelCreator.DidModify();
 		ModelCreator.updateValues();
 	}
 	
@@ -189,6 +198,7 @@ public class Project
 		if (SelectedAnimation != null) SelectedAnimation.RemoveElement(curElem);
 		
 		SelectedElement = tree.getSelectedElement();
+		ModelCreator.DidModify();
 		ModelCreator.updateValues();
 	}
 	

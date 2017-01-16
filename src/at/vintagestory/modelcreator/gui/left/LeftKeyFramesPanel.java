@@ -327,7 +327,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 				if (ModelCreator.currentProject.SelectedAnimation != null) {
 				 	Keyframe keyframe = ModelCreator.currentProject.SelectedAnimation.keyframes[row];
 				 	
-				 	ModelCreator.currentProject.SelectedAnimation.SetFrame(keyframe.FrameNumber);
+				 	ModelCreator.currentProject.SelectedAnimation.SetFrame(keyframe.getFrameNumber());
 				 	ModelCreator.updateFrame();
 				}
 			}
@@ -351,7 +351,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		animationsListModel = new DefaultComboBoxModel<String>();
 		Project project = ModelCreator.currentProject;
 		for (Animation anim : project.Animations) {
-			animationsListModel.addElement("<html><b>"+ anim.name +"</b></html>");	
+			animationsListModel.addElement("<html><b>"+ anim.getName() +"</b></html>");	
 		}
 		animationsList.setModel(animationsListModel);
 		

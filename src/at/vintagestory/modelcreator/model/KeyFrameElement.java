@@ -9,6 +9,7 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 
+import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 
@@ -21,10 +22,18 @@ public class KeyframeElement implements IDrawable
 	public boolean RotationSet;
 	public boolean StretchSet;
 
-	public double offsetX = 0.0, offsetY = 0.0, offsetZ = 0.0;
-	public double stretchX = 0.0, stretchY = 0.0, stretchZ = 0.0;
-	public double rotationX = 0, rotationY = 0, rotationZ = 0;
-	public double originX = 0, originY = 0, originZ = 0;
+	private double offsetX = 0.0;
+	private double offsetY = 0.0;
+	private double offsetZ = 0.0;
+	private double stretchX = 0.0;
+	private double stretchY = 0.0;
+	private double stretchZ = 0.0;
+	private double rotationX = 0;
+	private double rotationY = 0;
+	private double rotationZ = 0;
+	private double originX = 0;
+	private double originY = 0;
+	private double originZ = 0;
 
 	public List<IDrawable> ChildElements = new ArrayList<IDrawable>();
 
@@ -49,6 +58,7 @@ public class KeyframeElement implements IDrawable
 		KeyframeElement elem = new KeyframeElement(forElement);
 		ChildElements.add(elem);
 		elem.ParentElement = this;
+		ModelCreator.DidModify();
 		
 		return elem;
 	}
@@ -78,13 +88,13 @@ public class KeyframeElement implements IDrawable
 	{
 		float b;
 		
-		double originX = AnimatedElement.originX + this.originX;
-		double originY = AnimatedElement.originY + this.originY;
-		double originZ = AnimatedElement.originZ + this.originZ;
+		double originX = AnimatedElement.originX + this.getOriginX();
+		double originY = AnimatedElement.originY + this.getOriginY();
+		double originZ = AnimatedElement.originZ + this.getOriginZ();
 		
-		double startX = AnimatedElement.startX + offsetX;
-		double startY = AnimatedElement.startY + offsetY;
-		double startZ = AnimatedElement.startZ + offsetZ;
+		double startX = AnimatedElement.startX + getOffsetX();
+		double startY = AnimatedElement.startY + getOffsetY();
+		double startZ = AnimatedElement.startZ + getOffsetZ();
 		
 		
 		GL11.glPushMatrix();
@@ -120,9 +130,141 @@ public class KeyframeElement implements IDrawable
 	
 	public void rotateAxis()
 	{
-		GL11.glRotated(AnimatedElement.rotationX + rotationX, 1, 0, 0);
-		GL11.glRotated(AnimatedElement.rotationY + rotationY, 0, 1, 0);
-		GL11.glRotated(AnimatedElement.rotationZ + rotationZ, 0, 0, 1);
+		GL11.glRotated(AnimatedElement.rotationX + getRotationX(), 1, 0, 0);
+		GL11.glRotated(AnimatedElement.rotationY + getRotationY(), 0, 1, 0);
+		GL11.glRotated(AnimatedElement.rotationZ + getRotationZ(), 0, 0, 1);
+	}
+
+
+	public double getOffsetX()
+	{
+		return offsetX;
+	}
+	public double getOffsetY()
+	{
+		return offsetY;
+	}
+	public double getOffsetZ()
+	{
+		return offsetZ;
+	}
+
+
+
+	public void setOffsetX(double offsetX)
+	{
+		this.offsetX = offsetX;
+		ModelCreator.DidModify();
+	}
+	
+	public void setOffsetY(double offsetY)
+	{
+		this.offsetY = offsetY;
+		ModelCreator.DidModify();
+	}
+
+	public void setOffsetZ(double offsetZ)
+	{
+		this.offsetZ = offsetZ;
+		ModelCreator.DidModify();
+	}
+
+
+	public double getStretchX()
+	{
+		return stretchX;
+	}
+	public double getStretchY()
+	{
+		return stretchY;
+	}
+	public double getStretchZ()
+	{
+		return stretchZ;
+	}
+
+
+	public void setStretchX(double stretchX)
+	{
+		this.stretchX = stretchX;
+		ModelCreator.DidModify();
+	}
+
+	public void setStretchY(double stretchY)
+	{
+		this.stretchY = stretchY;
+		ModelCreator.DidModify();
+	}
+
+	public void setStretchZ(double stretchZ)
+	{
+		this.stretchZ = stretchZ;
+		ModelCreator.DidModify();
+	}
+
+
+	public double getRotationX()
+	{
+		return rotationX;
+	}
+	public double getRotationY()
+	{
+		return rotationY;
+	}
+	public double getRotationZ()
+	{
+		return rotationZ;
+	}
+	
+	
+	public void setRotationX(double rotationX)
+	{
+		this.rotationX = rotationX;
+		ModelCreator.DidModify();
+	}
+
+	public void setRotationY(double rotationY)
+	{
+		this.rotationY = rotationY;
+		ModelCreator.DidModify();
+	}
+
+	public void setRotationZ(double rotationZ)
+	{
+		this.rotationZ = rotationZ;
+		ModelCreator.DidModify();
+	}
+
+	public double getOriginX()
+	{
+		return originX;
+	}
+	public double getOriginY()
+	{
+		return originY;
+	}
+	public double getOriginZ()
+	{
+		return originZ;
+	}
+
+
+	public void setOriginX(double originX)
+	{
+		this.originX = originX;
+		ModelCreator.DidModify();
+	}
+
+	public void setOriginY(double originY)
+	{
+		this.originY = originY;
+		ModelCreator.DidModify();
+	}
+
+	public void setOriginZ(double originZ)
+	{
+		this.originZ = originZ;
+		ModelCreator.DidModify();
 	}
 
 }

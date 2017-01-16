@@ -100,9 +100,9 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 					KeyframeElement element = keyFramesPanel.getCurrentElement();
 					if (element != null)
 					{
-						if (num == 0) element.rotationX = Parser.parseDouble(rotationFields[num].getText(), element.rotationX);
-						if (num == 1) element.rotationY = Parser.parseDouble(rotationFields[num].getText(), element.rotationY);
-						if (num == 2) element.rotationZ = Parser.parseDouble(rotationFields[num].getText(), element.rotationZ);
+						if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
+						if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
+						if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
 						ModelCreator.updateValues();
 					}
 				}
@@ -117,9 +117,9 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 				KeyframeElement element = keyFramesPanel.getCurrentElement();
 				if (element != null)
 				{
-					if (num == 0) element.rotationX = Parser.parseDouble(rotationFields[num].getText(), element.rotationX);
-					if (num == 1) element.rotationY = Parser.parseDouble(rotationFields[num].getText(), element.rotationY);
-					if (num == 2) element.rotationZ = Parser.parseDouble(rotationFields[num].getText(), element.rotationZ);
+					if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
+					if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
+					if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
 					ModelCreator.updateValues();
 				}
 			}
@@ -150,13 +150,13 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 			if (elem == null) return;
 			
 			if (num == 0) {
-				elem.rotationX = newValue;
+				elem.setRotationX(newValue);
 			}
 			if (num == 1) {
-				elem.rotationY = newValue;
+				elem.setRotationY(newValue);
 			}
 			if (num == 2) {
-				elem.rotationZ = newValue;
+				elem.setRotationZ(newValue);
 			}
 			
 			ModelCreator.updateValues();
@@ -226,13 +226,13 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 			rotationSliders[i].setEnabled(enabled);
 		}
 		
-		rotationSliders[0].setValue(enabled ? (int) Math.round(element.rotationX / multiplier) : 0);
-		rotationSliders[1].setValue(enabled ? (int) Math.round(element.rotationY / multiplier) : 0);
-		rotationSliders[2].setValue(enabled ? (int) Math.round(element.rotationZ / multiplier) : 0);
+		rotationSliders[0].setValue(enabled ? (int) Math.round(element.getRotationX() / multiplier) : 0);
+		rotationSliders[1].setValue(enabled ? (int) Math.round(element.getRotationY() / multiplier) : 0);
+		rotationSliders[2].setValue(enabled ? (int) Math.round(element.getRotationZ() / multiplier) : 0);
 		
-		rotationFields[0].setText(enabled ? "" + element.rotationX : "");
-		rotationFields[1].setText(enabled ? "" + element.rotationY : "");
-		rotationFields[2].setText(enabled ? "" + element.rotationZ : "");
+		rotationFields[0].setText(enabled ? "" + element.getRotationX() : "");
+		rotationFields[1].setText(enabled ? "" + element.getRotationY() : "");
+		rotationFields[2].setText(enabled ? "" + element.getRotationZ() : "");
 		
 		ignoreSliderChanges = false;
 	}

@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
+
+import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.util.GameMath;
@@ -44,6 +46,7 @@ public class Element implements IDrawable
 
 	// Extra Variables
 	protected boolean shade = true;
+	private int tintIndex = 0;
 
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();
@@ -181,10 +184,7 @@ public class Element implements IDrawable
 		int id = 0;
 		for (Face face : faces)
 		{
-			if (face.getExists())
-			{
-				id = face.getSide();
-			}
+			id = face.getSide();
 		}
 		return id;
 	}
@@ -448,16 +448,19 @@ public class Element implements IDrawable
 	public void addStartX(double amt)
 	{
 		this.startX += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void addStartY(double amt)
 	{
 		this.startY += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void addStartZ(double amt)
 	{
 		this.startZ += amt;
+		ModelCreator.DidModify();
 	}
 	
 	public double getStartX()
@@ -480,16 +483,19 @@ public class Element implements IDrawable
 	public void setStartX(double amt)
 	{
 		this.startX = amt;
+		ModelCreator.DidModify();
 	}
 
 	public void setStartY(double amt)
 	{
 		this.startY = amt;
+		ModelCreator.DidModify();
 	}
 
 	public void setStartZ(double amt)
 	{
 		this.startZ = amt;
+		ModelCreator.DidModify();
 	}
 
 	public double getWidth()
@@ -510,31 +516,37 @@ public class Element implements IDrawable
 	public void addWidth(double amt)
 	{
 		this.width += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void addHeight(double amt)
 	{
 		this.height += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void addDepth(double amt)
 	{
 		this.depth += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void setWidth(double width)
 	{
 		this.width = width;
+		ModelCreator.DidModify();
 	}
 
 	public void setHeight(double height)
 	{
 		this.height = height;
+		ModelCreator.DidModify();
 	}
 
 	public void setDepth(double depth)
 	{
 		this.depth = depth;
+		ModelCreator.DidModify();
 	}
 
 	public double getOriginX()
@@ -555,31 +567,37 @@ public class Element implements IDrawable
 	public void addOriginX(double amt)
 	{
 		this.originX += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void addOriginY(double amt)
 	{
 		this.originY += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void addOriginZ(double amt)
 	{
 		this.originZ += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void setOriginX(double amt)
 	{
 		this.originX = amt;
+		ModelCreator.DidModify();
 	}
 
 	public void setOriginY(double amt)
 	{
 		this.originY = amt;
+		ModelCreator.DidModify();
 	}
 
 	public void setOriginZ(double amt)
 	{
 		this.originZ = amt;
+		ModelCreator.DidModify();
 	}
 
 	public double getRotationX()
@@ -601,24 +619,28 @@ public class Element implements IDrawable
 	{
 		this.rotationX = rotation;
 		recalculateBrightnessValues();
+		ModelCreator.DidModify();
 	}
 
 	public void setRotationY(double rotation)
 	{
 		this.rotationY = rotation;
 		recalculateBrightnessValues();
+		ModelCreator.DidModify();
 	}
 	
 	public void setRotationZ(double rotation)
 	{
 		this.rotationZ = rotation;
 		recalculateBrightnessValues();
+		ModelCreator.DidModify();
 	}
 	
 
 	public void setRescale(boolean rescale)
 	{
 		this.rescale = rescale;
+		ModelCreator.DidModify();
 	}
 
 	public boolean shouldRescale()
@@ -635,11 +657,13 @@ public class Element implements IDrawable
 	{
 		this.shade = shade;
 		recalculateBrightnessValues();
+		ModelCreator.DidModify();
 	}
 
 	public void setName(String name)
 	{
 		this.name = name;
+		ModelCreator.DidModify();
 	}
 	
 	
@@ -652,6 +676,16 @@ public class Element implements IDrawable
 		}		
 		Collections.reverse(path);
 		return path;
+	}
+
+	public int getTintIndex()
+	{
+		return tintIndex;
+	}
+
+	public void setTintIndex(int tintIndex)
+	{
+		this.tintIndex = tintIndex;
 	}
 
 }

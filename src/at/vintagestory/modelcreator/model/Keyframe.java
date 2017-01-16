@@ -3,17 +3,19 @@ package at.vintagestory.modelcreator.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 
 public class Keyframe
 {
-	public int FrameNumber;	
+	private int FrameNumber;	
 	public ArrayList<IDrawable> Elements = new ArrayList<IDrawable>();
 
 	
 	
 	public void AddElement(KeyframeElement keyfElem) {
 		Elements.add(keyfElem);
+		ModelCreator.DidModify();
 	}
 	
 	public void RemoveElement(KeyframeElement element) {
@@ -21,13 +23,16 @@ public class Keyframe
 		
 		if (walkElem == null) {
 			Elements.remove(element);
+			ModelCreator.DidModify();
 			return;
 		}
 		
 		while (walkElem.ParentElement != null) {
 			 walkElem = (KeyframeElement)walkElem.ParentElement;
 		}
+		
 		Elements.remove(walkElem);
+		ModelCreator.DidModify();
 	}
 	
 	
@@ -58,6 +63,17 @@ public class Keyframe
 		}
 		
 		return null;
+	}
+
+	public int getFrameNumber()
+	{
+		return FrameNumber;
+	}
+
+	public void setFrameNumber(int frameNumber)
+	{
+		FrameNumber = frameNumber;
+		ModelCreator.DidModify();
 	}
 	
 }

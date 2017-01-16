@@ -1,13 +1,14 @@
 package at.vintagestory.modelcreator;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
@@ -38,19 +39,28 @@ public class Exporter
 
 	public File writeJSONFile(File file)
 	{
-		FileWriter fw;
+		PrintWriter fw;
 		BufferedWriter writer;
 		try
 		{
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			OutputStreamWriter outWriter = new OutputStreamWriter(baos);
+			writer = new BufferedWriter(outWriter);
+			writeComponents(writer);
+			writer.close();
+			
 			if (!file.exists())
 			{
 				file.createNewFile();
 			}
-			fw = new FileWriter(file);
-			writer = new BufferedWriter(fw);
-			writeComponents(writer);
-			writer.close();
+			
+			fw = new PrintWriter(file);
+			fw.write(baos.toString());
 			fw.close();
+			
+			outWriter.close();
+			baos.close();
+			
 			return file;
 		}
 		catch (IOException e)
@@ -91,11 +101,12 @@ public class Exporter
 	{
 		writer.write("{");
 		writer.newLine();
-		if (!project.AmbientOcclusion)
+		/*if (!project.AmbientOcclusion)
 		{
-			writer.write("\"ambientocclusion\": " + project.AmbientOcclusion + ",");
+			writer.write(space(1) + "\"ambientocclusion\": " + project.AmbientOcclusion + ",");
 			writer.newLine();
-		}
+		}*/
+		
 		writeTextures(writer);
 		
 		writer.newLine();
@@ -145,7 +156,7 @@ public class Exporter
 		writer.write(space(2) + "{");
 		writer.newLine();
 
-		writer.write(space(3) + "\"name\": \"" + animation.name + "\",");
+		writer.write(space(3) + "\"name\": \"" + animation.getName() + "\",");
 		writer.newLine();
 		writer.write(space(3) + "\"quantityframes\": " + animation.GetQuantityFrames() + ",");
 		writer.newLine();
@@ -173,7 +184,7 @@ public class Exporter
 		writer.write(space(4) + "{");
 		writer.newLine();
 		
-		writer.write(space(5) + "\"frame\": " + keyframe.FrameNumber + ",");
+		writer.write(space(5) + "\"frame\": " + keyframe.getFrameNumber() + ",");
 		writer.newLine();
 		writer.write(space(5) + "\"elements\": [");
 		writer.newLine();
@@ -209,9 +220,9 @@ public class Exporter
 			writer.newLine();
 			writer.write(space(indent));
 			
-			writer.write("\"offsetX\": " + kElem.offsetX);
-			writer.write(", \"offsetY\": " + kElem.offsetY);
-			writer.write(", \"offsetZ\": " + kElem.offsetZ);
+			writer.write("\"offsetX\": " + kElem.getOffsetX());
+			writer.write(", \"offsetY\": " + kElem.getOffsetY());
+			writer.write(", \"offsetZ\": " + kElem.getOffsetZ());
 		}
 		
 		if (kElem.RotationSet) {
@@ -219,9 +230,9 @@ public class Exporter
 			writer.newLine();
 			writer.write(space(indent));
 			
-			writer.write("\"rotationX\": " + kElem.rotationX);
-			writer.write(", \"rotationY\": " + kElem.rotationY);
-			writer.write(", \"rotationZ\": " + kElem.rotationZ);	
+			writer.write("\"rotationX\": " + kElem.getRotationX());
+			writer.write(", \"rotationY\": " + kElem.getRotationY());
+			writer.write(", \"rotationZ\": " + kElem.getRotationZ());	
 		}
 		
 		if (kElem.StretchSet) {
@@ -229,9 +240,9 @@ public class Exporter
 			writer.newLine();
 			writer.write(space(indent));
 
-			writer.write("\"stretchX\": " + kElem.stretchX);
-			writer.write(", \"stretchY\": " + kElem.stretchY);
-			writer.write(", \"stretchZ\": " + kElem.stretchZ);
+			writer.write("\"stretchX\": " + kElem.getStretchX());
+			writer.write(", \"stretchY\": " + kElem.getStretchY());
+			writer.write(", \"stretchZ\": " + kElem.getStretchZ());
 		}
 		
 		
@@ -299,10 +310,18 @@ public class Exporter
 			writeShade(writer, cuboid, indentation);
 			writer.newLine();
 		}
-		if (cuboid.getRotationX() != 0 || cuboid.getRotationY() != 0 || cuboid.getRotationZ() != 0)
+		if (cuboid.getTintIndex() > 0)
+		{
+			writer.write(space(indentation) + "\"tintIndex\": " + cuboid.getTintIndex() + ",");
+			writer.newLine();
+		}
+
+		
+		if (cuboid.getRotationX() != 0 || cuboid.getRotationY() != 0 || cuboid.getRotationZ() != 0 || cuboid.getOriginX() != 0 || cuboid.getOriginY() != 0 || cuboid.getOriginZ() != 0)
 		{
 			writeRotation(writer, cuboid, indentation);
 		}
+		
 		writeFaces(writer, cuboid, indentation);
 		
 		if (cuboid.ChildElements.size() > 0) {
@@ -323,7 +342,6 @@ public class Exporter
 		
 		writer.newLine();
 		writer.write(space(indentation) + "}");
-
 	}
 
 	private void writeBounds(BufferedWriter writer, Element cuboid, int indentation) throws IOException
@@ -353,28 +371,26 @@ public class Exporter
 		writer.newLine();
 		for (Face face : cuboid.getAllFaces())
 		{
-			if (face.getExists()) {
-				writer.write(space(indentation + 1) + "\"" + Face.getFaceName(face.getSide()) + "\": { ");
-				writer.write("\"texture\": \"#" + textureList.indexOf(face.getTextureLocation() + face.getTextureName()) + "\"");
-				writer.write(", \"uv\": [ " + face.getStartU() + ", " + face.getStartV() + ", " + face.getEndU() + ", " + face.getEndV() + " ]");
-				if (face.getRotation() > 0)
-					writer.write(", \"rotation\": " + (int) face.getRotation() * 90);
-				if (face.isCullfaced())
-					writer.write(", \"cullface\": \"" + Face.getFaceName(face.getSide()) + "\"");
-				if (face.getGlow() > 0) {
-					writer.write(", \"glow\": " + face.getGlow());
-				}
-				if (!face.isEnabled()) {
-					writer.write(", \"enabled\": false");
-				}
-				
-				writer.write(" }");
-				if (face.getSide() != cuboid.getLastValidFace())
-				{
-					writer.write(",");
-					writer.newLine();
-				}				
+			writer.write(space(indentation + 1) + "\"" + Face.getFaceName(face.getSide()) + "\": { ");
+			writer.write("\"texture\": \"#" + textureList.indexOf(face.getTextureLocation() + face.getTextureName()) + "\"");
+			writer.write(", \"uv\": [ " + face.getStartU() + ", " + face.getStartV() + ", " + face.getEndU() + ", " + face.getEndV() + " ]");
+			if (face.getRotation() > 0)
+				writer.write(", \"rotation\": " + (int) face.getRotation() * 90);
+			if (face.isCullfaced())
+				writer.write(", \"cullface\": \"" + Face.getFaceName(face.getSide()) + "\"");
+			if (face.getGlow() > 0) {
+				writer.write(", \"glow\": " + face.getGlow());
 			}
+			if (!face.isEnabled()) {
+				writer.write(", \"enabled\": false");
+			}
+			
+			writer.write(" }");
+			if (face.getSide() != cuboid.getLastValidFace())
+			{
+				writer.write(",");
+				writer.newLine();
+			}				
 		}
 		writer.newLine();
 		writer.write(space(indentation) + "}");

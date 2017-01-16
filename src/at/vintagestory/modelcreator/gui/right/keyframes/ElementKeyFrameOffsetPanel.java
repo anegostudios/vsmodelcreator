@@ -87,7 +87,7 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 					KeyframeElement element = keyFramesPanel.getCurrentElement();
 					if (element != null)
 					{
-						element.offsetX = Parser.parseDouble(xPositionField.getText(), element.offsetX);
+						element.setOffsetX(Parser.parseDouble(xPositionField.getText(), element.getOffsetX()));
 						ModelCreator.updateValues();
 					}
 
@@ -102,7 +102,7 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 				KeyframeElement element = keyFramesPanel.getCurrentElement();
 				if (element != null)
 				{
-					element.offsetX = Parser.parseDouble(xPositionField.getText(), element.offsetX);
+					element.setOffsetX(Parser.parseDouble(xPositionField.getText(), element.getOffsetX()));
 					ModelCreator.updateValues();
 				}
 			}
@@ -132,7 +132,7 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 					KeyframeElement element = keyFramesPanel.getCurrentElement();
 					if (element != null)
 					{
-						element.offsetY = Parser.parseDouble(yPositionField.getText(), element.offsetY);
+						element.setOffsetY(Parser.parseDouble(yPositionField.getText(), element.getOffsetY()));
 						ModelCreator.updateValues();
 					}
 
@@ -147,7 +147,7 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 				KeyframeElement element = keyFramesPanel.getCurrentElement();
 				if (element != null)
 				{
-					element.offsetY = Parser.parseDouble(yPositionField.getText(), element.offsetY);
+					element.setOffsetY(Parser.parseDouble(yPositionField.getText(), element.getOffsetY()));
 					ModelCreator.updateValues();
 				}
 			}
@@ -176,7 +176,7 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 					KeyframeElement element = keyFramesPanel.getCurrentElement();
 					if (element != null)
 					{
-						element.offsetZ = Parser.parseDouble(zPositionField.getText(), element.offsetZ);
+						element.setOffsetZ(Parser.parseDouble(zPositionField.getText(), element.getOffsetZ()));
 						ModelCreator.updateValues();
 					}
 
@@ -192,7 +192,7 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 				KeyframeElement element = keyFramesPanel.getCurrentElement();
 				if (element != null)
 				{
-					element.offsetZ = Parser.parseDouble(zPositionField.getText(), element.offsetZ);
+					element.setOffsetZ(Parser.parseDouble(zPositionField.getText(), element.getOffsetZ()));
 					ModelCreator.updateValues();
 				}
 			}
@@ -269,23 +269,23 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		
 		switch (axis) {
 		case X:
-			cube.offsetX += direction;
+			cube.setOffsetX(cube.getOffsetX() + direction);
 			//if (ctrl) cube.addOriginX(size);
 			
-			xPositionField.setText(df.format(cube.offsetX));
+			xPositionField.setText(df.format(cube.getOffsetX()));
 			
 			break;
 		case Y:
-			cube.offsetY += direction;
+			cube.setOffsetY(cube.getOffsetY() + direction);
 			//if (ctrl) cube.addOriginY(size);
 			
-			yPositionField.setText(df.format(cube.offsetY));
+			yPositionField.setText(df.format(cube.getOffsetY()));
 			break;
 		default:
-			cube.offsetZ += direction;
+			cube.setOffsetZ(cube.getOffsetZ() + direction);
 			//if (ctrl) cube.addOriginZ(size);
 			
-			zPositionField.setText(df.format(cube.offsetZ));
+			zPositionField.setText(df.format(cube.getOffsetZ()));
 			break;
 		}
 		
@@ -325,8 +325,8 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		xPositionField.setEnabled(enabled);
 		yPositionField.setEnabled(enabled);
 		zPositionField.setEnabled(enabled);
-		xPositionField.setText(enabled ? df.format(cube.offsetX) : "");
-		yPositionField.setText(enabled ? df.format(cube.offsetY) : "");
-		zPositionField.setText(enabled ? df.format(cube.offsetZ) : "");
+		xPositionField.setText(enabled ? df.format(cube.getOffsetX()) : "");
+		yPositionField.setText(enabled ? df.format(cube.getOffsetY()) : "");
+		zPositionField.setText(enabled ? df.format(cube.getOffsetZ()) : "");
 	}
 }
