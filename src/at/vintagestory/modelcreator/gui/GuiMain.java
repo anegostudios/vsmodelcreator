@@ -41,6 +41,7 @@ public class GuiMain extends JMenuBar
 
 	/* Options */
 	private JMenu menuOptions;
+	private JCheckBoxMenuItem itemGrid;
 	private JCheckBoxMenuItem itemTransparency;
 	private JCheckBoxMenuItem itemUnlockAngles;
 	private JCheckBoxMenuItem itemSingleTexture;
@@ -78,6 +79,9 @@ public class GuiMain extends JMenuBar
 
 		menuOptions = new JMenu("Options");
 		{
+			itemGrid = createCheckboxItem("Show Grid", "Toggles the voxel grid", KeyEvent.VK_G, Icons.transparent);
+			itemGrid.setSelected(ModelCreator.transparent);
+			
 			itemTransparency = createCheckboxItem("Transparency", "Toggles transparent rendering in program", KeyEvent.VK_T, Icons.transparent);
 			itemTransparency.setSelected(ModelCreator.transparent);
 			
@@ -85,6 +89,11 @@ public class GuiMain extends JMenuBar
 			itemUnlockAngles.setSelected(ModelCreator.unlockAngles);
 			
 			itemSingleTexture = createCheckboxItem("Single Texture for all Faces", "When creating entities, it is often more useful to use only a single texture.", 0, Icons.transparent);
+			
+			itemGrid.setSelected(ModelCreator.showGrid);
+			itemTransparency.setSelected(ModelCreator.transparent);
+			itemUnlockAngles.setSelected(ModelCreator.unlockAngles);
+			itemSingleTexture.setSelected(ModelCreator.singleTextureMode);
 		}
 
 		menuAdd = new JMenu("Add");
@@ -105,6 +114,7 @@ public class GuiMain extends JMenuBar
 		initActions();
 
 	
+		menuOptions.add(itemGrid);
 		menuOptions.add(itemTransparency);
 		menuOptions.add(itemUnlockAngles);
 		menuOptions.add(itemSingleTexture);
@@ -196,6 +206,12 @@ public class GuiMain extends JMenuBar
 			creator.close();
 		});
 
+		itemGrid.addActionListener(a ->
+		{
+			ModelCreator.showGrid = itemGrid.isSelected();
+			ModelCreator.prefs.putBoolean("showGrid", ModelCreator.showGrid);
+		});
+		
 		itemTransparency.addActionListener(a ->
 		{
 			ModelCreator.transparent = itemTransparency.isSelected();

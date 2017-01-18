@@ -389,23 +389,26 @@ public class Animation
 		keyframe.RemoveElement(keyframeelem);
 		
 		if (!keyframe.HasElements()) {
-			
-			// Shrink array by 1
-			Keyframe[] newkeyframes = new Keyframe[keyframes.length - 1];
-			
-			int j = 0;
-			for (int i = 0; i < keyframes.length; i++) {
-				if (keyframes[i] != keyframe) newkeyframes[j++] = keyframes[i];
-			}
-			
-			keyframes = newkeyframes;
-			
-			ReloadFrameNumbers();
-			
+			RemoveKeyFrame(keyframe);
 			return true;
 		}
 		
 		return false;
+	}
+	
+	
+	void RemoveKeyFrame(Keyframe keyframe) {
+		// Shrink array by 1
+		Keyframe[] newkeyframes = new Keyframe[keyframes.length - 1];
+		
+		int j = 0;
+		for (int i = 0; i < keyframes.length; i++) {
+			if (keyframes[i] != keyframe) newkeyframes[j++] = keyframes[i];
+		}
+		
+		keyframes = newkeyframes;
+		
+		ReloadFrameNumbers();
 	}
 
 	
@@ -447,5 +450,54 @@ public class Animation
 		ModelCreator.DidModify();
 	}
 
+	public void MoveSelectedFrame(int direction)
+	{
+		Keyframe curFrame = null;
+		Keyframe prevFrame = null;
+		Keyframe nextFrame = null;
+		for (int i = 0; i < keyframes.length; i++) {
+			if (keyframes[i].getFrameNumber() == this.currentFrame) {
+				curFrame = keyframes[i];
+				prevFrame = keyframes[mod(i-1, keyframes.length)];
+				nextFrame = keyframes[mod(i+1, keyframes.length)];
+			}
+		}
+		
+		int nextFrameNumber = mod(curFrame.getFrameNumber() + direction, quantityFrames);
+		
+		if (direction > 0 && curFrame != nextFrame && curFrame.getFrameNumber() < nextFrame.getFrameNumber()) {
+			nextFrameNumber = Math.min(curFrame.getFrameNumber() + direction, nextFrame.getFrameNumber() - 1);
+		}
+
+		if (direction < 0 && curFrame != prevFrame && prevFrame.getFrameNumber() < curFrame.getFrameNumber()) {
+			nextFrameNumber = Math.max(curFrame.getFrameNumber() + direction, prevFrame.getFrameNumber() + 1);
+		}
+		
+		
+		
+		curFrame.setFrameNumber(nextFrameNumber);
+		this.currentFrame = nextFrameNumber;
+		
+		ReloadFrameNumbers();
+		ModelCreator.updateValues();
+	}
+
+	public void DeleteCurrentFrame()
+	{
+		RemoveKeyFrame(GetKeyFrame(currentFrame));
+		ReloadFrameNumbers();
+		ModelCreator.updateValues();
+	}
+
+	public boolean IsCurrentFrameKeyFrame()
+	{
+		return GetKeyFrame(currentFrame) != null;
+	}
+
+	private int mod(int x, int y)
+	{
+	    int result = x % y;
+	    return result < 0? result + y : result;
+	}
 	
 }

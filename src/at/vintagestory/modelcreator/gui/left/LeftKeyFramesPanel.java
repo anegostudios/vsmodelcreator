@@ -49,14 +49,20 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	JSlider frameSlider;
 	JLabel currentFrameLabel;
 	
-	JPanel btnContainer;
+	JPanel btnContainerTop;
 	JButton playPauseButton;
 	JButton nextFrameButton;
 	JButton prevFrameButton;
 	
 	JTable keyFramesTable;
-
 	String[] columnNames = {"#", "", "", ""};
+	
+	JPanel btnContainerBottom;
+	
+	JButton deleteFrameButton;
+	JButton moveFrameRightButton;
+	JButton moveFrameLeftButton;
+	
 	
 	
 	
@@ -79,6 +85,10 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		animationAddRemoveButton = new JButton();
 		currentFrameLabel = new JLabel();
 		keyFramesTable = new JTable();
+		deleteFrameButton = new JButton();
+		moveFrameLeftButton = new JButton();
+		moveFrameRightButton = new JButton();
+		
 		
 		tableModel = new AbstractTableModel()
 		{
@@ -268,8 +278,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		
 		
 		// 4. Play, Prev and Next Button
-		btnContainer = new JPanel(new GridLayout(1, 3, 4, 0));
-		btnContainer.setPreferredSize(new Dimension(205, 30));
+		btnContainerTop = new JPanel(new GridLayout(1, 3, 4, 0));
+		btnContainerTop.setPreferredSize(new Dimension(205, 30));
 		
 		playPauseButton.setIcon(Icons.play);
 		playPauseButton.setToolTipText("Play/Pause");
@@ -279,7 +289,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			playPauseButton.setIcon(ModelCreator.currentProject.PlayAnimation ? Icons.pause : Icons.play);
 		});
 		playPauseButton.setPreferredSize(new Dimension(30, 30));
-		btnContainer.add(playPauseButton);
+		btnContainerTop.add(playPauseButton);
 		
 		
 		
@@ -291,7 +301,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			ModelCreator.updateFrame();
 		});
 		prevFrameButton.setPreferredSize(new Dimension(30, 30));
-		btnContainer.add(prevFrameButton);
+		btnContainerTop.add(prevFrameButton);
 
 		
 		
@@ -303,9 +313,9 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			ModelCreator.updateFrame();
 		});
 		nextFrameButton.setPreferredSize(new Dimension(30, 30));
-		btnContainer.add(nextFrameButton);
+		btnContainerTop.add(nextFrameButton);
 		
-		add(btnContainer);
+		add(btnContainerTop);
 		
 		
 		// 5. List of Keyframes
@@ -339,6 +349,49 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		scrollPane.setPreferredSize(new Dimension(205, 400));
 		
 		add(scrollPane);
+		
+		
+		// 6. Keyframe editing buttons
+		
+		btnContainerBottom = new JPanel(new GridLayout(1, 4, 4, 0));
+		btnContainerBottom.setPreferredSize(new Dimension(205, 30));
+		
+
+		deleteFrameButton.setIcon(Icons.bin);
+		deleteFrameButton.setToolTipText("Delete Frame");
+		deleteFrameButton.addActionListener(e ->
+		{
+			ModelCreator.currentProject.SelectedAnimation.DeleteCurrentFrame();
+		});
+		deleteFrameButton.setPreferredSize(new Dimension(30, 30));
+		
+		btnContainerBottom.add(deleteFrameButton);
+		
+		btnContainerBottom.add(new JLabel());
+		
+		
+		moveFrameRightButton.setIcon(Icons.left);
+		moveFrameRightButton.setToolTipText("Move frame to the left");
+		moveFrameRightButton.addActionListener(e ->
+		{
+			ModelCreator.currentProject.SelectedAnimation.MoveSelectedFrame(-1);
+		});
+		moveFrameRightButton.setPreferredSize(new Dimension(30, 30));
+		btnContainerBottom.add(moveFrameRightButton);
+		
+		
+		
+		moveFrameLeftButton.setIcon(Icons.right);
+		moveFrameLeftButton.setToolTipText("Move frame to the right");
+		moveFrameLeftButton.addActionListener(e ->
+		{
+			ModelCreator.currentProject.SelectedAnimation.MoveSelectedFrame(1);
+		});
+		moveFrameLeftButton.setPreferredSize(new Dimension(30, 30));
+		btnContainerBottom.add(moveFrameLeftButton);
+		
+		add(btnContainerBottom);
+		
 		
 		
 		updateValues();
@@ -382,6 +435,11 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		prevFrameButton.setEnabled(enabled);
 		nextFrameButton.setEnabled(enabled);
 		
+		deleteFrameButton.setEnabled(enabled);
+		moveFrameRightButton.setEnabled(enabled);
+		moveFrameLeftButton.setEnabled(enabled);
+		
+		
 		currentFrameLabel.setText(enabled ? ("" + ModelCreator.currentProject.SelectedAnimation.currentFrame) : "");
 		
 		keyFramesTable.updateUI();
@@ -394,9 +452,15 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	{
 		if (ModelCreator.currentProject.SelectedAnimation == null) return;
 		
-		frameSlider.setValue(ModelCreator.currentProject.SelectedAnimation.currentFrame);
-		
+		frameSlider.setValue(ModelCreator.currentProject.SelectedAnimation.currentFrame);		
 		currentFrameLabel.setText("" + ModelCreator.currentProject.SelectedAnimation.currentFrame);
+		
+		
+		boolean enabled = !ModelCreator.currentProject.PlayAnimation && ModelCreator.currentProject.SelectedAnimation != null && ModelCreator.currentProject.SelectedAnimation.IsCurrentFrameKeyFrame();
+		
+		deleteFrameButton.setEnabled(enabled);
+		moveFrameRightButton.setEnabled(enabled);
+		moveFrameLeftButton.setEnabled(enabled);
 	}
 	
 }

@@ -79,7 +79,16 @@ public class Keyframe
 	public void setFrameNumber(int frameNumber)
 	{
 		FrameNumber = frameNumber;
+		setFrameNumber(frameNumber, Elements);
+		
 		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 	
+	void setFrameNumber(int frameNumber, List<IDrawable> elements) {
+		for (IDrawable elem : elements) {
+			KeyframeElement kelem = (KeyframeElement)elem;
+			kelem.FrameNumber = frameNumber;
+			setFrameNumber(frameNumber, kelem.ChildElements);
+		}
+	}
 }

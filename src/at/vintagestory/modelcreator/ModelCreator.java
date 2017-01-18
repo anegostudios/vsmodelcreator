@@ -68,7 +68,7 @@ public class ModelCreator extends JFrame
 	public static boolean updatingValues = false;
 	public static boolean projectWasModified;
 
-	
+	public static boolean showGrid = true;
 	public static boolean transparent = true;
 	public static boolean unlockAngles = false;
 	public static boolean singleTextureMode = false;

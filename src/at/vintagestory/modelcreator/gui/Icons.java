@@ -28,6 +28,7 @@ public class Icons
 	public static Icon light_off;
 	public static Icon arrow_up;
 	public static Icon arrow_down;
+
 	
 	public static Icon arrow_up_x;
 	public static Icon arrow_down_x;
@@ -52,6 +53,8 @@ public class Icons
 	public static Icon previous;
 	public static Icon next;
 	public static Icon addremove;
+	public static Icon left;
+	public static Icon right;
 
 	
 	public static void init(Class<?> clazz)
@@ -96,6 +99,10 @@ public class Icons
 		pause = new ImageIcon(loader.getResource("icons/pause.png"));
 		previous = new ImageIcon(loader.getResource("icons/prev.png"));
 		next = new ImageIcon(loader.getResource("icons/next.png"));
+		
+		left = new ImageIcon(loader.getResource("icons/move_left.png"));
+		right = new ImageIcon(loader.getResource("icons/move_right.png"));
+		
 		addremove = new ImageIcon(loader.getResource("icons/addremove.png"));
 		
 		facebook = new ImageIcon(loader.getResource("icons/facebook.png"));

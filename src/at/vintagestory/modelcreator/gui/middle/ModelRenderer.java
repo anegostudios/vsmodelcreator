@@ -111,6 +111,7 @@ public class ModelRenderer
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 
 		
+		if (!ModelCreator.showGrid) return;
 		GL11.glPushMatrix();
 		{
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -134,6 +135,8 @@ public class ModelRenderer
 	
 	public void drawPerspectiveGrid()
 	{
+		if (!ModelCreator.showGrid) return;
+		
 		glPushMatrix();
 		{
 			glColor3f(0.55F, 0.55F, 0.60F);
