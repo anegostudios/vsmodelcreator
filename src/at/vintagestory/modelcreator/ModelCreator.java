@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.lwjgl.LWJGLException;
@@ -52,6 +53,7 @@ import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.PendingTexture;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.Screenshot;
+import sun.nio.cs.HistoricallyNamedCharset;
 
 import java.util.prefs.Preferences;
 
@@ -65,8 +67,9 @@ public class ModelCreator extends JFrame
 	public static Preferences prefs;
 	
 	public static Project currentProject;
-	public static boolean updatingValues = false;
-	public static boolean projectWasModified;
+	public static ProjectChangeHistory changeHistory = new ProjectChangeHistory();
+	
+	public static boolean ignoreValueUpdates = false;
 
 	public static boolean showGrid = true;
 	public static boolean transparent = true;
@@ -95,7 +98,7 @@ public class ModelCreator extends JFrame
 	private final int SIDEBAR_WIDTH = 130;
 	
 	public LeftSidebar uvSidebar;
-	
+	public static GuiMain guiMain;
 	public static LeftKeyFramesPanel leftKeyframesPanel;
 
 	
@@ -115,10 +118,12 @@ public class ModelCreator extends JFrame
 		
 		singleTextureMode = prefs.getBoolean("singleTextureMode", false);
 		unlockAngles = prefs.getBoolean("unlockAngles", false);
+		showGrid = prefs.getBoolean("showGrid", false);
 		
 		Instance = this;
 		
 		currentProject = new Project(null);
+		changeHistory.addHistoryState(currentProject);
 		
 		setDropTarget(getCustomDropTarget());		
 		setPreferredSize(new Dimension(1200, 715));
@@ -130,6 +135,8 @@ public class ModelCreator extends JFrame
 		canvas = new Canvas();
 		
 		initComponents();
+		
+		
 
 
 		canvas.addComponentListener(new ComponentAdapter()
@@ -155,7 +162,7 @@ public class ModelCreator extends JFrame
 			@Override
 			public void windowClosing(WindowEvent e)
 			{
-				if (projectWasModified) {
+				if (currentProject.needsSaving) {
 					int	returnVal = JOptionPane.showConfirmDialog(null, "You have not saved your changes yet, would you like to save now?", "Warning", JOptionPane.YES_NO_CANCEL_OPTION);
 					
 					if (returnVal == JOptionPane.YES_OPTION) {
@@ -210,7 +217,10 @@ public class ModelCreator extends JFrame
 	
 
 	public static void DidModify() {
-		projectWasModified = true;
+		if (currentProject == null) return;
+		
+		currentProject.needsSaving = true;
+		changeHistory.addHistoryState(currentProject);
 	}
 
 	
@@ -242,7 +252,7 @@ public class ModelCreator extends JFrame
 		uvSidebar = new LeftUVSidebar("UV Editor", manager);
 		
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-		setJMenuBar(new GuiMain(this));
+		setJMenuBar(guiMain = new GuiMain(this));
 	}
 
 	private List<Image> getIcons()
@@ -259,24 +269,26 @@ public class ModelCreator extends JFrame
 	
 	public static void updateValues()
 	{
-		if (updatingValues) return;
+		if (currentProject == null) return;
+		if (ignoreValueUpdates) return;
 		
-		updatingValues = true;
+		ignoreValueUpdates = true;
 		
 		if (currentProject.SelectedAnimation != null) {
 			currentProject.SelectedAnimation.calculateAllFrames(currentProject);
 		}
 		
+		guiMain.updateValues();
 	 	((RightTopPanel)manager).updateValues();
 	 	leftKeyframesPanel.updateValues();
 	 	updateFrame();
 	 	updateTitle();
 	 	
-	 	updatingValues = false;
+	 	ignoreValueUpdates = false;
 	}
 	
 	static void updateTitle() {
-	 	String dash = ModelCreator.projectWasModified ? " * " : " - ";
+	 	String dash = currentProject.needsSaving ? " * " : " - ";
 	 	if (currentProject.filePath == null) {
 	 		Instance.setTitle("(untitled)" + dash + windowTitle);
 		} else {
@@ -285,9 +297,12 @@ public class ModelCreator extends JFrame
 	}
 	
 	public static void updateFrame() {
+		if (currentProject == null) return;
+		
 		leftKeyframesPanel.updateFrame();
 		((RightTopPanel)manager).updateFrame();
 		updateTitle();
+		guiMain.updateFrame();
 	}
 
 
@@ -364,6 +379,11 @@ public class ModelCreator extends JFrame
 	}
 
 	
+	boolean zKeyDown;
+	boolean yKeyDown;
+	boolean sKeyDown;
+	
+	
 	public void handleInput(int offset)
 	{
 		final float cameraMod = Math.abs(modelrenderer.camera.getZ());
@@ -392,6 +412,50 @@ public class ModelCreator extends JFrame
 
 			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 			{
+				if (Keyboard.isKeyDown(Keyboard.KEY_Z)) zKeyDown = true;
+				else {
+					if (zKeyDown) {
+						zKeyDown = false;
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() { changeHistory.Undo(); } 
+						});
+					}
+				}
+				
+				
+				if (Keyboard.isKeyDown(Keyboard.KEY_Y)) yKeyDown = true;
+				else {
+					if (yKeyDown) {
+						yKeyDown = false;
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() { changeHistory.Redo(); } 
+						});
+						
+					}
+				}
+				if (Keyboard.isKeyDown(Keyboard.KEY_S)) sKeyDown = true;
+				else {
+					if (sKeyDown) {
+						sKeyDown = false;
+						
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								if (ModelCreator.currentProject.filePath == null) {
+									SaveProjectAs();
+								} else {
+									SaveProject(new File(ModelCreator.currentProject.filePath));
+								}								
+							}
+						});
+						
+					}
+				}
+				
 				if (grabbed == null)
 				{
 					if (Mouse.isButtonDown(0) | Mouse.isButtonDown(1))
@@ -624,6 +688,8 @@ public class ModelCreator extends JFrame
 	
 	
 	public static List<IDrawable> getRootElementsForRender() {
+		if (currentProject == null) return null;
+		
 		if (leftKeyframesPanel.isVisible()) {
 			return currentProject.getCurrentFrameRootElements();
 		} else {
@@ -712,27 +778,31 @@ public class ModelCreator extends JFrame
 
 	public void LoadFile(String filePath)
 	{
-		if (ModelCreator.currentProject.rootElements.size() > 0 && projectWasModified)
+		if (ModelCreator.currentProject.rootElements.size() > 0 && currentProject.needsSaving)
 		{
 			int returnVal = JOptionPane.showConfirmDialog(null, "Your current unsaved project will be cleared, are you sure you want to continue?", "Warning", JOptionPane.YES_NO_OPTION);		
 			if (returnVal == JOptionPane.NO_OPTION || returnVal == JOptionPane.CLOSED_OPTION) return;
 		}
-		
+				
 		if (filePath == null) {
 			setTitle("(untitled) - " + windowTitle);
-			currentProject.clear();
 			currentProject = new Project(null);
 			
 		} else {
 			prefs.put("filePath", filePath);
-			Importer importer = new Importer(filePath);			
-			currentProject = importer.loadFromJSON();
+			Importer importer = new Importer(filePath);
+			
+			currentProject = null;
+			Project project = importer.loadFromJSON();
+			currentProject = project;
 			currentProject.LoadIntoEditor(ModelCreator.manager);
 			setTitle(new File(currentProject.filePath).getName() + " - " + windowTitle);
 		}
 		
-		projectWasModified = false;
+		changeHistory.clear();
+		changeHistory.addHistoryState(currentProject);
 		
+		currentProject.needsSaving = false;		
 		ModelCreator.updateValues();
 		currentProject.tree.jtree.updateUI();		
 	}
@@ -744,8 +814,9 @@ public class ModelCreator extends JFrame
 		exporter.export(file);
 		
 		ModelCreator.currentProject.filePath = file.getAbsolutePath(); 
-		ModelCreator.projectWasModified = false;
+		currentProject.needsSaving = false;
 		ModelCreator.updateValues();
+		changeHistory.didSave();
 	}
 	
 

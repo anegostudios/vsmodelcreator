@@ -13,7 +13,6 @@ public class TextureEntry
 	public ImageIcon icon;
 	public List<Texture> textures;
 	public String filePath;
-	public String metaLocation;
 
 
 	public TextureEntry(String name, Texture texture, ImageIcon image, String textureLocation)
@@ -55,5 +54,11 @@ public class TextureEntry
 	public String getFilePath()
 	{
 		return filePath;
+	}
+
+	public TextureEntry clone()
+	{
+		TextureEntry cloned = new TextureEntry(name, textures, icon, filePath);
+		return cloned;
 	}
 }

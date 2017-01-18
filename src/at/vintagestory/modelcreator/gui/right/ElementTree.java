@@ -35,8 +35,10 @@ public class ElementTree
 			@Override
 			public void valueChanged(TreeSelectionEvent e)
 			{
-				ModelCreator.currentProject.SelectedElement = getSelectedElement();
-				ModelCreator.updateValues();
+				if (!ModelCreator.ignoreValueUpdates) {
+					ModelCreator.currentProject.SelectedElement = getSelectedElement();
+					ModelCreator.updateValues();	
+				}
 			}
 		});
 		

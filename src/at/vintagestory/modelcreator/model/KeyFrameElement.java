@@ -269,4 +269,30 @@ public class KeyframeElement implements IDrawable
 		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
+	
+	public KeyframeElement clone() {
+		KeyframeElement cloned = new KeyframeElement(IsKeyFrame);
+		
+		cloned.AnimatedElementName = ParentElement == null ? AnimatedElementName : ((Element)ParentElement).name;
+		cloned.PositionSet = PositionSet;
+		cloned.RotationSet = RotationSet;
+		cloned.StretchSet = StretchSet;
+		cloned.offsetX = offsetX;
+		cloned.offsetY = offsetY;
+		cloned.offsetZ = offsetZ;
+		cloned.stretchX = stretchX;
+		cloned.stretchY = stretchY;
+		cloned.stretchZ = stretchZ;
+		cloned.originX = originX;
+		cloned.originY = originY;
+		cloned.originZ = originZ;
+		
+		for (IDrawable dw : ChildElements) {
+			cloned.ChildElements.add((IDrawable)((KeyframeElement)dw).clone());
+		}
+		
+		cloned.FrameNumber = FrameNumber;
+		
+		return cloned;
+	}
 }

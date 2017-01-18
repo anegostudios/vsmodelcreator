@@ -91,4 +91,18 @@ public class Keyframe
 			setFrameNumber(frameNumber, kelem.ChildElements);
 		}
 	}
+	
+	
+	public Keyframe clone() {
+		Keyframe cloned = new Keyframe(IsKeyFrame);
+		cloned.FrameNumber = FrameNumber;
+		
+		for (IDrawable dw : Elements) {
+			cloned.Elements.add((IDrawable) ((KeyframeElement)dw).clone());
+		}
+		
+		
+		return cloned;
+	}
+	
 }

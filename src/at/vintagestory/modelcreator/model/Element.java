@@ -20,7 +20,32 @@ import org.newdawn.slick.Color;
 
 public class Element implements IDrawable
 {
+    /// <summary>
+    /// Top, Front/Left, Back/Right, Bottom
+    /// </summary>
+	protected static float[] DefaultBlockSideBrightness = new float[] {
+        1f,
+        0.8f,
+        0.6f,
+        0.4f
+    };
+
+    /// <summary>
+    /// Shadings by Blockfacing index
+    /// </summary>
+    public static float[] DefaultBlockSideBrightnessByFacing = new float[] {
+        DefaultBlockSideBrightness[2],
+        DefaultBlockSideBrightness[1],
+        DefaultBlockSideBrightness[1],
+        DefaultBlockSideBrightness[2],
+        DefaultBlockSideBrightness[0],
+        DefaultBlockSideBrightness[3],
+    };
+    
 	static int nextOpenGlName = 0;
+
+	
+	
 	
 	public Element ParentElement;
 	public ArrayList<Element> ChildElements = new ArrayList<Element>();
@@ -51,31 +76,13 @@ public class Element implements IDrawable
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();
 	
+	
 	public float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 };
 
-    /// <summary>
-    /// Top, Front/Left, Back/Right, Bottom
-    /// </summary>
-	protected static float[] DefaultBlockSideBrightness = new float[] {
-        1f,
-        0.8f,
-        0.6f,
-        0.4f
-    };
-
-    /// <summary>
-    /// Shadings by Blockfacing index
-    /// </summary>
-    public static float[] DefaultBlockSideBrightnessByFacing = new float[] {
-        DefaultBlockSideBrightness[2],
-        DefaultBlockSideBrightness[1],
-        DefaultBlockSideBrightness[1],
-        DefaultBlockSideBrightness[2],
-        DefaultBlockSideBrightness[0],
-        DefaultBlockSideBrightness[3],
-    };
     
-    
+    public Element() {
+    	
+    }
     
 	public Element(double width, double height, double depth)
 	{
@@ -686,6 +693,46 @@ public class Element implements IDrawable
 	public void setTintIndex(int tintIndex)
 	{
 		this.tintIndex = tintIndex;
+	}
+	
+	
+	public Element clone() {
+		Element cloned = new Element();
+		
+		cloned.ParentElement = ParentElement;
+		for (Element child : ChildElements) {
+			cloned.ChildElements.add(child.clone());
+		}
+		
+		cloned.name = name;
+		cloned.openGlName = openGlName;
+		cloned.selectedFace = selectedFace;
+		for (int i = 0; i < faces.length; i++) {
+			cloned.faces[i] = faces[i].clone(cloned);
+		}
+		
+		cloned.startX = startX;
+		cloned.startY = startY;
+		cloned.startZ = startZ;
+		cloned.width = width;
+		cloned.height = height;
+		cloned.depth = depth;
+		cloned.originX = originX;
+		cloned.originY = originY;
+		cloned.originZ = originZ;
+		cloned.rotationX = rotationX;
+		cloned.rotationY = rotationY;
+		cloned.rotationZ = rotationZ;
+		cloned.rescale = rescale;
+		cloned.shade = shade;
+		cloned.tintIndex = tintIndex;
+		cloned.sphere = sphere;
+		
+		for (int i = 0; i < brightnessByFace.length; i++) {
+			cloned.brightnessByFace[i] = brightnessByFace[i];			
+		}
+		
+		return cloned;
 	}
 
 }

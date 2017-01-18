@@ -79,6 +79,10 @@ public class Face
 	private int side;
 	private int glow;
 
+	public Face() {
+		
+	}
+	
 	public Face(Element cuboid, int side)
 	{
 		this.cuboid = cuboid;
@@ -388,6 +392,27 @@ public class Face
 	{
 		this.rotation = rotation;
 		updateUV();
+	}
+	
+	
+	public Face clone(Element forElement) {
+		Face cloned = new Face();
+		cloned.texture = texture;
+		cloned.textureLocation = textureLocation;
+		cloned.textureU = textureU;
+		cloned.textureV = textureV;
+		cloned.textureUEnd = textureUEnd;
+		cloned.textureVEnd = textureVEnd;
+		cloned.fitTexture = fitTexture;
+		cloned.binded = binded;
+		cloned.cullface = cullface;
+		cloned.enabled = enabled;
+		cloned.autoUV = autoUV;
+		cloned.rotation = rotation;
+		cloned.cuboid = forElement;
+		cloned.side = side;
+		cloned.glow = glow;
+		return cloned;
 	}
 
 }

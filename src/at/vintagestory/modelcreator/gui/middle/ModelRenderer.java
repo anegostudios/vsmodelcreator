@@ -101,6 +101,7 @@ public class ModelRenderer
 		glTranslatef(-8, 0, -8);
 		
 		List<IDrawable> rootelems = ModelCreator.getRootElementsForRender();
+		if (rootelems == null) return;
 		Element selectedElem = manager.getCurrentElement();
 
 		for (int i = 0; i < rootelems.size(); i++)

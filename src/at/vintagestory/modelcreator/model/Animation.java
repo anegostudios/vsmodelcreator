@@ -479,6 +479,7 @@ public class Animation
 		this.currentFrame = nextFrameNumber;
 		
 		ReloadFrameNumbers();
+		ModelCreator.DidModify();
 		ModelCreator.updateValues();
 	}
 
@@ -486,6 +487,7 @@ public class Animation
 	{
 		RemoveKeyFrame(GetKeyFrame(currentFrame));
 		ReloadFrameNumbers();
+		ModelCreator.DidModify();
 		ModelCreator.updateValues();
 	}
 
@@ -498,6 +500,23 @@ public class Animation
 	{
 	    int result = x % y;
 	    return result < 0? result + y : result;
+	}
+	
+	
+	public Animation clone() {
+		Animation cloned = new Animation();
+		
+		cloned.name = name;
+		cloned.quantityFrames = quantityFrames;
+		
+		cloned.keyframes = new Keyframe[keyframes.length];
+		
+		for (int i = 0; i < keyframes.length; i++) {
+			cloned.keyframes[i] = keyframes[i].clone();
+		}
+		
+		
+		return cloned;
 	}
 	
 }

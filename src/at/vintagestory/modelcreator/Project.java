@@ -8,6 +8,7 @@ import at.vintagestory.modelcreator.gui.right.RightTopPanel;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.*;
+import at.vintagestory.modelcreator.util.screenshot.Uploader;
 
 public class Project
 {
@@ -16,8 +17,6 @@ public class Project
 	public ArrayList<PendingTexture> PendingTextures = new ArrayList<PendingTexture>();
 	public ArrayList<TextureEntry> Textures = new ArrayList<TextureEntry>();
 	public ArrayList<Element> rootElements = new ArrayList<Element>();
-	
-	
 	public ArrayList<Animation> Animations = new ArrayList<Animation>();
 	
 	
@@ -26,6 +25,7 @@ public class Project
 	public Animation SelectedAnimation;
 	public boolean PlayAnimation = false;
 	public ElementTree tree;
+	public boolean needsSaving;
 	
 	public String filePath;
 	
@@ -49,11 +49,15 @@ public class Project
 			manager.addPendingTexture(ptex);	
 		}
 		
+		ModelCreator.ignoreValueUpdates = true;
 		tree.clearElements();
+		ModelCreator.ignoreValueUpdates = false;
 		
 		for (Element elem : rootElements) {
 			tree.addRootElement(elem);
 		}
+		
+		tree.SelectElement(SelectedElement);
 		
 		if (Animations.size() > 0) {
 			SelectedAnimation = Animations.get(0);
@@ -205,7 +209,7 @@ public class Project
 
 	public void clear()
 	{
-		ModelCreator.updatingValues = true;
+		ModelCreator.ignoreValueUpdates = true;
 		AmbientOcclusion = true;
 		rootElements.clear();
 		Animations.clear();
@@ -214,7 +218,7 @@ public class Project
 		Textures.clear();
 		tree.clearElements();
 		SelectedAnimation = null;
-		ModelCreator.updatingValues = false;
+		ModelCreator.ignoreValueUpdates = false;
 		ModelCreator.updateValues();
 	}
 	
@@ -305,6 +309,40 @@ public class Project
 			if (foundElem != null) return foundElem;
 		}
 		
+		return null;
+	}
+	
+
+
+	public Project clone()
+	{
+		Project cloned = new Project(filePath);
+		cloned.AmbientOcclusion = AmbientOcclusion;
+		cloned.Textures = Textures;
+		/*for (TextureEntry entry : Textures) {
+			cloned.Textures.add(entry.clone());
+		}*/
+		
+		for (Element elem : rootElements) {
+			cloned.rootElements.add(elem.clone());
+		}
+		
+		for (Animation anim : Animations) {
+			cloned.Animations.add(anim.clone());
+		}
+		
+		cloned.needsSaving = needsSaving;
+		
+		
+		return cloned;
+	}
+
+
+	public Animation findAnimation(String name)
+	{
+		for (int i = 0; i < Animations.size(); i++) {
+			if (Animations.get(i).getName().equals(name)) return Animations.get(i);
+		}
 		return null;
 	}
 		

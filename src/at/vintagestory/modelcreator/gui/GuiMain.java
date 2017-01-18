@@ -2,12 +2,17 @@ package at.vintagestory.modelcreator.gui;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
@@ -39,6 +44,11 @@ public class GuiMain extends JMenuBar
 	private JMenuItem itemTexturePath;
 	private JMenuItem itemExit;
 
+	/* Edit */
+	private JMenu menuEdit;
+	private JMenuItem itemUndo;
+	private JMenuItem itemRedo;
+	
 	/* Options */
 	private JMenu menuOptions;
 	private JCheckBoxMenuItem itemGrid;
@@ -70,12 +80,19 @@ public class GuiMain extends JMenuBar
 		menuFile = new JMenu("File");
 		{
 			itemNew = createItem("New", "New Model", KeyEvent.VK_N, new ImageIcon(getClass().getClassLoader().getResource("icons/new.png")));
-			itemLoad = createItem("Open...", "Open JSON", KeyEvent.VK_I, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
-			itemSave = createItem("Save...", "Save JSON", KeyEvent.VK_S, new ImageIcon(getClass().getClassLoader().getResource("icons/export.png")));
+			itemLoad = createItem("Open...", "Open JSON", KeyEvent.VK_I, new ImageIcon(getClass().getClassLoader().getResource("icons/load.png")));
+			itemSave = createItem("Save...", "Save JSON", KeyEvent.VK_S, new ImageIcon(getClass().getClassLoader().getResource("icons/disk.png")));
 			itemSaveAs = createItem("Save as...", "Save JSON", KeyEvent.VK_E, new ImageIcon(getClass().getClassLoader().getResource("icons/export.png")));
 			itemTexturePath = createItem("Set Texture Path...", "Set the base path to look for textures", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
 			itemExit = createItem("Exit", "Exit Application", KeyEvent.VK_Q, new ImageIcon(getClass().getClassLoader().getResource("icons/exit.png")));
 		}
+		
+		menuEdit = new JMenu("Edit");
+		{
+			itemUndo = createItem("Undo", "Undo the last action", 0, new ImageIcon(getClass().getClassLoader().getResource("icons/arrow_undo.png")));
+			itemRedo = createItem("Redo", "Redo the last action", 0, new ImageIcon(getClass().getClassLoader().getResource("icons/arrow_redo.png")));
+		}
+
 
 		menuOptions = new JMenu("Options");
 		{
@@ -121,6 +138,9 @@ public class GuiMain extends JMenuBar
 		
 		menuAdd.add(itemAddCube);
 		menuAdd.add(itemAddFace);
+		
+		menuEdit.add(itemUndo);
+		menuEdit.add(itemRedo);
 
 		otherMenu.add(itemReloadTextures);
 		otherMenu.add(itemSaveScreenshot);
@@ -138,6 +158,7 @@ public class GuiMain extends JMenuBar
 		menuFile.add(itemExit);
 
 		add(menuFile);
+		add(menuEdit);
 		add(menuOptions);
 		add(menuAdd);
 		add(otherMenu);
@@ -149,13 +170,53 @@ public class GuiMain extends JMenuBar
 			KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 			KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 			KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-			KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+			KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+			KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+			KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 		};
 		
 		itemNew.setAccelerator(strokes[0]);
 		itemLoad.setAccelerator(strokes[1]);
 		itemSave.setAccelerator(strokes[2]);
 		itemReloadTextures.setAccelerator(strokes[3]);
+
+		// So much code for setting up a hotkey
+		// Java swing is so mentally retarded -_-
+		Action buttonAction = new AbstractAction("Undo") {
+		 
+		    @Override
+		    public void actionPerformed(ActionEvent evt) {
+		    	ModelCreator.changeHistory.Undo();
+		    }
+		};
+		String key = "Undo";
+		itemUndo.setAction(buttonAction);
+		itemUndo.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/arrow_undo.png")));
+		buttonAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Z);
+		itemUndo.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(strokes[4], key);
+		itemUndo.getActionMap().put(key, buttonAction);
+		
+		 
+		
+		itemUndo.setAccelerator(strokes[4]);
+		
+		
+		
+		Action buttonAction2 = new AbstractAction("Redo") {
+			 
+		    @Override
+		    public void actionPerformed(ActionEvent evt) {
+		    	ModelCreator.changeHistory.Redo();
+		    }
+		};
+		key = "Redo";
+		itemRedo.setAction(buttonAction2);
+		
+		buttonAction2.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
+		itemRedo.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/arrow_redo.png")));
+		itemRedo.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(strokes[5], key);
+		itemRedo.getActionMap().put(key, buttonAction2);
+		itemRedo.setAccelerator(strokes[5]);
 		
 
 		ActionListener listener = a -> { OnNewModel(); }; 
@@ -199,12 +260,13 @@ public class GuiMain extends JMenuBar
 		itemTexturePath.addActionListener(listener);
 
 		
-		
-		
 		itemExit.addActionListener(e ->
 		{
 			creator.close();
 		});
+		
+		
+	
 
 		itemGrid.addActionListener(a ->
 		{
@@ -392,6 +454,21 @@ public class GuiMain extends JMenuBar
 				});
 			}
 		}));
+	}
+
+	public void updateValues()
+	{
+		boolean enabled = !ModelCreator.currentProject.PlayAnimation;
+		
+		itemUndo.setEnabled(enabled && ModelCreator.changeHistory.CanUndo());
+		itemRedo.setEnabled(enabled && ModelCreator.changeHistory.CanRedo());
+		
+		itemAddCube.setEnabled(enabled);
+		itemAddFace.setEnabled(enabled);
+	}
+	
+	public void updateFrame() {
+		updateValues();
 	}
 
 }
