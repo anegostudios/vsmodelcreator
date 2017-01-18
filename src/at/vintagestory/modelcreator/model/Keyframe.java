@@ -10,12 +10,18 @@ public class Keyframe
 {
 	private int FrameNumber;	
 	public ArrayList<IDrawable> Elements = new ArrayList<IDrawable>();
+	
+	boolean IsKeyFrame;
 
+	
+	public Keyframe(boolean IsKeyFrame) {
+		this.IsKeyFrame = IsKeyFrame;
+	}
 	
 	
 	public void AddElement(KeyframeElement keyfElem) {
 		Elements.add(keyfElem);
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 	
 	public void RemoveElement(KeyframeElement element) {
@@ -23,7 +29,7 @@ public class Keyframe
 		
 		if (walkElem == null) {
 			Elements.remove(element);
-			ModelCreator.DidModify();
+			if (IsKeyFrame) ModelCreator.DidModify();
 			return;
 		}
 		
@@ -32,7 +38,7 @@ public class Keyframe
 		}
 		
 		Elements.remove(walkElem);
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 	
 	
@@ -73,7 +79,7 @@ public class Keyframe
 	public void setFrameNumber(int frameNumber)
 	{
 		FrameNumber = frameNumber;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 	
 }

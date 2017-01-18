@@ -5,13 +5,9 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
@@ -21,8 +17,6 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import at.vintagestory.modelcreator.Exporter;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.gui.texturedialog.TextureDialog;
 import at.vintagestory.modelcreator.model.Element;
@@ -49,6 +43,7 @@ public class GuiMain extends JMenuBar
 	private JMenu menuOptions;
 	private JCheckBoxMenuItem itemTransparency;
 	private JCheckBoxMenuItem itemUnlockAngles;
+	private JCheckBoxMenuItem itemSingleTexture;
 	
 	/* Add */
 	private JMenu menuAdd;
@@ -88,6 +83,8 @@ public class GuiMain extends JMenuBar
 			
 			itemUnlockAngles = createCheckboxItem("Unlock all Angles", "Disabling this allows angle stepping of single degrees. Suggested to unlock this only for entities.", KeyEvent.VK_A, Icons.transparent);
 			itemUnlockAngles.setSelected(ModelCreator.unlockAngles);
+			
+			itemSingleTexture = createCheckboxItem("Single Texture for all Faces", "When creating entities, it is often more useful to use only a single texture.", 0, Icons.transparent);
 		}
 
 		menuAdd = new JMenu("Add");
@@ -110,6 +107,7 @@ public class GuiMain extends JMenuBar
 	
 		menuOptions.add(itemTransparency);
 		menuOptions.add(itemUnlockAngles);
+		menuOptions.add(itemSingleTexture);
 		
 		menuAdd.add(itemAddCube);
 		menuAdd.add(itemAddFace);
@@ -206,6 +204,14 @@ public class GuiMain extends JMenuBar
 		itemUnlockAngles.addActionListener(a ->
 		{
 			ModelCreator.unlockAngles = itemUnlockAngles.isSelected();
+			ModelCreator.prefs.putBoolean("unlockAngles", ModelCreator.unlockAngles);
+			ModelCreator.updateValues();
+		});
+		
+		itemSingleTexture.addActionListener(a ->
+		{
+			ModelCreator.singleTextureMode = itemSingleTexture.isSelected();
+			ModelCreator.prefs.putBoolean("singleTextureMode", ModelCreator.singleTextureMode);
 			ModelCreator.updateValues();
 		});
 
@@ -258,28 +264,14 @@ public class GuiMain extends JMenuBar
 		int returnVal = chooser.showOpenDialog(null);
 		if (returnVal == JFileChooser.APPROVE_OPTION)
 		{
-			if (ModelCreator.currentProject.rootElements.size() > 0)
-			{
-				returnVal = JOptionPane.showConfirmDialog(null, "Your current project will be cleared, are you sure you want to continue?", "Warning", JOptionPane.YES_NO_OPTION);
-			}
-			
-			if (returnVal != JOptionPane.NO_OPTION && returnVal != JOptionPane.CLOSED_OPTION)
-			{
-				String filePath = chooser.getSelectedFile().getAbsolutePath();					
-				creator.LoadFile(filePath);					
-			}
-			
-			ModelCreator.updateValues();
+			String filePath = chooser.getSelectedFile().getAbsolutePath();
+			creator.LoadFile(filePath);
 		}
 	}
 
 	private void OnNewModel()
 	{
-		int returnVal = JOptionPane.showConfirmDialog(creator, "You current work will be cleared, are you sure?", "Note", JOptionPane.YES_NO_OPTION);
-		if (returnVal == JOptionPane.YES_OPTION)
-		{
-			creator.LoadFile(null);
-		}
+		creator.LoadFile(null);
 	}
 
 

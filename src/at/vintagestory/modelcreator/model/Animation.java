@@ -37,14 +37,13 @@ public class Animation
 		// So let's just built up one complete static model for each frame (only storing they keyframe data, but still a tree hierarchy and referencing the static box)
 		// simply select the right one for a given frame, and add up static model value with keyframe value
 		
-		
-		//System.out.println("calc all frames");
-		
 		// 1. Build up an empty list of all frames
 		allFrames.clear();
 		
+		if (quantityFrames < 0) return;
+		
 		for (int frame = 0; frame < quantityFrames; frame++) {
-			Keyframe keyframe = new Keyframe();
+			Keyframe keyframe = new Keyframe(false);
 			keyframe.setFrameNumber(frame);
 			
 			for (Element elem : project.rootElements) {
@@ -134,7 +133,7 @@ public class Animation
 	
 	
 	KeyframeElement createEmptyFrameForElement(Element element, int frameNumber) { 
-		KeyframeElement elem = new KeyframeElement(element);
+		KeyframeElement elem = new KeyframeElement(element, false);
 		elem.FrameNumber = frameNumber;
 		
 		for (Element child : element.ChildElements) {
@@ -143,9 +142,7 @@ public class Animation
 			
 			elem.ChildElements.add(childKeyFrameElem);
 		}
-		
-		ModelCreator.DidModify();
-		
+				
 		return elem;
 	}
 	
@@ -257,7 +254,7 @@ public class Animation
 		Keyframe keyframe = GetKeyFrame(currentFrame);
 		
 		if (keyframe == null) {
-			keyframe = new Keyframe();
+			keyframe = new Keyframe(true);
 			keyframe.setFrameNumber(currentFrame);
 			
 			// Grow array by 1. Insert new keyframe at the right spot
@@ -303,7 +300,7 @@ public class Animation
 		
 		
 		if (path.size() == 0) {
-			keyframeElem = new KeyframeElement(forElem);
+			keyframeElem = new KeyframeElement(forElem, true);
 			keyframe.AddElement(keyframeElem);	
 			ModelCreator.DidModify();
 			

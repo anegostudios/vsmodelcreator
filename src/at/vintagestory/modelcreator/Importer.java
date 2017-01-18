@@ -200,7 +200,7 @@ public class Importer
 	
 	private Keyframe readKeyframe(JsonObject obj)
 	{
-		Keyframe keyframe = new Keyframe();
+		Keyframe keyframe = new Keyframe(true);
 		keyframe.setFrameNumber(obj.get("frame").getAsInt());
 		
 		if (obj.has("elements") && obj.get("elements").isJsonArray()) {
@@ -223,7 +223,7 @@ public class Importer
 
 	private IDrawable readKeyframeElemenet(JsonObject obj)
 	{
-		KeyframeElement kelem = new KeyframeElement();
+		KeyframeElement kelem = new KeyframeElement(true);
 		
 		kelem.AnimatedElementName = obj.get("animatedElement").getAsString();
 		

@@ -205,6 +205,7 @@ public class Project
 
 	public void clear()
 	{
+		ModelCreator.updatingValues = true;
 		AmbientOcclusion = true;
 		rootElements.clear();
 		Animations.clear();
@@ -212,6 +213,8 @@ public class Project
 		PendingTextures.clear();
 		Textures.clear();
 		tree.clearElements();
+		SelectedAnimation = null;
+		ModelCreator.updatingValues = false;
 		ModelCreator.updateValues();
 	}
 	

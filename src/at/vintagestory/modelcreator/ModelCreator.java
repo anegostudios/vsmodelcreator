@@ -71,6 +71,7 @@ public class ModelCreator extends JFrame
 	
 	public static boolean transparent = true;
 	public static boolean unlockAngles = false;
+	public static boolean singleTextureMode = false;
 
 	// Canvas Variables
 	private final static AtomicReference<Dimension> newCanvasSize = new AtomicReference<Dimension>();
@@ -111,6 +112,10 @@ public class ModelCreator extends JFrame
 	public ModelCreator(String title)
 	{
 		super(title);
+		
+		singleTextureMode = prefs.getBoolean("singleTextureMode", false);
+		unlockAngles = prefs.getBoolean("unlockAngles", false);
+		
 		Instance = this;
 		
 		currentProject = new Project(null);
@@ -162,7 +167,7 @@ public class ModelCreator extends JFrame
 						
 					}
 					
-					if (returnVal == JOptionPane.CANCEL_OPTION) {
+					if (returnVal == JOptionPane.CANCEL_OPTION || returnVal == JOptionPane.CLOSED_OPTION) {
 						return;
 					}
 
@@ -265,21 +270,24 @@ public class ModelCreator extends JFrame
 	 	((RightTopPanel)manager).updateValues();
 	 	leftKeyframesPanel.updateValues();
 	 	updateFrame();
+	 	updateTitle();
 	 	
+	 	updatingValues = false;
+	}
+	
+	static void updateTitle() {
 	 	String dash = ModelCreator.projectWasModified ? " * " : " - ";
 	 	if (currentProject.filePath == null) {
 	 		Instance.setTitle("(untitled)" + dash + windowTitle);
 		} else {
 			Instance.setTitle(new File(currentProject.filePath).getName() + dash + windowTitle);
-		}
-		
-	 	
-	 	updatingValues = false;
+		}		
 	}
 	
 	public static void updateFrame() {
 		leftKeyframesPanel.updateFrame();
 		((RightTopPanel)manager).updateFrame();
+		updateTitle();
 	}
 
 
@@ -653,8 +661,6 @@ public class ModelCreator extends JFrame
 				DataFlavor flavor = evt.getCurrentDataFlavors()[0];
 		        evt.acceptDrop(evt.getDropAction());
 				
-		        
-		        
 				try {
 					@SuppressWarnings("rawtypes")
 					List data = (List)evt.getTransferable().getTransferData(flavor);
@@ -706,6 +712,12 @@ public class ModelCreator extends JFrame
 
 	public void LoadFile(String filePath)
 	{
+		if (ModelCreator.currentProject.rootElements.size() > 0 && projectWasModified)
+		{
+			int returnVal = JOptionPane.showConfirmDialog(null, "Your current unsaved project will be cleared, are you sure you want to continue?", "Warning", JOptionPane.YES_NO_OPTION);		
+			if (returnVal == JOptionPane.NO_OPTION || returnVal == JOptionPane.CLOSED_OPTION) return;
+		}
+		
 		if (filePath == null) {
 			setTitle("(untitled) - " + windowTitle);
 			currentProject.clear();
@@ -720,9 +732,9 @@ public class ModelCreator extends JFrame
 		}
 		
 		projectWasModified = false;
-		ModelCreator.updateValues();
-		currentProject.tree.jtree.updateUI();
 		
+		ModelCreator.updateValues();
+		currentProject.tree.jtree.updateUI();		
 	}
 	
 

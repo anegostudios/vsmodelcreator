@@ -43,10 +43,11 @@ public class KeyframeElement implements IDrawable
 	public Element AnimatedElement;
 	public int FrameNumber;
 	IDrawable ParentElement;
+	public boolean IsKeyFrame;
 
 	
-	public KeyframeElement() {
-		
+	public KeyframeElement(boolean IsKeyFrame) {
+		this.IsKeyFrame = IsKeyFrame; 
 	}
 	
 	
@@ -55,18 +56,19 @@ public class KeyframeElement implements IDrawable
 			if (((KeyframeElement)elem).AnimatedElement == forElement) return (KeyframeElement)elem;
 		}
 		
-		KeyframeElement elem = new KeyframeElement(forElement);
+		KeyframeElement elem = new KeyframeElement(forElement, IsKeyFrame);
 		ChildElements.add(elem);
 		elem.ParentElement = this;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 		
 		return elem;
 	}
 	
 	
-	public KeyframeElement(Element cuboid)
+	public KeyframeElement(Element cuboid, boolean IsKeyFrame)
 	{
 		this.AnimatedElement = cuboid;
+		this.IsKeyFrame = IsKeyFrame;
 		
 	}
 	
@@ -154,19 +156,19 @@ public class KeyframeElement implements IDrawable
 	public void setOffsetX(double offsetX)
 	{
 		this.offsetX = offsetX;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 	
 	public void setOffsetY(double offsetY)
 	{
 		this.offsetY = offsetY;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
 	public void setOffsetZ(double offsetZ)
 	{
 		this.offsetZ = offsetZ;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
 
@@ -187,19 +189,19 @@ public class KeyframeElement implements IDrawable
 	public void setStretchX(double stretchX)
 	{
 		this.stretchX = stretchX;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
 	public void setStretchY(double stretchY)
 	{
 		this.stretchY = stretchY;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
 	public void setStretchZ(double stretchZ)
 	{
 		this.stretchZ = stretchZ;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
 
@@ -220,19 +222,19 @@ public class KeyframeElement implements IDrawable
 	public void setRotationX(double rotationX)
 	{
 		this.rotationX = rotationX;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
 	public void setRotationY(double rotationY)
 	{
 		this.rotationY = rotationY;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
 	public void setRotationZ(double rotationZ)
 	{
 		this.rotationZ = rotationZ;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
 	public double getOriginX()
@@ -252,19 +254,19 @@ public class KeyframeElement implements IDrawable
 	public void setOriginX(double originX)
 	{
 		this.originX = originX;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
 	public void setOriginY(double originY)
 	{
 		this.originY = originY;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
 	public void setOriginZ(double originZ)
 	{
 		this.originZ = originZ;
-		ModelCreator.DidModify();
+		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 
 }

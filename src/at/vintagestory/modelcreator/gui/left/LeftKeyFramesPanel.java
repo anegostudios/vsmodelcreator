@@ -1,4 +1,4 @@
-	package at.vintagestory.modelcreator.gui.left;
+package at.vintagestory.modelcreator.gui.left;
 
 import java.awt.Dimension;
 import java.awt.Font;

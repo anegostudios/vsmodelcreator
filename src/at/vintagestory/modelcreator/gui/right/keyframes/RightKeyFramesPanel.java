@@ -6,8 +6,6 @@ import java.awt.GridLayout;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import at.vintagestory.modelcreator.ModelCreator;
-import at.vintagestory.modelcreator.gui.right.element.ElementPositionPanel;
-import at.vintagestory.modelcreator.gui.right.element.ElementRotationPanel;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.KeyframeElement;

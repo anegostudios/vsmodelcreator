@@ -19,7 +19,6 @@ import javax.swing.SpringLayout;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
-import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.KeyframeElement;
 import at.vintagestory.modelcreator.util.Parser;
