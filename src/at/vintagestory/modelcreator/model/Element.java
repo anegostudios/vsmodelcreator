@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
-
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
@@ -49,7 +48,7 @@ public class Element implements IDrawable
 	
 	public Element ParentElement;
 	public ArrayList<Element> ChildElements = new ArrayList<Element>();
-	
+	public ArrayList<AttachmentPoint> AttachmentPoints = new ArrayList<AttachmentPoint>();
 	
 	public String name = "Cube1";
 	
@@ -137,7 +136,6 @@ public class Element implements IDrawable
 		for (int i = 0; i < faces.length; i++)
 		{
 			Face oldFace = cuboid.getAllFaces()[i];
-			faces[i].fitTexture(oldFace.shouldFitTexture());
 			faces[i].setTexture(oldFace.getTextureName());
 			faces[i].setTextureLocation(oldFace.getTextureLocation());
 			faces[i].setStartU(oldFace.getStartU());
@@ -156,14 +154,13 @@ public class Element implements IDrawable
 		
 		updateUV();
 		recalculateBrightnessValues();
-		
-		
 	}
 
 	public void initFaces()
 	{
-		for (int i = 0; i < faces.length; i++)
+		for (int i = 0; i < faces.length; i++) {
 			faces[i] = new Face(this, i);
+		}
 	}
 
 	public void setSelectedFace(int face)

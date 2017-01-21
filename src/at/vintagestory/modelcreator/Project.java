@@ -8,7 +8,6 @@ import at.vintagestory.modelcreator.gui.right.RightTopPanel;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.*;
-import at.vintagestory.modelcreator.util.screenshot.Uploader;
 
 public class Project
 {
@@ -19,6 +18,7 @@ public class Project
 	public ArrayList<Element> rootElements = new ArrayList<Element>();
 	public ArrayList<Animation> Animations = new ArrayList<Animation>();
 	
+
 	
 	// Non-persistent project data 
 	public Element SelectedElement;
@@ -238,7 +238,7 @@ public class Project
 	
 	
 	void EnsureUniqueElementName(Element elem, IntRef totalQuantityElems) {
-		if (IsElementNameUsed(elem.name)) {
+		if (IsElementNameUsed(elem.name, elem)) {
 			
 			String numberStr = "";
 			int pos = elem.name.length() - 1;
@@ -253,7 +253,7 @@ public class Project
 			String baseName = elem.name.substring(0, elem.name.length() - numberStr.length());
 			
 			elem.name = baseName + nextNumber;
-			while(IsElementNameUsed(elem.name)) {
+			while(IsElementNameUsed(elem.name, elem)) {
 				nextNumber++;
 				elem.name = baseName + nextNumber;
 			}
@@ -267,15 +267,17 @@ public class Project
 	}
 
 	
-	public boolean IsElementNameUsed(String name) {
-		return IsElementNameUsed(name, rootElements);
+	public boolean IsElementNameUsed(String name, Element exceptElement) {
+		return IsElementNameUsed(name, rootElements, exceptElement);
 	}
 	
 	
-	boolean IsElementNameUsed(String name, ArrayList<Element> elems) {
+	boolean IsElementNameUsed(String name, ArrayList<Element> elems, Element exceptElement) {
 		for (Element elem : elems) {
+			if (elem == exceptElement) continue;
+			
 			if (elem.name.equals(name)) return true;
-			if (IsElementNameUsed(name, elem.ChildElements)) return true;
+			if (IsElementNameUsed(name, elem.ChildElements, exceptElement)) return true;
 		}
 		
 		return false;

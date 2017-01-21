@@ -69,6 +69,7 @@ public class ElementTree
 	public void SelectElement(Element elem) {
 		jtree.clearSelection();
 		
+		@SuppressWarnings("unchecked")
 		Enumeration<DefaultMutableTreeNode> enumer = rootNode.breadthFirstEnumeration();
 		while (enumer.hasMoreElements()) {
 			DefaultMutableTreeNode node = enumer.nextElement();
@@ -82,6 +83,7 @@ public class ElementTree
 	public void selectElementByOpenGLName(int opengglname) {
 		jtree.clearSelection();
 		
+		@SuppressWarnings("unchecked")
 		Enumeration<DefaultMutableTreeNode> enumer = rootNode.breadthFirstEnumeration();
 		
 		while (enumer.hasMoreElements()) {

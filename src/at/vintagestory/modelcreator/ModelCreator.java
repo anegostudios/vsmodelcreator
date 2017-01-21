@@ -53,7 +53,6 @@ import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.PendingTexture;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.Screenshot;
-import sun.nio.cs.HistoricallyNamedCharset;
 
 import java.util.prefs.Preferences;
 

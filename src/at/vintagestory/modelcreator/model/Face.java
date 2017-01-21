@@ -7,6 +7,8 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
+
+import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.gui.texturedialog.TextureDialog;
 
@@ -61,14 +63,53 @@ public class Face
         1, 0,  1,
         0, 0,  1
     };
+	
+	public static int[] cubeUVCoords = {
+            // North
+            1, 1,
+            1, 0,
+            0, 0,
+            0, 1,
 
+            // East 
+            0, 1,
+            1, 1,
+            1, 0,
+            0, 0,
+
+            // South
+            0, 1,
+            1, 1,
+            1, 0,
+            0, 0,
+            
+            // West
+            0, 1,
+            1, 1,
+            1, 0,
+            0, 0,
+
+            // Top face
+            1, 0,
+            0, 0,
+            0, 1,
+            1, 1,
+
+            // Bottom face
+            1, 0,
+            0, 0,
+            0, 1,
+            1, 1,
+	};
+
+	
+	
 	private String texture = null;
 	private String textureLocation = "blocks/";
 	private double textureU = 0;
 	private double textureV = 0;
 	private double textureUEnd = 16;
 	private double textureVEnd = 16;
-	private boolean fitTexture = false;
 	private boolean binded = false;
 	private boolean cullface = false;
 	private boolean enabled = true;
@@ -87,6 +128,14 @@ public class Face
 	{
 		this.cuboid = cuboid;
 		this.side = side;
+		
+		if (ModelCreator.singleTextureMode) {
+			if (ModelCreator.currentProject.Textures.size() > 0) {
+				this.texture = ModelCreator.currentProject.Textures.get(0).name;
+			}
+			setUnwrappedCubeUV();
+			updateUV();
+		}
 	}
 	
 	public void renderFace(BlockFacing blockFacing, float brightness)
@@ -99,13 +148,17 @@ public class Face
 
 			if (binded) GL11.glColor3f(brightness, brightness, brightness);
 			
-			int i = blockFacing.GetIndex() * 12;
+			int coordIndex = blockFacing.GetIndex() * 12;
+			int uvIndex = blockFacing.GetIndex() * 8;
 			
 			GL11.glBegin(GL11.GL_QUADS);
 			{
 				for (int j = 0; j < 4; j++) {
-					if (binded) setTexCoord(j);
-					GL11.glVertex3d(cuboid.getWidth() * CubeVertices[i++], cuboid.getHeight() * CubeVertices[i++], cuboid.getDepth() * CubeVertices[i++]);					
+					GL11.glTexCoord2d(
+							(cubeUVCoords[uvIndex++]==0 ? textureU : textureUEnd) / 16, 
+							(cubeUVCoords[uvIndex++]==0 ? textureV : textureVEnd) / 16
+					);
+					GL11.glVertex3d(cuboid.getWidth() * CubeVertices[coordIndex++], cuboid.getHeight() * CubeVertices[coordIndex++], cuboid.getDepth() * CubeVertices[coordIndex++]);
 				}
 			}
 			GL11.glEnd();
@@ -116,23 +169,7 @@ public class Face
 	}
 	
 
-	public void setTexCoord(int corner)
-	{
-		setTexCoord(corner, false);
-	}
 
-	public void setTexCoord(int corner, boolean forceFit)
-	{
-		int coord = corner + rotation;
-		if (coord == 0 | coord == 4)
-			GL11.glTexCoord2d(fitTexture | forceFit ? 0 : (textureU / 16), fitTexture | forceFit ? 1 : (textureVEnd / 16));
-		if (coord == 1 | coord == 5)
-			GL11.glTexCoord2d(fitTexture | forceFit ? 1 : (textureUEnd / 16), fitTexture | forceFit ? 1 : (textureVEnd / 16));
-		if (coord == 2 | coord == 6)
-			GL11.glTexCoord2d(fitTexture | forceFit ? 1 : (textureUEnd / 16), fitTexture | forceFit ? 0 : (textureV / 16));
-		if (coord == 3)
-			GL11.glTexCoord2d(fitTexture | forceFit ? 0 : (textureU / 16), fitTexture | forceFit ? 0 : (textureV / 16));
-	}
 
 	public void setTexture(String texture)
 	{
@@ -162,32 +199,38 @@ public class Face
 	{
 		this.textureU += amt;
 		this.textureUEnd += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void moveTextureV(double amt)
 	{
 		this.textureV += amt;
 		this.textureVEnd += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void addTextureX(double amt)
 	{
 		this.textureU += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void addTextureY(double amt)
 	{
 		this.textureV += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void addTextureXEnd(double amt)
 	{
 		this.textureUEnd += amt;
+		ModelCreator.DidModify();
 	}
 
 	public void addTextureYEnd(double amt)
 	{
 		this.textureVEnd += amt;
+		ModelCreator.DidModify();
 	}
 
 	public double getStartU()
@@ -213,21 +256,25 @@ public class Face
 	public void setStartU(double u)
 	{
 		textureU = u;
+		ModelCreator.DidModify();
 	}
 
 	public void setStartV(double v)
 	{
 		textureV = v;
+		ModelCreator.DidModify();
 	}
 
 	public void setEndU(double ue)
 	{
 		textureUEnd = ue;
+		ModelCreator.DidModify();
 	}
 
 	public void setEndV(double ve)
 	{
 		textureVEnd = ve;
+		ModelCreator.DidModify();
 	}
 
 	public String getTextureName()
@@ -248,16 +295,7 @@ public class Face
 	public void setTextureLocation(String textureLocation)
 	{
 		this.textureLocation = textureLocation;
-	}
-
-	public void fitTexture(boolean fitTexture)
-	{
-		this.fitTexture = fitTexture;
-	}
-
-	public boolean shouldFitTexture()
-	{
-		return fitTexture;
+		ModelCreator.DidModify();
 	}
 
 	public int getSide()
@@ -273,6 +311,7 @@ public class Face
 	public void setCullface(boolean cullface)
 	{
 		this.cullface = cullface;
+		ModelCreator.DidModify();
 	}
 
 	public boolean isEnabled()
@@ -283,6 +322,7 @@ public class Face
 	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
+		ModelCreator.DidModify();
 	}
 
 	public boolean isAutoUVEnabled()
@@ -293,6 +333,7 @@ public class Face
 	public void setAutoUVEnabled(boolean enabled)
 	{
 		this.autoUV = enabled;
+		ModelCreator.DidModify();
 	}
 
 	public boolean isBinded()
@@ -381,6 +422,7 @@ public class Face
 	
 	public void setGlow(int glow) {
 		this.glow = glow;
+		ModelCreator.DidModify();
 	}
 	
 	public int getRotation()
@@ -391,6 +433,7 @@ public class Face
 	public void setRotation(int rotation)
 	{
 		this.rotation = rotation;
+		ModelCreator.DidModify();
 		updateUV();
 	}
 	
@@ -403,7 +446,6 @@ public class Face
 		cloned.textureV = textureV;
 		cloned.textureUEnd = textureUEnd;
 		cloned.textureVEnd = textureVEnd;
-		cloned.fitTexture = fitTexture;
 		cloned.binded = binded;
 		cloned.cullface = cullface;
 		cloned.enabled = enabled;
@@ -413,6 +455,41 @@ public class Face
 		cloned.side = side;
 		cloned.glow = glow;
 		return cloned;
+	}
+	
+	
+	void setUnwrappedCubeUV() {
+		
+		switch (side) {
+			case 0: // N 
+				textureU = 0;
+				textureV = cuboid.getFaceDimension(5).getHeight();
+				break;
+			
+			case 1: // E
+				textureU = cuboid.getFaceDimension(0).getWidth();
+				textureV = cuboid.getFaceDimension(5).getHeight();
+				break;
+			
+			case 2: // S
+				textureU = cuboid.getFaceDimension(0).getWidth() + cuboid.getFaceDimension(1).getWidth();
+				textureV = cuboid.getFaceDimension(5).getHeight();
+				break;
+			
+			case 3: // W
+				textureU = cuboid.getFaceDimension(0).getWidth() + cuboid.getFaceDimension(1).getWidth() + cuboid.getFaceDimension(2).getWidth();
+				textureV = cuboid.getFaceDimension(5).getHeight();
+				break;
+			case 4: // U
+				textureU = cuboid.getFaceDimension(0).getWidth();
+				textureV = 0;
+				break;
+			case 5: // D
+				textureU = cuboid.getFaceDimension(0).getWidth() + cuboid.getFaceDimension(1).getWidth();
+				textureV = 0;
+				break;
+		}
+		
 	}
 
 }

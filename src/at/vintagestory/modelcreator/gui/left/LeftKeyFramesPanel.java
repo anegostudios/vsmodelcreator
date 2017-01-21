@@ -140,7 +140,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 				return false;
 			}
 			
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public Class getColumnClass(int c) {
 		        return String.class; //getValueAt(0, c).getClass();

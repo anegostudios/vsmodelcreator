@@ -19,7 +19,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 	private static final long serialVersionUID = 1L;
 
 	private ModelCreator creator;
-
+	
 	// Swing Variables
 	private SpringLayout layout;
 	private JScrollPane scrollPane;
@@ -82,14 +82,14 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 			{
 				Element elem = tree.getSelectedElement();
 				if (elem != null) {
-					if (ModelCreator.currentProject.IsElementNameUsed(nameField.getText())) {
+					if (ModelCreator.currentProject.IsElementNameUsed(nameField.getText(), elem)) {
 						nameField.setBackground(new Color(50, 0, 0));
 					} else {
-						elem.name = nameField.getText();
+						elem.setName(nameField.getText());
 						nameField.setBackground(getBackground());
 					}
-					
 				}
+				
 				tree.updateUI();
 			}
 		});
@@ -157,11 +157,17 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		if (cube != null)
 		{
 			nameField.setText(cube.name);
+			if (ModelCreator.currentProject.IsElementNameUsed(nameField.getText(), cube)) {
+				nameField.setBackground(new Color(50, 0, 0));
+			} else {
+				nameField.setBackground(getBackground());
+			}
 		}
 		
 		nameField.setEnabled(cube != null);
 		btnRemove.setEnabled(cube != null);
-		btnDuplicate.setEnabled(cube != null);		
+		btnDuplicate.setEnabled(cube != null);
+		
 	}
 
 	

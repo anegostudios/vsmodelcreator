@@ -182,9 +182,10 @@ public class GuiMain extends JMenuBar
 
 		// So much code for setting up a hotkey
 		// Java swing is so mentally retarded -_-
-		Action buttonAction = new AbstractAction("Undo") {
-		 
-		    @Override
+		Action buttonAction = new AbstractAction("Undo") {		 
+			private static final long serialVersionUID = 1L;
+
+			@Override
 		    public void actionPerformed(ActionEvent evt) {
 		    	ModelCreator.changeHistory.Undo();
 		    }
@@ -203,8 +204,9 @@ public class GuiMain extends JMenuBar
 		
 		
 		Action buttonAction2 = new AbstractAction("Redo") {
-			 
-		    @Override
+			private static final long serialVersionUID = 1L;
+
+			@Override
 		    public void actionPerformed(ActionEvent evt) {
 		    	ModelCreator.changeHistory.Redo();
 		    }

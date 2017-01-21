@@ -29,7 +29,6 @@ import static org.lwjgl.opengl.GL11.glVertex2i;
 import static org.lwjgl.opengl.GL11.glVertex3i;
 import static org.lwjgl.opengl.GL11.glViewport;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.opengl.GL11;
@@ -113,6 +112,7 @@ public class ModelRenderer
 
 		
 		if (!ModelCreator.showGrid) return;
+		
 		GL11.glPushMatrix();
 		{
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -249,6 +249,7 @@ public class ModelRenderer
 			glLineWidth(2F);
 			glRotated(-camera.getRY(), 0, 0, 1);
 
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_BLEND);
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			EnumFonts.BEBAS_NEUE_20.drawString(-5, -75, "N", new Color(1, 1, 1));
@@ -284,6 +285,8 @@ public class ModelRenderer
 				glVertex2i(45, 5);
 			}
 			glEnd();
+			
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
 		}
 		glPopMatrix();
 	}
