@@ -26,7 +26,8 @@ public class FacePanel extends JPanel implements IValueUpdater
 
 	private JPanel menuPanel;
 	private JComboBox<String> menuList;
-	private FaceUVPanel panelUV;
+	private ElementUVPanel panelElemUV;
+	private FaceUVPanel panelFaceUV;
 	private JPanel sliderPanel;
 	private JSlider rotation;
 	private FaceTexturePanel panelTexture;
@@ -60,6 +61,9 @@ public class FacePanel extends JPanel implements IValueUpdater
 
 	public void initComponents()
 	{
+		panelElemUV = new ElementUVPanel(manager);
+		panelElemUV.setVisible(ModelCreator.singleTextureMode);
+		
 		menuPanel = new JPanel(new GridLayout(1, 1));
 		menuPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Side</b></html>"));
 		menuList = new JComboBox<String>();
@@ -77,7 +81,7 @@ public class FacePanel extends JPanel implements IValueUpdater
 		menuPanel.add(menuList);
 
 		panelTexture = new FaceTexturePanel(manager);
-		panelUV = new FaceUVPanel(manager);
+		panelFaceUV = new FaceUVPanel(manager);
 		panelFaceExtras = new FacePropertiesPanel(manager);
 
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
@@ -109,9 +113,10 @@ public class FacePanel extends JPanel implements IValueUpdater
 	public void addComponents()
 	{
 		add(Box.createRigidArea(new Dimension(192, 5)));
+		add(panelElemUV);
 		add(menuPanel);
 		add(panelTexture);
-		add(panelUV);
+		add(panelFaceUV);
 		add(sliderPanel);
 		//add(panelModId);
 		add(panelFaceExtras);
@@ -136,7 +141,9 @@ public class FacePanel extends JPanel implements IValueUpdater
 			rotation.setEnabled(false);
 			rotation.setValue(0);
 		}
-		panelUV.updateValues();
+		panelFaceUV.updateValues();
 		panelFaceExtras.updateValues();
+		panelElemUV.updateValues();
+		panelElemUV.setVisible(ModelCreator.singleTextureMode);
 	}
 }

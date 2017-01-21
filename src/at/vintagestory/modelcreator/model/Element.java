@@ -57,6 +57,9 @@ public class Element implements IDrawable
 	// Face Variables
 	protected int selectedFace = 0;
 	protected Face[] faces = new Face[6];
+	private double texUStart;
+
+	private double texVStart;
 
 	// Element Variables
 	protected double startX = 0.0, startY = 0.0, startZ = 0.0;
@@ -155,6 +158,7 @@ public class Element implements IDrawable
 		updateUV();
 		recalculateBrightnessValues();
 	}
+	
 
 	public void initFaces()
 	{
@@ -429,12 +433,56 @@ public class Element implements IDrawable
 
 	public void updateUV()
 	{
+		if (ModelCreator.singleTextureMode) {
+			setUnwrappedCubeUV();
+			return;
+		}
+		
 		for (Face face : faces)
 		{
 			face.updateUV();
 		}
 	}
 
+
+	void setUnwrappedCubeUV() {
+		double x = getTexUStart();
+		double y = getTexVStart();
+		double height = 0;
+		
+		if (faces[4].isEnabled() && faces[4].isAutoUVEnabled()) {
+			faces[4].textureU = x;
+			faces[4].textureV = y;
+			faces[4].updateUV();
+			
+			height = faces[4].TextureHeight();
+			x += faces[4].TextureWidth();
+			
+		}
+		
+		if (faces[5].isEnabled() && faces[5].isAutoUVEnabled()) {
+			faces[5].textureU = x;
+			faces[5].textureV = y;
+			faces[5].updateUV();
+			
+			height = Math.max(height, faces[5].TextureHeight());
+		}
+		
+		x = getTexUStart();
+		y += height;
+		
+		for (int side = 0; side < 4; side++) {
+			Face face = faces[side];
+			if (!face.isEnabled() || !faces[side].isAutoUVEnabled()) continue;
+
+			face.textureU = x;
+			face.textureV = y;
+			face.updateUV();
+			
+			x += face.TextureWidth();
+		}
+	}
+	
 	public void rotateAxis()
 	{
 		GL11.glRotated(rotationX, 1, 0, 0);
@@ -730,6 +778,30 @@ public class Element implements IDrawable
 		}
 		
 		return cloned;
+	}
+
+	public double getTexUStart()
+	{
+		return texUStart;
+	}
+
+	public void setTexUStart(double texUStart)
+	{
+		this.texUStart = texUStart;
+		ModelCreator.DidModify();
+		updateUV();
+	}
+
+	public double getTexVStart()
+	{
+		return texVStart;
+	}
+
+	public void setTexVStart(double texVStart)
+	{
+		this.texVStart = texVStart;
+		ModelCreator.DidModify();
+		updateUV();
 	}
 
 }

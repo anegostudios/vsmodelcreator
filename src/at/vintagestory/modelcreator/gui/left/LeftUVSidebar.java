@@ -28,12 +28,13 @@ import at.vintagestory.modelcreator.enums.EnumFonts;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.model.TextureEntry;
 
 public class LeftUVSidebar extends LeftSidebar
 {
 	private IElementManager manager;
 
-	private final int LENGTH = 110;
+	private final int WIDTH = 110;
 
 	private final Color BLACK_ALPHA = new Color(0, 0, 0, 0.75F);
 
@@ -63,6 +64,19 @@ public class LeftUVSidebar extends LeftSidebar
 	void draw1(int canvasHeight) {
 		Element elem = manager.getCurrentElement();
 		
+		double texWidth = 16.0;
+		double texHeight = 16.0;
+		
+		if (ModelCreator.currentProject.Textures.size() > 0) {
+			texWidth = ModelCreator.currentProject.Textures.get(0).Width / 2.0;
+			texHeight = ModelCreator.currentProject.Textures.get(0).Height / 2.0;
+		}
+				
+		int width = 2 * WIDTH;
+		int scaledHeight = (int)(width * texHeight / texWidth);
+
+		double scaledTexWidth = width / texWidth;
+		double scaledTexHeight = scaledHeight / texHeight;
 		
 		
 		glPushMatrix();
@@ -71,8 +85,6 @@ public class LeftUVSidebar extends LeftSidebar
 
 			glPushMatrix(); {
 				
-				glTranslatef(0, 0 * (LENGTH + 10), 0);
-
 				Color color = Face.getFaceColour(0);
 				glColor3f(color.r, color.g, color.b);
 
@@ -93,13 +105,13 @@ public class LeftUVSidebar extends LeftSidebar
 				glBegin(GL_QUADS);
 				{
 					glTexCoord2f(0, 1);
-					glVertex2i(0, LENGTH);
+					glVertex2i(0, scaledHeight);
 					
 					glTexCoord2f(1, 1);
-					glVertex2i(LENGTH, LENGTH);
+					glVertex2i(width, scaledHeight);
 					
 					glTexCoord2f(1, 0);
-					glVertex2i(LENGTH, 0);
+					glVertex2i(width, 0);
 
 					glTexCoord2f(0, 0);
 					glVertex2i(0, 0);
@@ -113,17 +125,17 @@ public class LeftUVSidebar extends LeftSidebar
 
 					glBegin(GL_LINES);
 					{
-						glVertex2d(faces[i].getStartU() * (LENGTH / 16D), faces[i].getStartV() * (LENGTH / 16D));
-						glVertex2d(faces[i].getStartU() * (LENGTH / 16D), faces[i].getEndV() * (LENGTH / 16D));
+						glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+						glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
 
-						glVertex2d(faces[i].getStartU() * (LENGTH / 16D), faces[i].getEndV() * (LENGTH / 16D));
-						glVertex2d(faces[i].getEndU() * (LENGTH / 16D), faces[i].getEndV() * (LENGTH / 16D));
+						glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+						glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
 
-						glVertex2d(faces[i].getEndU() * (LENGTH / 16D), faces[i].getEndV() * (LENGTH / 16D));
-						glVertex2d(faces[i].getEndU() * (LENGTH / 16D), faces[i].getStartV() * (LENGTH / 16D));
+						glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+						glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
 
-						glVertex2d(faces[i].getEndU() * (LENGTH / 16D), faces[i].getStartV() * (LENGTH / 16D));
-						glVertex2d(faces[i].getStartU() * (LENGTH / 16D), faces[i].getStartV() * (LENGTH / 16D));
+						glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+						glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
 
 					}
 					glEnd();
@@ -148,17 +160,17 @@ public class LeftUVSidebar extends LeftSidebar
 
 			for (int i = 0; i < 6; i++) {
 				glPushMatrix(); {
-					if (30 + i * (LENGTH + 10) + (LENGTH + 10) > canvasHeight) {
-						glTranslatef(10 + LENGTH, count * (LENGTH + 10), 0);
-						startX[i] = 20 + LENGTH;
-						startY[i] = count * (LENGTH + 10) + 40;
+					if (30 + i * (WIDTH + 10) + (WIDTH + 10) > canvasHeight) {
+						glTranslatef(10 + WIDTH, count * (WIDTH + 10), 0);
+						startX[i] = 20 + WIDTH;
+						startY[i] = count * (WIDTH + 10) + 40;
 						count++;
 					}
 					else
 					{
-						glTranslatef(0, i * (LENGTH + 10), 0);
+						glTranslatef(0, i * (WIDTH + 10), 0);
 						startX[i] = 10;
-						startY[i] = i * (LENGTH + 10) + 40;
+						startY[i] = i * (WIDTH + 10) + 40;
 					}
 
 					Color color = Face.getFaceColour(i);
@@ -173,19 +185,33 @@ public class LeftUVSidebar extends LeftSidebar
 					{
 						faces[i].bindTexture();
 
+						double texWidth = 16;
+						double texHeight = 16;
+						
+						TextureEntry entry = ModelCreator.currentProject.getTextureEntry(faces[i].getTextureName());
+						
+						if (entry != null) {
+							texWidth = entry.Width / 2.0;
+							texHeight = entry.Height / 2.0;
+						}
+						
+						double scaledTexWidth = WIDTH / texWidth;
+						double scaledTexHeight = WIDTH / texHeight;
+						int scaledHeight = (int)(WIDTH * texHeight/texWidth);
+						
 						glBegin(GL_QUADS);
 						{
 							if (faces[i].isBinded())
 								glTexCoord2f(0, 1);
-							glVertex2i(0, LENGTH);
+							glVertex2i(0, scaledHeight);
 
 							if (faces[i].isBinded())
 								glTexCoord2f(1, 1);
-							glVertex2i(LENGTH, LENGTH);
+							glVertex2i(WIDTH, scaledHeight);
 
 							if (faces[i].isBinded())
 								glTexCoord2f(1, 0);
-							glVertex2i(LENGTH, 0);
+							glVertex2i(WIDTH, 0);
 
 							if (faces[i].isBinded())
 								glTexCoord2f(0, 0);
@@ -199,17 +225,17 @@ public class LeftUVSidebar extends LeftSidebar
 
 						glBegin(GL_LINES);
 						{
-							glVertex2d(faces[i].getStartU() * (LENGTH / 16D), faces[i].getStartV() * (LENGTH / 16D));
-							glVertex2d(faces[i].getStartU() * (LENGTH / 16D), faces[i].getEndV() * (LENGTH / 16D));
+							glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+							glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
 
-							glVertex2d(faces[i].getStartU() * (LENGTH / 16D), faces[i].getEndV() * (LENGTH / 16D));
-							glVertex2d(faces[i].getEndU() * (LENGTH / 16D), faces[i].getEndV() * (LENGTH / 16D));
+							glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+							glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
 
-							glVertex2d(faces[i].getEndU() * (LENGTH / 16D), faces[i].getEndV() * (LENGTH / 16D));
-							glVertex2d(faces[i].getEndU() * (LENGTH / 16D), faces[i].getStartV() * (LENGTH / 16D));
+							glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+							glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
 
-							glVertex2d(faces[i].getEndU() * (LENGTH / 16D), faces[i].getStartV() * (LENGTH / 16D));
-							glVertex2d(faces[i].getStartU() * (LENGTH / 16D), faces[i].getStartV() * (LENGTH / 16D));
+							glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+							glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
 
 						}
 						glEnd();
@@ -307,9 +333,9 @@ public class LeftUVSidebar extends LeftSidebar
 	{
 		for (int i = 0; i < 6; i++)
 		{
-			if (mouseX >= startX[i] && mouseX <= startX[i] + LENGTH)
+			if (mouseX >= startX[i] && mouseX <= startX[i] + WIDTH)
 			{
-				if ((canvasHeight - mouseY - 45) >= startY[i] && (canvasHeight - mouseY - 45) <= startY[i] + LENGTH)
+				if ((canvasHeight - mouseY - 45) >= startY[i] && (canvasHeight - mouseY - 45) <= startY[i] + WIDTH)
 				{
 					return i;
 				}

@@ -49,11 +49,13 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		{
 			if (manager.getCurrentElement() != null)
 			{
-				String texture = TextureDialog.display(manager);
+				TextureDialog dlg = new TextureDialog();
+				String texture = dlg.display(manager);
 				if (texture != null)
 				{
 					manager.getCurrentElement().getSelectedFace().setTexture(texture);
 				}
+				
 			}
 		});
 		btnSelect.setFont(defaultFont);
@@ -126,7 +128,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 	}
 
 	@Override
-	public void callback(boolean success, String errormessage, String texture)
+	public void onTextureLoaded(boolean success, String errormessage, String texture)
 	{
 		if (success)
 			if (manager.getCurrentElement() != null)

@@ -6,13 +6,8 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Arrays;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -23,129 +18,25 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
-
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.PendingTexture;
 import at.vintagestory.modelcreator.model.TextureEntry;
 
-public class TextureDialog
+public class TextureDialog implements ITextureCallback
 {
-	public static File lastLocation = null;
+	public File lastLocation = null;
 
-	public static String loadExternalTexture(File image) throws IOException
-	{
-		return loadTexture(image, null);
-	}
+	private String texture = null;
+	DefaultListModel<String> model;
+	JButton btnImport;
 	
-	public static void reloadTextures(ModelCreator creator) {
-		for (TextureEntry entry : ModelCreator.currentProject.Textures) {
-			try {
-				creator.pendingTextures.add(new PendingTexture(entry));
-			} catch (Exception e) {}
-		}
-	}
-	
-	
-	public static void reloadExternalTexture(TextureEntry entry) throws IOException {
-		FileInputStream is = new FileInputStream(entry.getFilePath());
-		Texture texture = TextureLoader.getTexture("PNG", is);
-		is.close();
-		
-		if (texture.getImageHeight() % 16 != 0 | texture.getImageWidth() % 16 != 0)
-		{
-			texture.release();
-			return;
-		}
-		
-		entry.icon = upscale(new ImageIcon(entry.getFilePath()), 256);
-		entry.textures = Arrays.asList(texture);
-	}
-	
-
-	private static String loadTexture(File image, String location) throws IOException
-	{
-		FileInputStream is = new FileInputStream(image);
-		Texture texture = TextureLoader.getTexture("PNG", is);
-		is.close();
-
-		if (texture.getImageHeight() % 16 != 0 || texture.getImageWidth() % 16 != 0)
-		{
-			texture.release();
-			return "Not a multiple of 16 ("+texture.getImageHeight()+","+texture.getImageWidth()+")";
-		}
-		
-		ImageIcon icon = upscale(new ImageIcon(image.getAbsolutePath()), 256);
-		ModelCreator.currentProject.Textures.add(new TextureEntry(image.getName().replace(".png", ""), texture, icon, image.getAbsolutePath()));
-		return null;
-	}
-
-	public static ImageIcon upscale(ImageIcon source, int length)
-	{
-		Image img = source.getImage();
-		Image newimg = img.getScaledInstance(length, length, java.awt.Image.SCALE_FAST);
-		return new ImageIcon(newimg);
-	}
-
-	public static TextureEntry getTextureEntry(String name)
-	{
-		for (TextureEntry entry : ModelCreator.currentProject.Textures)
-		{
-			if (entry.getName().equalsIgnoreCase(name))
-			{
-				return entry;
-			}
-		}
-		return null;
-	}
-
-	public static Texture getTexture(String name)
-	{
-		for (TextureEntry entry : ModelCreator.currentProject.Textures)
-		{
-			if (entry.getName().equalsIgnoreCase(name))
-			{
-				return entry.getTexture();
-			}
-		}
-		return null;
-	}
-
-	public static String getTextureLocation(String name)
-	{
-		for (TextureEntry entry : ModelCreator.currentProject.Textures)
-		{
-			if (entry.getName().equalsIgnoreCase(name))
-			{
-				return entry.getFilePath();
-			}
-		}
-		return null;
-	}
-	
-
-	public static ImageIcon getIcon(String name)
-	{
-		for (TextureEntry entry : ModelCreator.currentProject.Textures)
-		{
-			if (entry.getName().equalsIgnoreCase(name))
-			{
-				return entry.getIcon();
-			}
-		}
-		return null;
-	}
-
-	private static String texture = null;
-
-	public static String display(IElementManager manager)
+	public String display(IElementManager manager)
 	{
 		Font defaultFont = new Font("SansSerif", Font.BOLD, 18);
 
-		DefaultListModel<String> model = generate();
+		model = generate();
 		JList<String> list = new JList<String>();
 		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
@@ -187,29 +78,7 @@ public class TextureDialog
 				lastLocation = chooser.getSelectedFile().getParentFile();
 				try
 				{
-					File meta = new File(chooser.getSelectedFile().getAbsolutePath() + ".mcmeta");
-					System.out.println(meta.getName());
-					manager.addPendingTexture(new PendingTexture(chooser.getSelectedFile(), meta, new ITextureCallback()
-					{
-						@Override
-						public void callback(boolean isnew, String errormessage, String texture)
-						{
-							if (isnew)
-							{
-								model.insertElementAt(texture.replace(".png", ""), 0);
-							}
-							
-							if (errormessage != null)
-							{
-								JOptionPane error = new JOptionPane();
-								error.setMessage(errormessage);
-								JDialog dialog = error.createDialog(btnImport, "Texture Error");
-								dialog.setLocationRelativeTo(null);
-								dialog.setModal(false);
-								dialog.setVisible(true);
-							}
-						}
-					}));
+					manager.addPendingTexture(new PendingTexture(chooser.getSelectedFile(), this));
 				}
 				catch (Exception e1)
 				{
@@ -242,8 +111,28 @@ public class TextureDialog
 
 		return texture;
 	}
+	
+	
+	@Override
+	public void onTextureLoaded(boolean isnew, String errormessage, String texture) {
+	
+		if (isnew)
+		{
+			model.insertElementAt(texture.replace(".png", ""), 0);
+		}
+		
+		if (errormessage != null)
+		{
+			JOptionPane error = new JOptionPane();
+			error.setMessage(errormessage);
+			JDialog dialog = error.createDialog(btnImport, "Textur Error");
+			dialog.setLocationRelativeTo(null);
+			dialog.setModal(false);
+			dialog.setVisible(true);
+		}
+	}
 
-	private static DefaultListModel<String> generate()
+	private DefaultListModel<String> generate()
 	{
 		DefaultListModel<String> model = new DefaultListModel<String>();
 		for (TextureEntry entry : ModelCreator.currentProject.Textures)

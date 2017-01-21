@@ -223,6 +223,12 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		rotationSliders[1].setValue(enabled ? (int) Math.round(cube.getRotationY() / multiplier) : 0);
 		rotationSliders[2].setValue(enabled ? (int) Math.round(cube.getRotationZ() / multiplier) : 0);
 		
+		if (enabled) {
+			rotationFields[0].setText(""+cube.getRotationX());
+			rotationFields[1].setText(""+cube.getRotationY());
+			rotationFields[2].setText(""+cube.getRotationZ());			
+		}
+		
 		ignoreSliderChanges = false;
 	}
 	

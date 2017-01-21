@@ -6,6 +6,8 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 
+import at.vintagestory.modelcreator.ModelCreator;
+
 public class TextureCellRenderer extends DefaultListCellRenderer
 {
 	private static final long serialVersionUID = 1L;
@@ -15,7 +17,7 @@ public class TextureCellRenderer extends DefaultListCellRenderer
 	@Override
 	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus)
 	{
-		lbl.setIcon(TextureDialog.getIcon((String) list.getModel().getElementAt(index)));
+		lbl.setIcon(ModelCreator.currentProject.getIcon((String) list.getModel().getElementAt(index)));
 		lbl.revalidate();
 		if (isSelected)
 		{

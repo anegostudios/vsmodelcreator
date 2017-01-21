@@ -56,7 +56,7 @@ import at.vintagestory.modelcreator.util.screenshot.Screenshot;
 
 import java.util.prefs.Preferences;
 
-public class ModelCreator extends JFrame
+public class ModelCreator extends JFrame implements ITextureCallback
 {
 	public static String windowTitle = "Vintage Story Model Creator"; 
 	private static final long serialVersionUID = 1L;
@@ -270,7 +270,6 @@ public class ModelCreator extends JFrame
 	{
 		if (currentProject == null) return;
 		if (ignoreValueUpdates) return;
-		
 		ignoreValueUpdates = true;
 		
 		if (currentProject.SelectedAnimation != null) {
@@ -327,9 +326,12 @@ public class ModelCreator extends JFrame
 		modelrenderer.camera = new Camera(60F, (float) Display.getWidth() / (float) Display.getHeight(), 0.3F, 1000F);		
 
 		Dimension newDim;
-
+	//	System.out.println("0");
+		
 		while (!Display.isCloseRequested() && !getCloseRequested())
 		{
+			
+			//System.out.println("1");
 			for (PendingTexture texture : pendingTextures)
 			{
 				texture.load();
@@ -344,8 +346,11 @@ public class ModelCreator extends JFrame
 				height = newDim.height;
 			}
 
-			int leftSpacing = modelrenderer.renderedLeftSidebar == null ? 0 : getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
-
+			int leftSpacing = 0;
+			if (modelrenderer.renderedLeftSidebar != null) {
+				leftSpacing = singleTextureMode || getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
+			}		
+			
 			glViewport(leftSpacing, 0, width - leftSpacing, height);
 
 			handleInput(leftSpacing);
@@ -739,24 +744,7 @@ public class ModelCreator extends JFrame
 							}
 							
 							if (file.getName().endsWith(".png")) {								
-								File meta = new File(file.getAbsolutePath() + ".mcmeta");
-								
-								getElementManager().addPendingTexture(new PendingTexture(file, meta, new ITextureCallback()
-								{
-									@Override
-									public void callback(boolean isnew, String errormessage, String texture)
-									{										
-										if (errormessage != null)
-										{
-											JOptionPane error = new JOptionPane();
-											error.setMessage(errormessage);
-											JDialog dialog = error.createDialog(canvas, "Texture Error");
-											dialog.setLocationRelativeTo(null);
-											dialog.setModal(false);
-											dialog.setVisible(true);
-										}
-									}
-								}));
+								getElementManager().addPendingTexture(new PendingTexture(file, ModelCreator.Instance));
 							}
 							
 							
@@ -774,6 +762,20 @@ public class ModelCreator extends JFrame
 		 };
 	}
 
+	
+	@Override
+	public void onTextureLoaded(boolean isnew, String errormessage, String texture)
+	{										
+		if (errormessage != null)
+		{
+			JOptionPane error = new JOptionPane();
+			error.setMessage(errormessage);
+			JDialog dialog = error.createDialog(canvas, "Texture Error");
+			dialog.setLocationRelativeTo(null);
+			dialog.setModal(false);
+			dialog.setVisible(true);
+		}
+	}
 
 	public void LoadFile(String filePath)
 	{

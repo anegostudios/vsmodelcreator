@@ -7,10 +7,8 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
-
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.BlockFacing;
-import at.vintagestory.modelcreator.gui.texturedialog.TextureDialog;
 
 public class Face
 {
@@ -76,7 +74,7 @@ public class Face
             1, 1,
             1, 0,
             0, 0,
-
+            
             // South
             0, 1,
             1, 1,
@@ -106,8 +104,8 @@ public class Face
 	
 	private String texture = null;
 	private String textureLocation = "blocks/";
-	private double textureU = 0;
-	private double textureV = 0;
+	public double textureU = 0;
+	public double textureV = 0;
 	private double textureUEnd = 16;
 	private double textureVEnd = 16;
 	private boolean binded = false;
@@ -133,8 +131,6 @@ public class Face
 			if (ModelCreator.currentProject.Textures.size() > 0) {
 				this.texture = ModelCreator.currentProject.Textures.get(0).name;
 			}
-			setUnwrappedCubeUV();
-			updateUV();
 		}
 	}
 	
@@ -151,12 +147,17 @@ public class Face
 			int coordIndex = blockFacing.GetIndex() * 12;
 			int uvIndex = blockFacing.GetIndex() * 8;
 			
+			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
+			double texWidth = entry.Width / 2.0;
+			double texHeight = entry.Height / 2.0;
+
+			
 			GL11.glBegin(GL11.GL_QUADS);
 			{
 				for (int j = 0; j < 4; j++) {
 					GL11.glTexCoord2d(
-							(cubeUVCoords[uvIndex++]==0 ? textureU : textureUEnd) / 16, 
-							(cubeUVCoords[uvIndex++]==0 ? textureV : textureVEnd) / 16
+							(cubeUVCoords[uvIndex++]==0 ? textureU : textureUEnd) / texWidth, 
+							(cubeUVCoords[uvIndex++]==0 ? textureV : textureVEnd) / texHeight
 					);
 					GL11.glVertex3d(cuboid.getWidth() * CubeVertices[coordIndex++], cuboid.getHeight() * CubeVertices[coordIndex++], cuboid.getDepth() * CubeVertices[coordIndex++]);
 				}
@@ -181,7 +182,7 @@ public class Face
 		TextureImpl.bindNone();
 		if (texture != null)
 		{
-			TextureEntry entry = TextureDialog.getTextureEntry(texture);
+			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
 			if (entry != null)
 			{
 				if (entry.getTexture() != null)
@@ -192,6 +193,8 @@ public class Face
 
 				binded = true;
 			}
+		} else {
+			binded = false;
 		}
 	}
 
@@ -284,7 +287,7 @@ public class Face
 
 	public Texture getTexture()
 	{
-		return TextureDialog.getTexture(texture);
+		return ModelCreator.currentProject.getTexture(texture);
 	}
 
 	public String getTextureLocation()
@@ -458,38 +461,12 @@ public class Face
 	}
 	
 	
-	void setUnwrappedCubeUV() {
-		
-		switch (side) {
-			case 0: // N 
-				textureU = 0;
-				textureV = cuboid.getFaceDimension(5).getHeight();
-				break;
-			
-			case 1: // E
-				textureU = cuboid.getFaceDimension(0).getWidth();
-				textureV = cuboid.getFaceDimension(5).getHeight();
-				break;
-			
-			case 2: // S
-				textureU = cuboid.getFaceDimension(0).getWidth() + cuboid.getFaceDimension(1).getWidth();
-				textureV = cuboid.getFaceDimension(5).getHeight();
-				break;
-			
-			case 3: // W
-				textureU = cuboid.getFaceDimension(0).getWidth() + cuboid.getFaceDimension(1).getWidth() + cuboid.getFaceDimension(2).getWidth();
-				textureV = cuboid.getFaceDimension(5).getHeight();
-				break;
-			case 4: // U
-				textureU = cuboid.getFaceDimension(0).getWidth();
-				textureV = 0;
-				break;
-			case 5: // D
-				textureU = cuboid.getFaceDimension(0).getWidth() + cuboid.getFaceDimension(1).getWidth();
-				textureV = 0;
-				break;
-		}
-		
+	public double TextureWidth() {
+		return Math.abs(textureUEnd - textureU);
+	}
+	
+	public double TextureHeight() {
+		return Math.abs(textureVEnd - textureV);
 	}
 
 }

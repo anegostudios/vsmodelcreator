@@ -3,11 +3,9 @@ package at.vintagestory.modelcreator.model;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
-
-import at.vintagestory.modelcreator.gui.texturedialog.TextureDialog;
+import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 
 public class PendingTexture
@@ -22,23 +20,13 @@ public class PendingTexture
 		this(texture, (ITextureCallback) null);
 	}
 
-	public PendingTexture(File texture, File meta)
-	{
-		this(texture, meta, null);
-	}
-
+	
 	public PendingTexture(File texture, ITextureCallback callback)
 	{
 		this.texture = texture;
 		this.callback = callback;
 	}
-
-	public PendingTexture(File texture, File meta, ITextureCallback callback)
-	{
-		this.texture = texture;
-		this.callback = callback;
-	}
-
+	
 	public PendingTexture(TextureEntry entry)
 	{
 		this.entry = entry;
@@ -49,7 +37,7 @@ public class PendingTexture
 		try
 		{
 			if (entry != null) {
-				TextureDialog.reloadExternalTexture(entry);
+				ModelCreator.currentProject.reloadExternalTexture(entry);
 				return;
 			}
 			
@@ -57,19 +45,19 @@ public class PendingTexture
 			boolean isnew = false;
 			
 			String fileName = this.texture.getName().replace(".png", "").replaceAll("\\d*$", "");
-			Texture texture = TextureDialog.getTexture(fileName);
+			Texture texture = ModelCreator.currentProject.getTexture(fileName);
 			
 			if (texture == null)
 			{
 				FileInputStream is = new FileInputStream(this.texture);
 				texture = TextureLoader.getTexture("PNG", is);
-				errormessge = TextureDialog.loadExternalTexture(this.texture);
+				errormessge = ModelCreator.currentProject.loadTexture(this.texture);
 				is.close();
 				isnew = true;
 			}
 			
 			if (callback != null) {
-				callback.callback(isnew, errormessge, fileName);
+				callback.onTextureLoaded(isnew, errormessge, fileName);
 			}
 				
 		}

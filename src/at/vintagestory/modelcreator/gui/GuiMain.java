@@ -23,7 +23,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import at.vintagestory.modelcreator.ModelCreator;
-import at.vintagestory.modelcreator.gui.texturedialog.TextureDialog;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCallback;
@@ -297,7 +296,7 @@ public class GuiMain extends JMenuBar
 
 		
 		itemReloadTextures.addActionListener(a -> {
-			TextureDialog.reloadTextures(creator);
+			ModelCreator.currentProject.reloadTextures(creator);
 		});
 
 		itemSaveScreenshot.addActionListener(a ->

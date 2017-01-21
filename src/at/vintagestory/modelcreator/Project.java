@@ -1,7 +1,17 @@
 package at.vintagestory.modelcreator;
 
+import java.awt.Image;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import javax.swing.ImageIcon;
+
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
 
 import at.vintagestory.modelcreator.gui.right.ElementTree;
 import at.vintagestory.modelcreator.gui.right.RightTopPanel;
@@ -348,4 +358,108 @@ public class Project
 		return null;
 	}
 		
+	
+
+
+	public TextureEntry getTextureEntry(String name)
+	{
+		for (TextureEntry entry : Textures)
+		{
+			if (entry.getName().equalsIgnoreCase(name))
+			{
+				return entry;
+			}
+		}
+		return null;
+	}
+
+	public Texture getTexture(String name)
+	{
+		for (TextureEntry entry : Textures)
+		{
+			if (entry.getName().equalsIgnoreCase(name))
+			{
+				return entry.getTexture();
+			}
+		}
+		return null;
+	}
+
+	public String getTextureLocation(String name)
+	{
+		for (TextureEntry entry : Textures)
+		{
+			if (entry.getName().equalsIgnoreCase(name))
+			{
+				return entry.getFilePath();
+			}
+		}
+		return null;
+	}
+	
+
+	public ImageIcon getIcon(String name)
+	{
+		for (TextureEntry entry : Textures)
+		{
+			if (entry.getName().equalsIgnoreCase(name))
+			{
+				return entry.getIcon();
+			}
+		}
+		return null;
+	}
+	
+
+	
+	public void reloadTextures(ModelCreator creator) {
+		for (TextureEntry entry : ModelCreator.currentProject.Textures) {
+			try {
+				creator.pendingTextures.add(new PendingTexture(entry));
+			} catch (Exception e) {}
+		}
+	}
+	
+	
+	public void reloadExternalTexture(TextureEntry entry) throws IOException {
+		FileInputStream is = new FileInputStream(entry.getFilePath());
+		Texture texture = TextureLoader.getTexture("PNG", is);
+		is.close();
+		
+		if (texture.getImageHeight() % 16 != 0 | texture.getImageWidth() % 16 != 0)
+		{
+			texture.release();
+			return;
+		}
+		
+		entry.icon = upscaleIcon(new ImageIcon(entry.getFilePath()), 256);
+		entry.textures = Arrays.asList(texture);
+	}
+	
+
+	public String loadTexture(File image) throws IOException
+	{
+		FileInputStream is = new FileInputStream(image);
+		Texture texture = TextureLoader.getTexture("PNG", is);
+		is.close();
+
+		if (texture.getImageHeight() % 16 != 0 || texture.getImageWidth() % 16 != 0)
+		{
+			texture.release();
+			return "Not a multiple of 16 ("+texture.getImageHeight()+","+texture.getImageWidth()+")";
+		}
+		
+		ImageIcon icon = upscaleIcon(new ImageIcon(image.getAbsolutePath()), 256);
+		ModelCreator.currentProject.Textures.add(new TextureEntry(image.getName().replace(".png", ""), texture, icon, image.getAbsolutePath()));
+		return null;
+	}
+
+	public ImageIcon upscaleIcon(ImageIcon source, int length)
+	{
+		Image img = source.getImage();
+		Image newimg = img.getScaledInstance(length, -1, java.awt.Image.SCALE_FAST);
+		return new ImageIcon(newimg);
+	}
+
+
 }
