@@ -11,6 +11,7 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.util.GameMath;
@@ -320,47 +321,52 @@ public class Element implements IDrawable
 	public void drawSelectionExtras()
 	{
 		GL11.glLineWidth(1f);
-		GL11.glPushMatrix();
-		{
-			GL11.glTranslated(originX, originY, originZ);
-			GL11.glColor3f(0.25F, 0.25F, 0.25F);
-			sphere.draw(0.2F, 16, 16);
-			rotateAxis();
-			GL11.glBegin(GL_LINES);
+		
+		if (!ModelCreator.renderAttachmentPoints) {
+			GL11.glPushMatrix();
 			{
-				// 3 Axes
-				GL11.glColor3f(1, 0, 0);
-				GL11.glVertex3f(-4, 0, 0);
-				GL11.glVertex3f(4, 0, 0);
-				
-				GL11.glVertex3f(4, 0, 0);
-				GL11.glVertex3f(3.6f, 0, 0.4f);
-				GL11.glVertex3f(4, 0, 0);
-				GL11.glVertex3f(3.6f, 0, -0.4f);
-				
-				GL11.glColor3f(0, 1, 0);
-				GL11.glVertex3f(0, -4, 0);
-				GL11.glVertex3f(0, 4, 0);
-				
-				GL11.glVertex3f(0, 4, 0);
-				GL11.glVertex3f(0, 3.6f, 0.4f);
-				
-				GL11.glVertex3f(0, 4, 0);
-				GL11.glVertex3f(0, 3.6f, -0.4f);
-				
-				GL11.glColor3f(0, 0, 1);
-				GL11.glVertex3f(0, 0, -4);
-				GL11.glVertex3f(0, 0, 4);
-				
-				GL11.glVertex3f(0, 0, 4);
-				GL11.glVertex3f(0.4f, 0, 3.6f);
-				
-				GL11.glVertex3f(0, 0, 4);
-				GL11.glVertex3f(-0.4f, 0, 3.6f);
+				GL11.glTranslated(originX, originY, originZ);
+				GL11.glColor3f(0.25F, 0.25F, 0.25F);
+				sphere.draw(0.2F, 16, 16);
+				rotateAxis();
+				GL11.glBegin(GL_LINES);
+				{
+					// 3 Axes
+					GL11.glColor3f(1, 0, 0);
+					GL11.glVertex3f(-4, 0, 0);
+					GL11.glVertex3f(4, 0, 0);
+					
+					GL11.glVertex3f(4, 0, 0);
+					GL11.glVertex3f(3.6f, 0, 0.4f);
+					GL11.glVertex3f(4, 0, 0);
+					GL11.glVertex3f(3.6f, 0, -0.4f);
+					
+					GL11.glColor3f(0, 1, 0);
+					GL11.glVertex3f(0, -4, 0);
+					GL11.glVertex3f(0, 4, 0);
+					
+					GL11.glVertex3f(0, 4, 0);
+					GL11.glVertex3f(0, 3.6f, 0.4f);
+					
+					GL11.glVertex3f(0, 4, 0);
+					GL11.glVertex3f(0, 3.6f, -0.4f);
+					
+					GL11.glColor3f(0, 0, 1);
+					GL11.glVertex3f(0, 0, -4);
+					GL11.glVertex3f(0, 0, 4);
+					
+					GL11.glVertex3f(0, 0, 4);
+					GL11.glVertex3f(0.4f, 0, 3.6f);
+					
+					GL11.glVertex3f(0, 0, 4);
+					GL11.glVertex3f(-0.4f, 0, 3.6f);
+				}
+				GL11.glEnd();
 			}
-			GL11.glEnd();
+			GL11.glPopMatrix();			
 		}
-		GL11.glPopMatrix();
+		
+
 
 		// Cube highlight
 		GL11.glPushMatrix();
@@ -749,6 +755,10 @@ public class Element implements IDrawable
 			cloned.ChildElements.add(child.clone());
 		}
 		
+		for (AttachmentPoint point : AttachmentPoints) {
+			cloned.AttachmentPoints.add(point.clone());
+		}
+		
 		cloned.name = name;
 		cloned.openGlName = openGlName;
 		cloned.selectedFace = selectedFace;
@@ -802,6 +812,32 @@ public class Element implements IDrawable
 		this.texVStart = texVStart;
 		ModelCreator.DidModify();
 		updateUV();
+	}
+
+	public boolean IsAttachmentPointCodeUsed(String code, AttachmentPoint exceptPoint)
+	{
+		for (AttachmentPoint point : AttachmentPoints) {
+			if (point == exceptPoint) continue;
+			
+			if (code.equals(point.getCode())) return true;
+		}
+		
+		return false;
+	}
+
+	public AttachmentPoint AddNewAttachmentPoint()
+	{
+		AttachmentPoint point = new AttachmentPoint();
+		point.setCode("Point" + Project.nextAttachmentPointNumber++);
+		AttachmentPoints.add(point);
+		ModelCreator.DidModify();
+		return point;
+	}
+
+	public void RemoveCurrentAttachmentPoint()
+	{
+		AttachmentPoints.remove(ModelCreator.currentProject.SelectedAttachmentPoint);
+		ModelCreator.DidModify();
 	}
 
 }

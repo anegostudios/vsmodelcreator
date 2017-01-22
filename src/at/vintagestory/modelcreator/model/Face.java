@@ -128,7 +128,7 @@ public class Face
 		this.side = side;
 		
 		if (ModelCreator.singleTextureMode) {
-			if (ModelCreator.currentProject.Textures.size() > 0) {
+			if (ModelCreator.currentProject != null && ModelCreator.currentProject.Textures != null && ModelCreator.currentProject.Textures.size() > 0) {
 				this.texture = ModelCreator.currentProject.Textures.get(0).name;
 			}
 		}
@@ -148,8 +148,12 @@ public class Face
 			int uvIndex = blockFacing.GetIndex() * 8;
 			
 			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
-			double texWidth = entry.Width / 2.0;
-			double texHeight = entry.Height / 2.0;
+			double texWidth = 16;
+			double texHeight = 16;
+			if (entry != null) {
+				texWidth = entry.Width / 2.0;
+				texHeight = entry.Height / 2.0;				
+			}
 
 			
 			GL11.glBegin(GL11.GL_QUADS);

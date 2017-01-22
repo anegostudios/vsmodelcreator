@@ -7,12 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.swing.ImageIcon;
-
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
-
 import at.vintagestory.modelcreator.gui.right.ElementTree;
 import at.vintagestory.modelcreator.gui.right.RightTopPanel;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
@@ -30,12 +27,15 @@ public class Project
 	
 
 	
-	// Non-persistent project data 
+	// Non-persistent project data
+	public AttachmentPoint SelectedAttachmentPoint;
 	public Element SelectedElement;
 	public Animation SelectedAnimation;
 	public boolean PlayAnimation = false;
 	public ElementTree tree;
 	public boolean needsSaving;
+	
+	public static int nextAttachmentPointNumber = 1;
 	
 	public String filePath;
 	
@@ -281,6 +281,18 @@ public class Project
 		return IsElementNameUsed(name, rootElements, exceptElement);
 	}
 	
+	public boolean IsAttachmentPointCodeUsed(String code, AttachmentPoint exceptPoint)
+	{
+		return IsAttachmentPointCodeUsed(code, rootElements, exceptPoint);	
+	}
+	
+	public boolean IsAttachmentPointCodeUsed(String code, ArrayList<Element> elems, AttachmentPoint exceptPoint) {
+		for (Element elem : elems) {
+			if (elem.IsAttachmentPointCodeUsed(code, exceptPoint)) return true;
+		}
+		return false;
+	}
+
 	
 	boolean IsElementNameUsed(String name, ArrayList<Element> elems, Element exceptElement) {
 		for (Element elem : elems) {
@@ -460,6 +472,8 @@ public class Project
 		Image newimg = img.getScaledInstance(length, -1, java.awt.Image.SCALE_FAST);
 		return new ImageIcon(newimg);
 	}
+
+
 
 
 }

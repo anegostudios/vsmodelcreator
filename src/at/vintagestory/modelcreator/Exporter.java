@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import at.vintagestory.modelcreator.model.Animation;
+import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.Keyframe;
@@ -336,6 +337,46 @@ public class Exporter
 			writer.newLine();
 			writer.write(space(indentation) + "]");
 		}
+		
+		if (cuboid.AttachmentPoints.size() > 0) {
+			writer.write(",");
+			writer.newLine();
+			writer.write(space(indentation) + "\"attachmentpoints\": [");
+			
+			for (int i = 0; i < cuboid.AttachmentPoints.size(); i++) {
+				if (i > 0) writer.write(",");
+				writeAttachmentPoint(writer, cuboid.AttachmentPoints.get(i), indentation + 1);
+			}
+			
+			writer.newLine();
+			writer.write(space(indentation) + "]");
+		}
+		
+		
+		indentation--;
+		
+		writer.newLine();
+		writer.write(space(indentation) + "}");
+	}
+	
+	
+	private void writeAttachmentPoint(BufferedWriter writer, AttachmentPoint point, int indentation) throws IOException {
+		writer.newLine();
+		writer.write(space(indentation) + "{");
+		writer.newLine();
+		
+		indentation++;
+		
+		writer.write(space(indentation) + "\"code\": \"" + point.getCode() + "\",");
+		writer.newLine();
+		writer.write(space(indentation) + "\"posX\": \"" + point.getPosX() + "\",");
+		writer.write("\"posY\": \"" + point.getPosY() + "\",");
+		writer.write("\"posZ\": \"" + point.getPosZ() + "\",");
+		
+		writer.newLine();
+		writer.write(space(indentation) + "\"rotationX\": \"" + point.getRotationX() + "\",");
+		writer.write("\"rotationY\": \"" + point.getRotationY() + "\",");
+		writer.write("\"rotationZ\": \"" + point.getRotationZ() + "\"");
 		
 		indentation--;
 		

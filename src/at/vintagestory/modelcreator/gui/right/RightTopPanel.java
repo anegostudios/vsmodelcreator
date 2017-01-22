@@ -7,6 +7,7 @@ import javax.swing.*;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.gui.CuboidTabbedPane;
 import at.vintagestory.modelcreator.gui.Icons;
+import at.vintagestory.modelcreator.gui.right.attachmentpoints.AttachmentPointsPanel;
 import at.vintagestory.modelcreator.gui.right.element.ElementPanel;
 import at.vintagestory.modelcreator.gui.right.face.FacePanel;
 import at.vintagestory.modelcreator.gui.right.keyframes.RightKeyFramesPanel;
@@ -102,9 +103,11 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		scrollPane.setPreferredSize(new Dimension(205, 240));
 		add(scrollPane);
 
-		tabbedPane.add("Element", new ElementPanel(this));
+		tabbedPane.add("Cube", new ElementPanel(this));
 		tabbedPane.add("Faces", new FacePanel(this));
 		tabbedPane.add("Keyframe", rightKeyFramesPanel = new RightKeyFramesPanel());
+		tabbedPane.add("P", new AttachmentPointsPanel());
+		
 		tabbedPane.setPreferredSize(new Dimension(205, 650));
 		tabbedPane.setTabPlacement(JTabbedPane.TOP);
 		
@@ -119,6 +122,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 			}
 			
 			ModelCreator.leftKeyframesPanel.setVisible(tabbedPane.getSelectedIndex() == 2);
+			ModelCreator.renderAttachmentPoints = tabbedPane.getSelectedIndex() == 3;
 		});
 		
 		add(tabbedPane);

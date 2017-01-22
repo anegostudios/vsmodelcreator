@@ -4,60 +4,62 @@ import at.vintagestory.modelcreator.ModelCreator;
 
 public class AttachmentPoint
 {
-	protected double startX = 0.0, startY = 0.0, startZ = 0.0;
+	private String code;
+	
+	protected double posX = 0.0, posY = 0.0, posZ = 0.0;
 	protected double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
 	
-	public void addStartX(double amt)
+	public void addPosX(double amt)
 	{
-		this.startX += amt;
+		this.posX += amt;
 		ModelCreator.DidModify();
 	}
 
-	public void addStartY(double amt)
+	public void addPosY(double amt)
 	{
-		this.startY += amt;
+		this.posY += amt;
 		ModelCreator.DidModify();
 	}
 
-	public void addStartZ(double amt)
+	public void addPosZ(double amt)
 	{
-		this.startZ += amt;
+		this.posZ += amt;
 		ModelCreator.DidModify();
 	}
 	
-	public double getStartX()
+	public double getPosX()
 	{
-		return startX;
+		return posX;
 	}
 
-	public double getStartY()
+	public double getPosY()
 	{
-		return startY;
+		return posY;
 	}
 
-	public double getStartZ()
+	public double getPosZ()
 	{
-		return startZ;
+		return posZ;
 	}
 
 	
 
-	public void setStartX(double amt)
+	public void setPosX(double amt)
 	{
-		this.startX = amt;
+		this.posX = amt;
 		ModelCreator.DidModify();
 	}
 
-	public void setStartY(double amt)
+	public void setPosY(double amt)
 	{
-		this.startY = amt;
+		this.posY = amt;
 		ModelCreator.DidModify();
 	}
 
-	public void setStartZ(double amt)
+	public void setPosZ(double amt)
 	{
-		this.startZ = amt;
+		this.posZ = amt;
 		ModelCreator.DidModify();
 	}
 	
@@ -97,5 +99,35 @@ public class AttachmentPoint
 	}
 	
 
+	public AttachmentPoint clone() {
+		AttachmentPoint cloned = new AttachmentPoint();
+
+		cloned.posX = posX;
+		cloned.posY = posY;
+		cloned.posZ = posZ;
+		
+		cloned.rotationX = rotationX;
+		cloned.rotationY = rotationY;
+		cloned.rotationZ = rotationZ;
+		
+		
+		return cloned;
+	}
+	
+	@Override
+	public String toString() {
+		return code;
+	}
+
+	public String getCode()
+	{
+		return code;
+	}
+
+	public void setCode(String code)
+	{
+		this.code = code;
+		ModelCreator.DidModify();
+	}
 
 }

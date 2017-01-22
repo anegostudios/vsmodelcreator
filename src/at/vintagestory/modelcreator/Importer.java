@@ -18,6 +18,7 @@ import com.google.gson.JsonParser;
 
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.model.Animation;
+import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.Keyframe;
@@ -374,11 +375,33 @@ public class Importer
 			
 			}
 			
-			
+			if (obj.has("attachmentpoints") && obj.get("attachmentpoints").isJsonArray()) {
+				JsonArray children = obj.get("attachmentpoints").getAsJsonArray();
+				for(JsonElement child : children) {
+					if (child.isJsonObject()) {
+						element.AttachmentPoints.add(readAttachmentPoint(child.getAsJsonObject()));
+					}
+				}
+			}
 			return element;
 		}
-		
 		return null;
+	}
+	
+
+	private AttachmentPoint readAttachmentPoint(JsonObject obj)
+	{
+		AttachmentPoint point = new AttachmentPoint();
+		
+		point.setCode(obj.get("code").getAsString());
+		point.setPosX(obj.get("posX").getAsDouble());
+		point.setPosY(obj.get("posY").getAsDouble());
+		point.setPosZ(obj.get("posZ").getAsDouble());
+		point.setRotationX(obj.get("rotationX").getAsDouble());
+		point.setRotationY(obj.get("rotationY").getAsDouble());
+		point.setRotationZ(obj.get("rotationZ").getAsDouble());
+		
+		return point;
 	}
 	
 

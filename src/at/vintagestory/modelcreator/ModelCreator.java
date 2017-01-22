@@ -99,6 +99,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public LeftSidebar uvSidebar;
 	public static GuiMain guiMain;
 	public static LeftKeyFramesPanel leftKeyframesPanel;
+	public static boolean renderAttachmentPoints;
 
 	
 	public ModelRenderer modelrenderer;
