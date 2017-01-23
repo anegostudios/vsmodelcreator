@@ -20,6 +20,7 @@ import static org.lwjgl.opengl.GL11.glVertex2d;
 import static org.lwjgl.opengl.GL11.glVertex2i;
 
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.TextureImpl;
 
@@ -54,11 +55,21 @@ public class LeftUVSidebar extends LeftSidebar
 	{
 		super.draw(sidebarWidth, canvasWidth, canvasHeight, frameHeight);
 
+		if (ModelCreator.transparent) {
+			GL11.glEnable(GL11.GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}		
+
 		if (ModelCreator.singleTextureMode) {
 			draw1(canvasHeight);
 		} else {
 			draw6(canvasHeight);
 		}
+		
+		if (ModelCreator.transparent) {
+			GL11.glDisable(GL11.GL_BLEND);
+		}
+
 	}
 	
 	void draw1(int canvasHeight) {
@@ -71,13 +82,12 @@ public class LeftUVSidebar extends LeftSidebar
 			texWidth = ModelCreator.currentProject.Textures.get(0).Width / 2.0;
 			texHeight = ModelCreator.currentProject.Textures.get(0).Height / 2.0;
 		}
-				
+		
 		int width = 2 * WIDTH;
 		int scaledHeight = (int)(width * texHeight / texWidth);
 
 		double scaledTexWidth = width / texWidth;
 		double scaledTexHeight = scaledHeight / texHeight;
-		
 		
 		glPushMatrix();
 		{
@@ -145,6 +155,7 @@ public class LeftUVSidebar extends LeftSidebar
 			}
 		}
 		glPopMatrix();
+		
 	}
 	
 	void draw6(int canvasHeight) {
@@ -249,7 +260,7 @@ public class LeftUVSidebar extends LeftSidebar
 				glPopMatrix();
 			}
 		}
-		glPopMatrix();		
+		glPopMatrix();
 	}
 	
 	

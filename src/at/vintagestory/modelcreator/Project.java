@@ -462,7 +462,13 @@ public class Project
 		}
 		
 		ImageIcon icon = upscaleIcon(new ImageIcon(image.getAbsolutePath()), 256);
+		
 		ModelCreator.currentProject.Textures.add(new TextureEntry(image.getName().replace(".png", ""), texture, icon, image.getAbsolutePath()));
+		
+		if (ModelCreator.currentProject.Textures.size() == 1 && ModelCreator.singleTextureMode) {
+			applySingleTextureMode();
+		}
+		
 		return null;
 	}
 
@@ -471,6 +477,14 @@ public class Project
 		Image img = source.getImage();
 		Image newimg = img.getScaledInstance(length, -1, java.awt.Image.SCALE_FAST);
 		return new ImageIcon(newimg);
+	}
+
+
+	public void applySingleTextureMode()
+	{
+		for (Element elem : rootElements) {
+			elem.applySingleTextureMode();
+		}
 	}
 
 

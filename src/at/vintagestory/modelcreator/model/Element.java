@@ -325,6 +325,7 @@ public class Element implements IDrawable
 		if (!ModelCreator.renderAttachmentPoints) {
 			GL11.glPushMatrix();
 			{
+				GL11.glDisable(GL11.GL_DEPTH_TEST);
 				GL11.glTranslated(originX, originY, originZ);
 				GL11.glColor3f(0.25F, 0.25F, 0.25F);
 				sphere.draw(0.2F, 16, 16);
@@ -362,6 +363,7 @@ public class Element implements IDrawable
 					GL11.glVertex3f(-0.4f, 0, 3.6f);
 				}
 				GL11.glEnd();
+				GL11.glEnable(GL11.GL_DEPTH_TEST);
 			}
 			GL11.glPopMatrix();			
 		}
@@ -838,6 +840,18 @@ public class Element implements IDrawable
 	{
 		AttachmentPoints.remove(ModelCreator.currentProject.SelectedAttachmentPoint);
 		ModelCreator.DidModify();
+	}
+
+	public void applySingleTextureMode()
+	{
+		for (int i = 0; i < faces.length; i++) {
+			faces[i].applySingleTextureMode();
+		}
+		
+		for (Element elem : ChildElements) {
+			elem.applySingleTextureMode();
+		}
+		
 	}
 
 }

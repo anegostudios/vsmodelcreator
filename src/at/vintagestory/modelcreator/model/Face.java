@@ -126,12 +126,15 @@ public class Face
 	{
 		this.cuboid = cuboid;
 		this.side = side;
-		
+		applySingleTextureMode();
+	}
+	
+	public void applySingleTextureMode() {
 		if (ModelCreator.singleTextureMode) {
 			if (ModelCreator.currentProject != null && ModelCreator.currentProject.Textures != null && ModelCreator.currentProject.Textures.size() > 0) {
 				this.texture = ModelCreator.currentProject.Textures.get(0).name;
 			}
-		}
+		}		
 	}
 	
 	public void renderFace(BlockFacing blockFacing, float brightness)
