@@ -28,6 +28,9 @@ public class Icons
 	public static Icon light_off;
 	public static Icon arrow_up;
 	public static Icon arrow_down;
+	public static Icon reload;
+	public static Icon keyboard;
+	public static Icon drink;
 
 	
 	public static Icon arrow_up_x;
@@ -79,6 +82,9 @@ public class Icons
 		load = new ImageIcon(loader.getResource("icons/load.png"));
 		disk = new ImageIcon(loader.getResource("icons/disk.png"));
 		exit = new ImageIcon(loader.getResource("icons/exit.png"));
+		reload = new ImageIcon(loader.getResource("icons/reload.png"));
+		keyboard = new ImageIcon(loader.getResource("icons/keyboard.png"));
+		drink = new ImageIcon(loader.getResource("icons/drink.png"));
 		
 		light_on = new ImageIcon(loader.getResource("icons/box_off.png"));
 		light_off = new ImageIcon(loader.getResource("icons/box_on.png"));

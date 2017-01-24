@@ -327,12 +327,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		modelrenderer.camera = new Camera(60F, (float) Display.getWidth() / (float) Display.getHeight(), 0.3F, 1000F);		
 
 		Dimension newDim;
-	//	System.out.println("0");
 		
 		while (!Display.isCloseRequested() && !getCloseRequested())
 		{
-			
-			//System.out.println("1");
 			for (PendingTexture texture : pendingTextures)
 			{
 				texture.load();
@@ -350,7 +347,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			int leftSpacing = 0;
 			if (modelrenderer.renderedLeftSidebar != null) {
 				leftSpacing = singleTextureMode || getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
-			}		
+			}
+			
 			
 			glViewport(leftSpacing, 0, width - leftSpacing, height);
 

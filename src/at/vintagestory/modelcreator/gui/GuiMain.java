@@ -66,6 +66,7 @@ public class GuiMain extends JMenuBar
 	private JMenuItem itemSaveScreenshot;
 	private JMenuItem itemReloadTextures;
 	private JMenuItem itemImgurLink;
+	private JMenuItem itemControls;
 	private JMenuItem itemCredits;
 
 	public GuiMain(ModelCreator creator)
@@ -121,10 +122,11 @@ public class GuiMain extends JMenuBar
 		
 		otherMenu = new JMenu("Other");
 		{
-			itemReloadTextures = createItem("Reload textures", "Reload textures", KeyEvent.VK_F5, Icons.new_);
+			itemReloadTextures = createItem("Reload textures", "Reload textures", KeyEvent.VK_F5, Icons.reload);
 			itemSaveScreenshot = createItem("Save Screenshot to Disk...", "Save screenshot to disk.", KeyEvent.VK_F12, Icons.disk);
 			itemImgurLink = createItem("Get Imgur Link", "Get an Imgur link of your screenshot to share.", KeyEvent.VK_F11, Icons.imgur);
-			itemCredits = createItem("Credits", "Who made this tol", 0, Icons.new_);
+			itemControls = createItem("Quick Controls", "Some useful controls", 0, Icons.keyboard);
+			itemCredits = createItem("Credits", "Who made this tool", 0, Icons.drink);
 		}
 
 		initActions();
@@ -144,6 +146,7 @@ public class GuiMain extends JMenuBar
 		otherMenu.add(itemReloadTextures);
 		otherMenu.add(itemSaveScreenshot);
 		otherMenu.add(itemImgurLink);
+		otherMenu.add(itemControls);
 		otherMenu.add(itemCredits);
 
 		menuFile.add(itemNew);
@@ -291,6 +294,7 @@ public class GuiMain extends JMenuBar
 		{
 			ModelCreator.singleTextureMode = itemSingleTexture.isSelected();
 			ModelCreator.prefs.putBoolean("singleTextureMode", ModelCreator.singleTextureMode);
+			if (ModelCreator.singleTextureMode) ModelCreator.currentProject.applySingleTextureMode();
 			ModelCreator.updateValues();
 		});
 
@@ -309,6 +313,12 @@ public class GuiMain extends JMenuBar
 		{
 			CreateImgurLink();
 			
+		});
+		
+		
+		itemControls.addActionListener(a ->
+		{
+			ControlsDialog.show(creator);
 		});
 		
 		itemCredits.addActionListener(a ->

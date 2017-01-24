@@ -104,7 +104,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		add(scrollPane);
 
 		tabbedPane.add("Cube", new ElementPanel(this));
-		tabbedPane.add("Faces", new FacePanel(this));
+		tabbedPane.add("Face", new FacePanel(this));
 		tabbedPane.add("Keyframe", rightKeyFramesPanel = new RightKeyFramesPanel());
 		tabbedPane.add("P", new AttachmentPointsPanel());
 		
