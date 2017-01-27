@@ -298,6 +298,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static void updateFrame() {
 		if (currentProject == null) return;
 		
+		
 		leftKeyframesPanel.updateFrame();
 		((RightTopPanel)manager).updateFrame();
 		updateTitle();
@@ -371,7 +372,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			
 			if (currentProject != null && currentProject.SelectedAnimation != null && currentProject.PlayAnimation) {
 				currentProject.SelectedAnimation.NextFrame();
-				updateFrame();
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() { updateFrame(); } 
+				});
+				
 			}
 			
 			// Don't run faster than ~30 FPS (1000 / 30 = 33ms)

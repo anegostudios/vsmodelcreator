@@ -273,7 +273,7 @@ public class KeyframeElement implements IDrawable
 	public KeyframeElement clone() {
 		KeyframeElement cloned = new KeyframeElement(IsKeyFrame);
 		
-		cloned.AnimatedElementName = ParentElement == null ? AnimatedElementName : ((Element)ParentElement).name;
+		cloned.AnimatedElementName = ParentElement == null ? AnimatedElementName : ((Element)AnimatedElement).name;
 		cloned.PositionSet = PositionSet;
 		cloned.RotationSet = RotationSet;
 		cloned.StretchSet = StretchSet;

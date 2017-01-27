@@ -133,17 +133,17 @@ public class Animation
 	
 	
 	KeyframeElement createEmptyFrameForElement(Element element, int frameNumber) { 
-		KeyframeElement elem = new KeyframeElement(element, false);
-		elem.FrameNumber = frameNumber;
+		KeyframeElement kelem = new KeyframeElement(element, false);
+		kelem.FrameNumber = frameNumber;
 		
 		for (Element child : element.ChildElements) {
 			KeyframeElement childKeyFrameElem = createEmptyFrameForElement(child, frameNumber);
-			childKeyFrameElem.ParentElement = elem;
+			childKeyFrameElem.ParentElement = kelem;
 			
-			elem.ChildElements.add(childKeyFrameElem);
+			kelem.ChildElements.add(childKeyFrameElem);
 		}
 				
-		return elem;
+		return kelem;
 	}
 	
 	
