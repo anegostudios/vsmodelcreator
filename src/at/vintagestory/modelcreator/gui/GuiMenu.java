@@ -1,5 +1,6 @@
 package at.vintagestory.modelcreator.gui;
 
+import java.awt.ItemSelectable;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -24,11 +25,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.util.UVMapExporter;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCallback;
 import at.vintagestory.modelcreator.util.screenshot.Uploader;
 
-public class GuiMain extends JMenuBar
+public class GuiMenu extends JMenuBar
 {
 	private static final long serialVersionUID = 1L;
 
@@ -40,6 +42,7 @@ public class GuiMain extends JMenuBar
 	private JMenuItem itemLoad;
 	private JMenuItem itemSave;
 	private JMenuItem itemSaveAs;
+	private JMenuItem itemExportUvMap;
 	private JMenuItem itemTexturePath;
 	private JMenuItem itemExit;
 
@@ -54,6 +57,7 @@ public class GuiMain extends JMenuBar
 	private JCheckBoxMenuItem itemTransparency;
 	private JCheckBoxMenuItem itemUnlockAngles;
 	private JCheckBoxMenuItem itemSingleTexture;
+	private JMenuItem itemNoTextureSize;
 	
 	/* Add */
 	private JMenu menuAdd;
@@ -69,7 +73,7 @@ public class GuiMain extends JMenuBar
 	private JMenuItem itemControls;
 	private JMenuItem itemCredits;
 
-	public GuiMain(ModelCreator creator)
+	public GuiMenu(ModelCreator creator)
 	{
 		this.creator = creator;
 		initMenu();
@@ -84,6 +88,7 @@ public class GuiMain extends JMenuBar
 			itemSave = createItem("Save...", "Save JSON", KeyEvent.VK_S, new ImageIcon(getClass().getClassLoader().getResource("icons/disk.png")));
 			itemSaveAs = createItem("Save as...", "Save JSON", KeyEvent.VK_E, new ImageIcon(getClass().getClassLoader().getResource("icons/export.png")));
 			itemTexturePath = createItem("Set Texture Path...", "Set the base path to look for textures", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
+			itemExportUvMap = createItem("Export UV Map...", "Lets you export a UV map when in single texture mode", KeyEvent.VK_U, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
 			itemExit = createItem("Exit", "Exit Application", KeyEvent.VK_Q, new ImageIcon(getClass().getClassLoader().getResource("icons/exit.png")));
 		}
 		
@@ -106,6 +111,7 @@ public class GuiMain extends JMenuBar
 			itemUnlockAngles.setSelected(ModelCreator.unlockAngles);
 			
 			itemSingleTexture = createCheckboxItem("Single Texture for all Faces", "When creating entities, it is often more useful to use only a single texture.", 0, Icons.transparent);
+			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);
 			
 			itemGrid.setSelected(ModelCreator.showGrid);
 			itemTransparency.setSelected(ModelCreator.transparent);
@@ -136,6 +142,7 @@ public class GuiMain extends JMenuBar
 		menuOptions.add(itemTransparency);
 		menuOptions.add(itemUnlockAngles);
 		menuOptions.add(itemSingleTexture);
+		menuOptions.add(itemNoTextureSize);
 		
 		menuAdd.add(itemAddCube);
 		menuAdd.add(itemAddFace);
@@ -156,6 +163,7 @@ public class GuiMain extends JMenuBar
 		menuFile.add(itemSaveAs);
 		menuFile.addSeparator();
 		menuFile.add(itemTexturePath);
+		menuFile.add(itemExportUvMap);
 		menuFile.addSeparator();
 		menuFile.add(itemExit);
 
@@ -224,12 +232,10 @@ public class GuiMain extends JMenuBar
 		
 
 		ActionListener listener = a -> { OnNewModel(); }; 
-		//registerKeyboardAction(listener, strokes[0], WHEN_IN_FOCUSED_WINDOW);
 		itemNew.addActionListener(listener);
 
 
 		listener = e -> { OnLoadFile(); };	
-		//registerKeyboardAction(listener, strokes[1], WHEN_IN_FOCUSED_WINDOW);
 		itemLoad.addActionListener(listener);
 		
 
@@ -241,7 +247,6 @@ public class GuiMain extends JMenuBar
 			}
 		};
 		
-		//registerKeyboardAction(listener, strokes[2], WHEN_IN_FOCUSED_WINDOW);
 		itemSave.addActionListener(listener);
 		
 
@@ -260,9 +265,40 @@ public class GuiMain extends JMenuBar
 				ModelCreator.prefs.put("texturePath", chooser.getSelectedFile().getAbsolutePath());
 			}
 		};
-		//registerKeyboardAction(listener, strokes[3], WHEN_IN_FOCUSED_WINDOW);
+
 		itemTexturePath.addActionListener(listener);
 
+		itemExportUvMap.setEnabled(ModelCreator.singleTextureMode);
+		itemExportUvMap.addActionListener(e -> {
+			JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
+			chooser.setDialogTitle("Output Directory");
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			chooser.setApproveButtonText("Export");
+
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG (.png)", "png");
+			chooser.setFileFilter(filter);
+
+			int returnVal = chooser.showOpenDialog(null);
+			if (returnVal == JFileChooser.APPROVE_OPTION)
+			{
+				if (chooser.getSelectedFile().exists())
+				{
+					returnVal = JOptionPane.showConfirmDialog(null, "A file already exists with that name, are you sure you want to override?", "Warning", JOptionPane.YES_NO_OPTION);
+				}
+				if (returnVal != JOptionPane.NO_OPTION && returnVal != JOptionPane.CLOSED_OPTION)
+				{
+					String filePath = chooser.getSelectedFile().getAbsolutePath();
+					ModelCreator.prefs.put("filePath", filePath);
+					
+					if (!filePath.endsWith(".png")) {
+						chooser.setSelectedFile(new File(filePath + ".png"));
+					}
+					
+					UVMapExporter exporter = new UVMapExporter();
+					exporter.Export(chooser.getSelectedFile().getAbsolutePath());
+				}
+			}
+		});
 		
 		itemExit.addActionListener(e ->
 		{
@@ -297,6 +333,11 @@ public class GuiMain extends JMenuBar
 			if (ModelCreator.singleTextureMode) ModelCreator.currentProject.applySingleTextureMode();
 			ModelCreator.updateValues();
 		});
+		
+		itemNoTextureSize.addActionListener(a -> {
+			TextureSizeDialog.show(creator);
+		});
+		itemNoTextureSize.setEnabled(ModelCreator.singleTextureMode);
 
 		
 		itemReloadTextures.addActionListener(a -> {
@@ -336,6 +377,9 @@ public class GuiMain extends JMenuBar
 		{
 			ModelCreator.currentProject.addElementAsChild(new Element(1, 1));
 		});
+		
+		
+		
 	}
 	
 	
@@ -452,7 +496,7 @@ public class GuiMain extends JMenuBar
 								message.setMessage("Failed to upload screenshot. Check your internet connection then try again.");
 							}
 
-							JDialog dialog = message.createDialog(GuiMain.this, title);
+							JDialog dialog = message.createDialog(GuiMenu.this, title);
 							dialog.setLocationRelativeTo(null);
 							dialog.setModal(false);
 							dialog.setVisible(true);
@@ -476,6 +520,9 @@ public class GuiMain extends JMenuBar
 		
 		itemAddCube.setEnabled(enabled);
 		itemAddFace.setEnabled(enabled);
+		
+		itemNoTextureSize.setEnabled(ModelCreator.singleTextureMode);
+		itemExportUvMap.setEnabled(ModelCreator.singleTextureMode);
 	}
 	
 	public void updateFrame() {

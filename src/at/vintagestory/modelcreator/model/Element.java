@@ -246,7 +246,7 @@ public class Element implements IDrawable
 	public void recalculateBrightnessValues() {
 		for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
 			if (shade) {
-				brightnessByFace[i] = getFaceBrightness(BlockFacing.ALLFACES[i], (float)rotationX, (float)rotationY, (float)rotationZ);	
+				brightnessByFace[i] = getFaceBrightness(BlockFacing.ALLFACES[i]);	
 			} else {
 				brightnessByFace[i] = 1;
 			}
@@ -254,12 +254,12 @@ public class Element implements IDrawable
 		}
 	}
 	
-	public float getFaceBrightness(BlockFacing facing, float rotX, float rotY, float rotZ) {
+	public float getFaceBrightness(BlockFacing facing) {
 		float[] matrix = Mat4f.Create();
         
-        Mat4f.RotateX(matrix, matrix, rotX * GameMath.DEG2RAD);            
-        Mat4f.RotateY(matrix, matrix, rotY * GameMath.DEG2RAD);
-        Mat4f.RotateZ(matrix, matrix, rotZ * GameMath.DEG2RAD);
+        Mat4f.RotateX(matrix, matrix, (float)rotationX * GameMath.DEG2RAD);            
+        Mat4f.RotateY(matrix, matrix, (float)rotationY * GameMath.DEG2RAD);
+        Mat4f.RotateZ(matrix, matrix, (float)rotationZ * GameMath.DEG2RAD);
         
         float[] pos = new float[] { facing.GetFacingVector().X, facing.GetFacingVector().Y, facing.GetFacingVector().Z, 1 };
         pos = Mat4f.MulWithVec4(matrix, pos);

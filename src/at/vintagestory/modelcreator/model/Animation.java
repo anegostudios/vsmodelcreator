@@ -34,8 +34,8 @@ public class Animation
 	public void calculateAllFrames(Project project) {
 		// We'll use a simple, slightly memory intensive but cpu friendly solution
 		// Static models are tree hierarchies of boxes
-		// So let's just built up one complete static model for each frame (only storing they keyframe data, but still a tree hierarchy and referencing the static box)
-		// simply select the right one for a given frame, and add up static model value with keyframe value
+		// So let's just built up one complete static model for each frame (only storing the keyframe data, but still a tree hierarchy and referencing the static box)
+		
 		
 		// 1. Build up an empty list of all frames
 		allFrames.clear();
@@ -59,7 +59,7 @@ public class Animation
 		// - Loop through all Key frames
 		//   - Loop through all key frame elements
 		//     - Loop through all 3 data groups (position, rotation, stretch)
-		//       - Get next frame. Interpolate all frames betweeen current and next frame.
+		//       - Get next key frame. Interpolate all frames between current and next keyframe.
 		
 		for (int i = 0; i < keyframes.length; i++) {
 			for (IDrawable drawable : keyframes[i].Elements) {
@@ -74,25 +74,25 @@ public class Animation
 	
 
 	
-	void lerpKeyFrameElement(int keyFrameIndex, KeyframeElement prevkelem) {
+	void lerpKeyFrameElement(int keyFrameIndex, KeyframeElement curKelem) {
 		//System.out.println("lerp key frame element " + prevkelem.AnimatedElement.name + " for frame " + prevkelem.FrameNumber);
 		
 		for (int flag = 0; flag < 3; flag++) {
-			if (!prevkelem.IsSet(flag)) continue;
+			if (!curKelem.IsSet(flag)) continue;
 			
-			KeyframeElement nextkelem = getNextKeyFrameElement(keyFrameIndex, prevkelem.AnimatedElement, flag);
+			KeyframeElement nextkelem = getNextKeyFrameElementForFlag(keyFrameIndex, curKelem.AnimatedElement, flag);
 
 			int startFrame;
 			int frames;
 
-			if (nextkelem == null || prevkelem == nextkelem) {
+			if (nextkelem == null || curKelem == nextkelem) {
 				startFrame = 0;
 				frames = quantityFrames;
-				nextkelem = prevkelem;
+				nextkelem = curKelem;
 			} else {
-				startFrame = prevkelem.FrameNumber;
-				frames = nextkelem.FrameNumber - prevkelem.FrameNumber;
-				if (frames < 0) frames = nextkelem.FrameNumber + (quantityFrames - prevkelem.FrameNumber);
+				startFrame = curKelem.FrameNumber;
+				frames = nextkelem.FrameNumber - curKelem.FrameNumber;
+				if (frames < 0) frames = nextkelem.FrameNumber + (quantityFrames - curKelem.FrameNumber);
 			}
 			
 			//System.out.println("lerp frames " + (startFrame) + " - " + (startFrame + frames));
@@ -100,19 +100,19 @@ public class Animation
 			for (int x = 0; x < frames; x++) {
 				int frame = (startFrame + x) % quantityFrames;
 				
-				KeyframeElement kelem = allFrames.get(frame).GetKeyFrameElement(prevkelem.AnimatedElement);
-				lerpKeyFrameElement(kelem, prevkelem, nextkelem, flag, x);
+				KeyframeElement kelem = allFrames.get(frame).GetKeyFrameElement(curKelem.AnimatedElement);
+				lerpKeyFrameElement(kelem, curKelem, nextkelem, flag, x);
 			}
 		}
 		
 		
-		for (IDrawable childKelem : prevkelem.ChildElements) {
+		for (IDrawable childKelem : curKelem.ChildElements) {
 			lerpKeyFrameElement(keyFrameIndex, (KeyframeElement)childKelem);
 		}
 	}
 	
 	
-	KeyframeElement getNextKeyFrameElement(int index, Element forElement, int forFlag) {
+	KeyframeElement getNextKeyFrameElementForFlag(int index, Element forElement, int forFlag) {
 		Keyframe nextkeyframe;
 		
 		int j = index + 1;
@@ -147,7 +147,7 @@ public class Animation
 	}
 	
 	
-	void lerpKeyFrameElement(KeyframeElement keyFrameElem, KeyframeElement prev, KeyframeElement next, int forFlag, int relativeFrame) { 
+	void lerpKeyFrameElement(KeyframeElement frameElem, KeyframeElement prev, KeyframeElement next, int forFlag, int relativeFrame) { 
 		if (prev == null && next == null) return;
 		
 		double t = 0;
@@ -160,20 +160,20 @@ public class Animation
 		}
 		
 		if (forFlag == 0) {
-			keyFrameElem.setOffsetX(lerp(t, prev.getOffsetX(), next.getOffsetX()));
-			keyFrameElem.setOffsetY(lerp(t, prev.getOffsetY(), next.getOffsetY()));
-			keyFrameElem.setOffsetZ(lerp(t, prev.getOffsetZ(), next.getOffsetZ()));		
-			keyFrameElem.PositionSet = true;
+			frameElem.setOffsetX(lerp(t, prev.getOffsetX(), next.getOffsetX()));
+			frameElem.setOffsetY(lerp(t, prev.getOffsetY(), next.getOffsetY()));
+			frameElem.setOffsetZ(lerp(t, prev.getOffsetZ(), next.getOffsetZ()));		
+			frameElem.PositionSet = true;
 		} else if(forFlag == 1) {			
-			keyFrameElem.setRotationX(lerp(t, prev.getRotationX(), next.getRotationX()));
-			keyFrameElem.setRotationY(lerp(t, prev.getRotationY(), next.getRotationY()));
-			keyFrameElem.setRotationZ(lerp(t, prev.getRotationZ(), next.getRotationZ()));
-			keyFrameElem.RotationSet = true;
+			frameElem.setRotationX(lerp(t, prev.getRotationX(), next.getRotationX()));
+			frameElem.setRotationY(lerp(t, prev.getRotationY(), next.getRotationY()));
+			frameElem.setRotationZ(lerp(t, prev.getRotationZ(), next.getRotationZ()));
+			frameElem.RotationSet = true;
 		} else {
-			keyFrameElem.setStretchX(lerp(t, prev.getRotationX(), next.getRotationX()));
-			keyFrameElem.setStretchY(lerp(t, prev.getRotationY(), next.getRotationY()));
-			keyFrameElem.setStretchZ(lerp(t, prev.getRotationZ(), next.getRotationZ()));
-			keyFrameElem.StretchSet = true;
+			frameElem.setStretchX(lerp(t, prev.getRotationX(), next.getRotationX()));
+			frameElem.setStretchY(lerp(t, prev.getRotationY(), next.getRotationY()));
+			frameElem.setStretchZ(lerp(t, prev.getRotationZ(), next.getRotationZ()));
+			frameElem.StretchSet = true;
 		}
 	}
 	
@@ -432,7 +432,7 @@ public class Animation
 		kElem.FrameNumber = keyframe.getFrameNumber();
 		
 		for (IDrawable childElem : kElem.ChildElements) {
-			((KeyframeElement)childElem).ParentElement = kElem.AnimatedElement;
+			((KeyframeElement)childElem).ParentElement = kElem;
 			((KeyframeElement)childElem).FrameNumber = keyframe.getFrameNumber();
 			
 			ResolveElem(project, keyframe, (KeyframeElement)childElem);
@@ -455,6 +455,7 @@ public class Animation
 		Keyframe curFrame = null;
 		Keyframe prevFrame = null;
 		Keyframe nextFrame = null;
+		
 		for (int i = 0; i < keyframes.length; i++) {
 			if (keyframes[i].getFrameNumber() == this.currentFrame) {
 				curFrame = keyframes[i];

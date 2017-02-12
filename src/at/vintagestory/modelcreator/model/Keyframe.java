@@ -25,19 +25,16 @@ public class Keyframe
 	}
 	
 	public void RemoveElement(KeyframeElement element) {
-		KeyframeElement walkElem = (KeyframeElement)element.ParentElement;
+		KeyframeElement parentElem = (KeyframeElement)element.ParentElement;
 		
-		if (walkElem == null) {
+		if (parentElem == null) {
 			Elements.remove(element);
 			if (IsKeyFrame) ModelCreator.DidModify();
 			return;
 		}
 		
-		while (walkElem.ParentElement != null) {
-			 walkElem = (KeyframeElement)walkElem.ParentElement;
-		}
+		parentElem.ChildElements.remove(parentElem);
 		
-		Elements.remove(walkElem);
 		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 	
@@ -61,6 +58,7 @@ public class Keyframe
 		return findChildElement(elems, forElem);
 	}
 	
+	
 	KeyframeElement findChildElement(List<IDrawable> elems, Element forElem) {
 		KeyframeElement keyframeElem;
 		for (int i = 0; i < elems.size(); i++) {
@@ -70,6 +68,7 @@ public class Keyframe
 		
 		return null;
 	}
+	
 
 	public int getFrameNumber()
 	{

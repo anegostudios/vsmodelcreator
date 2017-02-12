@@ -39,7 +39,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
-import at.vintagestory.modelcreator.gui.GuiMain;
+import at.vintagestory.modelcreator.gui.GuiMenu;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.gui.left.LeftKeyFramesPanel;
 import at.vintagestory.modelcreator.gui.left.LeftSidebar;
@@ -74,6 +74,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static boolean transparent = true;
 	public static boolean unlockAngles = false;
 	public static boolean singleTextureMode = false;
+	public static int noTexWidth = 32;
+	public static int noTexHeight = 32;
 
 	// Canvas Variables
 	private final static AtomicReference<Dimension> newCanvasSize = new AtomicReference<Dimension>();
@@ -97,7 +99,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	private final int SIDEBAR_WIDTH = 130;
 	
 	public LeftSidebar uvSidebar;
-	public static GuiMain guiMain;
+	public static GuiMenu guiMain;
 	public static LeftKeyFramesPanel leftKeyframesPanel;
 	public static boolean renderAttachmentPoints;
 
@@ -119,6 +121,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		singleTextureMode = prefs.getBoolean("singleTextureMode", false);
 		unlockAngles = prefs.getBoolean("unlockAngles", false);
 		showGrid = prefs.getBoolean("showGrid", false);
+		noTexWidth = prefs.getInt("noTexWidth", 32);
+		noTexHeight = prefs.getInt("noTexHeight", 32);
 		
 		Instance = this;
 		
@@ -252,7 +256,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		uvSidebar = new LeftUVSidebar("UV Editor", manager);
 		
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-		setJMenuBar(guiMain = new GuiMain(this));
+		setJMenuBar(guiMain = new GuiMenu(this));
 	}
 
 	private List<Image> getIcons()

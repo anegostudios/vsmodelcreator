@@ -421,6 +421,10 @@ public class Face
 		return -1;
 	}
 
+	public Color getFaceColor() {
+		return ColorsByFace[side];	
+	}
+	
 	public static Color getFaceColour(int side)
 	{
 		return ColorsByFace[side];

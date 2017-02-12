@@ -42,7 +42,7 @@ public class KeyframeElement implements IDrawable
 	
 	public Element AnimatedElement;
 	public int FrameNumber;
-	IDrawable ParentElement;
+	KeyframeElement ParentElement;
 	public boolean IsKeyFrame;
 
 	

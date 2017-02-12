@@ -19,6 +19,8 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex2d;
 import static org.lwjgl.opengl.GL11.glVertex2i;
 
+import java.util.ArrayList;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
@@ -61,26 +63,26 @@ public class LeftUVSidebar extends LeftSidebar
 		}		
 
 		if (ModelCreator.singleTextureMode) {
-			draw1(canvasHeight);
+			drawSingleSquare(canvasHeight);
 		} else {
-			draw6(canvasHeight);
+			drawBoxSquares(canvasHeight);
 		}
 		
 		if (ModelCreator.transparent) {
 			GL11.glDisable(GL11.GL_BLEND);
 		}
-
 	}
 	
-	void draw1(int canvasHeight) {
-		Element elem = manager.getCurrentElement();
-		
+	void drawSingleSquare(int canvasHeight) {
 		double texWidth = 16.0;
 		double texHeight = 16.0;
 		
 		if (ModelCreator.currentProject.Textures.size() > 0) {
 			texWidth = ModelCreator.currentProject.Textures.get(0).Width / 2.0;
 			texHeight = ModelCreator.currentProject.Textures.get(0).Height / 2.0;
+		} else {
+			texWidth = ModelCreator.noTexWidth / 2.0;
+			texHeight = ModelCreator.noTexHeight / 2.0;
 		}
 		
 		int width = 2 * WIDTH;
@@ -95,21 +97,12 @@ public class LeftUVSidebar extends LeftSidebar
 
 			glPushMatrix(); {
 				
-				Color color = Face.getFaceColour(0);
-				glColor3f(color.r, color.g, color.b);
+				glColor3f(1, 1, 1);
 
-				Face[] faces = null;
-				if (elem != null) {
-					faces = elem.getAllFaces();
+				if (ModelCreator.currentProject.rootElements.size() > 0) {
+					Element elem = ModelCreator.currentProject.rootElements.get(0);	
+					elem.getAllFaces()[0].bindTexture();
 				}
-
-				if (faces == null) {
-					glPopMatrix();
-					glPopMatrix();
-					return;
-				}
-				
-				faces[0].bindTexture();
 				
 				glLineWidth(1F);
 				glBegin(GL_QUADS);
@@ -130,26 +123,8 @@ public class LeftUVSidebar extends LeftSidebar
 				
 				TextureImpl.bindNone();
 				
-				for (int i = 0; i < 6; i++) {
-					glColor3f(1, 1, 1);
-
-					glBegin(GL_LINES);
-					{
-						glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
-						glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
-
-						glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
-						glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
-
-						glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
-						glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
-
-						glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
-						glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
-
-					}
-					glEnd();
-				}
+				drawElementList(ModelCreator.currentProject.rootElements, scaledTexWidth, scaledTexHeight);
+				
 				
 				glPopMatrix();
 			}
@@ -158,7 +133,58 @@ public class LeftUVSidebar extends LeftSidebar
 		
 	}
 	
-	void draw6(int canvasHeight) {
+	private void drawElementList(ArrayList<Element> elems, double scaledTexWidth, double scaledTexHeight)
+	{
+		for (Element elem : elems) {
+			Face[] faces = elem.getAllFaces();
+			
+			for (int i = 0; i < 6; i++) {
+				Color color = Face.getFaceColour(i);
+				GL11.glColor4f(color.r * elem.brightnessByFace[i], color.g * elem.brightnessByFace[i], color.b * elem.brightnessByFace[i], 0.3f);
+	
+				glBegin(GL_QUADS);
+				{
+					glTexCoord2f(0, 1);
+					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+					
+					glTexCoord2f(1, 1);
+					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+					
+					glTexCoord2f(1, 0);
+					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+	
+					glTexCoord2f(0, 0);
+					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+				}
+				glEnd();
+	
+				
+				glColor3f(0.5f, 0.5f, 0.5f);
+	
+				glBegin(GL_LINES);
+				{
+					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+	
+					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+	
+					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+	
+					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+	
+				}
+				glEnd();
+			}
+			
+			drawElementList(elem.ChildElements, scaledTexWidth, scaledTexHeight);
+		}
+		
+	}
+
+	void drawBoxSquares(int canvasHeight) {
 		Element elem = manager.getCurrentElement();
 		
 		float[] bright = elem != null ? elem.brightnessByFace : brightnessByFace;
