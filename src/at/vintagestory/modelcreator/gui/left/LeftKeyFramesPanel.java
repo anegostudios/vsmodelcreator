@@ -40,9 +40,9 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	private IElementManager manager;
 	
 	private JComboBox<String> animationsList;
-	JButton animationAddRemoveButton;
-	
 	private DefaultComboBoxModel<String> animationsListModel;
+	JButton animationAddRemoveButton;	
+	
 	AbstractTableModel tableModel;
 	
 	JTextField durationTextField;
@@ -166,7 +166,12 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		animationsList.addActionListener(e ->
 		{
 			int selectedIndex = animationsList.getSelectedIndex();
-			ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.Animations.get(selectedIndex);
+			if (selectedIndex > 0) {
+				ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.Animations.get(selectedIndex);	
+			} else {
+				ModelCreator.currentProject.SelectedAnimation = null;	
+			}
+			
 			ModelCreator.updateValues();
 		});
 		

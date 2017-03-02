@@ -5,6 +5,7 @@ import java.util.List;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
+import at.vintagestory.modelcreator.enums.*;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.util.Vec3f;
 
@@ -14,6 +15,10 @@ public class Animation
 	int quantityFrames;
 	private String name;
 	public Keyframe[] keyframes = new Keyframe[0];
+	
+	public EnumEntityActivity ForActivity;
+    public EnumEntityActivityStoppedHandling OnActivityStopped = EnumEntityActivityStoppedHandling.Rewind;
+    public EnumEntityAnimationEndHandling OnAnimationEnd = EnumEntityAnimationEndHandling.Repeat;
 	
 		
 	// Non-persistent animation data 

@@ -160,6 +160,16 @@ public class Exporter
 		writer.newLine();
 		writer.write(space(3) + "\"quantityframes\": " + animation.GetQuantityFrames() + ",");
 		writer.newLine();
+		
+		writer.write(space(3) + "\"forActivity\": \"" + animation.ForActivity + "\",");
+		writer.newLine();
+		
+		writer.write(space(3) + "\"onActivityStopped\": \"" + animation.OnActivityStopped + "\",");
+		writer.newLine();
+		
+		writer.write(space(3) + "\"onAnimationEnd\": \"" + animation.OnAnimationEnd + "\",");
+		writer.newLine();
+		
 		writer.write(space(3) + "\"keyframes\": [");
 		writer.newLine();
 		for (int i = 0; i < animation.keyframes.length; i++) {

@@ -1,6 +1,5 @@
 package at.vintagestory.modelcreator.gui;
 
-import java.awt.ItemSelectable;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
