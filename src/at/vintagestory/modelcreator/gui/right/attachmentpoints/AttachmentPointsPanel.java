@@ -90,7 +90,7 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 		btnAdd.setToolTipText("New Element");
 		btnAdd.addActionListener(e -> {
 			if (ModelCreator.currentProject.SelectedElement == null) return;
-			ModelCreator.currentProject.SelectedAttachmentPoint = ModelCreator.currentProject.SelectedElement.AddNewAttachmentPoint();
+			ModelCreator.currentProject.SelectedAttachmentPoint = ModelCreator.currentProject.SelectedElement.addNewAttachmentPoint();
 			updateValues();
 			
 		});
@@ -103,7 +103,7 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 		btnRemove.setToolTipText("Remove Element");
 		btnRemove.addActionListener(e -> { 
 			if (ModelCreator.currentProject.SelectedElement == null) return;
-			ModelCreator.currentProject.SelectedElement.RemoveCurrentAttachmentPoint();
+			ModelCreator.currentProject.SelectedElement.removeCurrentAttachmentPoint();
 			ModelCreator.currentProject.SelectedAttachmentPoint = null;
 			updateValues();
 		});

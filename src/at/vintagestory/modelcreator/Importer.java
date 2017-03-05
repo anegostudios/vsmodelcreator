@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 
@@ -19,7 +19,6 @@ import com.google.gson.JsonParser;
 import at.vintagestory.modelcreator.enums.EnumEntityActivity;
 import at.vintagestory.modelcreator.enums.EnumEntityActivityStoppedHandling;
 import at.vintagestory.modelcreator.enums.EnumEntityAnimationEndHandling;
-import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
@@ -35,7 +34,6 @@ public class Importer
 
 	
 	private String inputPath;
-	
 	Project project;
 
 
@@ -94,7 +92,7 @@ public class Importer
 				{
 					if (!elements.get(i).isJsonObject()) continue;
 					
-					Element elem = readElement(elements.get(i).getAsJsonObject());
+					Element elem = readElement(elements.get(i).getAsJsonObject(), null);
 					if (elem != null) {
 						project.rootElements.add(elem);
 					}
@@ -219,16 +217,14 @@ public class Importer
 		Keyframe keyframe = new Keyframe(true);
 		keyframe.setFrameNumber(obj.get("frame").getAsInt());
 		
-		if (obj.has("elements") && obj.get("elements").isJsonArray()) {
-			JsonArray keyframeelems = obj.get("elements").getAsJsonArray();
-
-			keyframe.Elements = new ArrayList<IDrawable>();
+		if (obj.has("elements") && obj.get("elements").isJsonObject()) {
 			
-			for (int i = 0; i < keyframeelems.size(); i++)
-			{
-				if (!keyframeelems.get(i).isJsonObject()) continue;
+			Set<Entry<String, JsonElement>> elems = obj.get("elements").getAsJsonObject().entrySet();
+			
+			for (Entry<String, JsonElement> elem : elems) {
+				KeyframeElement keyframeElem = readKeyframeElemenet(elem.getValue().getAsJsonObject(), elem.getKey());
 				
-				keyframe.Elements.add(readKeyframeElemenet(keyframeelems.get(i).getAsJsonObject()));
+				keyframe.AddElementFromImport(project, keyframeElem);
 			}
 		}
 		
@@ -237,11 +233,11 @@ public class Importer
 	
 	
 
-	private IDrawable readKeyframeElemenet(JsonObject obj)
+	private KeyframeElement readKeyframeElemenet(JsonObject obj, String name)
 	{
 		KeyframeElement kelem = new KeyframeElement(true);
 		
-		kelem.AnimatedElementName = obj.get("animatedElement").getAsString();
+		kelem.AnimatedElementName = name; // obj.get("animatedElement").getAsString();
 		
 		if (obj.has("offsetX") || obj.has("offsetY") || obj.has("offsetZ")) {
 			kelem.PositionSet = true;
@@ -264,23 +260,10 @@ public class Importer
 			kelem.setStretchZ(obj.get("stretchZ").getAsDouble());
 		}
 		
-		if (obj.has("children") && obj.get("children").isJsonArray()) {
-			JsonArray children = obj.get("children").getAsJsonArray();
-
-			kelem.ChildElements = new ArrayList<IDrawable>();
-			
-			for (int i = 0; i < children.size(); i++)
-			{
-				if (!children.get(i).isJsonObject()) continue;
-				
-				kelem.ChildElements.add(readKeyframeElemenet(children.get(i).getAsJsonObject()));
-			}
-		}
-		
 		return kelem;
 	}
 
-	private Element readElement(JsonObject obj)
+	private Element readElement(JsonObject obj, Element parent)
 	{
 		String name = "Element";
 		JsonArray from = null;
@@ -384,7 +367,7 @@ public class Importer
 				JsonArray children = obj.get("children").getAsJsonArray();
 				for(JsonElement child : children) {
 					if (child.isJsonObject()) {
-						element.ChildElements.add(readElement(child.getAsJsonObject()));
+						element.ChildElements.add(readElement(child.getAsJsonObject(), element));
 					}
 				}
 			
@@ -398,6 +381,9 @@ public class Importer
 					}
 				}
 			}
+			
+			element.ParentElement = parent;
+			
 			return element;
 		}
 		return null;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 
 public class Keyframe
@@ -19,7 +20,13 @@ public class Keyframe
 	}
 	
 	
-	public void AddElement(KeyframeElement keyfElem) {
+	public void AddElementFromImport(Project project, KeyframeElement keyfElem) {
+		Element elem = project.findElement(keyfElem.AnimatedElementName);
+		KeyframeElement kelem = GetOrCreateKeyFrameElement(elem);
+		kelem.setFrom(keyfElem);
+	}
+	
+	public void AddElementDirectly(KeyframeElement keyfElem) {
 		Elements.add(keyfElem);
 		if (IsKeyFrame) ModelCreator.DidModify();
 	}
@@ -57,6 +64,48 @@ public class Keyframe
 		
 		return findChildElement(elems, forElem);
 	}
+	
+	
+	
+	public KeyframeElement GetOrCreateKeyFrameElement(Element forElem) { 
+		KeyframeElement keyframeElem = GetKeyFrameElement(forElem);
+		
+		if (keyframeElem != null) {
+			return keyframeElem;
+		}
+		
+		List<Element> path = forElem.GetParentPath();
+		
+		
+		if (path.size() == 0) {
+			keyframeElem = new KeyframeElement(forElem, true);
+			AddElementDirectly(keyframeElem);	
+			ModelCreator.DidModify();
+		} else if (path.size() == 1) {
+			KeyframeElement parent = GetOrCreateKeyFrameElement(path.get(0));
+			keyframeElem = parent.GetOrCreateChildElement(forElem);
+			
+		} else {
+			KeyframeElement parent = GetOrCreateKeyFrameElement(path.get(0));
+			path.remove(0);
+			
+			while (path.size() > 0) {
+				Element childElem = path.get(0);
+				path.remove(0);
+				keyframeElem = parent.GetOrCreateChildElement(childElem);
+				parent = keyframeElem;
+			}
+			
+			keyframeElem = keyframeElem.GetOrCreateChildElement(forElem);
+		}
+		
+		keyframeElem.FrameNumber = FrameNumber;
+		
+		return keyframeElem;
+	}
+	
+	
+	
 	
 	
 	KeyframeElement findChildElement(List<IDrawable> elems, Element forElem) {

@@ -68,6 +68,7 @@ public class KeyframeElement implements IDrawable
 	public KeyframeElement(Element cuboid, boolean IsKeyFrame)
 	{
 		this.AnimatedElement = cuboid;
+		this.AnimatedElementName = cuboid.name;
 		this.IsKeyFrame = IsKeyFrame;
 		
 	}
@@ -106,6 +107,9 @@ public class KeyframeElement implements IDrawable
 			GL11.glDisable(GL_CULL_FACE);
 			GL11.glTranslated(originX, originY, originZ);
 			rotateAxis();
+			
+			GL11.glScaled(stretchX, stretchY, stretchZ);
+			
 			GL11.glTranslated(-originX, -originY, -originZ);
 			
 			GL11.glTranslated(startX, startY, startZ);
@@ -273,7 +277,7 @@ public class KeyframeElement implements IDrawable
 	public KeyframeElement clone() {
 		KeyframeElement cloned = new KeyframeElement(IsKeyFrame);
 		
-		cloned.AnimatedElementName = ParentElement == null ? AnimatedElementName : ((Element)AnimatedElement).name;
+		cloned.AnimatedElementName = AnimatedElement == null ? AnimatedElementName : ((Element)AnimatedElement).name;
 		cloned.PositionSet = PositionSet;
 		cloned.RotationSet = RotationSet;
 		cloned.StretchSet = StretchSet;
@@ -292,7 +296,26 @@ public class KeyframeElement implements IDrawable
 		}
 		
 		cloned.FrameNumber = FrameNumber;
-		
 		return cloned;
+	}
+	
+	
+	public void setFrom(KeyframeElement kelem) {
+		AnimatedElementName = kelem.AnimatedElementName;
+		PositionSet = kelem.PositionSet;
+		RotationSet = kelem.RotationSet;
+		StretchSet = kelem.StretchSet;
+		offsetX = kelem.offsetX;
+		offsetY = kelem.offsetY;
+		offsetZ = kelem.offsetZ;
+		stretchX = kelem.stretchX;
+		stretchY = kelem.stretchY;
+		stretchZ = kelem.stretchZ;
+		originX = kelem.originX;
+		originY = kelem.originY;
+		originZ = kelem.originZ;
+		rotationX = kelem.rotationX;
+		rotationY = kelem.rotationY;
+		rotationZ = kelem.rotationZ;
 	}
 }

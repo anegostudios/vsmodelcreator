@@ -1,8 +1,6 @@
 package at.vintagestory.modelcreator.model;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.enums.*;
@@ -52,7 +50,7 @@ public class Animation
 			keyframe.setFrameNumber(frame);
 			
 			for (Element elem : project.rootElements) {
-				keyframe.AddElement(createEmptyFrameForElement(elem, frame));
+				keyframe.AddElementDirectly(createEmptyFrameForElement(elem, frame));
 			}
 			
 			allFrames.add(frame, keyframe);
@@ -289,48 +287,9 @@ public class Animation
 			ReloadFrameNumbers();
 		}
 		
-		return GetOrCreateKeyFrameElement(elem, keyframe);
-	}
+		return keyframe.GetOrCreateKeyFrameElement(elem);
+	}	
 	
-	
-	
-	public KeyframeElement GetOrCreateKeyFrameElement(Element forElem, Keyframe keyframe) { 
-		KeyframeElement keyframeElem = keyframe.GetKeyFrameElement(forElem);
-		
-		if (keyframeElem != null) {
-			return keyframeElem;
-		}
-		
-		List<Element> path = forElem.GetParentPath();
-		
-		
-		if (path.size() == 0) {
-			keyframeElem = new KeyframeElement(forElem, true);
-			keyframe.AddElement(keyframeElem);	
-			ModelCreator.DidModify();
-			
-		} else if (path.size() == 1) {
-			KeyframeElement parent = GetOrCreateKeyFrameElement(path.get(0), keyframe);
-			keyframeElem = parent.GetOrCreateChildElement(forElem);
-			
-		} else {
-			KeyframeElement parent = GetOrCreateKeyFrameElement(path.get(0), keyframe);
-			path.remove(0);
-			
-			while (path.size() > 0) {
-				Element childElem = path.get(0);
-				path.remove(0);
-				keyframeElem = parent.GetOrCreateChildElement(childElem);
-				parent = keyframeElem;
-			}
-			
-			keyframeElem = keyframeElem.GetOrCreateChildElement(forElem);
-		}
-		
-		keyframeElem.FrameNumber = currentFrame;
-		
-		return keyframeElem;
-	}
 	
 	
 	
@@ -434,6 +393,11 @@ public class Animation
 	private void ResolveElem(Project project, Keyframe keyframe, KeyframeElement kElem)
 	{
 		kElem.AnimatedElement = project.findElement(kElem.AnimatedElementName);
+		
+		if (kElem.AnimatedElement == null) {
+			System.out.println("Couldn't resolve animated element name " + kElem.AnimatedElementName);
+		}
+		
 		kElem.FrameNumber = keyframe.getFrameNumber();
 		
 		for (IDrawable childElem : kElem.ChildElements) {

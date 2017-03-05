@@ -49,7 +49,7 @@ public class AnimationSelector
 	JPanel leftPanel;
 	JPanel rightPanel;
 	
-	boolean ignoreSelectioChange = false;
+	boolean ignoreSelectionChange = false;
 
 	
 	public AnimationSelector() {
@@ -75,15 +75,20 @@ public class AnimationSelector
 			@Override
 			public void valueChanged(ListSelectionEvent e)
 			{
-				if (ignoreSelectioChange) return;
+				if (ignoreSelectionChange) return;
 				
 				int selectedIndex = list.getSelectedIndex();
-				ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.Animations.get(selectedIndex);
-				ModelCreator.updateValues();
 				
+				ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.Animations.get(selectedIndex);
+				System.out.println("selected " + ModelCreator.currentProject.SelectedAnimation);
 				nameField.setText(ModelCreator.currentProject.SelectedAnimation.getName());
 				
+				ModelCreator.updateValues();
+				
+				
+				
 				updateValues();
+				System.out.println("after selected " + ModelCreator.currentProject.SelectedAnimation);
 			}
 		});
 		
@@ -144,7 +149,7 @@ public class AnimationSelector
 			int dialogResult = JOptionPane.showConfirmDialog (null, "Really delete this Animation?","Warning", JOptionPane.YES_NO_OPTION);
 			if(dialogResult == JOptionPane.YES_OPTION) {
 				
-				ignoreSelectioChange = true;
+				ignoreSelectionChange = true;
 				int nextSelected = Math.max(0, project.getSelectedAnimationIndex() - 1);
 				project.Animations.remove(project.SelectedAnimation);
 				model.removeElementAt(list.getSelectedIndex());
@@ -163,7 +168,7 @@ public class AnimationSelector
 				}
 				
 				updateValues();
-				ignoreSelectioChange = false;
+				ignoreSelectionChange = false;
 			}		
 		});
 		

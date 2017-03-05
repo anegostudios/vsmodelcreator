@@ -288,7 +288,7 @@ public class Project
 	
 	public boolean IsAttachmentPointCodeUsed(String code, ArrayList<Element> elems, AttachmentPoint exceptPoint) {
 		for (Element elem : elems) {
-			if (elem.IsAttachmentPointCodeUsed(code, exceptPoint)) return true;
+			if (elem.isAttachmentPointCodeUsed(code, exceptPoint)) return true;
 		}
 		return false;
 	}

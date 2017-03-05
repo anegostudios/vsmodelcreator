@@ -148,7 +148,8 @@ public class Face
 			if (binded) GL11.glColor3f(brightness, brightness, brightness);
 			
 			int coordIndex = blockFacing.GetIndex() * 12;
-			int uvIndex = blockFacing.GetIndex() * 8;
+			int uvBaseIndex = blockFacing.GetIndex() * 8;
+			int uvIndex = 0;
 			
 			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
 			double texWidth = 16;
@@ -163,8 +164,8 @@ public class Face
 			{
 				for (int j = 0; j < 4; j++) {
 					GL11.glTexCoord2d(
-							(cubeUVCoords[uvIndex++]==0 ? textureU : textureUEnd) / texWidth, 
-							(cubeUVCoords[uvIndex++]==0 ? textureV : textureVEnd) / texHeight
+							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureU : textureUEnd) / texWidth, 
+							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureV : textureVEnd) / texHeight
 					);
 					GL11.glVertex3d(cuboid.getWidth() * CubeVertices[coordIndex++], cuboid.getHeight() * CubeVertices[coordIndex++], cuboid.getDepth() * CubeVertices[coordIndex++]);
 				}

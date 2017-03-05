@@ -394,6 +394,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	boolean zKeyDown;
 	boolean yKeyDown;
 	boolean sKeyDown;
+	boolean rKeyDown;
 	
 	
 	public void handleInput(int offset)
@@ -467,6 +468,22 @@ public class ModelCreator extends JFrame implements ITextureCallback
 						
 					}
 				}
+				
+				if (Keyboard.isKeyDown(Keyboard.KEY_R)) rKeyDown = true;
+				else {
+					if (rKeyDown) {
+						rKeyDown = false;
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								ModelCreator.currentProject.reloadTextures(ModelCreator.Instance);						
+							}
+						});
+					}
+				}
+				
 				
 				if (grabbed == null)
 				{
@@ -762,7 +779,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 					}
 					
 				} catch (Exception e) {
-					System.out.println(e);
+					System.out.println("Failed reading dropped file. File is probably in an incorrect format.");
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Couldn't open this file: " + e.toString());
 				}
 		        		        
 		        evt.dropComplete(true);

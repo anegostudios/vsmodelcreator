@@ -63,7 +63,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	JButton moveFrameRightButton;
 	JButton moveFrameLeftButton;
 	
-	
+	boolean ignoreSelectionChange = false;
 	
 	
 	public LeftKeyFramesPanel(IElementManager manager)
@@ -165,6 +165,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		animationsList.setToolTipText("The current animation you want to edit");
 		animationsList.addActionListener(e ->
 		{
+			if (ignoreSelectionChange) return;
+			
 			int selectedIndex = animationsList.getSelectedIndex();
 			if (selectedIndex > 0) {
 				ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.Animations.get(selectedIndex);	
@@ -420,7 +422,9 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		}
 		
 		if (ModelCreator.currentProject.SelectedAnimation != null) {
+			ignoreSelectionChange = true;
 			animationsList.setSelectedIndex(ModelCreator.currentProject.getSelectedAnimationIndex());
+			ignoreSelectionChange = false;
 		}
 	}
 	

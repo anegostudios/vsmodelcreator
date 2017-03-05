@@ -196,93 +196,83 @@ public class Exporter
 		
 		writer.write(space(5) + "\"frame\": " + keyframe.getFrameNumber() + ",");
 		writer.newLine();
-		writer.write(space(5) + "\"elements\": [");
+		writer.write(space(5) + "\"elements\": {");
 		writer.newLine();
 		
 		for (int i = 0; i < keyframe.Elements.size(); i++) {
-			writeKeyFrameElement(writer, (KeyframeElement)keyframe.Elements.get(i), 6);
-			
-			if (i != keyframe.Elements.size() - 1) {
-				writer.write(",");
-				writer.newLine();
+			if (writeKeyFrameElement(writer, (KeyframeElement)keyframe.Elements.get(i), 6)) {
+				if (i != keyframe.Elements.size() - 1) {
+					writer.write(",");
+					writer.newLine();
+				}				
 			}
+			
 		}
 		
 		writer.newLine();
-		writer.write(space(5) + "]");
+		writer.write(space(5) + "}");
 		writer.newLine();
 		writer.write(space(4) + "}");
 	}
 	
 	
 
-	private void writeKeyFrameElement(BufferedWriter writer, KeyframeElement kElem, int indent) throws IOException
+	private boolean writeKeyFrameElement(BufferedWriter writer, KeyframeElement kElem, int indent) throws IOException
 	{
-		writer.write(space(indent) + "{ ");
-		writer.newLine();
+		boolean didwrite = false;
 		
-		indent++;
-		
-		writer.write(space(indent) + "\"animatedElement\": \""+ kElem.AnimatedElement.name + "\"");
-		
-		if (kElem.PositionSet) {
-			writer.write(", ");
-			writer.newLine();
-			writer.write(space(indent));
+		if (!kElem.IsUseless()) {
+			writer.write(space(indent) + "\"" + kElem.AnimatedElement.name + "\": { ");
 			
-			writer.write("\"offsetX\": " + kElem.getOffsetX());
-			writer.write(", \"offsetY\": " + kElem.getOffsetY());
-			writer.write(", \"offsetZ\": " + kElem.getOffsetZ());
-		}
-		
-		if (kElem.RotationSet) {
-			writer.write(", ");
-			writer.newLine();
-			writer.write(space(indent));
+			boolean bla = false;
 			
-			writer.write("\"rotationX\": " + kElem.getRotationX());
-			writer.write(", \"rotationY\": " + kElem.getRotationY());
-			writer.write(", \"rotationZ\": " + kElem.getRotationZ());	
-		}
-		
-		if (kElem.StretchSet) {
-			writer.write(", ");
-			writer.newLine();
-			writer.write(space(indent));
-
-			writer.write("\"stretchX\": " + kElem.getStretchX());
-			writer.write(", \"stretchY\": " + kElem.getStretchY());
-			writer.write(", \"stretchZ\": " + kElem.getStretchZ());
-		}
-		
-		
-		
-		if (kElem.ChildElements.size() > 0) {
-			writer.write(", ");
-			writer.newLine();
-			writer.write(space(indent) + "\"children\": [");
-			writer.newLine();
-			
-			for (int i = 0; i < kElem.ChildElements.size(); i++)
-			{
-				writeKeyFrameElement(writer, (KeyframeElement)kElem.ChildElements.get(i), indent + 1);
-				
-				if (i != kElem.ChildElements.size() - 1) {
-					writer.write(",");
-					writer.newLine();
-				}
+			if (kElem.PositionSet) {
+				writer.write(space(indent));				
+				writer.write("\"offsetX\": " + kElem.getOffsetX());
+				writer.write(", \"offsetY\": " + kElem.getOffsetY());
+				writer.write(", \"offsetZ\": " + kElem.getOffsetZ());
+				bla = true;
 			}
 			
-			writer.newLine();
-			writer.write(space(indent) + "]");
-			writer.newLine();
-		} else {
-			writer.newLine();
+			if (kElem.RotationSet) {
+				if (bla) {
+					writer.write(", ");
+				}
+				writer.write("\"rotationX\": " + kElem.getRotationX());
+				writer.write(", \"rotationY\": " + kElem.getRotationY());
+				writer.write(", \"rotationZ\": " + kElem.getRotationZ());
+				bla = true;
+			}
+			
+			if (kElem.StretchSet) {
+				if (bla) {
+					writer.write(", ");
+				}
+				writer.write("\"stretchX\": " + kElem.getStretchX());
+				writer.write(", \"stretchY\": " + kElem.getStretchY());
+				writer.write(", \"stretchZ\": " + kElem.getStretchZ());
+			}
+			
+			writer.write(" }");
+			didwrite = true;
 		}
 		
-		indent--;
-				
-		writer.write(space(indent) + "}");
+		boolean didwritechild = false;
+		boolean didwriteanychild = false;
+		for (int i = 0; i < kElem.ChildElements.size(); i++)
+		{
+			if (didwritechild || (i == 0 && didwrite)) {
+				writer.write(",");
+				writer.newLine();
+			}
+			
+			didwritechild = writeKeyFrameElement(writer, (KeyframeElement)kElem.ChildElements.get(i), indent);
+			
+			didwriteanychild |= didwritechild;
+		}
+			
+		
+		return didwriteanychild || didwrite;
 	}
 	
 
@@ -396,9 +386,9 @@ public class Exporter
 
 	private void writeBounds(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
-		writer.write(space(indentation) + "\"from\": [ " + cuboid.getStartX() + ", " + cuboid.getStartY() + ", " + cuboid.getStartZ() + " ], ");
+		writer.write(space(indentation) + "\"from\": [ " + d2s(cuboid.getStartX()) + ", " + d2s(cuboid.getStartY()) + ", " + d2s(cuboid.getStartZ()) + " ], ");
 		writer.newLine();
-		writer.write(space(indentation) + "\"to\": [ " + (cuboid.getStartX() + cuboid.getWidth()) + ", " + (cuboid.getStartY() + cuboid.getHeight()) + ", " + (cuboid.getStartZ() + cuboid.getDepth()) + " ], ");
+		writer.write(space(indentation) + "\"to\": [ " + d2s(cuboid.getStartX() + cuboid.getWidth()) + ", " + d2s(cuboid.getStartY() + cuboid.getHeight()) + ", " + d2s(cuboid.getStartZ() + cuboid.getDepth()) + " ], ");
 	}
 
 	private void writeShade(BufferedWriter writer, Element cuboid, int indentation) throws IOException
@@ -408,7 +398,7 @@ public class Exporter
 
 	private void writeRotation(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
-		writer.write(space(indentation) + "\"rotationOrigin\": [ " + cuboid.getOriginX() + ", " + cuboid.getOriginY() + ", " + cuboid.getOriginZ() + " ],");
+		writer.write(space(indentation) + "\"rotationOrigin\": [ " + d2s(cuboid.getOriginX()) + ", " + d2s(cuboid.getOriginY()) + ", " + d2s(cuboid.getOriginZ()) + " ],");
 		writer.newLine();
 		if (cuboid.getRotationX() != 0) { writer.write(space(indentation) + "\"rotationX\": " + cuboid.getRotationX() + ","); writer.newLine(); }
 		if (cuboid.getRotationY() != 0) { writer.write(space(indentation) + "\"rotationY\": " + cuboid.getRotationY() + ","); writer.newLine(); }
@@ -423,7 +413,7 @@ public class Exporter
 		{
 			writer.write(space(indentation + 1) + "\"" + Face.getFaceName(face.getSide()) + "\": { ");
 			writer.write("\"texture\": \"#" + textureList.indexOf(face.getTextureLocation() + face.getTextureName()) + "\"");
-			writer.write(", \"uv\": [ " + face.getStartU() + ", " + face.getStartV() + ", " + face.getEndU() + ", " + face.getEndV() + " ]");
+			writer.write(", \"uv\": [ " + d2s(face.getStartU()) + ", " + d2s(face.getStartV()) + ", " + d2s(face.getEndU()) + ", " + d2s(face.getEndV()) + " ]");
 			if (face.getRotation() > 0)
 				writer.write(", \"rotation\": " + (int) face.getRotation() * 90);
 			if (face.isCullfaced())
@@ -456,5 +446,9 @@ public class Exporter
 			space += "\t";
 		}
 		return space;
+	}
+	
+	String d2s(double value) {
+		return "" + (Math.round(value * 10000) / 10000.0);
 	}
 }

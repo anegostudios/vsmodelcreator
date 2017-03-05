@@ -816,7 +816,7 @@ public class Element implements IDrawable
 		updateUV();
 	}
 
-	public boolean IsAttachmentPointCodeUsed(String code, AttachmentPoint exceptPoint)
+	public boolean isAttachmentPointCodeUsed(String code, AttachmentPoint exceptPoint)
 	{
 		for (AttachmentPoint point : AttachmentPoints) {
 			if (point == exceptPoint) continue;
@@ -827,7 +827,7 @@ public class Element implements IDrawable
 		return false;
 	}
 
-	public AttachmentPoint AddNewAttachmentPoint()
+	public AttachmentPoint addNewAttachmentPoint()
 	{
 		AttachmentPoint point = new AttachmentPoint();
 		point.setCode("Point" + Project.nextAttachmentPointNumber++);
@@ -836,7 +836,7 @@ public class Element implements IDrawable
 		return point;
 	}
 
-	public void RemoveCurrentAttachmentPoint()
+	public void removeCurrentAttachmentPoint()
 	{
 		AttachmentPoints.remove(ModelCreator.currentProject.SelectedAttachmentPoint);
 		ModelCreator.DidModify();
