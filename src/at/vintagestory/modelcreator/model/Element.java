@@ -303,20 +303,21 @@ public class Element implements IDrawable
 								
 				faces[i].renderFace(BlockFacing.ALLFACES[i], b);
 			}
+			
 			GL11.glLoadName(0);
 			
 			for (int i = 0; i < ChildElements.size(); i++) {
 				ChildElements.get(i).draw(selectedElem);
 			}
-
 		}
+		
 		GL11.glPopMatrix();
 		
 		if (selectedElem == this) {
 			drawSelectionExtras();
 		}
-		
 	}
+	
 
 	public void drawSelectionExtras()
 	{
@@ -362,9 +363,11 @@ public class Element implements IDrawable
 					GL11.glVertex3f(0, 0, 4);
 					GL11.glVertex3f(-0.4f, 0, 3.6f);
 				}
+				
 				GL11.glEnd();
 				GL11.glEnable(GL11.GL_DEPTH_TEST);
 			}
+			
 			GL11.glPopMatrix();			
 		}
 		

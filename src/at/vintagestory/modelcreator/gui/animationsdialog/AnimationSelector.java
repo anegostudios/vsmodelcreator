@@ -80,7 +80,7 @@ public class AnimationSelector
 				int selectedIndex = list.getSelectedIndex();
 				
 				ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.Animations.get(selectedIndex);
-				System.out.println("selected " + ModelCreator.currentProject.SelectedAnimation);
+				//System.out.println("selected " + ModelCreator.currentProject.SelectedAnimation);
 				nameField.setText(ModelCreator.currentProject.SelectedAnimation.getName());
 				
 				ModelCreator.updateValues();
@@ -88,7 +88,7 @@ public class AnimationSelector
 				
 				
 				updateValues();
-				System.out.println("after selected " + ModelCreator.currentProject.SelectedAnimation);
+				//System.out.println("after selected " + ModelCreator.currentProject.SelectedAnimation);
 			}
 		});
 		

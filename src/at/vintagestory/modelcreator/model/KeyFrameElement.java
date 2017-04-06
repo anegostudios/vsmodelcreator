@@ -25,9 +25,9 @@ public class KeyframeElement implements IDrawable
 	private double offsetX = 0.0;
 	private double offsetY = 0.0;
 	private double offsetZ = 0.0;
-	private double stretchX = 0.0;
-	private double stretchY = 0.0;
-	private double stretchZ = 0.0;
+	private double stretchX = 1.0;
+	private double stretchY = 1.0;
+	private double stretchZ = 1.0;
 	private double rotationX = 0;
 	private double rotationY = 0;
 	private double rotationZ = 0;
@@ -114,6 +114,7 @@ public class KeyframeElement implements IDrawable
 			
 			GL11.glTranslated(startX, startY, startZ);
 			
+			
 			for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
 				if (!AnimatedElement.faces[i].isEnabled()) continue;
 				
@@ -123,7 +124,7 @@ public class KeyframeElement implements IDrawable
 								
 				AnimatedElement.faces[i].renderFace(BlockFacing.ALLFACES[i], b);
 			}
-			GL11.glLoadName(0);
+			//GL11.glLoadName(0);
 			
 			for (int i = 0; i < ChildElements.size(); i++) {
 				ChildElements.get(i).draw(selectedElem);

@@ -153,6 +153,8 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			if (num == 2) {
 				elem.setRotationZ(newValue);
 			}
+			
+			ModelCreator.updateValues();
 		});
 		
 
