@@ -384,6 +384,8 @@ public class Importer
 			
 			element.ParentElement = parent;
 			
+			element.setTexFromFace();
+			
 			return element;
 		}
 		return null;

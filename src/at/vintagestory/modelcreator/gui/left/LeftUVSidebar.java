@@ -135,11 +135,14 @@ public class LeftUVSidebar extends LeftSidebar
 	
 	private void drawElementList(ArrayList<Element> elems, double scaledTexWidth, double scaledTexHeight)
 	{
+		Element selectedElem = ModelCreator.currentProject.SelectedElement;
+		
 		for (Element elem : elems) {
 			Face[] faces = elem.getAllFaces();
 			
 			for (int i = 0; i < 6; i++) {
 				Color color = Face.getFaceColour(i);
+				
 				GL11.glColor4f(color.r * elem.brightnessByFace[i], color.g * elem.brightnessByFace[i], color.b * elem.brightnessByFace[i], 0.3f);
 	
 				glBegin(GL_QUADS);
@@ -160,6 +163,11 @@ public class LeftUVSidebar extends LeftSidebar
 	
 				
 				glColor3f(0.5f, 0.5f, 0.5f);
+				if (elem == selectedElem) {
+					glColor3f(0f, 0f, 1f);
+				}
+				
+
 	
 				glBegin(GL_LINES);
 				{

@@ -857,4 +857,11 @@ public class Element implements IDrawable
 		
 	}
 
+	public void setTexFromFace()
+	{
+		Face f = faces[4];
+		texUStart = f.textureU;
+		texVStart = f.textureV;		
+	}
+
 }
