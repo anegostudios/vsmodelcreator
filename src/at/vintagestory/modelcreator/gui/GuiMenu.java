@@ -336,7 +336,6 @@ public class GuiMenu extends JMenuBar
 		itemNoTextureSize.addActionListener(a -> {
 			TextureSizeDialog.show(creator);
 		});
-		itemNoTextureSize.setEnabled(ModelCreator.singleTextureMode);
 
 		
 		itemReloadTextures.addActionListener(a -> {

@@ -66,7 +66,13 @@ public class Importer
 			}
 			catch (Exception e)
 			{
-				JOptionPane.showMessageDialog(null, "Couldn't open this file: " + e.getMessage());
+				StackTraceElement[] elems = e.getStackTrace();
+				String trace = "";
+				for (int i = 0; i < elems.length; i++) {
+					trace += elems[i].toString() + "\n";
+					if (i >= 10) break;
+				}
+				JOptionPane.showMessageDialog(null, "Couldn't open this file, something unexpecteded happened\n\n" + e.toString() + "\nat\n" + trace);
 				e.printStackTrace();
 			}
 		}

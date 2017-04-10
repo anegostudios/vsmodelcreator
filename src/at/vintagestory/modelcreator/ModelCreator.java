@@ -111,7 +111,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	
 	static {
-		prefs = Preferences.systemNodeForPackage(ModelCreator.class);
+		prefs = Preferences.userRoot().node("ModelCreator");
 	}
 	
 	
@@ -817,6 +817,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		if (filePath == null) {
 			setTitle("(untitled) - " + windowTitle);
 			currentProject = new Project(null);
+			currentProject.LoadIntoEditor(ModelCreator.manager);
 			
 		} else {
 			prefs.put("filePath", filePath);
