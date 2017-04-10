@@ -74,6 +74,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static boolean transparent = true;
 	public static boolean unlockAngles = false;
 	public static boolean singleTextureMode = false;
+	public static float texScale = 2;
 	public static int noTexWidth = 32;
 	public static int noTexHeight = 32;
 
@@ -123,6 +124,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		showGrid = prefs.getBoolean("showGrid", false);
 		noTexWidth = prefs.getInt("noTexWidth", 32);
 		noTexHeight = prefs.getInt("noTexHeight", 32);
+		texScale = prefs.getFloat("texScale", 2);
 		
 		Instance = this;
 		

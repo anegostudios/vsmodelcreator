@@ -78,14 +78,14 @@ public class LeftUVSidebar extends LeftSidebar
 		double texHeight = 16.0;
 		
 		if (ModelCreator.currentProject.Textures.size() > 0) {
-			texWidth = ModelCreator.currentProject.Textures.get(0).Width / 2.0;
-			texHeight = ModelCreator.currentProject.Textures.get(0).Height / 2.0;
+			texWidth = ModelCreator.currentProject.Textures.get(0).Width / ModelCreator.texScale;
+			texHeight = ModelCreator.currentProject.Textures.get(0).Height / ModelCreator.texScale;
 		} else {
-			texWidth = ModelCreator.noTexWidth / 2.0;
-			texHeight = ModelCreator.noTexHeight / 2.0;
+			texWidth = ModelCreator.noTexWidth / ModelCreator.texScale;
+			texHeight = ModelCreator.noTexHeight / ModelCreator.texScale;
 		}
 		
-		int width = 2 * WIDTH;
+		int width = (int)(2 * WIDTH);
 		int scaledHeight = (int)(width * texHeight / texWidth);
 
 		double scaledTexWidth = width / texWidth;
@@ -141,6 +141,8 @@ public class LeftUVSidebar extends LeftSidebar
 			Face[] faces = elem.getAllFaces();
 			
 			for (int i = 0; i < 6; i++) {
+				if (!faces[i].isEnabled()) continue;
+				
 				Color color = Face.getFaceColour(i);
 				
 				GL11.glColor4f(color.r * elem.brightnessByFace[i], color.g * elem.brightnessByFace[i], color.b * elem.brightnessByFace[i], 0.3f);

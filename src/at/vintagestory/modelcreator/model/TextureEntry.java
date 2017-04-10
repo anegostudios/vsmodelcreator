@@ -2,9 +2,7 @@ package at.vintagestory.modelcreator.model;
 
 import java.util.Arrays;
 import java.util.List;
-
 import javax.swing.ImageIcon;
-
 import org.newdawn.slick.opengl.Texture;
 
 public class TextureEntry

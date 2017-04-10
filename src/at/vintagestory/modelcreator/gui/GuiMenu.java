@@ -520,7 +520,6 @@ public class GuiMenu extends JMenuBar
 		itemAddCube.setEnabled(enabled);
 		itemAddFace.setEnabled(enabled);
 		
-		itemNoTextureSize.setEnabled(ModelCreator.singleTextureMode);
 		itemExportUvMap.setEnabled(ModelCreator.singleTextureMode);
 	}
 	

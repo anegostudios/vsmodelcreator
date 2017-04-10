@@ -29,6 +29,8 @@ public class UVMapExporter
 		for (Element elem : elements) {
 			Face[] faces = elem.getAllFaces();
 			for (int i = 0; i < faces.length; i++) {
+				if (!faces[i].isEnabled()) continue;
+				
 				drawElementFace(img, faces[i], elem);	
 			}
 			
@@ -38,10 +40,10 @@ public class UVMapExporter
 
 	private void drawElementFace(BufferedImage img, Face face, Element elem)
 	{
-		int startX = clamped((int)(face.getStartU() * 2.0), 0, ModelCreator.noTexWidth);
-		int startY = clamped((int)(face.getStartV() * 2.0), 0, ModelCreator.noTexHeight);
-		int endX = clamped((int)(face.getEndU() * 2.0), 0, ModelCreator.noTexWidth);
-		int endY = clamped((int)(face.getEndV() * 2.0), 0, ModelCreator.noTexHeight);
+		int startX = clamped((int)(face.getStartU() * ModelCreator.texScale), 0, ModelCreator.noTexWidth);
+		int startY = clamped((int)(face.getStartV() * ModelCreator.texScale), 0, ModelCreator.noTexHeight);
+		int endX = clamped((int)(face.getEndU() * ModelCreator.texScale), 0, ModelCreator.noTexWidth);
+		int endY = clamped((int)(face.getEndV() * ModelCreator.texScale), 0, ModelCreator.noTexHeight);
 		
 		Color color = face.getFaceColor();
 		int r = (int)(255 * color.r * elem.brightnessByFace[face.getSide()]);

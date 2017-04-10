@@ -459,16 +459,15 @@ public class Element implements IDrawable
 	void setUnwrappedCubeUV() {
 		double x = getTexUStart();
 		double y = getTexVStart();
-		double height = 0;
+		double maxTexHeight = 0;
 		
 		if (faces[4].isEnabled() && faces[4].isAutoUVEnabled()) {
 			faces[4].textureU = x;
 			faces[4].textureV = y;
 			faces[4].updateUV();
 			
-			height = faces[4].TextureHeight();
+			maxTexHeight = faces[4].TextureHeight();
 			x += faces[4].TextureWidth();
-			
 		}
 		
 		if (faces[5].isEnabled() && faces[5].isAutoUVEnabled()) {
@@ -476,11 +475,11 @@ public class Element implements IDrawable
 			faces[5].textureV = y;
 			faces[5].updateUV();
 			
-			height = Math.max(height, faces[5].TextureHeight());
+			maxTexHeight = Math.max(maxTexHeight, faces[5].TextureHeight());
 		}
 		
 		x = getTexUStart();
-		y += height;
+		y += maxTexHeight;
 		
 		for (int side = 0; side < 4; side++) {
 			Face face = faces[side];

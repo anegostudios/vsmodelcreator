@@ -152,11 +152,11 @@ public class Face
 			int uvIndex = 0;
 			
 			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
-			double texWidth = 16;
-			double texHeight = 16;
+			double texWidth = 16 / ModelCreator.texScale;
+			double texHeight = 16 / ModelCreator.texScale;
 			if (entry != null) {
-				texWidth = entry.Width / 2.0;
-				texHeight = entry.Height / 2.0;				
+				texWidth = entry.Width / ModelCreator.texScale;
+				texHeight = entry.Height / ModelCreator.texScale;				
 			}
 
 			
@@ -178,6 +178,20 @@ public class Face
 	}
 	
 
+	public double[] textureScale() {
+		double texWidth = 16;
+		double texHeight = 16;
+		
+		if (ModelCreator.currentProject != null) {
+			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
+			if (entry != null) {
+				texWidth = entry.Width;
+				texHeight = entry.Height;				
+			}			
+		}
+		
+		return new double[] { texWidth / (16 * ModelCreator.texScale/2), texHeight / (16 * ModelCreator.texScale/2) };
+	}
 
 
 	public void setTexture(String texture)
@@ -356,12 +370,16 @@ public class Face
 	{
 		if (autoUV)
 		{
+			// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
+			// without messing up the UV map
+			double[] scale = textureScale();
+			
 			if (rotation == 0 || rotation == 2) {
-				textureUEnd = textureU + cuboid.getFaceDimension(side).getWidth();
-				textureVEnd = textureV + cuboid.getFaceDimension(side).getHeight();	
+				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale[0]) / scale[0];
+				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale[1]) / scale[1];	
 			} else {
-				textureUEnd = textureU + cuboid.getFaceDimension(side).getHeight();
-				textureVEnd = textureV + cuboid.getFaceDimension(side).getWidth();
+				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale[1]) / scale[1];
+				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale[0]) / scale[0];
 			}
 			
 		}
@@ -472,13 +490,21 @@ public class Face
 		return cloned;
 	}
 	
-	
+
 	public double TextureWidth() {
-		return Math.abs(textureUEnd - textureU);
+		// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
+		// without messing up the UV map
+		double[] scale = textureScale();
+
+		return Math.floor(Math.abs(textureUEnd - textureU) * scale[0]) / scale[0];
 	}
 	
 	public double TextureHeight() {
-		return Math.abs(textureVEnd - textureV);
+		// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
+		// without messing up the UV map
+		double[] scale = textureScale();
+
+		return Math.floor(Math.abs(textureVEnd - textureV) * scale[1]) / scale[1];
 	}
 
 }
