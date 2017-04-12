@@ -113,6 +113,26 @@ public class Importer
 				project.AmbientOcclusion = obj.get("ambientocclusion").getAsBoolean();
 			}
 			
+			if (obj.has("textureWidth") && obj.get("textureWidth").isJsonPrimitive())
+			{
+				project.TextureWidth = obj.get("textureWidth").getAsInt();
+			}
+			
+			if (obj.has("textureHeight") && obj.get("textureHeight").isJsonPrimitive())
+			{
+				project.TextureHeight = obj.get("textureHeight").getAsInt();
+			}
+			
+			if (obj.has("singleTexture") && obj.get("singleTexture").isJsonPrimitive())
+			{
+				project.SingleTexture = obj.get("singleTexture").getAsBoolean();
+			}
+			
+			if (obj.has("allAngles") && obj.get("allAngles").isJsonPrimitive())
+			{
+				project.AllAngles = obj.get("allAngles").getAsBoolean();
+			}
+			
 			if (obj.has("animations") && obj.get("animations").isJsonArray()) {
 				JsonArray animations = obj.get("animations").getAsJsonArray();
 

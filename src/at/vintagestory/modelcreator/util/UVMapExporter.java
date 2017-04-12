@@ -13,7 +13,11 @@ import at.vintagestory.modelcreator.model.Face;
 public class UVMapExporter
 {
 	public void Export(String path) {
-		BufferedImage img = new BufferedImage(ModelCreator.noTexWidth, ModelCreator.noTexHeight, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage img = new BufferedImage(
+				(int)(ModelCreator.currentProject.TextureWidth * ModelCreator.noTexScale),
+				(int)(ModelCreator.currentProject.TextureHeight * ModelCreator.noTexScale), 
+				BufferedImage.TYPE_INT_ARGB
+		);
 		
 		drawElementList(img, ModelCreator.currentProject.rootElements);
 		
@@ -40,10 +44,10 @@ public class UVMapExporter
 
 	private void drawElementFace(BufferedImage img, Face face, Element elem)
 	{
-		int startX = clamped((int)(face.getStartU() * ModelCreator.texScale), 0, ModelCreator.noTexWidth);
-		int startY = clamped((int)(face.getStartV() * ModelCreator.texScale), 0, ModelCreator.noTexHeight);
-		int endX = clamped((int)(face.getEndU() * ModelCreator.texScale), 0, ModelCreator.noTexWidth);
-		int endY = clamped((int)(face.getEndV() * ModelCreator.texScale), 0, ModelCreator.noTexHeight);
+		int startX = clamped((int)(face.getStartU() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureWidth * ModelCreator.noTexScale));
+		int startY = clamped((int)(face.getStartV() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureHeight * ModelCreator.noTexScale));
+		int endX = clamped((int)(face.getEndU() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureWidth * ModelCreator.noTexScale));
+		int endY = clamped((int)(face.getEndV() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureHeight * ModelCreator.noTexScale));
 		
 		Color color = face.getFaceColor();
 		int r = (int)(255 * color.r * elem.brightnessByFace[face.getSide()]);

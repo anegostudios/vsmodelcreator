@@ -25,22 +25,20 @@ public class TextureSizeDialog
 		JPanel panel = new JPanel(new GridLayout(2, 1, 5, 0));
 		
 		
-		JPanel panelRow1 = new JPanel(new GridLayout(4, 1, 5, 0));
-		JLabel label = new JLabel("Scale, when a texture is applied");
-		label.setPreferredSize(new Dimension(30, 20));
+		JPanel panelRow1 = new JPanel(new GridLayout(5, 1, 5, 0));
+		JLabel label = new JLabel("Scale when no texture is applied,");
+		label.setPreferredSize(new Dimension(200, 20));
+		panelRow1.add(label);
+		
+		label = new JLabel("only used for the UV map exporter");
+		label.setPreferredSize(new Dimension(200, 20));
 		panelRow1.add(label);
 		
 		JTextField scaleTextField = new JTextField();
-		scaleTextField.setPreferredSize(new Dimension(100, 20));
-		scaleTextField.setText(""+ModelCreator.texScale);
+		scaleTextField.setPreferredSize(new Dimension(50, 20));
+		scaleTextField.setText(""+ModelCreator.noTexScale);
 		panelRow1.add(scaleTextField);
 		
-		
-		panelRow1.add(new JLabel());
-		
-		label = new JLabel("Size, when no texture is applied, used when exporting a UV map");
-		label.setPreferredSize(new Dimension(370, 20));
-		panelRow1.add(label);
 		
 		panel.add(panelRow1);
 		
@@ -51,25 +49,25 @@ public class TextureSizeDialog
 		
 		JPanel panelRow2 = new JPanel(new GridLayout(4, 2, 5, 0));
 		
-		label = new JLabel("Width");
+		label = new JLabel("Texture Width");
 		label.setPreferredSize(new Dimension(30, 20));
 		panelRow2.add(label);
 		
-		label = new JLabel("Height");
+		label = new JLabel("Texture Height");
 		label.setPreferredSize(new Dimension(30, 20));
 		panelRow2.add(label);
 		
 
 		JTextField widthTextField = new JTextField();
-		widthTextField.setPreferredSize(new Dimension(150, 20));
-		widthTextField.setText(""+ModelCreator.noTexWidth);
+		widthTextField.setPreferredSize(new Dimension(50, 20));
+		widthTextField.setText(""+ModelCreator.currentProject.TextureWidth);
 		panelRow2.add(widthTextField);
 		
 		
 		
 		JTextField heightTextField = new JTextField();
-		heightTextField.setPreferredSize(new Dimension(150, 20));
-		heightTextField.setText(""+ModelCreator.noTexHeight);
+		heightTextField.setPreferredSize(new Dimension(50, 20));
+		heightTextField.setText(""+ModelCreator.currentProject.TextureHeight);
 		panelRow2.add(heightTextField);
 		
 		
@@ -78,13 +76,19 @@ public class TextureSizeDialog
 		btnSubmit.addActionListener(a ->
 		{
 			try {
-				ModelCreator.noTexWidth = Integer.parseInt(widthTextField.getText());
-				ModelCreator.noTexHeight = Integer.parseInt(heightTextField.getText());
-				ModelCreator.texScale = Float.parseFloat(scaleTextField.getText());
+				int width = Integer.parseInt(widthTextField.getText());
+				int height = Integer.parseInt(heightTextField.getText());
 				
-				ModelCreator.prefs.putInt("noTexWidth", ModelCreator.noTexWidth);
-				ModelCreator.prefs.putInt("noTexHeight", ModelCreator.noTexHeight);
-				ModelCreator.prefs.putFloat("texScale", ModelCreator.texScale);
+				if (width != ModelCreator.currentProject.TextureWidth || height != ModelCreator.currentProject.TextureHeight) {
+					ModelCreator.DidModify();
+				}
+				
+				ModelCreator.currentProject.TextureWidth = width;
+				ModelCreator.currentProject.TextureHeight = height;
+				ModelCreator.noTexScale = Float.parseFloat(scaleTextField.getText());
+				ModelCreator.prefs.putFloat("texScale", ModelCreator.noTexScale);
+				
+				
 				
 				dialog.dispose();
 			} catch (Exception e) {

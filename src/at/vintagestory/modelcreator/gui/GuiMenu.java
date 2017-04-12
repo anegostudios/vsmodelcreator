@@ -50,13 +50,16 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemUndo;
 	private JMenuItem itemRedo;
 	
-	/* Options */
-	private JMenu menuOptions;
-	private JCheckBoxMenuItem itemGrid;
-	private JCheckBoxMenuItem itemTransparency;
+	/* Project */
+	private JMenu menuProject;
 	private JCheckBoxMenuItem itemUnlockAngles;
 	private JCheckBoxMenuItem itemSingleTexture;
 	private JMenuItem itemNoTextureSize;
+	
+	/* View */
+	private JMenu menuView;
+	private JCheckBoxMenuItem itemGrid;
+	private JCheckBoxMenuItem itemTransparency;
 	
 	/* Add */
 	private JMenu menuAdd;
@@ -98,24 +101,25 @@ public class GuiMenu extends JMenuBar
 		}
 
 
-		menuOptions = new JMenu("Options");
+		menuProject = new JMenu("Project");
 		{
-			itemGrid = createCheckboxItem("Show Grid", "Toggles the voxel grid", KeyEvent.VK_G, Icons.transparent);
+			itemUnlockAngles = createCheckboxItem("Unlock all Angles", "Disabling this allows angle stepping of single degrees. Suggested to unlock this only for entities.", KeyEvent.VK_A, Icons.transparent);
+			itemUnlockAngles.setSelected(ModelCreator.currentProject.AllAngles);
+			
+			itemSingleTexture = createCheckboxItem("Single Texture + UV Unwrap Mode", "When creating entities, it is often more useful to use only a single texture.", 0, Icons.transparent);
+			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);		
+		}
+		
+		menuView = new JMenu("View");
+		{
+			itemGrid = createCheckboxItem("Grid", "Toggles the voxel grid", KeyEvent.VK_G, Icons.transparent);
 			itemGrid.setSelected(ModelCreator.transparent);
 			
 			itemTransparency = createCheckboxItem("Transparency", "Toggles transparent rendering in program", KeyEvent.VK_T, Icons.transparent);
 			itemTransparency.setSelected(ModelCreator.transparent);
 			
-			itemUnlockAngles = createCheckboxItem("Unlock all Angles", "Disabling this allows angle stepping of single degrees. Suggested to unlock this only for entities.", KeyEvent.VK_A, Icons.transparent);
-			itemUnlockAngles.setSelected(ModelCreator.unlockAngles);
-			
-			itemSingleTexture = createCheckboxItem("Single Texture for all Faces", "When creating entities, it is often more useful to use only a single texture.", 0, Icons.transparent);
-			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);
-			
 			itemGrid.setSelected(ModelCreator.showGrid);
 			itemTransparency.setSelected(ModelCreator.transparent);
-			itemUnlockAngles.setSelected(ModelCreator.unlockAngles);
-			itemSingleTexture.setSelected(ModelCreator.singleTextureMode);
 		}
 
 		menuAdd = new JMenu("Add");
@@ -137,11 +141,13 @@ public class GuiMenu extends JMenuBar
 		initActions();
 
 	
-		menuOptions.add(itemGrid);
-		menuOptions.add(itemTransparency);
-		menuOptions.add(itemUnlockAngles);
-		menuOptions.add(itemSingleTexture);
-		menuOptions.add(itemNoTextureSize);
+		menuView.add(itemGrid);
+		menuView.add(itemTransparency);
+		
+		
+		menuProject.add(itemUnlockAngles);
+		menuProject.add(itemSingleTexture);
+		menuProject.add(itemNoTextureSize);
 		
 		menuAdd.add(itemAddCube);
 		menuAdd.add(itemAddFace);
@@ -168,7 +174,8 @@ public class GuiMenu extends JMenuBar
 
 		add(menuFile);
 		add(menuEdit);
-		add(menuOptions);
+		add(menuView);
+		add(menuProject);
 		add(menuAdd);
 		add(otherMenu);
 	}
@@ -267,7 +274,7 @@ public class GuiMenu extends JMenuBar
 
 		itemTexturePath.addActionListener(listener);
 
-		itemExportUvMap.setEnabled(ModelCreator.singleTextureMode);
+		itemExportUvMap.setEnabled(ModelCreator.currentProject.SingleTexture);
 		itemExportUvMap.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
 			chooser.setDialogTitle("Output Directory");
@@ -320,16 +327,17 @@ public class GuiMenu extends JMenuBar
 		
 		itemUnlockAngles.addActionListener(a ->
 		{
-			ModelCreator.unlockAngles = itemUnlockAngles.isSelected();
-			ModelCreator.prefs.putBoolean("unlockAngles", ModelCreator.unlockAngles);
+			ModelCreator.currentProject.AllAngles = itemUnlockAngles.isSelected();
+			ModelCreator.prefs.putBoolean("unlockAngles", ModelCreator.currentProject.AllAngles);
+			ModelCreator.DidModify();
 			ModelCreator.updateValues();
 		});
 		
 		itemSingleTexture.addActionListener(a ->
 		{
-			ModelCreator.singleTextureMode = itemSingleTexture.isSelected();
-			ModelCreator.prefs.putBoolean("singleTextureMode", ModelCreator.singleTextureMode);
-			if (ModelCreator.singleTextureMode) ModelCreator.currentProject.applySingleTextureMode();
+			ModelCreator.currentProject.SingleTexture = itemSingleTexture.isSelected();
+			if (ModelCreator.currentProject.SingleTexture) ModelCreator.currentProject.applySingleTextureMode();
+			ModelCreator.DidModify();
 			ModelCreator.updateValues();
 		});
 		
@@ -519,7 +527,9 @@ public class GuiMenu extends JMenuBar
 		itemAddCube.setEnabled(enabled);
 		itemAddFace.setEnabled(enabled);
 		
-		itemExportUvMap.setEnabled(ModelCreator.singleTextureMode);
+		itemExportUvMap.setEnabled(ModelCreator.currentProject.SingleTexture);
+		itemUnlockAngles.setSelected(ModelCreator.currentProject.AllAngles);
+		itemSingleTexture.setSelected(ModelCreator.currentProject.SingleTexture);
 	}
 	
 	public void updateFrame() {

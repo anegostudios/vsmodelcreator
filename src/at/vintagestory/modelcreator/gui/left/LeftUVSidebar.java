@@ -62,7 +62,7 @@ public class LeftUVSidebar extends LeftSidebar
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}		
 
-		if (ModelCreator.singleTextureMode) {
+		if (ModelCreator.currentProject.SingleTexture) {
 			drawSingleSquare(canvasHeight);
 		} else {
 			drawBoxSquares(canvasHeight);
@@ -74,22 +74,25 @@ public class LeftUVSidebar extends LeftSidebar
 	}
 	
 	void drawSingleSquare(int canvasHeight) {
-		double texWidth = 16.0;
-		double texHeight = 16.0;
+		double texWidth = ModelCreator.currentProject.TextureWidth;
+		double texHeight = ModelCreator.currentProject.TextureHeight;
+		
+		double scaleX = 2;
+		double scaleY = 2;
 		
 		if (ModelCreator.currentProject.Textures.size() > 0) {
-			texWidth = ModelCreator.currentProject.Textures.get(0).Width / ModelCreator.texScale;
-			texHeight = ModelCreator.currentProject.Textures.get(0).Height / ModelCreator.texScale;
-		} else {
-			texWidth = ModelCreator.noTexWidth / ModelCreator.texScale;
-			texHeight = ModelCreator.noTexHeight / ModelCreator.texScale;
+			scaleX = ModelCreator.currentProject.Textures.get(0).Width / texWidth;
+			scaleY = ModelCreator.currentProject.Textures.get(0).Height / texHeight;
 		}
 		
-		int width = (int)(2 * WIDTH);
-		int scaledHeight = (int)(width * texHeight / texWidth);
+		texWidth *= scaleX / 2;
+		texHeight *= scaleY / 2;
+		
+		int texBoxWidth = (int)(2 * WIDTH);
+		int texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
 
-		double scaledTexWidth = width / texWidth;
-		double scaledTexHeight = scaledHeight / texHeight;
+		double scaledTexWidth = texBoxWidth / texWidth;
+		double scaledTexHeight = texBoxHeight / texHeight;
 		
 		glPushMatrix();
 		{
@@ -108,13 +111,13 @@ public class LeftUVSidebar extends LeftSidebar
 				glBegin(GL_QUADS);
 				{
 					glTexCoord2f(0, 1);
-					glVertex2i(0, scaledHeight);
+					glVertex2i(0, texBoxHeight);
 					
 					glTexCoord2f(1, 1);
-					glVertex2i(width, scaledHeight);
+					glVertex2i(texBoxWidth, texBoxHeight);
 					
 					glTexCoord2f(1, 0);
-					glVertex2i(width, 0);
+					glVertex2i(texBoxWidth, 0);
 
 					glTexCoord2f(0, 0);
 					glVertex2i(0, 0);
@@ -143,6 +146,12 @@ public class LeftUVSidebar extends LeftSidebar
 			for (int i = 0; i < 6; i++) {
 				if (!faces[i].isEnabled()) continue;
 				
+				Face face = faces[i];
+				double u = face.getStartU();
+				double v = face.getStartV();
+				double uend = face.getEndU();
+				double vend = face.getEndV();
+				
 				Color color = Face.getFaceColour(i);
 				
 				GL11.glColor4f(color.r * elem.brightnessByFace[i], color.g * elem.brightnessByFace[i], color.b * elem.brightnessByFace[i], 0.3f);
@@ -150,16 +159,16 @@ public class LeftUVSidebar extends LeftSidebar
 				glBegin(GL_QUADS);
 				{
 					glTexCoord2f(0, 1);
-					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+					glVertex2d(u * scaledTexWidth, vend * scaledTexHeight);
 					
 					glTexCoord2f(1, 1);
-					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+					glVertex2d(uend * scaledTexWidth, vend * scaledTexHeight);
 					
 					glTexCoord2f(1, 0);
-					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+					glVertex2d(uend * scaledTexWidth, v * scaledTexHeight);
 	
 					glTexCoord2f(0, 0);
-					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+					glVertex2d(u * scaledTexWidth, v * scaledTexHeight);
 				}
 				glEnd();
 	
@@ -173,17 +182,17 @@ public class LeftUVSidebar extends LeftSidebar
 	
 				glBegin(GL_LINES);
 				{
-					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
-					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+					glVertex2d(u * scaledTexWidth, v * scaledTexHeight);
+					glVertex2d(u * scaledTexWidth, vend * scaledTexHeight);
 	
-					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
-					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
+					glVertex2d(u * scaledTexWidth, vend * scaledTexHeight);
+					glVertex2d(uend * scaledTexWidth, vend * scaledTexHeight);
 	
-					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
-					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+					glVertex2d(uend * scaledTexWidth, vend * scaledTexHeight);
+					glVertex2d(uend * scaledTexWidth, v * scaledTexHeight);
 	
-					glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
-					glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
+					glVertex2d(uend * scaledTexWidth, v * scaledTexHeight);
+					glVertex2d(u * scaledTexWidth, v * scaledTexHeight);
 	
 				}
 				glEnd();
@@ -198,6 +207,8 @@ public class LeftUVSidebar extends LeftSidebar
 		Element elem = manager.getCurrentElement();
 		
 		float[] bright = elem != null ? elem.brightnessByFace : brightnessByFace;
+		
+		
 		
 		glPushMatrix();
 		{
@@ -232,9 +243,18 @@ public class LeftUVSidebar extends LeftSidebar
 					{
 						faces[i].bindTexture();
 
-						double texWidth = 16;
-						double texHeight = 16;
-						
+
+						double scaleX = 2;
+						double scaleY = 2;
+						double texWidth = ModelCreator.currentProject.TextureWidth;
+						double texHeight = ModelCreator.currentProject.TextureHeight; 
+						if (ModelCreator.currentProject.Textures.size() > 0) {
+							scaleX = ModelCreator.currentProject.Textures.get(0).Width / texWidth;
+							scaleY = ModelCreator.currentProject.Textures.get(0).Height / texHeight;
+						}
+						texWidth *= scaleX;
+						texHeight *= scaleY;
+
 						TextureEntry entry = ModelCreator.currentProject.getTextureEntry(faces[i].getTextureName());
 						
 						if (entry != null) {

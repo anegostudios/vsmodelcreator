@@ -444,7 +444,9 @@ public class Element implements IDrawable
 
 	public void updateUV()
 	{
-		if (ModelCreator.singleTextureMode) {
+		if (ModelCreator.currentProject == null) return;
+		
+		if (ModelCreator.currentProject.SingleTexture) {
 			setUnwrappedCubeUV();
 			return;
 		}

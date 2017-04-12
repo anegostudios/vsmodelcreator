@@ -107,6 +107,20 @@ public class Exporter
 			writer.newLine();
 		}*/
 		
+		if (project.AllAngles) {
+			writer.write(space(1) + "\"allAngles\": " + project.AllAngles + ",");
+			writer.newLine();
+		}
+		if (project.SingleTexture) {
+			writer.write(space(1) + "\"singleTexture\": " + project.SingleTexture + ",");
+			writer.newLine();
+		}
+		writer.write(space(1) + "\"textureWidth\": " + project.TextureWidth + ",");
+		writer.newLine();
+		writer.write(space(1) + "\"textureHeight\": " + project.TextureHeight + ",");
+		writer.newLine();
+		
+		
 		writeTextures(writer);
 		
 		writer.newLine();

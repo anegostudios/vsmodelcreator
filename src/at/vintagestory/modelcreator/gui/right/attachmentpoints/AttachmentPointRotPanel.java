@@ -174,7 +174,7 @@ public class AttachmentPointRotPanel extends JPanel implements IValueUpdater
 	public void toggleFields(AttachmentPoint point) {
 		ignoreSliderChanges = true;
 		
-		if (ModelCreator.unlockAngles) {
+		if (ModelCreator.currentProject.AllAngles) {
 			if (ROTATION_MIN != -180) {
 				ROTATION_MIN = -180;
 				ROTATION_MAX = 180;
@@ -230,7 +230,7 @@ public class AttachmentPointRotPanel extends JPanel implements IValueUpdater
 	
 
 	Hashtable<Integer, JLabel> getLabelTable() {
-		if (ModelCreator.unlockAngles) {
+		if (ModelCreator.currentProject.AllAngles) {
 			Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 			labelTable.put(new Integer(-180), new JLabel("-180\u00b0"));
 			labelTable.put(new Integer(-90), new JLabel("-90\u00b0"));

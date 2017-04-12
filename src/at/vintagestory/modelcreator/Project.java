@@ -25,7 +25,10 @@ public class Project
 	public ArrayList<Element> rootElements = new ArrayList<Element>();
 	public ArrayList<Animation> Animations = new ArrayList<Animation>();
 	
-
+	public int TextureWidth = 32;
+	public int TextureHeight = 32;
+	public boolean SingleTexture;
+	public boolean AllAngles;
 	
 	// Non-persistent project data
 	public AttachmentPoint SelectedAttachmentPoint;
@@ -465,7 +468,7 @@ public class Project
 		
 		ModelCreator.currentProject.Textures.add(new TextureEntry(image.getName().replace(".png", ""), texture, icon, image.getAbsolutePath()));
 		
-		if (ModelCreator.currentProject.Textures.size() == 1 && ModelCreator.singleTextureMode) {
+		if (ModelCreator.currentProject.Textures.size() == 1 && SingleTexture) {
 			applySingleTextureMode();
 		}
 		

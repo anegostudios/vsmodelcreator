@@ -62,7 +62,7 @@ public class FacePanel extends JPanel implements IValueUpdater
 	public void initComponents()
 	{
 		panelElemUV = new ElementUVPanel(manager);
-		panelElemUV.setVisible(ModelCreator.singleTextureMode);
+		panelElemUV.setVisible(ModelCreator.currentProject.SingleTexture);
 		
 		menuPanel = new JPanel(new GridLayout(1, 1));
 		menuPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Side</b></html>"));
@@ -144,6 +144,6 @@ public class FacePanel extends JPanel implements IValueUpdater
 		panelFaceUV.updateValues();
 		panelFaceExtras.updateValues();
 		panelElemUV.updateValues();
-		panelElemUV.setVisible(ModelCreator.singleTextureMode);
+		panelElemUV.setVisible(ModelCreator.currentProject.SingleTexture);
 	}
 }

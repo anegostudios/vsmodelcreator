@@ -130,10 +130,8 @@ public class Face
 	}
 	
 	public void applySingleTextureMode() {
-		if (ModelCreator.singleTextureMode) {
-			if (ModelCreator.currentProject != null && ModelCreator.currentProject.Textures != null && ModelCreator.currentProject.Textures.size() > 0) {
-				this.texture = ModelCreator.currentProject.Textures.get(0).name;
-			}
+		if (ModelCreator.currentProject != null && ModelCreator.currentProject.SingleTexture && ModelCreator.currentProject.Textures != null && ModelCreator.currentProject.Textures.size() > 0) {
+			this.texture = ModelCreator.currentProject.Textures.get(0).name;
 		}		
 	}
 	
@@ -151,21 +149,15 @@ public class Face
 			int uvBaseIndex = blockFacing.GetIndex() * 8;
 			int uvIndex = 0;
 			
-			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
-			double texWidth = 16 / ModelCreator.texScale;
-			double texHeight = 16 / ModelCreator.texScale;
-			if (entry != null) {
-				texWidth = entry.Width / ModelCreator.texScale;
-				texHeight = entry.Height / ModelCreator.texScale;				
-			}
+			double[] scale = textureScale();
 
 			
 			GL11.glBegin(GL11.GL_QUADS);
 			{
 				for (int j = 0; j < 4; j++) {
 					GL11.glTexCoord2d(
-							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureU : textureUEnd) / texWidth, 
-							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureV : textureVEnd) / texHeight
+							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureU : textureUEnd) / scale[0] / 16, 
+							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureV : textureVEnd) / scale[1] / 16
 					);
 					GL11.glVertex3d(cuboid.getWidth() * CubeVertices[coordIndex++], cuboid.getHeight() * CubeVertices[coordIndex++], cuboid.getDepth() * CubeVertices[coordIndex++]);
 				}
@@ -179,18 +171,21 @@ public class Face
 	
 
 	public double[] textureScale() {
-		double texWidth = 16;
-		double texHeight = 16;
+		double texWidth = ModelCreator.currentProject.TextureWidth;
+		double texHeight = ModelCreator.currentProject.TextureWidth;
+		
+		double scaleX = ModelCreator.noTexScale;
+		double scaleY = ModelCreator.noTexScale;
 		
 		if (ModelCreator.currentProject != null) {
 			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
 			if (entry != null) {
-				texWidth = entry.Width;
-				texHeight = entry.Height;				
-			}			
+				scaleX = entry.Width / texWidth;
+				scaleY = entry.Height / texHeight;				
+			}
 		}
 		
-		return new double[] { texWidth / (16 * ModelCreator.texScale/2), texHeight / (16 * ModelCreator.texScale/2) };
+		return new double[] { scaleX, scaleY };
 	}
 
 
@@ -375,11 +370,11 @@ public class Face
 			double[] scale = textureScale();
 			
 			if (rotation == 0 || rotation == 2) {
-				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale[0]) / scale[0];
-				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale[1]) / scale[1];	
+				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale[0] + 0.000001) / scale[0];      // Stupid rounding errors -.-
+				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale[1] + 0.000001) / scale[1];	
 			} else {
-				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale[1]) / scale[1];
-				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale[0]) / scale[0];
+				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale[0] + 0.000001) / scale[0];
+				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale[1] + 0.000001) / scale[1];
 			}
 			
 		}

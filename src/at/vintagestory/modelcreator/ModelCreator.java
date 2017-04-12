@@ -72,11 +72,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	public static boolean showGrid = true;
 	public static boolean transparent = true;
-	public static boolean unlockAngles = false;
-	public static boolean singleTextureMode = false;
-	public static float texScale = 2;
-	public static int noTexWidth = 32;
-	public static int noTexHeight = 32;
+	public static float noTexScale = 2;
 
 	// Canvas Variables
 	private final static AtomicReference<Dimension> newCanvasSize = new AtomicReference<Dimension>();
@@ -119,12 +115,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	{
 		super(title);
 		
-		singleTextureMode = prefs.getBoolean("singleTextureMode", false);
-		unlockAngles = prefs.getBoolean("unlockAngles", false);
 		showGrid = prefs.getBoolean("showGrid", false);
-		noTexWidth = prefs.getInt("noTexWidth", 32);
-		noTexHeight = prefs.getInt("noTexHeight", 32);
-		texScale = prefs.getFloat("texScale", 2);
+		noTexScale = prefs.getFloat("noTexScale", 2);
 		
 		Instance = this;
 		
@@ -337,6 +329,13 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		while (!Display.isCloseRequested() && !getCloseRequested())
 		{
+			Project project = ModelCreator.currentProject;
+			
+			if (project == null) {
+				Thread.sleep(5);
+				continue;
+			}
+			
 			for (PendingTexture texture : pendingTextures)
 			{
 				texture.load();
@@ -353,7 +352,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 			int leftSpacing = 0;
 			if (modelrenderer.renderedLeftSidebar != null) {
-				leftSpacing = singleTextureMode || getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
+				leftSpacing = project.SingleTexture || getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
 			}
 			
 			
@@ -376,8 +375,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 			
 			
-			if (currentProject != null && currentProject.SelectedAnimation != null && currentProject.PlayAnimation) {
-				currentProject.SelectedAnimation.NextFrame();
+			if (project != null && project.SelectedAnimation != null && project.PlayAnimation) {
+				project.SelectedAnimation.NextFrame();
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() { updateFrame(); } 
