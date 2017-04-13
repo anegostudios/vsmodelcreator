@@ -5,7 +5,8 @@ cd ..
 cd output-bin
 mkdir natives
 cd natives
-xcopy ..\..\natives /e
+mkdir windows
+xcopy ..\..\natives\windows windows /e
 cd ..
 cd ..
 pause

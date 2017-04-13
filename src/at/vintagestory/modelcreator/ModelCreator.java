@@ -72,6 +72,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	public static boolean showGrid = true;
 	public static boolean transparent = true;
+	public static boolean autoreloadTexture = true;
 	public static float noTexScale = 2;
 
 	// Canvas Variables
@@ -117,6 +118,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		showGrid = prefs.getBoolean("showGrid", false);
 		noTexScale = prefs.getFloat("noTexScale", 2);
+		autoreloadTexture = prefs.getBoolean("autoreloadTexture", true);
 		
 		Instance = this;
 		

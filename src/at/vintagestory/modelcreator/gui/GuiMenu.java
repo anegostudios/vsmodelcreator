@@ -71,6 +71,7 @@ public class GuiMenu extends JMenuBar
 	private JMenu otherMenu;
 	private JMenuItem itemSaveScreenshot;
 	private JMenuItem itemReloadTextures;
+	private JCheckBoxMenuItem itemAutoReloadTextures;
 	private JMenuItem itemImgurLink;
 	private JMenuItem itemControls;
 	private JMenuItem itemCredits;
@@ -131,7 +132,8 @@ public class GuiMenu extends JMenuBar
 		
 		otherMenu = new JMenu("Other");
 		{
-			itemReloadTextures = createItem("Reload textures", "Reload textures", KeyEvent.VK_F5, Icons.reload);
+			itemAutoReloadTextures = createCheckboxItem("Autoreload changed textures", "Automatically reloads a texture if the file has been modified", 0, Icons.reload);
+			itemReloadTextures = createItem("Reload textures now", "Reloads textures now", KeyEvent.VK_F5, Icons.reload);
 			itemSaveScreenshot = createItem("Save Screenshot to Disk...", "Save screenshot to disk.", KeyEvent.VK_F12, Icons.disk);
 			itemImgurLink = createItem("Get Imgur Link", "Get an Imgur link of your screenshot to share.", KeyEvent.VK_F11, Icons.imgur);
 			itemControls = createItem("Quick Controls", "Some useful controls", 0, Icons.keyboard);
@@ -155,6 +157,7 @@ public class GuiMenu extends JMenuBar
 		menuEdit.add(itemUndo);
 		menuEdit.add(itemRedo);
 
+		otherMenu.add(itemAutoReloadTextures);
 		otherMenu.add(itemReloadTextures);
 		otherMenu.add(itemSaveScreenshot);
 		otherMenu.add(itemImgurLink);
@@ -349,6 +352,12 @@ public class GuiMenu extends JMenuBar
 		itemReloadTextures.addActionListener(a -> {
 			ModelCreator.currentProject.reloadTextures(creator);
 		});
+		
+		itemAutoReloadTextures.addActionListener(a -> {
+			ModelCreator.autoreloadTexture = itemAutoReloadTextures.isSelected();
+			ModelCreator.prefs.putBoolean("autoreloadTexture", ModelCreator.autoreloadTexture);
+		});
+		itemAutoReloadTextures.setSelected(ModelCreator.autoreloadTexture);
 
 		itemSaveScreenshot.addActionListener(a ->
 		{
