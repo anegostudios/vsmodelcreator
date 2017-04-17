@@ -230,6 +230,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 				frameSlider.setEnabled(max > 0);
 				
 				ModelCreator.currentProject.SelectedAnimation.SetQuantityFrames(max, ModelCreator.currentProject);
+				ModelCreator.currentProject.SelectedAnimation.currentFrame = Math.min(ModelCreator.currentProject.SelectedAnimation.currentFrame, max);
 				ModelCreator.updateFrame();	
 			}
 		});

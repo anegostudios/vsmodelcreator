@@ -175,8 +175,10 @@ public class Exporter
 		writer.write(space(3) + "\"quantityframes\": " + animation.GetQuantityFrames() + ",");
 		writer.newLine();
 		
-		writer.write(space(3) + "\"forActivity\": \"" + animation.ForActivity + "\",");
-		writer.newLine();
+		if (animation.ForActivity != null) {
+			writer.write(space(3) + "\"forActivity\": \"" + animation.ForActivity + "\",");
+			writer.newLine();			
+		}
 		
 		writer.write(space(3) + "\"onActivityStopped\": \"" + animation.OnActivityStopped + "\",");
 		writer.newLine();
@@ -187,6 +189,8 @@ public class Exporter
 		writer.write(space(3) + "\"keyframes\": [");
 		writer.newLine();
 		for (int i = 0; i < animation.keyframes.length; i++) {
+			if (animation.keyframes[i].Elements.size() == 0) continue;
+			
 			writeKeyFrame(writer, animation.keyframes[i]);
 			
 			if (i != animation.keyframes.length - 1) {
@@ -213,14 +217,15 @@ public class Exporter
 		writer.write(space(5) + "\"elements\": {");
 		writer.newLine();
 		
+		boolean didwrite = false;
+		
 		for (int i = 0; i < keyframe.Elements.size(); i++) {
-			if (writeKeyFrameElement(writer, (KeyframeElement)keyframe.Elements.get(i), 6)) {
-				if (i != keyframe.Elements.size() - 1) {
-					writer.write(",");
-					writer.newLine();
-				}				
+			if (didwrite) {
+				writer.write(",");
+				writer.newLine();
 			}
 			
+			didwrite = writeKeyFrameElement(writer, (KeyframeElement)keyframe.Elements.get(i), 6);
 		}
 		
 		writer.newLine();
@@ -241,7 +246,6 @@ public class Exporter
 			boolean bla = false;
 			
 			if (kElem.PositionSet) {
-				writer.write(space(indent));				
 				writer.write("\"offsetX\": " + kElem.getOffsetX());
 				writer.write(", \"offsetY\": " + kElem.getOffsetY());
 				writer.write(", \"offsetZ\": " + kElem.getOffsetZ());

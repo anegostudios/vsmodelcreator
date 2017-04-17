@@ -2,11 +2,13 @@ package at.vintagestory.modelcreator.model;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_LINES;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.Sphere;
 import org.newdawn.slick.Color;
 
 import at.vintagestory.modelcreator.ModelCreator;
@@ -44,6 +46,10 @@ public class KeyframeElement implements IDrawable
 	public int FrameNumber;
 	KeyframeElement ParentElement;
 	public boolean IsKeyFrame;
+	
+	// Rotation Point Indicator
+	protected Sphere sphere = new Sphere();
+
 
 	
 	public KeyframeElement(boolean IsKeyFrame) {
@@ -102,7 +108,7 @@ public class KeyframeElement implements IDrawable
 		
 		GL11.glPushMatrix();
 		{
-			//GL11.glLoadName(openGlName);
+			GL11.glLoadName(AnimatedElement.openGlName);
 			GL11.glEnable(GL_BLEND);
 			GL11.glDisable(GL_CULL_FACE);
 			GL11.glTranslated(originX, originY, originZ);
@@ -124,7 +130,7 @@ public class KeyframeElement implements IDrawable
 								
 				AnimatedElement.faces[i].renderFace(BlockFacing.ALLFACES[i], b);
 			}
-			//GL11.glLoadName(0);
+			GL11.glLoadName(0);
 			
 			for (int i = 0; i < ChildElements.size(); i++) {
 				ChildElements.get(i).draw(selectedElem);
@@ -132,6 +138,138 @@ public class KeyframeElement implements IDrawable
 
 		}
 		GL11.glPopMatrix();
+		
+		
+		if (selectedElem == AnimatedElement) {
+			drawSelectionExtras();
+		}
+	}
+	
+
+	public void drawSelectionExtras()
+	{
+		double originX = AnimatedElement.originX + this.getOriginX();
+		double originY = AnimatedElement.originY + this.getOriginY();
+		double originZ = AnimatedElement.originZ + this.getOriginZ();
+		
+		double startX = AnimatedElement.startX + getOffsetX();
+		double startY = AnimatedElement.startY + getOffsetY();
+		double startZ = AnimatedElement.startZ + getOffsetZ();
+
+		
+		GL11.glLineWidth(1f);
+		
+		if (!ModelCreator.renderAttachmentPoints) {
+			GL11.glPushMatrix();
+			{
+				GL11.glDisable(GL11.GL_DEPTH_TEST);
+				GL11.glTranslated(originX, originY, originZ);
+				GL11.glColor3f(0.25F, 0.25F, 0.25F);
+				sphere.draw(0.2F, 16, 16);
+				rotateAxis();
+				GL11.glBegin(GL_LINES);
+				{
+					// 3 Axes
+					GL11.glColor3f(1, 0, 0);
+					GL11.glVertex3f(-4, 0, 0);
+					GL11.glVertex3f(4, 0, 0);
+					
+					GL11.glVertex3f(4, 0, 0);
+					GL11.glVertex3f(3.6f, 0, 0.4f);
+					GL11.glVertex3f(4, 0, 0);
+					GL11.glVertex3f(3.6f, 0, -0.4f);
+					
+					GL11.glColor3f(0, 1, 0);
+					GL11.glVertex3f(0, -4, 0);
+					GL11.glVertex3f(0, 4, 0);
+					
+					GL11.glVertex3f(0, 4, 0);
+					GL11.glVertex3f(0, 3.6f, 0.4f);
+					
+					GL11.glVertex3f(0, 4, 0);
+					GL11.glVertex3f(0, 3.6f, -0.4f);
+					
+					GL11.glColor3f(0, 0, 1);
+					GL11.glVertex3f(0, 0, -4);
+					GL11.glVertex3f(0, 0, 4);
+					
+					GL11.glVertex3f(0, 0, 4);
+					GL11.glVertex3f(0.4f, 0, 3.6f);
+					
+					GL11.glVertex3f(0, 0, 4);
+					GL11.glVertex3f(-0.4f, 0, 3.6f);
+				}
+				
+				GL11.glEnd();
+				GL11.glEnable(GL11.GL_DEPTH_TEST);
+			}
+			
+			GL11.glPopMatrix();			
+		}
+		
+
+
+		// Cube highlight
+		GL11.glPushMatrix();
+		{
+			GL11.glTranslated(originX, originY, originZ);
+			rotateAxis();
+			GL11.glTranslated(-originX, -originY, -originZ);
+			
+			GL11.glTranslated(startX, startY, startZ);
+			
+			GL11.glDisable(GL11.GL_DEPTH_TEST);
+			GL11.glBegin(GL11.GL_LINES);
+			{
+				GL11.glColor4f(0F, 0F, 0F, 0.5f);
+				
+				float w = (float)AnimatedElement.width;
+				float h = (float)AnimatedElement.height;
+				float d = (float)AnimatedElement.depth;
+				
+				GL11.glVertex3f(0, 0, 0);
+				GL11.glVertex3f(0, h, 0);
+				
+				GL11.glVertex3f(w, 0, 0);
+				GL11.glVertex3f(w, h, 0);
+
+				GL11.glVertex3f(w, 0, d);
+				GL11.glVertex3f(w, h, d);
+				
+				GL11.glVertex3f(0, 0, d);
+				GL11.glVertex3f(0, h, d);
+				
+				GL11.glVertex3f(0, h, 0);
+				GL11.glVertex3f(w, h, 0);
+				
+				GL11.glVertex3f(w, h, 0);
+				GL11.glVertex3f(w, h, d);
+				
+				GL11.glVertex3f(w, h, d);
+				GL11.glVertex3f(0, h, d);
+				
+				GL11.glVertex3f(0, h, d);
+				GL11.glVertex3f(0, h, 0);
+				
+				
+				GL11.glVertex3f(0, 0, 0);
+				GL11.glVertex3f(w, 0, 0);
+				
+				GL11.glVertex3f(w, 0, 0);
+				GL11.glVertex3f(w, 0, d);
+				
+				GL11.glVertex3f(w, 0, d);
+				GL11.glVertex3f(0, 0, d);
+				
+				GL11.glVertex3f(0, 0, d);
+				GL11.glVertex3f(0, 0, 0);
+			}
+			
+			GL11.glEnd();
+			GL11.glEnable(GL11.GL_DEPTH_TEST);
+		
+		}
+		GL11.glPopMatrix();		
 	}
 	
 	

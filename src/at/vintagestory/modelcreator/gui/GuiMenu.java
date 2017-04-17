@@ -25,6 +25,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.util.UVMapExporter;
+import at.vintagestory.modelcreator.util.screenshot.AnimatedGifCapture;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCallback;
 import at.vintagestory.modelcreator.util.screenshot.Uploader;
@@ -70,12 +71,17 @@ public class GuiMenu extends JMenuBar
 	/* Other */
 	private JMenu otherMenu;
 	private JMenuItem itemSaveScreenshot;
+	public JMenuItem itemSaveAnimation;
 	private JMenuItem itemReloadTextures;
 	private JCheckBoxMenuItem itemAutoReloadTextures;
 	private JMenuItem itemImgurLink;
+	
+	/* Help */
+	private JMenu helpMenu;
 	private JMenuItem itemControls;
 	private JMenuItem itemCredits;
 
+	
 	public GuiMenu(ModelCreator creator)
 	{
 		this.creator = creator;
@@ -104,6 +110,10 @@ public class GuiMenu extends JMenuBar
 
 		menuProject = new JMenu("Project");
 		{
+			itemAutoReloadTextures = createCheckboxItem("Autoreload changed textures", "Automatically reloads a texture if the file has been modified", 0, Icons.reload);
+			itemReloadTextures = createItem("Reload textures now", "Reloads textures now", KeyEvent.VK_F5, Icons.reload);
+			
+
 			itemUnlockAngles = createCheckboxItem("Unlock all Angles", "Disabling this allows angle stepping of single degrees. Suggested to unlock this only for entities.", KeyEvent.VK_A, Icons.transparent);
 			itemUnlockAngles.setSelected(ModelCreator.currentProject.AllAngles);
 			
@@ -130,26 +140,34 @@ public class GuiMenu extends JMenuBar
 		}
 
 		
-		otherMenu = new JMenu("Other");
+		otherMenu = new JMenu("Export");
 		{
-			itemAutoReloadTextures = createCheckboxItem("Autoreload changed textures", "Automatically reloads a texture if the file has been modified", 0, Icons.reload);
-			itemReloadTextures = createItem("Reload textures now", "Reloads textures now", KeyEvent.VK_F5, Icons.reload);
 			itemSaveScreenshot = createItem("Save Screenshot to Disk...", "Save screenshot to disk.", KeyEvent.VK_F12, Icons.disk);
-			itemImgurLink = createItem("Get Imgur Link", "Get an Imgur link of your screenshot to share.", KeyEvent.VK_F11, Icons.imgur);
+			itemSaveAnimation= createItem("Export Current Animation as GIF...", "Export current Animation as GIF.", 0, Icons.disk);
+			itemImgurLink = createItem("Get Screenshot as Imgur Link", "Get an Imgur link of your screenshot to share.", KeyEvent.VK_F11, Icons.imgur);
+		}
+
+		
+		helpMenu = new JMenu("Help");
+		{
 			itemControls = createItem("Quick Controls", "Some useful controls", 0, Icons.keyboard);
 			itemCredits = createItem("Credits", "Who made this tool", 0, Icons.drink);
 		}
 
+		
 		initActions();
 
 	
 		menuView.add(itemGrid);
 		menuView.add(itemTransparency);
 		
-		
 		menuProject.add(itemUnlockAngles);
 		menuProject.add(itemSingleTexture);
 		menuProject.add(itemNoTextureSize);
+		menuProject.addSeparator();
+		menuProject.add(itemAutoReloadTextures);
+		menuProject.add(itemReloadTextures);
+
 		
 		menuAdd.add(itemAddCube);
 		menuAdd.add(itemAddFace);
@@ -157,12 +175,14 @@ public class GuiMenu extends JMenuBar
 		menuEdit.add(itemUndo);
 		menuEdit.add(itemRedo);
 
-		otherMenu.add(itemAutoReloadTextures);
-		otherMenu.add(itemReloadTextures);
+		
 		otherMenu.add(itemSaveScreenshot);
 		otherMenu.add(itemImgurLink);
-		otherMenu.add(itemControls);
-		otherMenu.add(itemCredits);
+		otherMenu.addSeparator();
+		otherMenu.add(itemSaveAnimation);
+
+		helpMenu.add(itemControls);
+		helpMenu.add(itemCredits);
 
 		menuFile.add(itemNew);
 		menuFile.addSeparator();
@@ -181,6 +201,7 @@ public class GuiMenu extends JMenuBar
 		add(menuProject);
 		add(menuAdd);
 		add(otherMenu);
+		add(helpMenu);
 	}
 
 	private void initActions()
@@ -362,9 +383,22 @@ public class GuiMenu extends JMenuBar
 		itemSaveScreenshot.addActionListener(a ->
 		{
 			saveScreenshot();
-			
 		});
-
+		
+		itemSaveAnimation.addActionListener(a -> {
+			JFileChooser chooser = new JFileChooser();
+			chooser.setDialogTitle("Save gif file to...");
+			chooser.setFileFilter(new FileNameExtensionFilter(".gif Files", "txt", "gif"));
+			int returnVal = chooser.showOpenDialog(null);
+			if (returnVal == JFileChooser.APPROVE_OPTION)
+			{
+				String filename = chooser.getSelectedFile().getAbsolutePath();
+				if (!filename.endsWith(".gif")) filename += ".gif";
+				ModelCreator.gifCapture = new AnimatedGifCapture(filename);
+			}
+		});
+		itemSaveAnimation.setEnabled(ModelCreator.leftKeyframesPanel.isVisible() && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
+		
 		itemImgurLink.addActionListener(a ->
 		{
 			CreateImgurLink();
@@ -538,7 +572,7 @@ public class GuiMenu extends JMenuBar
 		
 		itemExportUvMap.setEnabled(ModelCreator.currentProject.SingleTexture);
 		itemUnlockAngles.setSelected(ModelCreator.currentProject.AllAngles);
-		itemSingleTexture.setSelected(ModelCreator.currentProject.SingleTexture);
+		itemSingleTexture.setSelected(ModelCreator.currentProject.SingleTexture);		
 	}
 	
 	public void updateFrame() {

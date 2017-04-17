@@ -142,8 +142,9 @@ public class Project
 	{
 		if (SelectedAnimation == null || SelectedAnimation.keyframes.length == 0) return new ArrayList<IDrawable>(rootElements);
 		
-		if (SelectedAnimation.allFrames.size() == 0) {
+		if (SelectedAnimation.allFrames.size() == 0 || SelectedAnimation.currentFrame >= SelectedAnimation.allFrames.size()) {
 			SelectedAnimation.calculateAllFrames(this);
+			SelectedAnimation.currentFrame = Math.min(SelectedAnimation.currentFrame, SelectedAnimation.allFrames.size());
 		}
 		
 		return SelectedAnimation.allFrames.get(SelectedAnimation.currentFrame).Elements;

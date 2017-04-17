@@ -15,7 +15,7 @@ import org.lwjgl.opengl.GL11;
 
 import at.vintagestory.modelcreator.util.Url;
 
-public class Screenshot
+public class ScreenshotCapture
 {
 	public static void getScreenshot(int width, int height, ScreenshotCallback callback)
 	{

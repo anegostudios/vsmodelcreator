@@ -51,8 +51,9 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.PendingTexture;
+import at.vintagestory.modelcreator.util.screenshot.AnimatedGifCapture;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
-import at.vintagestory.modelcreator.util.screenshot.Screenshot;
+import at.vintagestory.modelcreator.util.screenshot.ScreenshotCapture;
 
 import java.util.prefs.Preferences;
 
@@ -88,6 +89,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	// Texture Loading Cache
 	public List<PendingTexture> pendingTextures = new ArrayList<PendingTexture>();
 	private PendingScreenshot screenshot = null;
+	public static AnimatedGifCapture gifCapture = null;
+	
+	
+	
 
 	private int lastMouseX, lastMouseY;
 	private boolean grabbing = false;
@@ -361,6 +366,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			glViewport(leftSpacing, 0, width - leftSpacing, height);
 
 			handleInput(leftSpacing);
+			
+			
+			if (gifCapture != null && !gifCapture.isComplete()) {
+				gifCapture.PrepareFrame();
+			}
 
 			modelrenderer.Render(leftSpacing, width, height, getHeight());
 			
@@ -370,21 +380,40 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			if (screenshot != null)
 			{
 				if (screenshot.getFile() != null)
-					Screenshot.getScreenshot(width, height, screenshot.getCallback(), screenshot.getFile());
+					ScreenshotCapture.getScreenshot(width, height, screenshot.getCallback(), screenshot.getFile());
 				else
-					Screenshot.getScreenshot(width, height, screenshot.getCallback());
+					ScreenshotCapture.getScreenshot(width, height, screenshot.getCallback());
 				screenshot = null;
 			}
 			
 			
-			if (project != null && project.SelectedAnimation != null && project.PlayAnimation) {
-				project.SelectedAnimation.NextFrame();
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() { updateFrame(); } 
-				});
+			if (gifCapture != null && !gifCapture.isComplete()) {
+				gifCapture.CaptureFrame(width, height);
+				
+				if (gifCapture.isComplete()) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run()
+						{
+							JOptionPane.showMessageDialog(null, "Gif export complete");							
+						}
+					});
+					
+					gifCapture = null;
+				}
+			} else {
+				
+				if (project != null && project.SelectedAnimation != null && project.PlayAnimation) {
+					project.SelectedAnimation.NextFrame();
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() { updateFrame(); } 
+					});
+					
+				}
 				
 			}
+			
 			
 			// Don't run faster than ~30 FPS (1000 / 30 = 33ms)
 			long duration = System.currentTimeMillis() - prevFrameMillisec; 
@@ -783,8 +812,15 @@ public class ModelCreator extends JFrame implements ITextureCallback
 					
 				} catch (Exception e) {
 					System.out.println("Failed reading dropped file. File is probably in an incorrect format.");
-					e.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Couldn't open this file: " + e.toString());
+					StackTraceElement[] elems = e.getStackTrace();
+					String trace = "";
+					for (int i = 0; i < elems.length; i++) {
+						trace += elems[i].toString() + "\n";
+						if (i >= 10) break;
+					}
+					
+		        	JOptionPane.showMessageDialog(null, "Couldn't open this file, something unexpecteded happened\n\n" + e.toString() + "\nat\n" + trace);
+		        	e.printStackTrace();
 				}
 		        		        
 		        evt.dropComplete(true);

@@ -24,7 +24,7 @@ public class ControlsDialog
 		JLabel message = new JLabel();
 		message.setText("<html><p><b>UV Panel (Left)</b></p>"
 				+ "<ul>"
-				+ "<li>Hold left mouse button to resive UV Rectangles"
+				+ "<li>Hold left mouse button to move/resive UV Rectangles (if auto uv is on, you can only move it)"
 				+ "</ul>"
 				+ "<p><b>Model Pane (Middle)</b></p>"
 				+ "<ul>"

@@ -123,6 +123,8 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 			
 			ModelCreator.leftKeyframesPanel.setVisible(tabbedPane.getSelectedIndex() == 2);
 			ModelCreator.renderAttachmentPoints = tabbedPane.getSelectedIndex() == 3;
+			ModelCreator.guiMain.itemSaveAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
+			updateValues();
 		});
 		
 		add(tabbedPane);
