@@ -421,6 +421,9 @@ public class KeyframeElement implements IDrawable
 		cloned.PositionSet = PositionSet;
 		cloned.RotationSet = RotationSet;
 		cloned.StretchSet = StretchSet;
+		cloned.rotationX = rotationX;
+		cloned.rotationY = rotationY;
+		cloned.rotationZ = rotationZ;
 		cloned.offsetX = offsetX;
 		cloned.offsetY = offsetY;
 		cloned.offsetZ = offsetZ;

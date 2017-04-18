@@ -412,13 +412,15 @@ public class ModelCreator extends JFrame implements ITextureCallback
 					
 				}
 				
+
+				// Don't run faster than ~30 FPS (1000 / 30 = 33ms)
+				long duration = System.currentTimeMillis() - prevFrameMillisec; 
+				Thread.sleep(Math.max(33 - duration, 0));
+				prevFrameMillisec = System.currentTimeMillis();
+				
 			}
 			
 			
-			// Don't run faster than ~30 FPS (1000 / 30 = 33ms)
-			long duration = System.currentTimeMillis() - prevFrameMillisec; 
-			Thread.sleep(Math.max(33 - duration, 0));
-			prevFrameMillisec = System.currentTimeMillis();
 		}
 	}
 

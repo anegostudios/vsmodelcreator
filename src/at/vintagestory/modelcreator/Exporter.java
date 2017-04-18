@@ -220,12 +220,13 @@ public class Exporter
 		boolean didwrite = false;
 		
 		for (int i = 0; i < keyframe.Elements.size(); i++) {
-			if (didwrite) {
+			KeyframeElement kElem = (KeyframeElement)keyframe.Elements.get(i);
+			if (didwrite && willWriteKeyFrameElement(kElem)) {
 				writer.write(",");
 				writer.newLine();
 			}
 			
-			didwrite = writeKeyFrameElement(writer, (KeyframeElement)keyframe.Elements.get(i), 6);
+			didwrite = writeKeyFrameElement(writer, kElem, 6);
 		}
 		
 		writer.newLine();
@@ -234,6 +235,17 @@ public class Exporter
 		writer.write(space(4) + "}");
 	}
 	
+	
+	boolean willWriteKeyFrameElement(KeyframeElement kElem) {
+		if (!kElem.IsUseless()) return true;
+		
+		for (int i = 0; i < kElem.ChildElements.size(); i++)
+		{
+			if (!((KeyframeElement)kElem.ChildElements.get(i)).IsUseless()) return true;
+		}
+		
+		return false;
+	}
 	
 
 	private boolean writeKeyFrameElement(BufferedWriter writer, KeyframeElement kElem, int indent) throws IOException
@@ -279,12 +291,13 @@ public class Exporter
 		boolean didwriteanychild = false;
 		for (int i = 0; i < kElem.ChildElements.size(); i++)
 		{
-			if (didwritechild || (i == 0 && didwrite)) {
+			KeyframeElement childKelem = (KeyframeElement)kElem.ChildElements.get(i);
+			if ((didwritechild || (i == 0 && didwrite)) && willWriteKeyFrameElement(childKelem)) {
 				writer.write(",");
 				writer.newLine();
 			}
 			
-			didwritechild = writeKeyFrameElement(writer, (KeyframeElement)kElem.ChildElements.get(i), indent);
+			didwritechild = writeKeyFrameElement(writer, childKelem, indent);
 			
 			didwriteanychild |= didwritechild;
 		}
