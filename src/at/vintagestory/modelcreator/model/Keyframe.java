@@ -12,7 +12,7 @@ public class Keyframe
 	private int FrameNumber;	
 	public ArrayList<IDrawable> Elements = new ArrayList<IDrawable>();
 	
-	boolean IsKeyFrame;
+	public boolean IsKeyFrame;
 
 	
 	public Keyframe(boolean IsKeyFrame) {
@@ -141,12 +141,16 @@ public class Keyframe
 	}
 	
 	
-	public Keyframe clone() {
-		Keyframe cloned = new Keyframe(IsKeyFrame);
+	public Keyframe clone(boolean withElementReference) {
+		return clone(IsKeyFrame, withElementReference);
+	}
+	
+	public Keyframe clone(boolean iskeyframe, boolean withElementReference) {
+		Keyframe cloned = new Keyframe(iskeyframe);
 		cloned.FrameNumber = FrameNumber;
 		
 		for (IDrawable dw : Elements) {
-			cloned.Elements.add((IDrawable) ((KeyframeElement)dw).clone());
+			cloned.Elements.add((IDrawable) ((KeyframeElement)dw).clone(iskeyframe, withElementReference));
 		}
 		
 		

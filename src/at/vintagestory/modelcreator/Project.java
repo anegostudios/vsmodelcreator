@@ -342,7 +342,7 @@ public class Project
 	
 
 
-	public Project clone()
+	public Project clone(boolean withElementReference)
 	{
 		Project cloned = new Project(filePath);
 		cloned.AmbientOcclusion = AmbientOcclusion;
@@ -356,7 +356,7 @@ public class Project
 		}
 		
 		for (Animation anim : Animations) {
-			cloned.Animations.add(anim.clone());
+			cloned.Animations.add(anim.clone(withElementReference));
 		}
 		
 		cloned.needsSaving = needsSaving;

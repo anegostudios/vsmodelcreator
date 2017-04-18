@@ -54,7 +54,7 @@ public class ProjectChangeHistory
 	void ApplyState() {
 		Project oldProject = ModelCreator.currentProject;
 		
-		ModelCreator.currentProject = ProjectSnapshots.get(currentHistoryState).clone();
+		ModelCreator.currentProject = ProjectSnapshots.get(currentHistoryState).clone(false);
 		ModelCreator.currentProject.tree = oldProject.tree;
 		if (oldProject.SelectedAnimation != null) {
 			ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.findAnimation(oldProject.SelectedAnimation.getName());	
@@ -83,7 +83,7 @@ public class ProjectChangeHistory
 			currentHistoryState--;
 		}
 		
-		ProjectSnapshots.add(0, project.clone());
+		ProjectSnapshots.add(0, project.clone(false));
 		//System.out.println("added history state, states = " + ProjectSnapshots.size());
 		
 		if (ProjectSnapshots.size() > maxHistoryStates) {

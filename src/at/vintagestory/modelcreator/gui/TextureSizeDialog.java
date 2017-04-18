@@ -21,8 +21,6 @@ public class TextureSizeDialog
 		
 		JPanel container = new JPanel(new BorderLayout(20, 10));
 		container.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-		JPanel panel = new JPanel(new GridLayout(2, 1, 5, 0));
 		
 		
 		JPanel panelRow1 = new JPanel(new GridLayout(5, 1, 5, 0));
@@ -40,7 +38,7 @@ public class TextureSizeDialog
 		panelRow1.add(scaleTextField);
 		
 		
-		panel.add(panelRow1);
+		container.add(panelRow1, BorderLayout.CENTER);
 		
 		
 		
@@ -94,7 +92,6 @@ public class TextureSizeDialog
 			} catch (Exception e) {
 				
 			}
-			
 		});
 		
 		
@@ -106,14 +103,10 @@ public class TextureSizeDialog
 
 		
 		
-		panel.add(panelRow2);
-			
-		
-		container.add(panel);
-		
+		container.add(panelRow2, BorderLayout.SOUTH);
 		
 		dialog.setResizable(false);
-		//dialog.setPreferredSize(new Dimension(350, 250));
+		
 		dialog.add(container);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);

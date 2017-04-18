@@ -473,7 +473,7 @@ public class Animation
 	}
 	
 	
-	public Animation clone() {
+	public Animation clone(boolean withElementReference) {
 		Animation cloned = new Animation();
 		
 		cloned.name = name;
@@ -482,11 +482,34 @@ public class Animation
 		cloned.keyframes = new Keyframe[keyframes.length];
 		
 		for (int i = 0; i < keyframes.length; i++) {
-			cloned.keyframes[i] = keyframes[i].clone();
+			cloned.keyframes[i] = keyframes[i].clone(withElementReference);
 		}
 		
 		
 		return cloned;
+	}
+
+	public void InsertKeyFrame(Keyframe sourceFrame)
+	{
+		Keyframe[] newKeyframes = new Keyframe[keyframes.length + 1];
+		
+		int j = 0;
+		for (int i = 0; i < keyframes.length; i++) {
+			if (sourceFrame != null && sourceFrame.getFrameNumber() < keyframes[i].getFrameNumber()) {
+				newKeyframes[j++] = sourceFrame;
+				sourceFrame = null;
+				i--;
+			} else {
+				newKeyframes[j++] = keyframes[i];
+			}
+		}
+		if (sourceFrame != null) newKeyframes[j++] = sourceFrame;
+		
+		
+		this.keyframes = newKeyframes;
+		ReloadFrameNumbers();
+		ModelCreator.DidModify();
+		ModelCreator.updateValues();
 	}
 	
 }

@@ -26,6 +26,7 @@ import javax.swing.table.AbstractTableModel;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.Start;
+import at.vintagestory.modelcreator.gui.FrameSelectionDialog;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.gui.animationsdialog.AnimationSelector;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
@@ -60,6 +61,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	JPanel btnContainerBottom;
 	
 	JButton deleteFrameButton;
+	JButton duplicateFrameButton;
 	JButton moveFrameRightButton;
 	JButton moveFrameLeftButton;
 	
@@ -86,6 +88,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		currentFrameLabel = new JLabel();
 		keyFramesTable = new JTable();
 		deleteFrameButton = new JButton();
+		duplicateFrameButton = new JButton();
 		moveFrameLeftButton = new JButton();
 		moveFrameRightButton = new JButton();
 		
@@ -369,13 +372,20 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		deleteFrameButton.setToolTipText("Delete Frame");
 		deleteFrameButton.addActionListener(e ->
 		{
+			
 			ModelCreator.currentProject.SelectedAnimation.DeleteCurrentFrame();
 		});
 		deleteFrameButton.setPreferredSize(new Dimension(30, 30));
 		
 		btnContainerBottom.add(deleteFrameButton);
 		
-		btnContainerBottom.add(new JLabel());
+		
+		duplicateFrameButton.setIcon(Icons.copy);
+		duplicateFrameButton.setToolTipText("Duplicate Frame");
+		duplicateFrameButton.addActionListener(e -> {
+			FrameSelectionDialog.show(ModelCreator.Instance);
+		});
+		btnContainerBottom.add(duplicateFrameButton);
 		
 		
 		moveFrameRightButton.setIcon(Icons.left);

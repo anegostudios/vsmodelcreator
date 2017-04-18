@@ -413,10 +413,11 @@ public class KeyframeElement implements IDrawable
 	}
 
 	
-	public KeyframeElement clone() {
-		KeyframeElement cloned = new KeyframeElement(IsKeyFrame);
+	public KeyframeElement clone(boolean iskeyframe, boolean withElementReference) {
+		KeyframeElement cloned = new KeyframeElement(iskeyframe);
 		
 		cloned.AnimatedElementName = AnimatedElement == null ? AnimatedElementName : ((Element)AnimatedElement).name;
+		cloned.AnimatedElement = AnimatedElement;
 		cloned.PositionSet = PositionSet;
 		cloned.RotationSet = RotationSet;
 		cloned.StretchSet = StretchSet;
@@ -431,7 +432,7 @@ public class KeyframeElement implements IDrawable
 		cloned.originZ = originZ;
 		
 		for (IDrawable dw : ChildElements) {
-			cloned.ChildElements.add((IDrawable)((KeyframeElement)dw).clone());
+			cloned.ChildElements.add((IDrawable)((KeyframeElement)dw).clone(iskeyframe, withElementReference));
 		}
 		
 		cloned.FrameNumber = FrameNumber;
