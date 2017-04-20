@@ -14,7 +14,6 @@ import at.vintagestory.modelcreator.gui.right.keyframes.RightKeyFramesPanel;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
-import at.vintagestory.modelcreator.model.PendingTexture;
 
 public class RightTopPanel extends JPanel implements IElementManager, IValueUpdater {
 	private static final long serialVersionUID = 1L;
@@ -143,11 +142,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		return ModelCreator.currentProject.SelectedElement;
 	}
 
-	@Override
-	public void addPendingTexture(PendingTexture texture)
-	{
-		creator.pendingTextures.add(texture);
-	}
+
 
 	public ModelCreator getCreator()
 	{

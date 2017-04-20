@@ -180,8 +180,8 @@ public class Face
 		if (ModelCreator.currentProject != null) {
 			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
 			if (entry != null) {
-				scaleX = entry.Width / texWidth;
-				scaleY = entry.Height / texHeight;				
+				scaleX = entry.Width / texWidth * 2;
+				scaleY = entry.Height / texHeight * 2;				
 			}
 		}
 		

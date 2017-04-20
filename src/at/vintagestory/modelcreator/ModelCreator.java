@@ -19,6 +19,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -87,7 +88,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	private Element grabbed = null;
 
 	// Texture Loading Cache
-	public List<PendingTexture> pendingTextures = new ArrayList<PendingTexture>();
+	List<PendingTexture> pendingTextures = Collections.synchronizedList(new ArrayList<PendingTexture>());
 	private PendingScreenshot screenshot = null;
 	public static AnimatedGifCapture gifCapture = null;
 	
@@ -276,19 +277,25 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	{
 		if (currentProject == null) return;
 		if (ignoreValueUpdates) return;
-		ignoreValueUpdates = true;
 		
-		if (currentProject.SelectedAnimation != null) {
-			currentProject.SelectedAnimation.calculateAllFrames(currentProject);
-		}
-		
-		guiMain.updateValues();
-	 	((RightTopPanel)manager).updateValues();
-	 	leftKeyframesPanel.updateValues();
-	 	updateFrame();
-	 	updateTitle();
-	 	
-	 	ignoreValueUpdates = false;
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() { 
+				ignoreValueUpdates = true;
+				
+				if (currentProject.SelectedAnimation != null) {
+					currentProject.SelectedAnimation.calculateAllFrames(currentProject);
+				}
+				
+				guiMain.updateValues();
+			 	((RightTopPanel)manager).updateValues();
+			 	leftKeyframesPanel.updateValues();
+			 	updateFrame(false);
+			 	updateTitle();
+			 	
+			 	ignoreValueUpdates = false;
+			}
+		});
 	}
 	
 	static void updateTitle() {
@@ -301,18 +308,38 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	}
 	
 	public static void updateFrame() {
+		updateFrame(true);
+	}
+	
+	public static void updateFrame(boolean later) {
 		if (currentProject == null) return;
 		
-		
-		leftKeyframesPanel.updateFrame();
-		((RightTopPanel)manager).updateFrame();
-		updateTitle();
-		guiMain.updateFrame();
+		if (later) {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() { 
+					leftKeyframesPanel.updateFrame();
+					((RightTopPanel)manager).updateFrame();
+					updateTitle();
+					guiMain.updateFrame();				
+				}
+			});
+		} else {
+			leftKeyframesPanel.updateFrame();
+			((RightTopPanel)manager).updateFrame();
+			updateTitle();
+			guiMain.updateFrame();							
+		}
 	}
 
 
 	
-	
+	public void AddPendingTexture(PendingTexture texture) {
+		synchronized (pendingTextures)
+		{
+			pendingTextures.add(texture);
+		}
+	}
 	
 	public void initDisplay()
 	{
@@ -343,11 +370,14 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				continue;
 			}
 			
-			for (PendingTexture texture : pendingTextures)
+			synchronized (pendingTextures)
 			{
-				texture.load();
+				for (PendingTexture texture : pendingTextures)
+				{
+					texture.load();
+				}
+				pendingTextures.clear();				
 			}
-			pendingTextures.clear();
 
 			newDim = newCanvasSize.getAndSet(null);
 
@@ -405,11 +435,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				
 				if (project != null && project.SelectedAnimation != null && project.PlayAnimation) {
 					project.SelectedAnimation.NextFrame();
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() { updateFrame(); } 
-					});
-					
+					updateFrame(true);
 				}
 				
 
@@ -803,7 +829,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 							}
 							
 							if (file.getName().endsWith(".png")) {								
-								getElementManager().addPendingTexture(new PendingTexture(file, ModelCreator.Instance));
+								AddPendingTexture(new PendingTexture(file, ModelCreator.Instance));
 							}
 							
 							

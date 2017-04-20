@@ -59,7 +59,7 @@ public class Project
 		}
 		
 		for (PendingTexture ptex : PendingTextures) {
-			manager.addPendingTexture(ptex);	
+			ModelCreator.Instance.AddPendingTexture(ptex);	
 		}
 		
 		ModelCreator.ignoreValueUpdates = true;

@@ -78,7 +78,7 @@ public class TextureDialog implements ITextureCallback
 				lastLocation = chooser.getSelectedFile().getParentFile();
 				try
 				{
-					manager.addPendingTexture(new PendingTexture(chooser.getSelectedFile(), this));
+					ModelCreator.Instance.AddPendingTexture(new PendingTexture(chooser.getSelectedFile(), this));
 				}
 				catch (Exception e1)
 				{
