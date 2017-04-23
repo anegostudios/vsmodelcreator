@@ -171,17 +171,17 @@ public class Face
 	
 
 	public double[] textureScale() {
-		double texWidth = ModelCreator.currentProject.TextureWidth;
-		double texHeight = ModelCreator.currentProject.TextureWidth;
-		
 		double scaleX = ModelCreator.noTexScale;
 		double scaleY = ModelCreator.noTexScale;
 		
 		if (ModelCreator.currentProject != null) {
+			double texWidth = ModelCreator.currentProject.TextureWidth;
+			double texHeight = ModelCreator.currentProject.TextureHeight;
+			
 			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
 			if (entry != null) {
-				scaleX = entry.Width / texWidth * 2;
-				scaleY = entry.Height / texHeight * 2;				
+				scaleX = entry.Width / texWidth * (texWidth / 32);
+				scaleY = entry.Height / texHeight * (texHeight / 32);				
 			}
 		}
 		

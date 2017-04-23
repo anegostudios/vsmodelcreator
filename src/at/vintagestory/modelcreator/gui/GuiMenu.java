@@ -117,7 +117,7 @@ public class GuiMenu extends JMenuBar
 			itemUnlockAngles = createCheckboxItem("Unlock all Angles", "Disabling this allows angle stepping of single degrees. Suggested to unlock this only for entities.", KeyEvent.VK_A, Icons.transparent);
 			itemUnlockAngles.setSelected(ModelCreator.currentProject.AllAngles);
 			
-			itemSingleTexture = createCheckboxItem("Single Texture + UV Unwrap Mode", "When creating entities, it is often more useful to use only a single texture.", 0, Icons.transparent);
+			itemSingleTexture = createCheckboxItem("Entity Texturing Mode", "When creating entities, it is often more useful to use only a single texture and have the uv boxes unwrap side by side.", 0, Icons.transparent);
 			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);		
 		}
 		
