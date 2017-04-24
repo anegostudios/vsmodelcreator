@@ -59,7 +59,6 @@ public class Element implements IDrawable
 	protected int selectedFace = 0;
 	protected Face[] faces = new Face[6];
 	private double texUStart;
-
 	private double texVStart;
 
 	// Element Variables
@@ -788,6 +787,8 @@ public class Element implements IDrawable
 		cloned.shade = shade;
 		cloned.tintIndex = tintIndex;
 		cloned.sphere = sphere;
+		cloned.texUStart = texUStart;
+		cloned.texVStart = texVStart;
 		
 		for (int i = 0; i < brightnessByFace.length; i++) {
 			cloned.brightnessByFace[i] = brightnessByFace[i];			

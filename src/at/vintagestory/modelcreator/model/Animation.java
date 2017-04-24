@@ -478,6 +478,9 @@ public class Animation
 		
 		cloned.name = name;
 		cloned.quantityFrames = quantityFrames;
+		cloned.ForActivity = ForActivity;
+		cloned.OnActivityStopped = OnActivityStopped;
+		cloned.OnAnimationEnd = OnAnimationEnd;
 		
 		cloned.keyframes = new Keyframe[keyframes.length];
 		

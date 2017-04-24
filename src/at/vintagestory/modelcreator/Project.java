@@ -347,9 +347,10 @@ public class Project
 		Project cloned = new Project(filePath);
 		cloned.AmbientOcclusion = AmbientOcclusion;
 		cloned.Textures = Textures;
-		/*for (TextureEntry entry : Textures) {
-			cloned.Textures.add(entry.clone());
-		}*/
+		cloned.AllAngles = AllAngles;
+		cloned.SingleTexture = SingleTexture;
+		cloned.TextureWidth = TextureWidth;
+		cloned.TextureHeight = TextureHeight;
 		
 		for (Element elem : rootElements) {
 			cloned.rootElements.add(elem.clone());
