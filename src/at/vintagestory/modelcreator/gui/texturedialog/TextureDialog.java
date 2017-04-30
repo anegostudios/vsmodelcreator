@@ -78,7 +78,7 @@ public class TextureDialog implements ITextureCallback
 				lastLocation = chooser.getSelectedFile().getParentFile();
 				try
 				{
-					ModelCreator.Instance.AddPendingTexture(new PendingTexture(chooser.getSelectedFile(), this));
+					ModelCreator.Instance.AddPendingTexture(new PendingTexture(null, chooser.getSelectedFile(), this));
 				}
 				catch (Exception e1)
 				{
@@ -135,7 +135,7 @@ public class TextureDialog implements ITextureCallback
 	private DefaultListModel<String> generate()
 	{
 		DefaultListModel<String> model = new DefaultListModel<String>();
-		for (TextureEntry entry : ModelCreator.currentProject.Textures)
+		for (TextureEntry entry : ModelCreator.currentProject.Textures.values())
 		{
 			model.addElement(entry.getName());
 		}

@@ -3,10 +3,14 @@ package at.vintagestory.modelcreator.gui.right.keyframes;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.text.DecimalFormat;
 import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
@@ -30,7 +34,7 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 	private RightKeyFramesPanel keyFramesPanel;
 
 	
-	
+	private DecimalFormat df = new DecimalFormat("#.#");	
 	
 	private JTextField[] rotationFields;
 	private JSlider[] rotationSliders;
@@ -123,6 +127,15 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 				}
 			}
 		});
+		
+		rotationFields[num].addMouseWheelListener(new MouseWheelListener()
+		{
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				modifyAngle(num, e.getWheelRotation() > 0 ? 1 : -1, e.getModifiers());
+			}
+		});
 
 		
 		
@@ -174,6 +187,34 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 		layout.putConstraint(SpringLayout.SOUTH, sliderPanel, 5, SpringLayout.SOUTH, rotationSliders[num]);
 	}
 
+	
+	public void modifyAngle(int num, int direction, int modifiers) {
+		KeyframeElement elem = keyFramesPanel.getCurrentElement();
+		if (elem == null) return;		
+		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
+		double newValue;
+		
+		switch (num) {
+		case 0:
+			newValue = elem.getRotationX() + size;
+			elem.setRotationX(newValue);
+			rotationFields[num].setText(""+df.format(newValue));
+			break;
+		case 1:
+			newValue = elem.getRotationY() + size;
+			elem.setRotationY(newValue);
+			rotationFields[num].setText(""+df.format(newValue));
+			break;
+		default:
+			newValue = elem.getRotationZ() + size;
+			elem.setRotationZ(newValue);
+			rotationFields[num].setText(""+df.format(newValue));			
+			break;
+		}
+		
+		ModelCreator.updateValues();
+	}
+	
 
 	@Override
 	public void updateValues()
@@ -229,9 +270,9 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 		rotationSliders[1].setValue(enabled ? (int) Math.round(element.getRotationY() / multiplier) : 0);
 		rotationSliders[2].setValue(enabled ? (int) Math.round(element.getRotationZ() / multiplier) : 0);
 		
-		rotationFields[0].setText(enabled ? "" + element.getRotationX() : "");
-		rotationFields[1].setText(enabled ? "" + element.getRotationY() : "");
-		rotationFields[2].setText(enabled ? "" + element.getRotationZ() : "");
+		rotationFields[0].setText(enabled ? "" + df.format(element.getRotationX()) : "");
+		rotationFields[1].setText(enabled ? "" + df.format(element.getRotationY()) : "");
+		rotationFields[2].setText(enabled ? "" + df.format(element.getRotationZ()) : "");
 		
 		ignoreSliderChanges = false;
 	}

@@ -3,14 +3,16 @@ package at.vintagestory.modelcreator.gui.right.element;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.text.DecimalFormat;
 import java.util.Hashtable;
-
 import javax.swing.*;
-
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
@@ -26,7 +28,7 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 	private IElementManager manager;
 
 	
-	
+	private DecimalFormat df = new DecimalFormat("#.#");	
 	
 	private JTextField[] rotationFields;
 	private JSlider[] rotationSliders;
@@ -121,6 +123,14 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		});
 
 		
+		rotationFields[num].addMouseWheelListener(new MouseWheelListener()
+		{
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				modifyAngle(num, e.getWheelRotation() > 0 ? 1 : -1, e.getModifiers());
+			}
+		});
 		
 		sliderPanel.add(rotationFields[num]);
 		
@@ -170,6 +180,33 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		layout.putConstraint(SpringLayout.SOUTH, sliderPanel, 5, SpringLayout.SOUTH, rotationSliders[num]);
 	}
 
+	
+	public void modifyAngle(int num, int direction, int modifiers) {
+		Element cube = manager.getCurrentElement();
+		if (cube == null) return;		
+		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
+		double newValue;
+		
+		switch (num) {
+		case 0:
+			newValue = cube.getRotationX() + size;
+			cube.setRotationX(newValue);
+			rotationFields[num].setText(""+df.format(newValue));
+			break;
+		case 1:
+			newValue = cube.getRotationY() + size;
+			cube.setRotationY(newValue);
+			rotationFields[num].setText(""+df.format(newValue));
+			break;
+		default:
+			newValue = cube.getRotationZ() + size;
+			cube.setRotationZ(newValue);
+			rotationFields[num].setText(""+df.format(newValue));			
+			break;
+		}
+		
+		ModelCreator.updateValues();
+	}
 
 	@Override
 	public void updateValues()
@@ -226,9 +263,9 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		rotationSliders[2].setValue(enabled ? (int) Math.round(cube.getRotationZ() / multiplier) : 0);
 		
 		if (enabled) {
-			rotationFields[0].setText(""+cube.getRotationX());
-			rotationFields[1].setText(""+cube.getRotationY());
-			rotationFields[2].setText(""+cube.getRotationZ());			
+			rotationFields[0].setText(""+df.format(cube.getRotationX()));
+			rotationFields[1].setText(""+df.format(cube.getRotationY()));
+			rotationFields[2].setText(""+df.format(cube.getRotationZ()));			
 		}
 		
 		ignoreSliderChanges = false;

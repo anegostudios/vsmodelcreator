@@ -6,9 +6,9 @@ public class Clipboard
 {
 	private static ClipboardTexture texture;
 
-	public static void copyTexture(String location, String texture)
+	public static void copyTexture(String texture)
 	{
-		Clipboard.texture = new ClipboardTexture(location, texture);
+		Clipboard.texture = new ClipboardTexture(texture);
 	}
 
 	public static ClipboardTexture getTexture()

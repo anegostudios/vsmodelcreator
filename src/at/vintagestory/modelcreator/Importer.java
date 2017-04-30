@@ -135,7 +135,7 @@ public class Importer
 			
 			if (obj.has("singleTexture") && obj.get("singleTexture").isJsonPrimitive())
 			{
-				project.SingleTexture = obj.get("singleTexture").getAsBoolean();
+				project.EntityTextureMode = obj.get("singleTexture").getAsBoolean();
 			}
 			
 			if (obj.has("allAngles") && obj.get("allAngles").isJsonPrimitive())
@@ -170,47 +170,50 @@ public class Importer
 			{
 				if (entry.getValue().isJsonPrimitive())
 				{
-					String texture = entry.getValue().getAsString();
+					String textureSubPath = entry.getValue().getAsString();
 
-					if (texture.startsWith("#"))
+					if (textureSubPath.startsWith("#"))
 					{
-						textureMap.put(entry.getKey(), textureMap.get(texture.replace("#", "")));
+						textureMap.put(entry.getKey(), textureMap.get(textureSubPath.replace("#", "")));
 					}
 					else
 					{						
-						textureMap.put(entry.getKey().replace("#", ""), texture);
+						textureMap.put(entry.getKey().replace("#", ""), textureSubPath);
 					}
-					loadTexture(file, texture);
+					
+					loadTexture(file, entry.getKey(), textureSubPath);
 				}
 			}
 		}
 	}
 
-	private void loadTexture(File dir, String texture)
+	private void loadTexture(File dir, String textureName, String textureSubPath)
 	{
 		File assets = dir.getParentFile().getParentFile();
-		//System.out.println("1." + assets.getAbsolutePath());
+
 		if (assets != null)
 		{
 			File textureDir = new File(assets, "textures/");
-			//System.out.println("3." + textureDir.getAbsolutePath());
+
 			if (textureDir.exists() && textureDir.isDirectory())
 			{
-				File textureFile = new File(textureDir, texture + ".png");
-				//System.out.println("4." + textureFile.getAbsolutePath());
+				File textureFile = new File(textureDir, textureSubPath + ".png");
+
 				if (textureFile.exists() && textureFile.isFile())
 				{
-					project.PendingTextures.add(new PendingTexture(textureFile));
+					project.PendingTextures.add(new PendingTexture(textureName, textureFile));
 					return;
 				}
 			}
 		}
 
-		String texturePath = ModelCreator.prefs.get("texturePath", ".");
 		
-		if (new File(texturePath + File.separator + texture + ".png").exists())
+		String textureBasePath = ModelCreator.prefs.get("texturePath", ".");
+		File f = new File(textureBasePath + File.separator + textureSubPath + ".png");
+		
+		if (f.exists())
 		{
-			project.PendingTextures.add(new PendingTexture(new File(texturePath + File.separator + texture + ".png")));
+			project.PendingTextures.add(new PendingTexture(textureName, f));
 		}
 	}
 
@@ -281,7 +284,7 @@ public class Importer
 	{
 		KeyframeElement kelem = new KeyframeElement(true);
 		
-		kelem.AnimatedElementName = name; // obj.get("animatedElement").getAsString();
+		kelem.AnimatedElementName = name;
 		
 		if (obj.has("offsetX") || obj.has("offsetY") || obj.has("offsetZ")) {
 			kelem.PositionSet = true;
@@ -491,16 +494,7 @@ public class Importer
 			if (obj.has("texture") && obj.get("texture").isJsonPrimitive())
 			{
 				String loc = obj.get("texture").getAsString().replace("#", "");
-
-				if (textureMap.containsKey(loc))
-				{
-					String tloc = textureMap.get(loc);
-					String location = tloc.substring(0, tloc.lastIndexOf('/') + 1);
-					String tname = tloc.replace(location, "");
-
-					face.setTextureLocation(location);
-					face.setTexture(tname);
-				}
+				face.setTextureName(loc);
 			}
 
 			if (obj.has("rotation") && obj.get("rotation").isJsonPrimitive())

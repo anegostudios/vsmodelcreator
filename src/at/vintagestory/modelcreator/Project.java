@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.ImageIcon;
 import org.newdawn.slick.opengl.Texture;
@@ -21,13 +22,13 @@ public class Project
 	// Persistent project data
 	public boolean AmbientOcclusion;
 	public ArrayList<PendingTexture> PendingTextures = new ArrayList<PendingTexture>();
-	public ArrayList<TextureEntry> Textures = new ArrayList<TextureEntry>();
+	public HashMap<String, TextureEntry> Textures = new HashMap<String, TextureEntry>();
 	public ArrayList<Element> rootElements = new ArrayList<Element>();
 	public ArrayList<Animation> Animations = new ArrayList<Animation>();
 	
 	public int TextureWidth = 32;
 	public int TextureHeight = 32;
-	public boolean SingleTexture;
+	public boolean EntityTextureMode;
 	public boolean AllAngles;
 	
 	// Non-persistent project data
@@ -348,7 +349,7 @@ public class Project
 		cloned.AmbientOcclusion = AmbientOcclusion;
 		cloned.Textures = Textures;
 		cloned.AllAngles = AllAngles;
-		cloned.SingleTexture = SingleTexture;
+		cloned.EntityTextureMode = EntityTextureMode;
 		cloned.TextureWidth = TextureWidth;
 		cloned.TextureHeight = TextureHeight;
 		
@@ -380,57 +381,36 @@ public class Project
 
 	public TextureEntry getTextureEntry(String name)
 	{
-		for (TextureEntry entry : Textures)
-		{
-			if (entry.getName().equalsIgnoreCase(name))
-			{
-				return entry;
-			}
-		}
-		return null;
+		return Textures.get(name);
 	}
 
 	public Texture getTexture(String name)
 	{
-		for (TextureEntry entry : Textures)
-		{
-			if (entry.getName().equalsIgnoreCase(name))
-			{
-				return entry.getTexture();
-			}
-		}
-		return null;
+		TextureEntry entry = getTextureEntry(name);
+		if (entry == null) return null;
+		
+		return entry.getTexture();
 	}
 
 	public String getTextureLocation(String name)
 	{
-		for (TextureEntry entry : Textures)
-		{
-			if (entry.getName().equalsIgnoreCase(name))
-			{
-				return entry.getFilePath();
-			}
-		}
-		return null;
+		TextureEntry entry = getTextureEntry(name);
+		if (entry == null) return null;
+		return entry.getFilePath();
 	}
 	
 
 	public ImageIcon getIcon(String name)
 	{
-		for (TextureEntry entry : Textures)
-		{
-			if (entry.getName().equalsIgnoreCase(name))
-			{
-				return entry.getIcon();
-			}
-		}
-		return null;
+		TextureEntry entry = getTextureEntry(name);
+		if (entry == null) return null;
+		return entry.getIcon();
 	}
 	
 
 	
 	public void reloadTextures(ModelCreator creator) {
-		for (TextureEntry entry : ModelCreator.currentProject.Textures) {
+		for (TextureEntry entry : Textures.values()) {
 			try {
 				creator.pendingTextures.add(new PendingTexture(entry));
 			} catch (Exception e) {}
@@ -454,7 +434,7 @@ public class Project
 	}
 	
 
-	public String loadTexture(File image) throws IOException
+	public String loadTexture(String textureName, File image) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
 		Texture texture = TextureLoader.getTexture("PNG", is);
@@ -463,14 +443,41 @@ public class Project
 		if (texture.getImageHeight() % 16 != 0 || texture.getImageWidth() % 16 != 0)
 		{
 			texture.release();
-			return "Not a multiple of 16 ("+texture.getImageHeight()+","+texture.getImageWidth()+")";
+			return "Cannot load this texture, the width or length is not a multiple of 16 ("+texture.getImageHeight()+"x"+texture.getImageWidth()+")";
 		}
 		
 		ImageIcon icon = upscaleIcon(new ImageIcon(image.getAbsolutePath()), 256);
 		
-		ModelCreator.currentProject.Textures.add(new TextureEntry(image.getName().replace(".png", ""), texture, icon, image.getAbsolutePath()));
+		if (textureName == null) {
+			textureName = image.getName().replace(".png", "");	
+		}
 		
-		if (ModelCreator.currentProject.Textures.size() == 1 && SingleTexture) {
+		if (Textures.containsKey(textureName)) {
+			TextureEntry entry = Textures.get(textureName);
+			if (entry.getFilePath().equals(image.getAbsolutePath())) {
+				Textures.put(textureName, new TextureEntry(textureName, texture, icon, image.getAbsolutePath()));
+			} else {
+				
+				int i = 2;
+				while (true) {
+					
+					String altimgName = textureName + i;
+					if (!Textures.containsKey(altimgName)) {
+						Textures.put(altimgName, new TextureEntry(altimgName, texture, icon, image.getAbsolutePath()));
+						break;
+					}					
+					i++;
+				}
+			}
+			
+			
+		} else {
+			Textures.put(textureName, new TextureEntry(textureName, texture, icon, image.getAbsolutePath()));	
+		}
+		
+		
+		
+		if (Textures.size() == 1 && EntityTextureMode) {
 			applySingleTextureMode();
 		}
 		

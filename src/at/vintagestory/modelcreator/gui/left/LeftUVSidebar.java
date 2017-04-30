@@ -62,7 +62,7 @@ public class LeftUVSidebar extends LeftSidebar
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}		
 
-		if (ModelCreator.currentProject.SingleTexture) {
+		if (ModelCreator.currentProject.EntityTextureMode) {
 			drawSingleSquare(canvasHeight);
 		} else {
 			drawBoxSquares(canvasHeight);

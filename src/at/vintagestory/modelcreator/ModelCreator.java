@@ -389,7 +389,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 			int leftSpacing = 0;
 			if (modelrenderer.renderedLeftSidebar != null) {
-				leftSpacing = project.SingleTexture || getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
+				leftSpacing = project.EntityTextureMode || getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
 			}
 			
 			
@@ -826,11 +826,21 @@ public class ModelCreator extends JFrame implements ITextureCallback
 							
 							if (file.getName().endsWith(".json")) {		
 								LoadFile(file.getAbsolutePath());
+								return;
 							}
 							
 							if (file.getName().endsWith(".png")) {								
-								AddPendingTexture(new PendingTexture(file, ModelCreator.Instance));
+								AddPendingTexture(new PendingTexture(null, file, ModelCreator.Instance));
+								return;
 							}
+							
+							SwingUtilities.invokeLater(new Runnable() {
+								@Override
+								public void run()
+								{
+									JOptionPane.showMessageDialog(null, "Huh? What file is this? I can only read .png and .json :(");							
+								}
+							});
 							
 							
 							return;

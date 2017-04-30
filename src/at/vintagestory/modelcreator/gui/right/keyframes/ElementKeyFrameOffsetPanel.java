@@ -3,6 +3,7 @@ package at.vintagestory.modelcreator.gui.right.keyframes;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -260,25 +261,25 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		KeyframeElement cube = keyFramesPanel.getCurrentElement();
 		if (cube == null) return;
 		
-		//float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
+		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
 		//boolean ctrl = (modifiers & ActionEvent.CTRL_MASK) > 0;
 		
 		switch (axis) {
 		case X:
-			cube.setOffsetX(cube.getOffsetX() + direction);
+			cube.setOffsetX(cube.getOffsetX() + size);
 			//if (ctrl) cube.addOriginX(size);
 			
 			xPositionField.setText(df.format(cube.getOffsetX()));
 			
 			break;
 		case Y:
-			cube.setOffsetY(cube.getOffsetY() + direction);
+			cube.setOffsetY(cube.getOffsetY() + size);
 			//if (ctrl) cube.addOriginY(size);
 			
 			yPositionField.setText(df.format(cube.getOffsetY()));
 			break;
 		default:
-			cube.setOffsetZ(cube.getOffsetZ() + direction);
+			cube.setOffsetZ(cube.getOffsetZ() + size);
 			//if (ctrl) cube.addOriginZ(size);
 			
 			zPositionField.setText(df.format(cube.getOffsetZ()));

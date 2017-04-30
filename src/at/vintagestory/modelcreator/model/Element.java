@@ -139,8 +139,8 @@ public class Element implements IDrawable
 		for (int i = 0; i < faces.length; i++)
 		{
 			Face oldFace = cuboid.getAllFaces()[i];
-			faces[i].setTexture(oldFace.getTextureName());
-			faces[i].setTextureLocation(oldFace.getTextureLocation());
+			faces[i].setTextureName(oldFace.getTextureName());
+			//faces[i].setTextureLocation(oldFace.getTextureLocation());
 			faces[i].setStartU(oldFace.getStartU());
 			faces[i].setStartV(oldFace.getStartV());
 			faces[i].setEndU(oldFace.getEndU());
@@ -221,22 +221,22 @@ public class Element implements IDrawable
 	{
 		for (Face face : faces)
 		{
-			face.setTexture(null);
-			face.setTextureLocation("blocks/");
+			face.setTextureName(null);
+			//face.setTextureLocation(ModelCreator.currentProject.EntityTextureMode ? "entities/" : "blocks/");
 		}
 	}
 	
 	public void setAllTextures(ClipboardTexture texture)
 	{
-		setAllTextures(texture.getLocation(), texture.getTexture());
+		setAllTextureNames(texture.getTexture());
 	}
 
-	public void setAllTextures(String location, String texture)
+	public void setAllTextureNames(String texture)
 	{
 		for (Face face : faces)
 		{
-			face.setTexture(texture);
-			face.setTextureLocation(location);
+			face.setTextureName(texture);
+			//face.setTextureLocation(location);
 		}
 	}
 	
@@ -445,7 +445,7 @@ public class Element implements IDrawable
 	{
 		if (ModelCreator.currentProject == null) return;
 		
-		if (ModelCreator.currentProject.SingleTexture) {
+		if (ModelCreator.currentProject.EntityTextureMode) {
 			setUnwrappedCubeUV();
 			return;
 		}

@@ -14,17 +14,19 @@ public class PendingTexture
 	public ITextureCallback callback;
 	
 	public TextureEntry entry;
+	String textureName;
 
-	public PendingTexture(File texture)
+	public PendingTexture(String textureName, File texture)
 	{
-		this(texture, (ITextureCallback) null);
+		this(textureName, texture, (ITextureCallback) null);
 	}
 
 	
-	public PendingTexture(File texture, ITextureCallback callback)
+	public PendingTexture(String textureName, File texture, ITextureCallback callback)
 	{
 		this.texture = texture;
 		this.callback = callback;
+		this.textureName = textureName;
 	}
 	
 	public PendingTexture(TextureEntry entry)
@@ -51,7 +53,7 @@ public class PendingTexture
 			{
 				FileInputStream is = new FileInputStream(this.texture);
 				texture = TextureLoader.getTexture("PNG", is);
-				errormessge = ModelCreator.currentProject.loadTexture(this.texture);
+				errormessge = ModelCreator.currentProject.loadTexture(textureName, this.texture);
 				is.close();
 				isnew = true;
 			}
@@ -59,7 +61,7 @@ public class PendingTexture
 			if (callback != null) {
 				callback.onTextureLoaded(isnew, errormessge, fileName);
 			}
-				
+		
 		}
 		catch (IOException e)
 		{

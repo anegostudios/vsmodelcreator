@@ -102,8 +102,7 @@ public class Face
 
 	
 	
-	private String texture = null;
-	private String textureLocation = "blocks/";
+	private String textureName = null;
 	public double textureU = 0;
 	public double textureV = 0;
 	private double textureUEnd = 16;
@@ -130,8 +129,8 @@ public class Face
 	}
 	
 	public void applySingleTextureMode() {
-		if (ModelCreator.currentProject != null && ModelCreator.currentProject.SingleTexture && ModelCreator.currentProject.Textures != null && ModelCreator.currentProject.Textures.size() > 0) {
-			this.texture = ModelCreator.currentProject.Textures.get(0).name;
+		if (ModelCreator.currentProject != null && ModelCreator.currentProject.EntityTextureMode && ModelCreator.currentProject.Textures != null && ModelCreator.currentProject.Textures.size() > 0) {
+			this.textureName = ModelCreator.currentProject.Textures.get(0).name;
 		}		
 	}
 	
@@ -178,7 +177,7 @@ public class Face
 			double texWidth = ModelCreator.currentProject.TextureWidth;
 			double texHeight = ModelCreator.currentProject.TextureHeight;
 			
-			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
+			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(textureName);
 			if (entry != null) {
 				scaleX = entry.Width / texWidth * (texWidth / 32);
 				scaleY = entry.Height / texHeight * (texHeight / 32);				
@@ -189,17 +188,17 @@ public class Face
 	}
 
 
-	public void setTexture(String texture)
+	public void setTextureName(String texture)
 	{
-		this.texture = texture;
+		this.textureName = texture;
 	}
 
 	public void bindTexture()
 	{
 		TextureImpl.bindNone();
-		if (texture != null)
+		if (textureName != null)
 		{
-			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(texture);
+			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(textureName);
 			if (entry != null)
 			{
 				if (entry.getTexture() != null)
@@ -299,24 +298,19 @@ public class Face
 
 	public String getTextureName()
 	{
-		return texture;
+		return textureName;
 	}
 
 	public Texture getTexture()
 	{
-		return ModelCreator.currentProject.getTexture(texture);
+		return ModelCreator.currentProject.getTexture(textureName);
+	}
+	
+	public TextureEntry getTextureEntry()
+	{
+		return ModelCreator.currentProject.getTextureEntry(textureName);
 	}
 
-	public String getTextureLocation()
-	{
-		return textureLocation;
-	}
-
-	public void setTextureLocation(String textureLocation)
-	{
-		this.textureLocation = textureLocation;
-		ModelCreator.DidModify();
-	}
 
 	public int getSide()
 	{
@@ -468,8 +462,7 @@ public class Face
 	
 	public Face clone(Element forElement) {
 		Face cloned = new Face();
-		cloned.texture = texture;
-		cloned.textureLocation = textureLocation;
+		cloned.textureName = textureName;
 		cloned.textureU = textureU;
 		cloned.textureV = textureV;
 		cloned.textureUEnd = textureUEnd;

@@ -50,7 +50,6 @@ public class KeyframeElement implements IDrawable
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();
 
-
 	
 	public KeyframeElement(boolean IsKeyFrame) {
 		this.IsKeyFrame = IsKeyFrame; 

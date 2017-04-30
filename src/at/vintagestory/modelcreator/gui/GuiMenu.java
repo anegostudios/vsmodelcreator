@@ -298,7 +298,7 @@ public class GuiMenu extends JMenuBar
 
 		itemTexturePath.addActionListener(listener);
 
-		itemExportUvMap.setEnabled(ModelCreator.currentProject.SingleTexture);
+		itemExportUvMap.setEnabled(ModelCreator.currentProject.EntityTextureMode);
 		itemExportUvMap.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
 			chooser.setDialogTitle("Output Directory");
@@ -313,8 +313,9 @@ public class GuiMenu extends JMenuBar
 			{
 				if (chooser.getSelectedFile().exists())
 				{
-					returnVal = JOptionPane.showConfirmDialog(null, "A file already exists with that name, are you sure you want to override?", "Warning", JOptionPane.YES_NO_OPTION);
+					returnVal = JOptionPane.showConfirmDialog(null, "A file already exists with that name, are you sure you want to override it?", "Warning", JOptionPane.YES_NO_OPTION);
 				}
+				
 				if (returnVal != JOptionPane.NO_OPTION && returnVal != JOptionPane.CLOSED_OPTION)
 				{
 					String filePath = chooser.getSelectedFile().getAbsolutePath();
@@ -359,8 +360,8 @@ public class GuiMenu extends JMenuBar
 		
 		itemSingleTexture.addActionListener(a ->
 		{
-			ModelCreator.currentProject.SingleTexture = itemSingleTexture.isSelected();
-			if (ModelCreator.currentProject.SingleTexture) ModelCreator.currentProject.applySingleTextureMode();
+			ModelCreator.currentProject.EntityTextureMode = itemSingleTexture.isSelected();
+			if (ModelCreator.currentProject.EntityTextureMode) ModelCreator.currentProject.applySingleTextureMode();
 			ModelCreator.DidModify();
 			ModelCreator.updateValues();
 		});
@@ -570,9 +571,9 @@ public class GuiMenu extends JMenuBar
 		itemAddCube.setEnabled(enabled);
 		itemAddFace.setEnabled(enabled);
 		
-		itemExportUvMap.setEnabled(ModelCreator.currentProject.SingleTexture);
+		itemExportUvMap.setEnabled(ModelCreator.currentProject.EntityTextureMode);
 		itemUnlockAngles.setSelected(ModelCreator.currentProject.AllAngles);
-		itemSingleTexture.setSelected(ModelCreator.currentProject.SingleTexture);		
+		itemSingleTexture.setSelected(ModelCreator.currentProject.EntityTextureMode);		
 	}
 	
 	public void updateFrame() {

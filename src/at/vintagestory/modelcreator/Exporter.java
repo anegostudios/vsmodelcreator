@@ -6,19 +6,21 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.Keyframe;
 import at.vintagestory.modelcreator.model.KeyframeElement;
+import at.vintagestory.modelcreator.model.TextureEntry;
 
 public class Exporter
 {
-	private List<String> textureList = new ArrayList<String>();
-
+	private Map<String, String> textureMap = new HashMap<String, String>();
+	
 	Project project;
 	
 	public Exporter(Project project)
@@ -83,9 +85,16 @@ public class Exporter
 		{
 			if (face.getTextureName() != null && !face.getTextureName().equals("null"))
 			{
-				if (!textureList.contains(face.getTextureLocation() + face.getTextureName()))
+				if (!textureMap.containsKey(face.getTextureName()))
 				{
-					textureList.add(face.getTextureLocation() + face.getTextureName());
+					TextureEntry tex = face.getTextureEntry();
+					String textureBasePath = ModelCreator.prefs.get("texturePath", ".");
+					
+					String subPath = tex.getFilePath();
+					if (subPath.contains(textureBasePath)) subPath = tex.getFilePath().substring(textureBasePath.length()  + 1);
+					subPath = subPath.replace('\\', '/').replace(".png", "");
+					
+					textureMap.put(face.getTextureName(), subPath);
 				}
 			}
 		}
@@ -101,18 +110,13 @@ public class Exporter
 	{
 		writer.write("{");
 		writer.newLine();
-		/*if (!project.AmbientOcclusion)
-		{
-			writer.write(space(1) + "\"ambientocclusion\": " + project.AmbientOcclusion + ",");
-			writer.newLine();
-		}*/
 		
 		if (project.AllAngles) {
 			writer.write(space(1) + "\"allAngles\": " + project.AllAngles + ",");
 			writer.newLine();
 		}
-		if (project.SingleTexture) {
-			writer.write(space(1) + "\"singleTexture\": " + project.SingleTexture + ",");
+		if (project.EntityTextureMode) {
+			writer.write(space(1) + "\"singleTexture\": " + project.EntityTextureMode + ",");
 			writer.newLine();
 		}
 		writer.write(space(1) + "\"textureWidth\": " + project.TextureWidth + ",");
@@ -311,19 +315,21 @@ public class Exporter
 	{
 		writer.write(space(1) + "\"textures\": {");
 		writer.newLine();
-		
-		for (String texture : textureList)
+		int i = 0;
+		for (String texturename : textureMap.keySet())
 		{
-			writer.write(space(2) + "\"" + textureList.indexOf(texture) + "\": \"" + texture + "\"");
-			if (textureList.indexOf(texture) != textureList.size() - 1)
+			writer.write(space(2) + "\"" + texturename + "\": \"" + textureMap.get(texturename) + "\"");
+			if (i < textureMap.size() - 1)
 			{
 				writer.write(",");
 			}
 			writer.newLine();
+			i++;
 		}
 		writer.write(space(1) + "},");
 	}
 
+	
 	private void writeElement(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
 		writer.newLine();
@@ -443,7 +449,7 @@ public class Exporter
 		for (Face face : cuboid.getAllFaces())
 		{
 			writer.write(space(indentation + 1) + "\"" + Face.getFaceName(face.getSide()) + "\": { ");
-			writer.write("\"texture\": \"#" + textureList.indexOf(face.getTextureLocation() + face.getTextureName()) + "\"");
+			writer.write("\"texture\": \"#" + face.getTextureName() + "\"");
 			writer.write(", \"uv\": [ " + d2s(face.getStartU()) + ", " + d2s(face.getStartV()) + ", " + d2s(face.getEndU()) + ", " + d2s(face.getEndV()) + " ]");
 			if (face.getRotation() > 0)
 				writer.write(", \"rotation\": " + (int) face.getRotation() * 90);
