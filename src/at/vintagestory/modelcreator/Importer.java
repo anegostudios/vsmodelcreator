@@ -243,8 +243,12 @@ public class Importer
 			}
 		}
 		
-		if (obj.has("forActivity") && obj.get("forActivity").isJsonPrimitive()) {
-			anim.ForActivity = EnumEntityActivity.valueOf(obj.get("forActivity").getAsString());
+		if (obj.has("forActivities") && obj.get("forActivities").isJsonArray()) {
+			JsonArray activities = obj.get("forActivities").getAsJsonArray();
+			for (int i = 0; i < activities.size(); i++) {
+				String activity = activities.get(i).getAsString(); 
+				anim.ForActivities.add(EnumEntityActivity.valueOf(activity));	
+			}
 		}
 
 		if (obj.has("onActivityStopped") && obj.get("onActivityStopped").isJsonPrimitive()) {

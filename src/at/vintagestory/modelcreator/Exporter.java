@@ -179,8 +179,15 @@ public class Exporter
 		writer.write(space(3) + "\"quantityframes\": " + animation.GetQuantityFrames() + ",");
 		writer.newLine();
 		
-		if (animation.ForActivity != null) {
-			writer.write(space(3) + "\"forActivity\": \"" + animation.ForActivity + "\",");
+		int q = animation.ForActivities.size();
+		if (q > 0) {
+			
+			writer.write(space(3) + "\"forActivities\": [");
+			for (int i = 0; i < q; i++) {
+				if (i > 0) writer.write(", ");
+				writer.write("\"" + animation.ForActivities.get(i) + "\"");
+			}
+			writer.write("],");
 			writer.newLine();			
 		}
 		

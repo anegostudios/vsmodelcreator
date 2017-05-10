@@ -14,7 +14,7 @@ public class Animation
 	private String name;
 	public Keyframe[] keyframes = new Keyframe[0];
 	
-	public EnumEntityActivity ForActivity;
+	public ArrayList<EnumEntityActivity> ForActivities = new ArrayList<EnumEntityActivity>();
     public EnumEntityActivityStoppedHandling OnActivityStopped = EnumEntityActivityStoppedHandling.Rewind;
     public EnumEntityAnimationEndHandling OnAnimationEnd = EnumEntityAnimationEndHandling.Repeat;
 	
@@ -478,7 +478,7 @@ public class Animation
 		
 		cloned.name = name;
 		cloned.quantityFrames = quantityFrames;
-		cloned.ForActivity = ForActivity;
+		cloned.ForActivities = new ArrayList<EnumEntityActivity>(ForActivities);
 		cloned.OnActivityStopped = OnActivityStopped;
 		cloned.OnAnimationEnd = OnAnimationEnd;
 		

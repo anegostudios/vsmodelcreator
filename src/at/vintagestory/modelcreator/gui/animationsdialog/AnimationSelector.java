@@ -40,7 +40,9 @@ public class AnimationSelector
 	JTextField nameField = new JTextField();
 	JScrollPane scroll = new JScrollPane(list);
 
-	private JComboBox<String> activitiesList;
+	private JList<String> activitiesList;
+	
+	
 	private JComboBox<String> activityStoppedList;
 	private JComboBox<String> animEndedList;
 	
@@ -59,6 +61,7 @@ public class AnimationSelector
 		DefaultListModel<String> model = animList();		
 		list.setModel(model);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
 		
 		scroll.getVerticalScrollBar().setVisible(false);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -84,11 +87,7 @@ public class AnimationSelector
 				nameField.setText(ModelCreator.currentProject.SelectedAnimation.getName());
 				
 				ModelCreator.updateValues();
-				
-				
-				
 				updateValues();
-				//System.out.println("after selected " + ModelCreator.currentProject.SelectedAnimation);
 			}
 		});
 		
@@ -237,21 +236,34 @@ public class AnimationSelector
 		layout = new SpringLayout();
 		rightPanel = new JPanel(layout);
 		
-		activitiesList = new JComboBox<String>();
 		
-		activitiesList.setToolTipText("The actvitiy for which the animation should play for");
-		activitiesList.addActionListener(e ->
+		activitiesList = new JList<String>();
+		activitiesList.setToolTipText("The actvities for which the animation should play for");
+		activitiesList.addListSelectionListener(e ->
 		{
-			int selectedIndex = activitiesList.getSelectedIndex();
-			if (selectedIndex == -1) {
-				ModelCreator.currentProject.SelectedAnimation.ForActivity = EnumEntityActivity.None;
-			} else {
-				ModelCreator.currentProject.SelectedAnimation.ForActivity = EnumEntityActivity.values()[selectedIndex];	
+			if (ignoreSelectionChange) return;
+			
+			int[] indices = activitiesList.getSelectedIndices();
+			
+			ModelCreator.currentProject.SelectedAnimation.ForActivities.clear();
+			
+			for (int i = 0; i < indices.length; i++) {
+				int index = indices[i];
+				ModelCreator.currentProject.SelectedAnimation.ForActivities.add(EnumEntityActivity.values()[index]);	
 			}
+			
+			ModelCreator.DidModify();
+			ModelCreator.updateValues();
 		});
 		
-		activitiesList.setPreferredSize(new Dimension(170, 29));	
-		activitiesList.setModel(activityList());
+		DefaultListModel<String> activityListItems = activityList();
+		activitiesList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		
+		activitiesList.setPreferredSize(new Dimension(170, 170));	
+		activitiesList.setModel(activityListItems);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setViewportView(activitiesList);
 		
 		
 		activityStoppedList = new JComboBox<String>();
@@ -277,21 +289,21 @@ public class AnimationSelector
 		animEndedList.setPreferredSize(new Dimension(170, 29));	
 		animEndedList.setModel(animationEndList());
 		
-		JLabel label = new JLabel("For Activity");
+		JLabel label = new JLabel("For Activities");
 		label.setPreferredSize(new Dimension(170, 29));
 		layout.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.WEST, rightPanel);
 		layout.putConstraint(SpringLayout.NORTH, label, 10, SpringLayout.NORTH, rightPanel);
 		rightPanel.add(label);
-		rightPanel.add(activitiesList);
-		layout.putConstraint(SpringLayout.WEST, activitiesList, 0, SpringLayout.WEST, label);
-		layout.putConstraint(SpringLayout.NORTH, activitiesList, 0, SpringLayout.SOUTH, label);
+		rightPanel.add(scrollPane);
+		layout.putConstraint(SpringLayout.WEST, scrollPane, 0, SpringLayout.WEST, label);
+		layout.putConstraint(SpringLayout.NORTH, scrollPane, 0, SpringLayout.SOUTH, label);
 		
 		
 		
 		label = new JLabel("On Activity stopped");
 		label.setPreferredSize(new Dimension(170, 29));
-		layout.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.WEST, activitiesList);
-		layout.putConstraint(SpringLayout.NORTH, label, 10, SpringLayout.SOUTH, activitiesList);
+		layout.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.WEST, scrollPane);
+		layout.putConstraint(SpringLayout.NORTH, label, 10, SpringLayout.SOUTH, scrollPane);
 		
 		rightPanel.add(label);
 		rightPanel.add(activityStoppedList);
@@ -334,9 +346,9 @@ public class AnimationSelector
 	}
 	
 
-	private DefaultComboBoxModel<String> activityList()
+	private DefaultListModel<String> activityList()
 	{
-		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
+		DefaultListModel<String> model = new DefaultListModel<String>();
 		
 		for (EnumEntityActivity activity : EnumEntityActivity.values()) {
 			model.addElement("<html><b>"+ activity +"</b></html>");	
@@ -371,17 +383,27 @@ public class AnimationSelector
 	
 	
 	public void updateValues() {
+		ignoreSelectionChange = true;
+		
 		Animation anim = ModelCreator.currentProject.SelectedAnimation;
 		
 		activitiesList.setEnabled(anim != null);
 		activityStoppedList.setEnabled(anim != null);
 		animEndedList.setEnabled(anim != null);
 		
-		if (anim == null) return;
+		if (anim == null) {
+			ignoreSelectionChange = false;
+			return;
+		}
 		
-		activitiesList.setSelectedIndex(anim.ForActivity == null ? 0 : anim.ForActivity.index());
+		int[] indices = new int[anim.ForActivities.size()];
+		for (int i = 0; i < indices.length; i++) indices[i] = anim.ForActivities.get(i).index();
+		activitiesList.setSelectedIndices(indices);
+		
 		activityStoppedList.setSelectedIndex(anim.OnActivityStopped == null ? 0 : anim.OnActivityStopped.index());
 		animEndedList.setSelectedIndex(anim.OnAnimationEnd == null ? 0 : anim.OnAnimationEnd.index());
+		
+		ignoreSelectionChange = false;
 	}
 
 		
