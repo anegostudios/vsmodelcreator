@@ -130,7 +130,9 @@ public class Face
 	
 	public void applySingleTextureMode() {
 		if (ModelCreator.currentProject != null && ModelCreator.currentProject.EntityTextureMode && ModelCreator.currentProject.Textures != null && ModelCreator.currentProject.Textures.size() > 0) {
-			this.textureName = ModelCreator.currentProject.Textures.get(0).name;
+			//this.textureName = ModelCreator.currentProject.Textures.get(0).name;
+			
+			this.textureName = ModelCreator.currentProject.Textures.values().iterator().next().name;
 		}		
 	}
 	

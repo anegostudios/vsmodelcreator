@@ -215,21 +215,6 @@ public class AnimationSelector
 		dialog.setLocationRelativeTo(null);
 	}
 	
-	
-	public static void display(IElementManager manager)
-	{
-		AnimationSelector selector = new AnimationSelector();
-		selector.show();
-	}
-
-	
-	
-	private void show()
-	{
-		dialog.setVisible(true);
-		
-	}
-
 
 	private void addAnimationSettings()
 	{
@@ -259,10 +244,10 @@ public class AnimationSelector
 		DefaultListModel<String> activityListItems = activityList();
 		activitiesList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
-		activitiesList.setPreferredSize(new Dimension(170, 170));	
 		activitiesList.setModel(activityListItems);
 		
 		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setPreferredSize(new Dimension(200, 170));	
 		scrollPane.setViewportView(activitiesList);
 		
 		
@@ -274,7 +259,7 @@ public class AnimationSelector
 			ModelCreator.currentProject.SelectedAnimation.OnActivityStopped = EnumEntityActivityStoppedHandling.values()[selectedIndex];	
 		});
 		
-		activityStoppedList.setPreferredSize(new Dimension(170, 29));	
+		activityStoppedList.setPreferredSize(new Dimension(200, 29));	
 		activityStoppedList.setModel(activityStoppedList());
 		
 		
@@ -286,7 +271,7 @@ public class AnimationSelector
 			ModelCreator.currentProject.SelectedAnimation.OnAnimationEnd = EnumEntityAnimationEndHandling.values()[selectedIndex];	
 		});
 		
-		animEndedList.setPreferredSize(new Dimension(170, 29));	
+		animEndedList.setPreferredSize(new Dimension(200, 29));	
 		animEndedList.setModel(animationEndList());
 		
 		JLabel label = new JLabel("For Activities");
@@ -405,6 +390,22 @@ public class AnimationSelector
 		
 		ignoreSelectionChange = false;
 	}
+
+	
+	public static void display(IElementManager manager)
+	{
+		AnimationSelector selector = new AnimationSelector();
+		selector.show();
+	}
+
+	
+	
+	private void show()
+	{
+		dialog.setVisible(true);
+		
+	}
+
 
 		
 }

@@ -20,10 +20,15 @@ public class Keyframe
 	}
 	
 	
-	public void AddElementFromImport(Project project, KeyframeElement keyfElem) {
+	public boolean AddElementFromImport(Project project, KeyframeElement keyfElem) {
 		Element elem = project.findElement(keyfElem.AnimatedElementName);
-		KeyframeElement kelem = GetOrCreateKeyFrameElement(elem);
-		kelem.setFrom(keyfElem);
+		if (elem != null) {
+			KeyframeElement kelem = GetOrCreateKeyFrameElement(elem);
+			kelem.setFrom(keyfElem);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public void AddElementDirectly(KeyframeElement keyfElem) {

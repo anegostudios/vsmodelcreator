@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -27,6 +28,7 @@ import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.Keyframe;
 import at.vintagestory.modelcreator.model.KeyframeElement;
 import at.vintagestory.modelcreator.model.PendingTexture;
+import java.util.ArrayList;
 
 public class Importer
 {
@@ -36,7 +38,9 @@ public class Importer
 	
 	private String inputPath;
 	Project project;
-
+	
+	String Warnings = "";
+	HashSet<String> missingAnimationElements = new HashSet<String>();
 
 	public Importer(String path)
 	{
@@ -50,6 +54,9 @@ public class Importer
 
 	public Project loadFromJSON()
 	{
+		Warnings = "";
+		missingAnimationElements.clear();
+		
 		project = new Project(inputPath);
 		
 		File path = new File(inputPath);
@@ -64,6 +71,16 @@ public class Importer
 				readComponents(reader, path.getParentFile());
 				reader.close();
 				fr.close();
+				
+				if (Warnings.length() > 0) {
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							JOptionPane.showMessageDialog(null, "I opened the file, but some warnings occured:\n\n" + Warnings);
+						}
+					});
+				}
+				
 			}
 			catch (Exception e)
 			{
@@ -77,13 +94,11 @@ public class Importer
 							if (i >= 10) break;
 						}
 						
-			        	JOptionPane.showMessageDialog(null, "Couldn't open this file, something unexpecteded happened\n\n" + e.toString() + "\nat\n" + trace);
+			        	JOptionPane.showMessageDialog(null, "Oh Snap. I couldn't fully open this file, something unexpecteded happened\n\n" + e.toString() + "\nat\n" + trace);
 			        	e.printStackTrace();
 			        }
 			        
 			    });
-				
-				
 			}
 		}
 		
@@ -155,6 +170,14 @@ public class Importer
 						project.Animations.add(animation);
 					}
 				}
+				
+				if (missingAnimationElements.size() > 0) {
+					Warnings += "While loading the animations, the following elements were not found and thus their keyframe elements for not loaded:\n";
+					for(String s : missingAnimationElements) {
+						Warnings += "-" + s + "\n";
+					}	
+				}
+				
 			}
 		}
 	}
@@ -223,24 +246,21 @@ public class Importer
 		anim.setName(obj.get("name").getAsString());
 		
 		if (obj.has("keyframes") && obj.get("keyframes").isJsonArray()) {
-			JsonArray keyframes = obj.get("keyframes").getAsJsonArray();
+			JsonArray jsonkeyframes = obj.get("keyframes").getAsJsonArray();
 
-			int quantity = 0;
-			for (int i = 0; i < keyframes.size(); i++)
-			{
-				if (!keyframes.get(i).isJsonObject()) continue;
-				quantity++;
-			}
+			ArrayList<Keyframe> keyframes = new ArrayList<Keyframe>();
 			
-			anim.keyframes = new Keyframe[quantity];
-
-			
-			for (int i = 0; i < keyframes.size(); i++)
+			for (int i = 0; i < jsonkeyframes.size(); i++)
 			{
-				if (!keyframes.get(i).isJsonObject()) continue;
+				if (!jsonkeyframes.get(i).isJsonObject()) continue;
 				
-				anim.keyframes[i] = readKeyframe(keyframes.get(i).getAsJsonObject());
+				Keyframe keyframe = readKeyframe(jsonkeyframes.get(i).getAsJsonObject());
+				if (keyframe != null) {
+					keyframes.add(keyframe);
+				}
 			}
+			
+			anim.keyframes = keyframes.toArray(new Keyframe[0]);
 		}
 		
 		if (obj.has("forActivities") && obj.get("forActivities").isJsonArray()) {
@@ -275,7 +295,9 @@ public class Importer
 			for (Entry<String, JsonElement> elem : elems) {
 				KeyframeElement keyframeElem = readKeyframeElemenet(elem.getValue().getAsJsonObject(), elem.getKey());
 				
-				keyframe.AddElementFromImport(project, keyframeElem);
+				if(!keyframe.AddElementFromImport(project, keyframeElem)) {
+					missingAnimationElements.add(keyframeElem.AnimatedElementName);
+				}
 			}
 		}
 		
