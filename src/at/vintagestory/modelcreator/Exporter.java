@@ -88,6 +88,8 @@ public class Exporter
 				if (!textureMap.containsKey(face.getTextureName()))
 				{
 					TextureEntry tex = face.getTextureEntry();
+					if (tex == null) continue;
+					
 					String textureBasePath = ModelCreator.prefs.get("texturePath", ".");
 					
 					String subPath = tex.getFilePath();

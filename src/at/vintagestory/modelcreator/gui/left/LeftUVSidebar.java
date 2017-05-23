@@ -81,8 +81,9 @@ public class LeftUVSidebar extends LeftSidebar
 		double scaleY = 2;
 		
 		if (ModelCreator.currentProject.Textures.size() > 0) {
-			scaleX = ModelCreator.currentProject.Textures.get(0).Width / texWidth;
-			scaleY = ModelCreator.currentProject.Textures.get(0).Height / texHeight;
+			TextureEntry texEntry = ModelCreator.currentProject.Textures.get(ModelCreator.currentProject.Textures.keySet().iterator().next());
+			scaleX = texEntry.Width / texWidth;
+			scaleY = texEntry.Height / texHeight;
 		}
 		
 		texWidth *= scaleX / 2;
