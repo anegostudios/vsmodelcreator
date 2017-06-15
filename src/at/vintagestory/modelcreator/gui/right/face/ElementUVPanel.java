@@ -8,6 +8,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
@@ -17,6 +19,7 @@ import javax.swing.JTextField;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
+import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
@@ -92,6 +95,18 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			}
 		});
 
+		xStartField.addMouseWheelListener(new MouseWheelListener()
+		{
+			
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				int notches = e.getWheelRotation();
+				modifyPosition(EnumAxis.X, (notches > 0 ? 1 : -1));
+			}
+		});
+
+		
 		yStartField.setSize(new Dimension(62, 30));
 		yStartField.setFont(defaultFont);
 		yStartField.setHorizontalAlignment(JTextField.CENTER);
@@ -121,6 +136,19 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 				ModelCreator.updateValues();
 			}
 		});
+		
+		yStartField.addMouseWheelListener(new MouseWheelListener()
+		{
+			
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				int notches = e.getWheelRotation();
+				modifyPosition(EnumAxis.Y, (notches > 0 ? 1 : -1));
+			}
+		});
+
+		
 
 
 		btnPlusX.addActionListener(e ->
@@ -203,4 +231,30 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			yStartField.setText("");
 		}
 	}
+	
+	
+
+	public void modifyPosition(EnumAxis axis, int direction) {
+		Element cube = manager.getCurrentElement();
+		if (cube == null) return;
+		
+		float size = direction * 1f;
+		
+		switch (axis) {
+			case X:
+				cube.setTexUStart(cube.getTexUStart() + size);
+				xStartField.setText(df.format(cube.getTexUStart()));
+				break;
+			case Y:
+				cube.setTexVStart(cube.getTexVStart() + size);
+				yStartField.setText(df.format(cube.getTexVStart()));
+				break;
+			default:
+				break;
+		}
+		
+		ModelCreator.updateValues();
+		
+	}
+
 }
