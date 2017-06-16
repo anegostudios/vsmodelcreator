@@ -4,10 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
@@ -19,6 +15,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
 public class ElementRotationPanel extends JPanel implements IValueUpdater
@@ -87,41 +84,16 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		rotationFields[num].setBackground(new Color(Face.ColorsByFace[colIndex].r, Face.ColorsByFace[colIndex].g, Face.ColorsByFace[colIndex].b));
 		
 		
-		rotationFields[num].addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					Element element = manager.getCurrentElement();
-					if (element != null)
-					{
-						if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
-						if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
-						if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
-						ModelCreator.updateValues();
-					}
-				}
-			}
+		AwtUtil.addChangeListener(rotationFields[num], e -> {
+			Element element = manager.getCurrentElement();
+			if (element == null) return;
+			
+			if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
+			if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
+			if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
+			ModelCreator.updateValues(rotationFields[num]);
 		});
 		
-		rotationFields[num].addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				Element element = manager.getCurrentElement();
-				if (element != null)
-				{
-					if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
-					if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
-					if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
-					ModelCreator.updateValues();
-				}
-			}
-		});
-
 		
 		rotationFields[num].addMouseWheelListener(new MouseWheelListener()
 		{
@@ -164,7 +136,7 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 				elem.setRotationZ(newValue);
 			}
 			
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(rotationSliders[num]);
 		});
 		
 
@@ -205,17 +177,17 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 			break;
 		}
 		
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 	}
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
-		toggleFields(cube);
+		toggleFields(cube, byGuiElem);
 	}
 	
-	public void toggleFields(Element cube) {
+	public void toggleFields(Element cube, JComponent byGuiElem) {
 		ignoreSliderChanges = true;
 		
 		if (ModelCreator.currentProject.AllAngles) {
@@ -263,9 +235,9 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		rotationSliders[2].setValue(enabled ? (int) Math.round(cube.getRotationZ() / multiplier) : 0);
 		
 		if (enabled) {
-			rotationFields[0].setText(""+df.format(cube.getRotationX()));
-			rotationFields[1].setText(""+df.format(cube.getRotationY()));
-			rotationFields[2].setText(""+df.format(cube.getRotationZ()));			
+			if (byGuiElem != rotationFields[0]) rotationFields[0].setText(""+df.format(cube.getRotationX()));
+			if (byGuiElem != rotationFields[1]) rotationFields[1].setText(""+df.format(cube.getRotationY()));
+			if (byGuiElem != rotationFields[2]) rotationFields[2].setText(""+df.format(cube.getRotationZ()));			
 		}
 		
 		ignoreSliderChanges = false;

@@ -3,6 +3,7 @@ package at.vintagestory.modelcreator.gui.right.element;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -41,7 +42,7 @@ public class ModelPropertiesPanel extends JPanel implements IValueUpdater
 	}
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		ambientOcc.setSelected(ModelCreator.currentProject.AmbientOcclusion);
 	}

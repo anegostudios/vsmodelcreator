@@ -4,16 +4,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -24,6 +21,7 @@ import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
 public class ElementSizePanel extends JPanel implements IValueUpdater
@@ -76,38 +74,16 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		xSizeField.setSize(new Dimension(62, 30));
 		xSizeField.setFont(defaultFont);
 		xSizeField.setHorizontalAlignment(JTextField.CENTER);
-		xSizeField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					Element element = manager.getCurrentElement();
-					if (element != null)
-					{
-						element.setWidth(Parser.parseDouble(xSizeField.getText(), element.getWidth()));
-						element.updateUV();
-						ModelCreator.updateValues();
-					}
+		
+		AwtUtil.addChangeListener(xSizeField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element == null) return;
+			
+			element.setWidth(Parser.parseDouble(xSizeField.getText(), element.getWidth()));
+			element.updateUV();
+			ModelCreator.updateValues(xSizeField);			
+		});
 
-				}
-			}
-		});
-		xSizeField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				Element element = manager.getCurrentElement();
-				if (element != null)
-				{
-					element.setWidth(Parser.parseDouble(xSizeField.getText(), element.getWidth()));
-					element.updateUV();
-					ModelCreator.updateValues();
-				}
-			}
-		});
 		xSizeField.addMouseWheelListener(new MouseWheelListener()
 		{
 			@Override
@@ -120,38 +96,16 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		ySizeField.setSize(new Dimension(62, 30));
 		ySizeField.setFont(defaultFont);
 		ySizeField.setHorizontalAlignment(JTextField.CENTER);
-		ySizeField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					Element element = manager.getCurrentElement();
-					if (element != null)
-					{
-						element.setHeight(Parser.parseDouble(ySizeField.getText(), element.getHeight()));
-						element.updateUV();
-						ModelCreator.updateValues();
-					}
+		
+		AwtUtil.addChangeListener(ySizeField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element == null) return;
+			
+			element.setHeight(Parser.parseDouble(ySizeField.getText(), element.getHeight()));
+			element.updateUV();
+			ModelCreator.updateValues(ySizeField);			
+		});
 
-				}
-			}
-		});
-		ySizeField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				Element element = manager.getCurrentElement();
-				if (element != null)
-				{
-					element.setHeight(Parser.parseDouble(ySizeField.getText(), element.getHeight()));
-					element.updateUV();
-					ModelCreator.updateValues();
-				}
-			}
-		});
 		ySizeField.addMouseWheelListener(new MouseWheelListener()
 		{
 			@Override
@@ -165,38 +119,16 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		zSizeField.setSize(new Dimension(62, 30));
 		zSizeField.setFont(defaultFont);
 		zSizeField.setHorizontalAlignment(JTextField.CENTER);
-		zSizeField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					Element element = manager.getCurrentElement();
-					if (element != null)
-					{
-						element.setDepth(Parser.parseDouble(zSizeField.getText(), element.getDepth()));
-						element.updateUV();
-						ModelCreator.updateValues();
-					}
+		
+		AwtUtil.addChangeListener(zSizeField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element == null) return;
+			
+			element.setDepth(Parser.parseDouble(zSizeField.getText(), element.getDepth()));
+			element.updateUV();
+			ModelCreator.updateValues(zSizeField);			
+		});
 
-				}
-			}
-		});
-		zSizeField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				Element element = manager.getCurrentElement();
-				if (element != null)
-				{
-					element.setDepth(Parser.parseDouble(zSizeField.getText(), element.getDepth()));
-					element.updateUV();
-					ModelCreator.updateValues();
-				}
-			}
-		});
 		zSizeField.addMouseWheelListener(new MouseWheelListener()
 		{
 			@Override
@@ -289,12 +221,12 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		}
 		
 		cube.updateUV();
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 	}
 
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
 		boolean enabled = cube != null && this.enabled;
@@ -308,8 +240,8 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 		xSizeField.setEnabled(enabled);
 		ySizeField.setEnabled(enabled);
 		zSizeField.setEnabled(enabled);
-		xSizeField.setText(enabled ? df.format(cube.getWidth()) : "");
-		ySizeField.setText(enabled ? df.format(cube.getHeight()) : "");
-		zSizeField.setText(enabled ? df.format(cube.getDepth()) : "");
+		if (byGuiElem != xSizeField) xSizeField.setText(enabled ? df.format(cube.getWidth()) : "");
+		if (byGuiElem != ySizeField) ySizeField.setText(enabled ? df.format(cube.getHeight()) : "");
+		if (byGuiElem != zSizeField) zSizeField.setText(enabled ? df.format(cube.getDepth()) : "");
 	}
 }

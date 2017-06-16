@@ -485,6 +485,7 @@ public class Face
 		// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
 		// without messing up the UV map
 		double[] scale = textureScale();
+		//scale[0] /= 2;
 
 		return Math.floor(Math.abs(textureUEnd - textureU) * scale[0]) / scale[0];
 	}
@@ -493,6 +494,7 @@ public class Face
 		// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
 		// without messing up the UV map
 		double[] scale = textureScale();
+		//scale[1] /= 2;
 
 		return Math.floor(Math.abs(textureVEnd - textureV) * scale[1]) / scale[1];
 	}

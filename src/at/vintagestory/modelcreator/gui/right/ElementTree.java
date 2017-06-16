@@ -37,7 +37,7 @@ public class ElementTree
 			{
 				if (!ModelCreator.ignoreValueUpdates) {
 					ModelCreator.currentProject.SelectedElement = getSelectedElement();
-					ModelCreator.updateValues();	
+					ModelCreator.updateValues(jtree);	
 				}
 			}
 		});
@@ -66,7 +66,7 @@ public class ElementTree
 	}
 	
 	
-	public void SelectElement(Element elem) {
+	public void selectElement(Element elem) {
 		jtree.clearSelection();
 		
 		@SuppressWarnings("unchecked")
@@ -140,7 +140,7 @@ public class ElementTree
         }
 
         DefaultMutableTreeNode node =  addElement(parentNode, child, true);
-        SelectElement(child);
+        selectElement(child);
         return node;
     }
 
@@ -158,7 +158,7 @@ public class ElementTree
         }
 
         DefaultMutableTreeNode node =  addElement(parentNode, child, true);
-        SelectElement(child);
+        selectElement(child);
         return node;
     }
     

@@ -3,13 +3,10 @@ package at.vintagestory.modelcreator.gui.right.attachmentpoints;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -20,6 +17,7 @@ import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
 public class AttachmentPointRotPanel extends JPanel implements IValueUpdater
@@ -51,7 +49,6 @@ public class AttachmentPointRotPanel extends JPanel implements IValueUpdater
 
 	public void initComponents()
 	{
-		
 		SpringLayout layout = new SpringLayout();
 		
 		JPanel slidersPanel = new JPanel(layout);
@@ -81,41 +78,16 @@ public class AttachmentPointRotPanel extends JPanel implements IValueUpdater
 		rotationFields[num].setBackground(new Color(Face.ColorsByFace[colIndex].r, Face.ColorsByFace[colIndex].g, Face.ColorsByFace[colIndex].b));
 		
 		
-		rotationFields[num].addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
-					if (point != null)
-					{
-						if (num == 0) point.setRotationX(Parser.parseDouble(rotationFields[num].getText(), point.getRotationX()));
-						if (num == 1) point.setRotationY(Parser.parseDouble(rotationFields[num].getText(), point.getRotationY()));
-						if (num == 2) point.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), point.getRotationZ()));
-						ModelCreator.updateValues();
-					}
-				}
-			}
+		AwtUtil.addChangeListener(rotationFields[num], e -> {
+			AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
+			if (point == null) return;
+			
+			if (num == 0) point.setRotationX(Parser.parseDouble(rotationFields[num].getText(), point.getRotationX()));
+			if (num == 1) point.setRotationY(Parser.parseDouble(rotationFields[num].getText(), point.getRotationY()));
+			if (num == 2) point.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), point.getRotationZ()));
+			
+			ModelCreator.updateValues(rotationFields[num]);			
 		});
-		
-		rotationFields[num].addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
-				if (point != null)
-				{
-					if (num == 0) point.setRotationX(Parser.parseDouble(rotationFields[num].getText(), point.getRotationX()));
-					if (num == 1) point.setRotationY(Parser.parseDouble(rotationFields[num].getText(), point.getRotationY()));
-					if (num == 2) point.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), point.getRotationZ()));
-					ModelCreator.updateValues();
-				}
-			}
-		});
-
 		
 		
 		sliderPanel.add(rotationFields[num]);
@@ -166,12 +138,12 @@ public class AttachmentPointRotPanel extends JPanel implements IValueUpdater
 
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
-		toggleFields(ModelCreator.currentProject.SelectedAttachmentPoint);
+		toggleFields(ModelCreator.currentProject.SelectedAttachmentPoint, byGuiElem);
 	}
 	
-	public void toggleFields(AttachmentPoint point) {
+	public void toggleFields(AttachmentPoint point, JComponent byGuiElem) {
 		ignoreSliderChanges = true;
 		
 		if (ModelCreator.currentProject.AllAngles) {
@@ -219,9 +191,9 @@ public class AttachmentPointRotPanel extends JPanel implements IValueUpdater
 		rotationSliders[2].setValue(enabled ? (int) Math.round(point.getRotationZ() / multiplier) : 0);
 		
 		if (enabled) {
-			rotationFields[0].setText(""+point.getRotationX());
-			rotationFields[1].setText(""+point.getRotationY());
-			rotationFields[2].setText(""+point.getRotationZ());			
+			if (byGuiElem != rotationFields[0]) rotationFields[0].setText(""+point.getRotationX());
+			if (byGuiElem != rotationFields[1]) rotationFields[1].setText(""+point.getRotationY());
+			if (byGuiElem != rotationFields[2]) rotationFields[2].setText(""+point.getRotationZ());			
 		}
 		
 		ignoreSliderChanges = false;

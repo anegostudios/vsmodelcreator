@@ -4,14 +4,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -22,6 +19,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
 public class FaceUVPanel extends JPanel implements IValueUpdater
@@ -49,7 +47,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 	{
 		this.manager = manager;
 		setLayout(new GridLayout(3, 4, 4, 4));
-		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>UV</b></html>"));
+		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Face UV</b></html>"));
 		setMaximumSize(new Dimension(186, 124));
 		initComponents();
 		initProperties();
@@ -79,143 +77,58 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 		xStartField.setSize(new Dimension(62, 30));
 		xStartField.setFont(defaultFont);
 		xStartField.setHorizontalAlignment(JTextField.CENTER);
-		xStartField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					if (manager.getCurrentElement() != null)
-					{
-						Face face = manager.getCurrentElement().getSelectedFace();
-						face.setStartU(Parser.parseDouble(xStartField.getText(), face.getStartU()));
-						face.updateUV();
-						ModelCreator.updateValues();
-					}
-
-				}
-			}
-		});
-		xStartField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				if (manager.getCurrentElement() != null)
-				{
-					Face face = manager.getCurrentElement().getSelectedFace();
-					face.setStartU(Parser.parseDouble(xStartField.getText(), face.getStartU()));
-					face.updateUV();
-					ModelCreator.updateValues();
-				}
-			}
+		
+		
+		AwtUtil.addChangeListener(xStartField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element == null) return;			
+			Face face = element.getSelectedFace();
+			face.setStartU(Parser.parseDouble(xStartField.getText(), face.getStartU()));
+			face.updateUV();
+			ModelCreator.updateValues(xStartField);			
 		});
 
 		yStartField.setSize(new Dimension(62, 30));
 		yStartField.setFont(defaultFont);
 		yStartField.setHorizontalAlignment(JTextField.CENTER);
-		yStartField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					if (manager.getCurrentElement() != null)
-					{
-						Face face = manager.getCurrentElement().getSelectedFace();
-						face.setStartV(Parser.parseDouble(yStartField.getText(), face.getStartV()));
-						face.updateUV();
-						ModelCreator.updateValues();
-					}
-				}
-			}
+		
+		
+		AwtUtil.addChangeListener(yStartField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element == null) return;			
+			Face face = element.getSelectedFace();
+			face.setStartV(Parser.parseDouble(yStartField.getText(), face.getStartV()));
+			face.updateUV();
+			ModelCreator.updateValues(yStartField);			
 		});
-		yStartField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				if (manager.getCurrentElement() != null)
-				{
-					Face face = manager.getCurrentElement().getSelectedFace();
-					face.setStartV(Parser.parseDouble(yStartField.getText(), face.getStartV()));
-					face.updateUV();
-					ModelCreator.updateValues();
-				}
-			}
-		});
+
 
 		xEndField.setSize(new Dimension(62, 30));
 		xEndField.setFont(defaultFont);
 		xEndField.setHorizontalAlignment(JTextField.CENTER);
-		xEndField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					if (manager.getCurrentElement() != null)
-					{
-						Face face = manager.getCurrentElement().getSelectedFace();
-						face.setEndU(Parser.parseDouble(xEndField.getText(), face.getEndU()));
-						face.updateUV();
-						ModelCreator.updateValues();
-					}
-				}
-			}
-		});
-		xEndField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				if (manager.getCurrentElement() != null)
-				{
-					Face face = manager.getCurrentElement().getSelectedFace();
-					face.setEndU(Parser.parseDouble(xEndField.getText(), face.getEndU()));
-					face.updateUV();
-					ModelCreator.updateValues();
-				}
-			}
+		
+		AwtUtil.addChangeListener(xEndField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element == null) return;			
+			Face face = element.getSelectedFace();
+			face.setEndU(Parser.parseDouble(xEndField.getText(), face.getEndU()));
+			face.updateUV();
+			ModelCreator.updateValues(xEndField);			
 		});
 
 		yEndField.setSize(new Dimension(62, 30));
 		yEndField.setFont(defaultFont);
 		yEndField.setHorizontalAlignment(JTextField.CENTER);
-		yEndField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					if (manager.getCurrentElement() != null)
-					{
-						Face face = manager.getCurrentElement().getSelectedFace();
-						face.setEndV(Parser.parseDouble(yEndField.getText(), face.getEndV()));
-						face.updateUV();
-						ModelCreator.updateValues();
-					}
-				}
-			}
+				
+		AwtUtil.addChangeListener(yEndField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element == null) return;			
+			Face face = element.getSelectedFace();
+			face.setEndV(Parser.parseDouble(yEndField.getText(), face.getEndV()));
+			face.updateUV();
+			ModelCreator.updateValues(yEndField);			
 		});
-		yEndField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				if (manager.getCurrentElement() != null)
-				{
-					Face face = manager.getCurrentElement().getSelectedFace();
-					face.setEndV(Parser.parseDouble(yEndField.getText(), face.getEndV()));
-					face.updateUV();
-					ModelCreator.updateValues();
-				}
-			}
-		});
+
 
 		btnPlusX.addActionListener(e ->
 		{
@@ -232,7 +145,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureX(1.0);
 				}
 				cube.updateUV();
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(btnPlusX);
 			}
 		});
 
@@ -255,7 +168,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureY(1.0);
 				}
 				cube.updateUV();
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(btnPlusY);
 			}
 		});
 		btnPlusY.setPreferredSize(new Dimension(62, 30));
@@ -277,7 +190,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureX(-1.0);
 				}
 				cube.updateUV();
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(btnNegX);
 			}
 		});
 		btnNegX.setSize(new Dimension(62, 30));
@@ -299,7 +212,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureY(-1.0);
 				}
 				cube.updateUV();
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(btnNegY);
 			}
 		});
 		btnNegY.setSize(new Dimension(62, 30));
@@ -321,7 +234,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureXEnd(1.0);
 				}
 				face.setAutoUVEnabled(false);
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(btnPlusXEnd);
 			}
 		});
 		btnPlusXEnd.setSize(new Dimension(62, 30));
@@ -343,7 +256,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureYEnd(1.0);
 				}
 				face.setAutoUVEnabled(false);
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(btnPlusYEnd);
 			}
 		});
 		btnPlusYEnd.setPreferredSize(new Dimension(62, 30));
@@ -365,7 +278,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureXEnd(-1.0);
 				}
 				face.setAutoUVEnabled(false);
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(btnNegXEnd);
 			}
 		});
 		btnNegXEnd.setSize(new Dimension(62, 30));
@@ -387,7 +300,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 					face.addTextureYEnd(-1.0);
 				}
 				face.setAutoUVEnabled(false);
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(btnNegYEnd);
 			}
 		});
 		btnNegYEnd.setSize(new Dimension(62, 30));
@@ -412,7 +325,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 	}
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
 		if (cube != null)
@@ -421,10 +334,10 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			yStartField.setEnabled(true);
 			xEndField.setEnabled(true);
 			yEndField.setEnabled(true);
-			xStartField.setText(df.format(cube.getSelectedFace().getStartU()));
-			yStartField.setText(df.format(cube.getSelectedFace().getStartV()));
-			xEndField.setText(df.format(cube.getSelectedFace().getEndU()));
-			yEndField.setText(df.format(cube.getSelectedFace().getEndV()));
+			if (byGuiElem != xStartField) xStartField.setText(df.format(cube.getSelectedFace().getStartU()));
+			if (byGuiElem != yStartField) yStartField.setText(df.format(cube.getSelectedFace().getStartV()));
+			if (byGuiElem != xEndField) xEndField.setText(df.format(cube.getSelectedFace().getEndU()));
+			if (byGuiElem != yEndField) yEndField.setText(df.format(cube.getSelectedFace().getEndV()));
 		}
 		else
 		{

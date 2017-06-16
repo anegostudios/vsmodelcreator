@@ -4,16 +4,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -24,6 +21,7 @@ import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
 public class ElementUVPanel extends JPanel implements IValueUpdater
@@ -44,7 +42,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 	{
 		this.manager = manager;
 		setLayout(new GridLayout(3, 4, 4, 4));
-		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>UV</b></html>"));
+		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>UV (all Faces)</b></html>"));
 		setMaximumSize(new Dimension(186, 124));
 		initComponents();
 		initProperties();
@@ -67,31 +65,13 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		xStartField.setSize(new Dimension(62, 30));
 		xStartField.setFont(defaultFont);
 		xStartField.setHorizontalAlignment(JTextField.CENTER);
-		xStartField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
+		
+		AwtUtil.addChangeListener(xStartField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element != null)
 			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					Element elem = manager.getCurrentElement();
-					if (elem == null) return;
-					elem.setTexUStart(Parser.parseDouble(xStartField.getText(), elem.getTexUStart()));
-					ModelCreator.updateValues();
-
-				}
-			}
-		});
-		xStartField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				Element elem = manager.getCurrentElement();
-				if (elem == null) return;
-				elem.setTexUStart(Parser.parseDouble(xStartField.getText(), elem.getTexUStart()));
-				ModelCreator.updateValues();
-
+				element.setTexUStart((Parser.parseDouble(xStartField.getText(), element.getTexUStart())));
+				ModelCreator.updateValues(xStartField);
 			}
 		});
 
@@ -110,32 +90,16 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		yStartField.setSize(new Dimension(62, 30));
 		yStartField.setFont(defaultFont);
 		yStartField.setHorizontalAlignment(JTextField.CENTER);
-		yStartField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
+		
+		AwtUtil.addChangeListener(yStartField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element != null)
 			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					Element elem = manager.getCurrentElement();
-					if (elem == null) return;
-					elem.setTexVStart(Parser.parseDouble(yStartField.getText(), elem.getTexVStart()));
-					ModelCreator.updateValues();
+				element.setTexVStart((Parser.parseDouble(yStartField.getText(), element.getTexVStart())));
+				ModelCreator.updateValues(yStartField);
+			}
+		});
 
-				}
-			}
-		});
-		yStartField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				Element elem = manager.getCurrentElement();
-				if (elem == null) return;
-				elem.setTexVStart(Parser.parseDouble(yStartField.getText(), elem.getTexVStart()));
-				ModelCreator.updateValues();
-			}
-		});
 		
 		yStartField.addMouseWheelListener(new MouseWheelListener()
 		{
@@ -157,7 +121,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			if (elem == null) return;
 			double diff = ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1) ? 0.1 : 1;
 			elem.setTexUStart(elem.getTexUStart() + diff);
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(btnPlusX);
 		});
 
 		btnPlusX.setSize(new Dimension(62, 30));
@@ -170,7 +134,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			if (elem == null) return;
 			double diff = ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1) ? 0.1 : 1;
 			elem.setTexVStart(elem.getTexVStart() + diff);
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(btnPlusX);
 		});
 		btnPlusY.setPreferredSize(new Dimension(62, 30));
 		btnPlusY.setFont(defaultFont);
@@ -182,7 +146,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			if (elem == null) return;
 			double diff = ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1) ? -0.1 : -1;
 			elem.setTexUStart(elem.getTexUStart() + diff);
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(btnNegX);
 		});
 		btnNegX.setSize(new Dimension(62, 30));
 		btnNegX.setFont(defaultFont);
@@ -194,7 +158,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			if (elem == null) return;
 			double diff = ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1) ? -0.1 : -1;
 			elem.setTexVStart(elem.getTexVStart() + diff);
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(btnNegY);
 
 		});
 		btnNegY.setSize(new Dimension(62, 30));
@@ -213,15 +177,15 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 	}
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
 		if (cube != null)
 		{
 			xStartField.setEnabled(true);
 			yStartField.setEnabled(true);
-			xStartField.setText(df.format(cube.getTexUStart()));
-			yStartField.setText(df.format(cube.getTexVStart()));
+			if (byGuiElem != xStartField) xStartField.setText(df.format(cube.getTexUStart()));
+			if (byGuiElem != yStartField) yStartField.setText(df.format(cube.getTexVStart()));
 		}
 		else
 		{
@@ -253,7 +217,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 				break;
 		}
 		
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 		
 	}
 

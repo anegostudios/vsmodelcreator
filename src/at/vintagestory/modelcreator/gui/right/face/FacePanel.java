@@ -8,6 +8,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -71,10 +72,11 @@ public class FacePanel extends JPanel implements IValueUpdater
 		menuList.setToolTipText("The face to edit.");
 		menuList.addActionListener(e ->
 		{
+			if (ModelCreator.ignoreValueUpdates) return;
 			if (manager.getCurrentElement() != null)
 			{
 				manager.getCurrentElement().setSelectedFace(menuList.getSelectedIndex());
-				updateValues();
+				updateValues(menuList);
 			}
 		});
 		menuPanel.setMaximumSize(new Dimension(186, 50));
@@ -102,7 +104,7 @@ public class FacePanel extends JPanel implements IValueUpdater
 		rotation.addChangeListener(e ->
 		{
 			manager.getCurrentElement().getSelectedFace().setRotation(rotation.getValue());
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(rotation);
 		});
 		
 		rotation.setToolTipText("<html>The rotation of the texture<br>Default: 0\u00b0</html>");
@@ -118,32 +120,27 @@ public class FacePanel extends JPanel implements IValueUpdater
 		add(panelTexture);
 		add(panelFaceUV);
 		add(sliderPanel);
-		//add(panelModId);
 		add(panelFaceExtras);
 	}
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
 		if (cube != null)
 		{
 			menuList.setSelectedIndex(cube.getSelectedFaceIndex());
-			//modidField.setEnabled(true);
-			//modidField.setText(cube.getSelectedFace().getTextureLocation());
 			rotation.setEnabled(true);
 			rotation.setValue(cube.getSelectedFace().getRotation());
 		}
 		else
 		{
-			//modidField.setEnabled(false);
-			//modidField.setText("");
 			rotation.setEnabled(false);
 			rotation.setValue(0);
 		}
-		panelFaceUV.updateValues();
-		panelFaceExtras.updateValues();
-		panelElemUV.updateValues();
+		panelFaceUV.updateValues(byGuiElem);
+		panelFaceExtras.updateValues(byGuiElem);
+		panelElemUV.updateValues(byGuiElem);
 		panelElemUV.setVisible(ModelCreator.currentProject.EntityTextureMode);
 	}
 }

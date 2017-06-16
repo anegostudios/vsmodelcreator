@@ -482,6 +482,9 @@ public class Element implements IDrawable
 		x = getTexUStart();
 		y += maxTexHeight;
 		
+		double scales[] = faces[0].textureScale();
+		y = Math.ceil(y * scales[1] * 0.5) / (scales[1] * 0.5);
+		
 		for (int side = 0; side < 4; side++) {
 			Face face = faces[side];
 			if (!face.isEnabled() || !faces[side].isAutoUVEnabled()) continue;
@@ -804,9 +807,7 @@ public class Element implements IDrawable
 
 	public void setTexUStart(double texUStart)
 	{
-		this.texUStart = texUStart;
-		ModelCreator.DidModify();
-		updateUV();
+		setTexUVStart(texUStart, texVStart);
 	}
 
 	public double getTexVStart()
@@ -816,10 +817,22 @@ public class Element implements IDrawable
 
 	public void setTexVStart(double texVStart)
 	{
+		setTexUVStart(texUStart, texVStart);
+	}
+	
+	public void setTexUVStart(double texUStart, double texVStart)
+	{
+		this.texUStart = texUStart;
 		this.texVStart = texVStart;
+		
+		for (Face face : faces) {
+			face.setAutoUVEnabled(true);
+		}
+		
 		ModelCreator.DidModify();
 		updateUV();
 	}
+
 
 	public boolean isAttachmentPointCodeUsed(String code, AttachmentPoint exceptPoint)
 	{

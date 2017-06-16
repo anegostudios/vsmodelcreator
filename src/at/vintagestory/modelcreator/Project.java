@@ -71,7 +71,7 @@ public class Project
 			tree.addRootElement(elem);
 		}
 		
-		tree.SelectElement(SelectedElement);
+		tree.selectElement(SelectedElement);
 		
 		if (Animations.size() > 0) {
 			SelectedAnimation = Animations.get(0);
@@ -145,7 +145,8 @@ public class Project
 		
 		if (SelectedAnimation.allFrames.size() == 0 || SelectedAnimation.currentFrame >= SelectedAnimation.allFrames.size()) {
 			SelectedAnimation.calculateAllFrames(this);
-			SelectedAnimation.currentFrame = Math.min(SelectedAnimation.currentFrame, SelectedAnimation.allFrames.size());
+			SelectedAnimation.currentFrame = Math.min(SelectedAnimation.currentFrame - 1, SelectedAnimation.allFrames.size());
+			ModelCreator.updateFrame();
 		}
 		
 		return SelectedAnimation.allFrames.get(SelectedAnimation.currentFrame).Elements;
@@ -166,7 +167,7 @@ public class Project
 		SelectedElement = elem;
 		
 		ModelCreator.DidModify();
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 		tree.updateUI();
 	}
 	
@@ -181,7 +182,7 @@ public class Project
 		SelectedElement = tree.getSelectedElement();
 		
 		ModelCreator.DidModify();
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 		tree.jtree.updateUI();
 	}
 	
@@ -193,7 +194,7 @@ public class Project
 			EnsureUniqueElementName(newElem);
 			
 			tree.addElementAsSibling(newElem);
-			tree.SelectElement(newElem);
+			tree.selectElement(newElem);
 			
 			if (newElem.ParentElement == null) {
 				rootElements.add(newElem);
@@ -202,7 +203,7 @@ public class Project
 		
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.DidModify();
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 	}
 	
 	
@@ -218,7 +219,7 @@ public class Project
 		
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.DidModify();
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 	}
 	
 
@@ -234,7 +235,7 @@ public class Project
 		tree.clearElements();
 		SelectedAnimation = null;
 		ModelCreator.ignoreValueUpdates = false;
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 	}
 	
 	
@@ -242,7 +243,14 @@ public class Project
 	{
 		tree.selectElementByOpenGLName(pos);
 		SelectedElement = tree.getSelectedElement();
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
+	}
+	
+	public void selectElement(Element element)
+	{
+		tree.selectElement(element);
+		SelectedElement = tree.getSelectedElement();
+		ModelCreator.updateValues(null);
 	}
 	
 

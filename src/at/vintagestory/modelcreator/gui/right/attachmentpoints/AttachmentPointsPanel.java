@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -80,7 +81,7 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 		pointList.setPreferredSize(new Dimension(195, 100));
 		pointList.addListSelectionListener(e -> {
 			ModelCreator.currentProject.SelectedAttachmentPoint = pointList.getSelectedValue();
-			updateValues();
+			updateValues(pointList);
 		});
 
 		btnContainer = new JPanel(new GridLayout(1, 3, 4, 0));
@@ -91,7 +92,7 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 		btnAdd.addActionListener(e -> {
 			if (ModelCreator.currentProject.SelectedElement == null) return;
 			ModelCreator.currentProject.SelectedAttachmentPoint = ModelCreator.currentProject.SelectedElement.addNewAttachmentPoint();
-			updateValues();
+			updateValues(btnAdd);
 			
 		});
 		btnAdd.setPreferredSize(new Dimension(30, 30));
@@ -105,7 +106,7 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 			if (ModelCreator.currentProject.SelectedElement == null) return;
 			ModelCreator.currentProject.SelectedElement.removeCurrentAttachmentPoint();
 			ModelCreator.currentProject.SelectedAttachmentPoint = null;
-			updateValues();
+			updateValues(btnRemove);
 		});
 		
 		btnRemove.setPreferredSize(new Dimension(30, 30));
@@ -135,7 +136,7 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 					codeField.setBackground(getBackground());
 				}
 				
-				updateValues();
+				updateValues(codeField);
 			}
 		});
 		
@@ -165,13 +166,13 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 	}
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		pointList.updateUI();
 		
 		
-		posPanel.updateValues();
-		rotPanel.updateValues();
+		posPanel.updateValues(byGuiElem);
+		rotPanel.updateValues(byGuiElem);
 		
 		Element curElem = ModelCreator.currentProject.SelectedElement;
 		pointList.setEnabled(curElem != null);

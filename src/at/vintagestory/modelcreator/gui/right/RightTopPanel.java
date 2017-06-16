@@ -123,7 +123,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 			ModelCreator.leftKeyframesPanel.setVisible(tabbedPane.getSelectedIndex() == 2);
 			ModelCreator.renderAttachmentPoints = tabbedPane.getSelectedIndex() == 3;
 			ModelCreator.guiMain.itemSaveAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
-			updateValues();
+			updateValues(tabbedPane);
 		});
 		
 		add(tabbedPane);
@@ -150,9 +150,9 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 	}
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
-		tabbedPane.updateValues();
+		tabbedPane.updateValues(byGuiElem);
 		
 		Element cube = getCurrentElement();
 		if (cube != null)
@@ -172,7 +172,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 	}
 
 	
-	public void updateFrame() {
-		rightKeyFramesPanel.updateFrame();
+	public void updateFrame(JComponent byGuiElem) {
+		rightKeyFramesPanel.updateFrame(byGuiElem);
 	}
 }

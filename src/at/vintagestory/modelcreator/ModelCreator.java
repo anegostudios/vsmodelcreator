@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -33,7 +34,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -200,7 +200,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		
 		currentProject.LoadIntoEditor(getElementManager());
-		updateValues();
+		updateValues(null);
 
 		
 		prevFrameMillisec = System.currentTimeMillis();
@@ -273,7 +273,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	
 	
-	public static void updateValues()
+	public static void updateValues(JComponent byGuiElem)
 	{
 		if (currentProject == null) return;
 		if (ignoreValueUpdates) return;
@@ -287,9 +287,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 					currentProject.SelectedAnimation.calculateAllFrames(currentProject);
 				}
 				
-				guiMain.updateValues();
-			 	((RightTopPanel)manager).updateValues();
-			 	leftKeyframesPanel.updateValues();
+				guiMain.updateValues(byGuiElem);
+			 	((RightTopPanel)manager).updateValues(byGuiElem);
+			 	leftKeyframesPanel.updateValues(byGuiElem);
 			 	updateFrame(false);
 			 	updateTitle();
 			 	
@@ -319,14 +319,14 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				@Override
 				public void run() { 
 					leftKeyframesPanel.updateFrame();
-					((RightTopPanel)manager).updateFrame();
+					((RightTopPanel)manager).updateFrame(null);
 					updateTitle();
 					guiMain.updateFrame();				
 				}
 			});
 		} else {
 			leftKeyframesPanel.updateFrame();
-			((RightTopPanel)manager).updateFrame();
+			((RightTopPanel)manager).updateFrame(null);
 			updateTitle();
 			guiMain.updateFrame();							
 		}
@@ -656,7 +656,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 						if (yMovement != 0)
 							lastMouseY = newMouseY;
 
-						updateValues();
+						updateValues(null);
 						element.updateUV();
 					}
 				}
@@ -909,7 +909,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		changeHistory.addHistoryState(currentProject);
 		
 		currentProject.needsSaving = false;		
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 		currentProject.tree.jtree.updateUI();		
 	}
 	
@@ -921,7 +921,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		ModelCreator.currentProject.filePath = file.getAbsolutePath(); 
 		currentProject.needsSaving = false;
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 		changeHistory.didSave();
 	}
 	

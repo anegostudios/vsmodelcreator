@@ -4,16 +4,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -25,6 +22,7 @@ import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.KeyframeElement;
+import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
 public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdater
@@ -92,41 +90,17 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 		
 		rotationFields[num].setBackground(new Color(Face.ColorsByFace[colIndex].r, Face.ColorsByFace[colIndex].g, Face.ColorsByFace[colIndex].b));
 		
-		
-		rotationFields[num].addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					KeyframeElement element = keyFramesPanel.getCurrentElement();
-					if (element != null)
-					{
-						if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
-						if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
-						if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
-						ModelCreator.updateValues();
-					}
-				}
-			}
+		AwtUtil.addChangeListener(rotationFields[num], e -> {
+			KeyframeElement element = keyFramesPanel.getCurrentElement();
+			if (element == null) return;
+			if (rotationFields[num].getText().length() == 0) return;
+			
+			if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
+			if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
+			if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
+			ModelCreator.updateValues(rotationFields[num]);
 		});
 		
-		rotationFields[num].addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				KeyframeElement element = keyFramesPanel.getCurrentElement();
-				if (element != null)
-				{
-					if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
-					if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
-					if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
-					ModelCreator.updateValues();
-				}
-			}
-		});
 		
 		rotationFields[num].addMouseWheelListener(new MouseWheelListener()
 		{
@@ -171,7 +145,7 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 				elem.setRotationZ(newValue);
 			}
 			
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(rotationSliders[num]);
 		});
 		
 
@@ -212,18 +186,18 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 			break;
 		}
 		
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(rotationSliders[num]);
 	}
 	
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		KeyframeElement element = keyFramesPanel.getCurrentElement();
-		toggleFields(element);
+		toggleFields(element, byGuiElem);
 	}
 	
-	public void toggleFields(KeyframeElement element) {
+	public void toggleFields(KeyframeElement element, JComponent byGuiElem) {
 		ignoreSliderChanges = true;
 		
 		if (ModelCreator.currentProject.AllAngles) {
@@ -270,9 +244,9 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 		rotationSliders[1].setValue(enabled ? (int) Math.round(element.getRotationY() / multiplier) : 0);
 		rotationSliders[2].setValue(enabled ? (int) Math.round(element.getRotationZ() / multiplier) : 0);
 		
-		rotationFields[0].setText(enabled ? "" + df.format(element.getRotationX()) : "");
-		rotationFields[1].setText(enabled ? "" + df.format(element.getRotationY()) : "");
-		rotationFields[2].setText(enabled ? "" + df.format(element.getRotationZ()) : "");
+		if (byGuiElem != rotationFields[0]) rotationFields[0].setText(enabled ? "" + df.format(element.getRotationX()) : "");
+		if (byGuiElem != rotationFields[1]) rotationFields[1].setText(enabled ? "" + df.format(element.getRotationY()) : "");
+		if (byGuiElem != rotationFields[2]) rotationFields[2].setText(enabled ? "" + df.format(element.getRotationZ()) : "");
 		
 		ignoreSliderChanges = false;
 	}

@@ -310,7 +310,7 @@ public class Animation
 	}
 	
 	
-	void ReloadFrameNumbers() {
+	public void ReloadFrameNumbers() {
 		frameNumbers = new int[keyframes.length];
 		
 		for (int i = 0; i < keyframes.length; i++) {
@@ -361,7 +361,7 @@ public class Animation
 	}
 	
 	
-	void RemoveKeyFrame(Keyframe keyframe) {
+	public void RemoveKeyFrame(Keyframe keyframe) {
 		// Shrink array by 1
 		Keyframe[] newkeyframes = new Keyframe[keyframes.length - 1];
 		
@@ -450,7 +450,7 @@ public class Animation
 		
 		ReloadFrameNumbers();
 		ModelCreator.DidModify();
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 	}
 
 	public void DeleteCurrentFrame()
@@ -458,7 +458,7 @@ public class Animation
 		RemoveKeyFrame(GetKeyFrame(currentFrame));
 		ReloadFrameNumbers();
 		ModelCreator.DidModify();
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 	}
 
 	public boolean IsCurrentFrameKeyFrame()
@@ -512,7 +512,7 @@ public class Animation
 		this.keyframes = newKeyframes;
 		ReloadFrameNumbers();
 		ModelCreator.DidModify();
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 	}
 	
 }

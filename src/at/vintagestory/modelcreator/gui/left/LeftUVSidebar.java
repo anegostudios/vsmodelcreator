@@ -343,7 +343,9 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		if (!grabbing && newGrabbing) {
 			this.lastMouseX = Mouse.getX();
-			this.lastMouseY = Mouse.getY();			
+			this.lastMouseY = Mouse.getY();
+			
+			ModelCreator.currentProject.selectElement(grabbedElement);
 		}
 
 		if (grabbing = newGrabbing)
@@ -351,16 +353,15 @@ public class LeftUVSidebar extends LeftSidebar
 			int newMouseX = Mouse.getX();
 			int newMouseY = Mouse.getY();
 			
-			int xMovement = (int) ((newMouseX - this.lastMouseX) / 6);
-			int yMovement = (int) ((newMouseY - this.lastMouseY) / 6);
+			int xMovement = (int) ((newMouseX - this.lastMouseX) / scaledTexWidth);
+			int yMovement = (int) ((newMouseY - this.lastMouseY) / scaledTexHeight);
 
 			if (xMovement != 0 || yMovement != 0)
 			{
 				if (ModelCreator.currentProject.EntityTextureMode) {
 					if (grabbedElement != null && Mouse.isButtonDown(0))
 					{
-						grabbedElement.setTexUStart(grabbedElement.getTexUStart() + xMovement);
-						grabbedElement.setTexVStart(grabbedElement.getTexVStart() - yMovement);
+						grabbedElement.setTexUVStart(grabbedElement.getTexUStart() + xMovement, grabbedElement.getTexVStart() - yMovement);
 					}
 					
 				} else {
@@ -393,6 +394,7 @@ public class LeftUVSidebar extends LeftSidebar
 					}
 					
 					face.updateUV();
+					
 				}
 				
 
@@ -402,7 +404,7 @@ public class LeftUVSidebar extends LeftSidebar
 					this.lastMouseY = newMouseY;
 				
 				
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(null);
 			}
 		}
 	}

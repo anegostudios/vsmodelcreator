@@ -3,6 +3,8 @@ package at.vintagestory.modelcreator.gui.right.keyframes;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import at.vintagestory.modelcreator.ModelCreator;
@@ -52,7 +54,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		btnRot.addActionListener(a ->
 		{
 			ModelCreator.currentProject.SelectedAnimation.ToggleRotation(ModelCreator.manager.getCurrentElement(), btnRot.isSelected());
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(btnRot);
 		});
 		btnContainer.add(btnRot);
 		
@@ -62,7 +64,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		btnPos.addActionListener(a ->
 		{
 			ModelCreator.currentProject.SelectedAnimation.TogglePosition(ModelCreator.manager.getCurrentElement(), btnPos.isSelected());
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(btnPos);
 		});
 		btnContainer.add(btnPos);
 		
@@ -73,7 +75,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		btnStretch.addActionListener(a ->
 		{
 			ModelCreator.currentProject.SelectedAnimation.ToggleStretch(ModelCreator.manager.getCurrentElement(), btnStretch.isSelected());
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(btnStretch);
 		});
 		btnContainer.add(btnStretch);
 		
@@ -84,18 +86,18 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		add(panelPosition);
 		//add(panelSize);	
 		
-		updateValues();
+		updateValues(null);
 	}
 	
 
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
-		updateFrame();
+		updateFrame(byGuiElem);
 	}
 	
-	public void updateFrame() {
+	public void updateFrame(JComponent byGuiElem) {
 		if (ModelCreator.manager == null) return;
 		Element elem = ModelCreator.manager.getCurrentElement();
 		
@@ -113,8 +115,8 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		btnStretch.setSelected(enabled && keyframeElem != null && keyframeElem.StretchSet);
 		
 	
-		panelRotation.toggleFields(keyframeElem != null ? getCurrentElement() : null);
-		panelPosition.toggleFields(keyframeElem != null ? getCurrentElement() : null);
+		panelRotation.toggleFields(keyframeElem != null ? getCurrentElement() : null, byGuiElem);
+		panelPosition.toggleFields(keyframeElem != null ? getCurrentElement() : null, byGuiElem);
 		
 		
 		btnPos.setEnabled(enabled);
@@ -125,12 +127,12 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 
 	public KeyframeElement getCurrentElement()
 	{
-		if (ModelCreator.manager==null) return null;
+		if (ModelCreator.manager == null) return null;
 		
 		Element elem = ModelCreator.manager.getCurrentElement();
 		if (elem == null || ModelCreator.currentProject.SelectedAnimation == null) return null;
 		
-		return ModelCreator.currentProject.SelectedAnimation.GetOrCreateKeyFrameElement(elem);
+		return ModelCreator.currentProject.SelectedAnimation.GetKeyFrameElement(elem, ModelCreator.currentProject.SelectedAnimation.currentFrame);
 	}
 
 }

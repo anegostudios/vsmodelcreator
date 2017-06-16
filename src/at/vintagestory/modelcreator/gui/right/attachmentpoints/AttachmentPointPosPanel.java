@@ -4,16 +4,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -23,6 +20,7 @@ import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.AttachmentPoint;
+import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
 public class AttachmentPointPosPanel extends JPanel implements IValueUpdater
@@ -74,36 +72,15 @@ public class AttachmentPointPosPanel extends JPanel implements IValueUpdater
 		xPositionField.setSize(new Dimension(62, 30));
 		xPositionField.setFont(defaultFont);
 		xPositionField.setHorizontalAlignment(JTextField.CENTER);
-		xPositionField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
-					if (point != null)
-					{
-						point.setPosX(Parser.parseDouble(xPositionField.getText(), point.getPosX()));
-						ModelCreator.updateValues();
-					}
+		
+		AwtUtil.addChangeListener(xPositionField, e -> {
+			AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
+			if (point == null) return;
+			
+			point.setPosX(Parser.parseDouble(xPositionField.getText(), point.getPosX()));
+			ModelCreator.updateValues(xPositionField);
+		});
 
-				}
-			}
-		});
-		xPositionField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
-				if (point != null)
-				{
-					point.setPosX(Parser.parseDouble(xPositionField.getText(), point.getPosX()));
-					ModelCreator.updateValues();
-				}
-			}
-		});
 		xPositionField.addMouseWheelListener(new MouseWheelListener()
 		{
 			
@@ -119,36 +96,16 @@ public class AttachmentPointPosPanel extends JPanel implements IValueUpdater
 		yPositionField.setSize(new Dimension(62, 30));
 		yPositionField.setFont(defaultFont);
 		yPositionField.setHorizontalAlignment(JTextField.CENTER);
-		yPositionField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
-					if (point != null)
-					{
-						point.setPosY(Parser.parseDouble(yPositionField.getText(), point.getPosY()));
-						ModelCreator.updateValues();
-					}
+		
+		AwtUtil.addChangeListener(yPositionField, e -> {
+			AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
+			if (point == null) return;
+			
+			point.setPosY(Parser.parseDouble(yPositionField.getText(), point.getPosY()));
+			ModelCreator.updateValues(yPositionField);
+		});
 
-				}
-			}
-		});
-		yPositionField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
-				if (point != null)
-				{
-					point.setPosY(Parser.parseDouble(yPositionField.getText(), point.getPosY()));
-					ModelCreator.updateValues();
-				}
-			}
-		});
+		
 		yPositionField.addMouseWheelListener(new MouseWheelListener()
 		{
 			
@@ -163,36 +120,13 @@ public class AttachmentPointPosPanel extends JPanel implements IValueUpdater
 		zPositionField.setSize(new Dimension(62, 30));
 		zPositionField.setFont(defaultFont);
 		zPositionField.setHorizontalAlignment(JTextField.CENTER);
-		zPositionField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
-					if (point != null)
-					{
-						point.setPosZ(Parser.parseDouble(zPositionField.getText(), point.getPosZ()));
-						ModelCreator.updateValues();
-					}
-
-				}
-			}
-		});
 		
-		zPositionField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
-				if (point != null)
-				{
-					point.setPosZ(Parser.parseDouble(zPositionField.getText(), point.getPosZ()));
-					ModelCreator.updateValues();
-				}
-			}
+		AwtUtil.addChangeListener(zPositionField, e -> {
+			AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
+			if (point == null) return;
+			
+			point.setPosZ(Parser.parseDouble(zPositionField.getText(), point.getPosZ()));
+			ModelCreator.updateValues(zPositionField);
 		});
 		
 		zPositionField.addMouseWheelListener(new MouseWheelListener()
@@ -280,7 +214,7 @@ public class AttachmentPointPosPanel extends JPanel implements IValueUpdater
 			break;
 		}
 		
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 	}
 
 	public void addComponents()
@@ -297,13 +231,13 @@ public class AttachmentPointPosPanel extends JPanel implements IValueUpdater
 	}
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
-		toggleFields(ModelCreator.currentProject.SelectedAttachmentPoint);
+		toggleFields(ModelCreator.currentProject.SelectedAttachmentPoint, byGuiElem);
 	}
 	
 	
-	public void toggleFields(AttachmentPoint point) {
+	public void toggleFields(AttachmentPoint point, JComponent byGuiElem) {
 		boolean enabled = point != null && this.enabled;
 		btnPlusX.setEnabled(enabled);
 		btnPlusY.setEnabled(enabled);
@@ -315,8 +249,8 @@ public class AttachmentPointPosPanel extends JPanel implements IValueUpdater
 		xPositionField.setEnabled(enabled);
 		yPositionField.setEnabled(enabled);
 		zPositionField.setEnabled(enabled);
-		xPositionField.setText(enabled ? df.format(point.getPosX()) : "");
-		yPositionField.setText(enabled ? df.format(point.getPosY()) : "");
-		zPositionField.setText(enabled ? df.format(point.getPosZ()) : "");
+		if (byGuiElem != xPositionField) xPositionField.setText(enabled ? df.format(point.getPosX()) : "");
+		if (byGuiElem != yPositionField) yPositionField.setText(enabled ? df.format(point.getPosY()) : "");
+		if (byGuiElem != zPositionField) zPositionField.setText(enabled ? df.format(point.getPosZ()) : "");
 	}
 }

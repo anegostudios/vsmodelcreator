@@ -355,7 +355,7 @@ public class GuiMenu extends JMenuBar
 			ModelCreator.currentProject.AllAngles = itemUnlockAngles.isSelected();
 			ModelCreator.prefs.putBoolean("unlockAngles", ModelCreator.currentProject.AllAngles);
 			ModelCreator.DidModify();
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(itemUnlockAngles);
 		});
 		
 		itemSingleTexture.addActionListener(a ->
@@ -363,7 +363,7 @@ public class GuiMenu extends JMenuBar
 			ModelCreator.currentProject.EntityTextureMode = itemSingleTexture.isSelected();
 			if (ModelCreator.currentProject.EntityTextureMode) ModelCreator.currentProject.applySingleTextureMode();
 			ModelCreator.DidModify();
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(itemSingleTexture);
 		});
 		
 		itemNoTextureSize.addActionListener(a -> {
@@ -561,7 +561,7 @@ public class GuiMenu extends JMenuBar
 		}));
 	}
 
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		boolean enabled = !ModelCreator.currentProject.PlayAnimation;
 		
@@ -577,7 +577,7 @@ public class GuiMenu extends JMenuBar
 	}
 	
 	public void updateFrame() {
-		updateValues();
+		updateValues(null);
 	}
 
 }

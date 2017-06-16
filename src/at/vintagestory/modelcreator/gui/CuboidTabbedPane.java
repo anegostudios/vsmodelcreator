@@ -2,6 +2,7 @@ package at.vintagestory.modelcreator.gui;
 
 import java.awt.Component;
 
+import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
 
 import at.vintagestory.modelcreator.interfaces.IElementManager;
@@ -18,7 +19,7 @@ public class CuboidTabbedPane extends JTabbedPane
 		this.manager = manager;
 	}
 
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		for (int i = 0; i < getTabCount(); i++)
 		{
@@ -28,7 +29,7 @@ public class CuboidTabbedPane extends JTabbedPane
 				if (component instanceof IValueUpdater)
 				{
 					IValueUpdater updater = (IValueUpdater) component;
-					updater.updateValues();
+					updater.updateValues(byGuiElem);
 				}
 			}
 		}

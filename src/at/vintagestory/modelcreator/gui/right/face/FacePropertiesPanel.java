@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -16,6 +17,7 @@ import at.vintagestory.modelcreator.gui.ComponentUtil;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.util.AwtUtil;
 
 public class FacePropertiesPanel extends JPanel implements IValueUpdater
 {
@@ -52,17 +54,17 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 		{
 			manager.getCurrentElement().getSelectedFace().setAutoUVEnabled(boxAutoUV.isSelected());
 			manager.getCurrentElement().getSelectedFace().updateUV();
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(boxAutoUV);
 		});
 		glowValue = new JTextField();
 		
-		glowValue.addActionListener(e -> {
+		
+		AwtUtil.addChangeListener(glowValue, e -> {
 			try {
 				manager.getCurrentElement().getSelectedFace().setGlow(Integer.parseInt(glowValue.getText()));	
 			} catch(Exception ex) {
 				
 			}
-			
 		});
 				
 		horizontalBox.add(boxEnabled);
@@ -79,7 +81,7 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 	}
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
 		if (cube != null)
@@ -89,7 +91,7 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 			boxAutoUV.setEnabled(true);
 			boxAutoUV.setSelected(cube.getSelectedFace().isAutoUVEnabled());
 			glowValue.setEnabled(true);
-			glowValue.setText(""+cube.getSelectedFace().getGlow());
+			if (byGuiElem != glowValue) glowValue.setText(""+cube.getSelectedFace().getGlow());
 		}
 		else
 		{

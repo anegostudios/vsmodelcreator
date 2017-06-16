@@ -4,16 +4,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -24,6 +21,7 @@ import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
 public class ElementRotationOriginPanel extends JPanel implements IValueUpdater
@@ -76,35 +74,16 @@ public class ElementRotationOriginPanel extends JPanel implements IValueUpdater
 		xOriginField.setSize(new Dimension(62, 30));
 		xOriginField.setFont(defaultFont);
 		xOriginField.setHorizontalAlignment(JTextField.CENTER);
-		xOriginField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
+		
+		AwtUtil.addChangeListener(xOriginField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element != null)
 			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					Element element = manager.getCurrentElement();
-					if (element != null)
-					{
-						element.setOriginX((Parser.parseDouble(xOriginField.getText(), element.getOriginX())));
-						ModelCreator.updateValues();
-					}
-				}
+				element.setOriginX((Parser.parseDouble(xOriginField.getText(), element.getOriginX())));
+				ModelCreator.updateValues(xOriginField);
 			}
 		});
-		xOriginField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				Element element = manager.getCurrentElement();
-				if (element != null)
-				{
-					element.setOriginX((Parser.parseDouble(xOriginField.getText(), element.getOriginX())));
-					ModelCreator.updateValues();
-				}
-			}
-		});
+		
 		xOriginField.addMouseWheelListener(new MouseWheelListener()
 		{
 			@Override
@@ -117,35 +96,18 @@ public class ElementRotationOriginPanel extends JPanel implements IValueUpdater
 		yOriginField.setSize(new Dimension(62, 30));
 		yOriginField.setFont(defaultFont);
 		yOriginField.setHorizontalAlignment(JTextField.CENTER);
-		yOriginField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
+		
+		
+		
+		AwtUtil.addChangeListener(yOriginField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element != null)
 			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					Element element = manager.getCurrentElement();
-					if (element != null)
-					{
-						element.setOriginY((Parser.parseDouble(yOriginField.getText(), element.getOriginY())));
-						ModelCreator.updateValues();
-					}
-				}
+				element.setOriginY((Parser.parseDouble(yOriginField.getText(), element.getOriginY())));
+				ModelCreator.updateValues(yOriginField);
 			}
 		});
-		yOriginField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				Element element = manager.getCurrentElement();
-				if (element != null)
-				{
-					element.setOriginY((Parser.parseDouble(yOriginField.getText(), element.getOriginY())));
-					ModelCreator.updateValues();
-				}
-			}
-		});
+		
 		yOriginField.addMouseWheelListener(new MouseWheelListener()
 		{
 			@Override
@@ -158,36 +120,17 @@ public class ElementRotationOriginPanel extends JPanel implements IValueUpdater
 		zOriginField.setSize(new Dimension(62, 30));
 		zOriginField.setFont(defaultFont);
 		zOriginField.setHorizontalAlignment(JTextField.CENTER);
-		zOriginField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
+
+		AwtUtil.addChangeListener(zOriginField, e -> {
+			Element element = manager.getCurrentElement();
+			if (element != null)
 			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					Element element = manager.getCurrentElement();
-					if (element != null)
-					{
-						element.setOriginZ((Parser.parseDouble(zOriginField.getText(), element.getOriginZ())));
-						ModelCreator.updateValues();
-					}
-				}
+				element.setOriginZ((Parser.parseDouble(zOriginField.getText(), element.getOriginZ())));
+				ModelCreator.updateValues(zOriginField);
 			}
 		});
 		
-		zOriginField.addFocusListener(new FocusAdapter()
-		{
-			@Override
-			public void focusLost(FocusEvent e)
-			{
-				Element element = manager.getCurrentElement();
-				if (element != null)
-				{
-					element.setOriginZ((Parser.parseDouble(zOriginField.getText(), element.getOriginZ())));
-					ModelCreator.updateValues();
-				}
-			}
-		});
+		
 		zOriginField.addMouseWheelListener(new MouseWheelListener()
 		{
 			@Override
@@ -262,7 +205,7 @@ public class ElementRotationOriginPanel extends JPanel implements IValueUpdater
 	}
 
 	@Override
-	public void updateValues()
+	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
 		boolean enabled = cube != null && this.enabled;
@@ -277,9 +220,9 @@ public class ElementRotationOriginPanel extends JPanel implements IValueUpdater
 		xOriginField.setEnabled(enabled);
 		yOriginField.setEnabled(enabled);
 		zOriginField.setEnabled(enabled);
-		xOriginField.setText(enabled ? df.format(cube.getOriginX()) : "");
-		yOriginField.setText(enabled ? df.format(cube.getOriginY()) : "");
-		zOriginField.setText(enabled ? df.format(cube.getOriginZ()) : "");
+		if (byGuiElem != xOriginField) xOriginField.setText(enabled ? df.format(cube.getOriginX()) : "");
+		if (byGuiElem != yOriginField) yOriginField.setText(enabled ? df.format(cube.getOriginY()) : "");
+		if (byGuiElem != zOriginField) zOriginField.setText(enabled ? df.format(cube.getOriginZ()) : "");
 	}
 	
 

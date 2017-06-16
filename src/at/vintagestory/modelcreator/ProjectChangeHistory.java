@@ -72,7 +72,7 @@ public class ProjectChangeHistory
 		
 		
 		ModelCreator.currentProject.LoadIntoEditor(ModelCreator.manager);
-		ModelCreator.updateValues();
+		ModelCreator.updateValues(null);
 		ModelCreator.currentProject.tree.jtree.updateUI();
 	}
 	

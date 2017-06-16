@@ -86,7 +86,7 @@ public class AnimationSelector
 				//System.out.println("selected " + ModelCreator.currentProject.SelectedAnimation);
 				nameField.setText(ModelCreator.currentProject.SelectedAnimation.getName());
 				
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(list);
 				updateValues();
 			}
 		});
@@ -103,7 +103,7 @@ public class AnimationSelector
 				ModelCreator.currentProject.SelectedAnimation.setName(nameField.getText());
 				
 				model.set(list.getSelectedIndex(), nameField.getText());
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(nameField);
 			}
 		});
 		
@@ -127,7 +127,7 @@ public class AnimationSelector
 			model.addElement(anim.getName());
 			list.setSelectedIndex(project.getSelectedAnimationIndex());
 			
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(btnSelect);
 			
 			nameField.setText(ModelCreator.currentProject.SelectedAnimation.getName());
 			
@@ -158,7 +158,7 @@ public class AnimationSelector
 					project.SelectedAnimation = project.Animations.get(nextSelected);
 				}
 				
-				ModelCreator.updateValues();
+				ModelCreator.updateValues(btnImport);
 				
 				if (ModelCreator.currentProject.SelectedAnimation == null) {
 					nameField.setText("");
@@ -238,7 +238,7 @@ public class AnimationSelector
 			}
 			
 			ModelCreator.DidModify();
-			ModelCreator.updateValues();
+			ModelCreator.updateValues(activitiesList);
 		});
 		
 		DefaultListModel<String> activityListItems = activityList();
