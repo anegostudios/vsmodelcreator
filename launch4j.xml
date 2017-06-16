@@ -3,7 +3,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>output-jar\modelcreator.jar</jar>
-  <outfile>output-bin\ModelCreator.exe</outfile>
+  <outfile>output-bin\VSModelCreator.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
