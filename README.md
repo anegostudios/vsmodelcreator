@@ -1,6 +1,6 @@
 Vintage Story Model Creator, based on MrCrayfish's Model Creator here: https://github.com/MrCrayfish/ModelCreator
 
-Simple and Easy tool for creating block, item and entity models for Vintage Story. Features:
+Simple and Easy tool for creating blocks, items and entity models for [Vintage Story](http://www.vintagestory.at/). Features:
 
 - Create/Remove/Modify/Arrange single cubes to build shapes
 - Texturing Mode
