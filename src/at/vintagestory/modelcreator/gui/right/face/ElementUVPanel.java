@@ -9,7 +9,10 @@ import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -35,15 +38,20 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 	private JTextField yStartField;
 	private JButton btnNegX;
 	private JButton btnNegY;
+	private JComboBox<String> menuList;
+	private JPanel unwrapPanel;
 
 	private DecimalFormat df = new DecimalFormat("#.#");
+	
+	private DefaultComboBoxModel<String> model;
 
 	public ElementUVPanel(IElementManager manager)
 	{
 		this.manager = manager;
-		setLayout(new GridLayout(3, 4, 4, 4));
+		//setLayout(new GridLayout(2, 1, 4, 4));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>UV (all Faces)</b></html>"));
-		setMaximumSize(new Dimension(186, 124));
+		setMaximumSize(new Dimension(186, 174));
 		initComponents();
 		initProperties();
 		addComponents();
@@ -57,6 +65,15 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		yStartField = new JTextField();
 		btnNegX = new JButton(Icons.arrow_down);
 		btnNegY = new JButton(Icons.arrow_down);
+		
+		model = new DefaultComboBoxModel<String>();
+		model.addElement("Compact");
+		model.addElement("North is front");
+		model.addElement("East is front");
+		model.addElement("South is front");
+		model.addElement("West is front");
+		model.addElement("Up is front");
+		model.addElement("Down is front");
 	}
 
 	public void initProperties()
@@ -164,33 +181,61 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		btnNegY.setSize(new Dimension(62, 30));
 		btnNegY.setFont(defaultFont);
 		btnNegY.setToolTipText("<html>Decreases the start V.<br><b>Hold shift for decimals</b></html>");
+		
+		
+		unwrapPanel = new JPanel(new GridLayout(1, 1));
+		unwrapPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>UV Unwrap Order</b></html>"));
+		menuList = new JComboBox<String>();
+		menuList.setModel(model);
+		menuList.setToolTipText("How to unwrap the box UV map, choosing the right one will help you when texturing the model");
+		menuList.addActionListener(e ->
+		{
+			if (ModelCreator.ignoreValueUpdates) return;
+			if (manager.getCurrentElement() != null)
+			{
+				manager.getCurrentElement().setUnwrapMode(menuList.getSelectedIndex());
+				manager.getCurrentElement().updateUV();
+				updateValues(menuList);
+			}
+		});
+		
+		unwrapPanel.setPreferredSize(new Dimension(186, 50));
+		unwrapPanel.add(menuList);
 	}
 
 	public void addComponents()
 	{
-		add(btnPlusX);
-		add(btnPlusY);
-		add(xStartField);
-		add(yStartField);
-		add(btnNegX);
-		add(btnNegY);
+		JPanel uvCoordPanel = new JPanel(new GridLayout(3, 4, 4, 4));
+		
+		uvCoordPanel.add(btnPlusX);
+		uvCoordPanel.add(btnPlusY);
+		uvCoordPanel.add(xStartField);
+		uvCoordPanel.add(yStartField);
+		uvCoordPanel.add(btnNegX);
+		uvCoordPanel.add(btnNegY);
+		
+		add(uvCoordPanel);
+		add(unwrapPanel);
 	}
 
 	@Override
 	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
+		boolean enabled = cube != null;
+		
+		xStartField.setEnabled(enabled);
+		yStartField.setEnabled(enabled);
+		menuList.setEnabled(enabled);
+
 		if (cube != null)
-		{
-			xStartField.setEnabled(true);
-			yStartField.setEnabled(true);
+		{			
 			if (byGuiElem != xStartField) xStartField.setText(df.format(cube.getTexUStart()));
 			if (byGuiElem != yStartField) yStartField.setText(df.format(cube.getTexVStart()));
+			if (byGuiElem != menuList) menuList.setSelectedIndex(cube.getUnwrapMode());
 		}
 		else
 		{
-			xStartField.setEnabled(false);
-			yStartField.setEnabled(false);
 			xStartField.setText("");
 			yStartField.setText("");
 		}

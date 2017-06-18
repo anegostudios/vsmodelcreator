@@ -78,6 +78,8 @@ public class Element implements IDrawable
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();
 	
+	protected int unwrapMode;
+	
 	
 	public float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 };
 
@@ -456,8 +458,138 @@ public class Element implements IDrawable
 		}
 	}
 
+	
+	// Cases:
+	// N center, E left, W right, U above, D below, S besides
+	// E center, S left, N right, U above, D below, W besides 
+	// S center, W left, E right, U above, D below, N besides
+	// W center, N left, S right, U above, D below, E besides
+	// U center, W left, E right, S above, N below, D besides 
+	// D center, E left, W right, N above, S below, U besides
+
+	// First index = blockfacing.index
+	// Second index:
+	// 0 = center
+	// 1 = left
+	// 2 = right
+	// 3 = above
+	// 4 = below
+	// 5 = very right
+	// resulting value = blockfacing index:
+	// 0 = N
+	// 1 = E
+	// 2 = S
+	// 3 = W
+	// 4 = U
+	// 5 = D
+	int[][] allUvPositions = new int[][] {
+		// N
+		new int[] { 0, 1, 3, 4, 5, 2 },
+		// E
+		new int[] { 1, 2, 0, 4, 5, 3 },
+		// S
+		new int[] { 2, 3, 1, 4, 5, 0 },
+		// W
+		new int[] { 3, 0, 2, 4, 5, 1 },
+		// U
+		new int[] { 4, 3, 1, 0, 2, 5 },
+		// D
+		new int[] { 5, 1, 3, 0, 2, 4 },
+	};
 
 	void setUnwrappedCubeUV() {
+		if (unwrapMode == 0) {
+			performDefaultUVUnwrapping();
+			return;
+		}
+		
+		
+		
+		for (int i = 0; i < 6; i++) {
+			faces[i].rotation = 0;
+		}
+		if (unwrapMode - 1 == 0) faces[4].rotation = 2;
+		if (unwrapMode - 1 == 2) faces[5].rotation = 2;
+		if (unwrapMode - 1 == 1) {
+			faces[4].rotation = 3;
+			faces[5].rotation = 3;
+		}
+		if (unwrapMode - 1 == 3) {
+			faces[4].rotation = 1;
+			faces[5].rotation = 1;
+		}
+		if (unwrapMode - 1 == 4) {
+			faces[0].rotation = 2;
+			faces[1].rotation = 1;
+			faces[3].rotation = 3;
+		}
+		if (unwrapMode - 1 == 5) {
+			faces[2].rotation = 2;
+			faces[1].rotation = 1;
+			faces[3].rotation = 3;
+		}
+		
+		int[] uvPositions = allUvPositions[unwrapMode - 1];
+		double scales[] = faces[0].textureScale();
+		
+		Face aboveFace = faces[uvPositions[3]];
+		Face veryRightFace = faces[uvPositions[5]];
+		Face leftFace = faces[uvPositions[1]];
+		Face centerFace = faces[uvPositions[0]];
+		Face rightFace = faces[uvPositions[2]];
+		Face belowFace = faces[uvPositions[4]];
+		
+		// Row 1
+		double x = getTexUStart();
+		double y = getTexVStart();
+		
+		x += leftFace.TextureWidth();
+		
+		aboveFace.textureU = x;
+		aboveFace.textureV = y;
+		aboveFace.updateUV();
+		
+		// Row 2
+		y += aboveFace.TextureHeight();
+		y = Math.ceil(y * scales[1] * 0.5) / (scales[1] * 0.5);
+		
+		x = getTexUStart();
+		
+		leftFace.textureU = x;
+		leftFace.textureV = y;
+		leftFace.updateUV();
+		
+		x += leftFace.TextureWidth();
+		
+		centerFace.textureU = x;
+		centerFace.textureV = y;
+		centerFace.updateUV();
+		
+		x += centerFace.TextureWidth();
+		
+		rightFace.textureU = x;
+		rightFace.textureV = y;
+		rightFace.updateUV();
+		
+		x += rightFace.TextureWidth();
+		
+		veryRightFace.textureU = x;
+		veryRightFace.textureV = y;
+		veryRightFace.updateUV();
+
+		
+		// Row 3
+		x = getTexUStart() + leftFace.TextureWidth();
+		y += Math.max(leftFace.TextureHeight(), Math.max(centerFace.TextureHeight(), Math.max(rightFace.TextureHeight(), veryRightFace.TextureHeight())));
+		y = Math.ceil(y * scales[1] * 0.5) / (scales[1] * 0.5);
+		
+		belowFace.textureU = x;
+		belowFace.textureV = y;
+		belowFace.updateUV();
+	}
+	
+	private void performDefaultUVUnwrapping()
+	{
 		double x = getTexUStart();
 		double y = getTexVStart();
 		double maxTexHeight = 0;
@@ -497,6 +629,7 @@ public class Element implements IDrawable
 		}
 	}
 	
+
 	public void rotateAxis()
 	{
 		GL11.glRotated(rotationX, 1, 0, 0);
@@ -877,6 +1010,16 @@ public class Element implements IDrawable
 		Face f = faces[4];
 		texUStart = f.textureU;
 		texVStart = f.textureV;		
+	}
+
+	public void setUnwrapMode(int selectedIndex)
+	{
+		unwrapMode = selectedIndex;
+		
+	}
+	
+	public int getUnwrapMode() {
+		return unwrapMode;
 	}
 
 }

@@ -18,6 +18,7 @@ import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.model.Face;
 
 public class FacePanel extends JPanel implements IValueUpdater
 {
@@ -49,15 +50,24 @@ public class FacePanel extends JPanel implements IValueUpdater
 		addComponents();
 	}
 
+	String FaceColor(int face) {
+		return 
+			(int)(Face.ColorsByFace[face].getRed() * Element.DefaultBlockSideBrightnessByFacing[face]) + "," +
+			(int)(Face.ColorsByFace[face].getGreen() * Element.DefaultBlockSideBrightnessByFacing[face]) + "," +
+			(int)(Face.ColorsByFace[face].getBlue() * Element.DefaultBlockSideBrightnessByFacing[face])
+		;
+				
+	}
+	
 	public void initMenu()
 	{
 		model = new DefaultComboBoxModel<String>();
-		model.addElement("<html><div style='padding:5px;color:rgb(255,0,0);'><b>North</b></html>");
-		model.addElement("<html><div style='padding:5px;color:rgb(0,255,0);'><b>East</b></html>");
-		model.addElement("<html><div style='padding:5px;color:rgb(0,0,255);'><b>South</b></html>");
-		model.addElement("<html><div style='padding:5px;color:rgb(255,187,0);'><b>West</b></html>");
-		model.addElement("<html><div style='padding:5px;color:rgb(0,255,255);'><b>Up</b></html>");
-		model.addElement("<html><div style='padding:5px;color:rgb(255,0,255);'><b>Down</b></html>");
+		model.addElement("<html><div style='padding:5px;color:rgb(" + FaceColor(0) + ");'><b>North</b></html>");
+		model.addElement("<html><div style='padding:5px;color:rgb(" + FaceColor(1) + ");'><b>East</b></html>");
+		model.addElement("<html><div style='padding:5px;color:rgb(" + FaceColor(2) + ");'><b>South</b></html>");
+		model.addElement("<html><div style='padding:5px;color:rgb(" + FaceColor(3) + ");'><b>West</b></html>");
+		model.addElement("<html><div style='padding:5px;color:rgb(" + FaceColor(4) + ");'><b>Up</b></html>");
+		model.addElement("<html><div style='padding:5px;color:rgb(" + FaceColor(5) + ");'><b>Down</b></html>");
 	}
 
 	public void initComponents()
@@ -103,8 +113,10 @@ public class FacePanel extends JPanel implements IValueUpdater
 		
 		rotation.addChangeListener(e ->
 		{
-			manager.getCurrentElement().getSelectedFace().setRotation(rotation.getValue());
-			ModelCreator.updateValues(rotation);
+			if (manager.getCurrentElement() != null) {
+				manager.getCurrentElement().getSelectedFace().setRotation(rotation.getValue());
+				ModelCreator.updateValues(rotation);				
+			}
 		});
 		
 		rotation.setToolTipText("<html>The rotation of the texture<br>Default: 0\u00b0</html>");

@@ -111,7 +111,7 @@ public class Face
 	private boolean cullface = false;
 	private boolean enabled = true;
 	private boolean autoUV = true;
-	private int rotation;
+	public int rotation;
 
 	private Element cuboid;
 	private int side;
