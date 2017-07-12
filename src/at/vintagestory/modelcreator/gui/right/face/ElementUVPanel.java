@@ -1,13 +1,15 @@
 package at.vintagestory.modelcreator.gui.right.face;
 
+import java.awt.Checkbox;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -40,6 +42,13 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 	private JButton btnNegY;
 	private JComboBox<String> menuList;
 	private JPanel unwrapPanel;
+	
+	//private JSlider rotation;
+	//private JPanel sliderPanel;
+	/*private final int ROTATION_MIN = 0;
+	private final int ROTATION_MAX = 3;
+	private final int ROTATION_INIT = 0;*/
+	Checkbox checkbox;
 
 	private DecimalFormat df = new DecimalFormat("#.#");
 	
@@ -48,10 +57,9 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 	public ElementUVPanel(IElementManager manager)
 	{
 		this.manager = manager;
-		//setLayout(new GridLayout(2, 1, 4, 4));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>UV (all Faces)</b></html>"));
-		setMaximumSize(new Dimension(186, 174));
+		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>UV Position (all Faces)</b></html>"));
+		setMaximumSize(new Dimension(186, 224));
 		initComponents();
 		initProperties();
 		addComponents();
@@ -74,6 +82,55 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		model.addElement("West is front");
 		model.addElement("Up is front");
 		model.addElement("Down is front");
+		
+		/*Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+		labelTable.put(new Integer(0), new JLabel("0\u00b0"));
+		labelTable.put(new Integer(1), new JLabel("90\u00b0"));
+		labelTable.put(new Integer(2), new JLabel("180\u00b0"));
+		labelTable.put(new Integer(3), new JLabel("270\u00b0"));
+		sliderPanel = new JPanel(new GridLayout(1, 1));
+		sliderPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Rotation (all faces)</b></html>"));
+		rotation = new JSlider(JSlider.HORIZONTAL, ROTATION_MIN, ROTATION_MAX, ROTATION_INIT);
+		rotation.setMajorTickSpacing(4);
+		rotation.setPaintTicks(true);
+		rotation.setPaintLabels(true);
+		rotation.setLabelTable(labelTable);
+		
+		
+		rotation.addChangeListener(e ->
+		{
+			Element elem = manager.getCurrentElement();
+			if (elem == null) return;
+			
+			elem.setUnwrapRotation(rotation.getValue());
+			elem.updateUV();
+			ModelCreator.updateValues(rotation);
+		});
+		
+		rotation.setToolTipText("<html>The rotation of the texture<br>Default: 0\u00b0</html>");
+		sliderPanel.setMaximumSize(new Dimension(190, 80));*/
+		//sliderPanel.add(rotation);
+
+		checkbox = new Checkbox("Alternate unwrap direction");
+		checkbox.addItemListener(new ItemListener()
+		{
+			@Override
+			public void itemStateChanged(ItemEvent e)
+			{
+				Element elem = manager.getCurrentElement();
+				if (elem == null) return;
+				
+				elem.setAlternateUnrwapDir(e.getStateChange() == 1);
+				elem.updateUV();
+				elem.updateUV();
+				ModelCreator.updateValues(null);
+			}
+		});
+		
+		
+		//sliderPanel.add(checkbox);
+		
+		
 	}
 
 	public void initProperties()
@@ -216,6 +273,8 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		
 		add(uvCoordPanel);
 		add(unwrapPanel);
+		add(checkbox);
+		//add(sliderPanel);
 	}
 
 	@Override
@@ -227,9 +286,11 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		xStartField.setEnabled(enabled);
 		yStartField.setEnabled(enabled);
 		menuList.setEnabled(enabled);
+		checkbox.setEnabled(enabled);
 
 		if (cube != null)
 		{			
+			checkbox.setState(cube.getAlternateUnrwapDir());
 			if (byGuiElem != xStartField) xStartField.setText(df.format(cube.getTexUStart()));
 			if (byGuiElem != yStartField) yStartField.setText(df.format(cube.getTexVStart()));
 			if (byGuiElem != menuList) menuList.setSelectedIndex(cube.getUnwrapMode());
@@ -248,6 +309,8 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		if (cube == null) return;
 		
 		float size = direction * 1f;
+		
+		
 		
 		switch (axis) {
 			case X:

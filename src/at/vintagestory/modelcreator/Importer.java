@@ -419,6 +419,23 @@ public class Importer
 				element.setUnwrapMode(obj.get("unwrapMode").getAsInt());
 			}
 
+			if (obj.has("unwrapRotation") && obj.get("unwrapRotation").isJsonPrimitive()) {
+				element.setUnwrapRotation(obj.get("unwrapRotation").getAsInt());
+			}
+			
+			element.setTexFromFace();
+			if (obj.has("uv") && obj.get("uv").isJsonArray())
+			{
+				JsonArray uv = obj.get("uv").getAsJsonArray();
+
+				double uStart = uv.get(0).getAsDouble();
+				double vStart = uv.get(1).getAsDouble();
+
+				element.setTexUStart(uStart);
+				element.setTexVStart(vStart);
+			}
+
+
 
 			for (Face face : element.getAllFaces())
 			{
@@ -460,7 +477,6 @@ public class Importer
 			
 			element.ParentElement = parent;
 			
-			element.setTexFromFace();
 			
 			return element;
 		}

@@ -256,7 +256,8 @@ public class AnimationSelector
 		activityStoppedList.addActionListener(e ->
 		{
 			int selectedIndex = activityStoppedList.getSelectedIndex();
-			ModelCreator.currentProject.SelectedAnimation.OnActivityStopped = EnumEntityActivityStoppedHandling.values()[selectedIndex];	
+			ModelCreator.currentProject.SelectedAnimation.OnActivityStopped = EnumEntityActivityStoppedHandling.values()[selectedIndex];
+			ModelCreator.DidModify();
 		});
 		
 		activityStoppedList.setPreferredSize(new Dimension(200, 29));	
@@ -268,7 +269,8 @@ public class AnimationSelector
 		animEndedList.addActionListener(e ->
 		{
 			int selectedIndex = animEndedList.getSelectedIndex();
-			ModelCreator.currentProject.SelectedAnimation.OnAnimationEnd = EnumEntityAnimationEndHandling.values()[selectedIndex];	
+			ModelCreator.currentProject.SelectedAnimation.OnAnimationEnd = EnumEntityAnimationEndHandling.values()[selectedIndex];
+			ModelCreator.DidModify();
 		});
 		
 		animEndedList.setPreferredSize(new Dimension(200, 29));	

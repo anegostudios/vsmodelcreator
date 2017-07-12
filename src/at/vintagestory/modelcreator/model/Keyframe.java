@@ -45,7 +45,7 @@ public class Keyframe
 			return;
 		}
 		
-		parentElem.ChildElements.remove(parentElem);
+		parentElem.ChildElements.remove(element);
 		
 		if (IsKeyFrame) ModelCreator.DidModify();
 	}
@@ -56,18 +56,22 @@ public class Keyframe
 	}
 	
 	public KeyframeElement GetKeyFrameElement(Element forElem) {
-		if (forElem == null) return null;
-		List<Element> path = forElem.GetParentPath();
-		
-		List<IDrawable> elems = Elements;		
-		while (path.size() > 0) {
-			KeyframeElement kelem = findChildElement(elems, path.get(0));
-			if (kelem == null) return null;
-			path.remove(0);
-			elems = kelem.ChildElements;
+		return GetKeyFrameElement(Elements, forElem);
+	}
+	
+	KeyframeElement GetKeyFrameElement(List<IDrawable> elems, Element forElem) {
+		KeyframeElement kElem;
+		for (int i = 0; i < elems.size(); i++) {
+			kElem = (KeyframeElement)elems.get(i);
+			if (kElem != null && kElem.AnimatedElement == forElem) return kElem;
+			
+			if (kElem.ChildElements != null) {
+				KeyframeElement childKelem = GetKeyFrameElement(kElem.ChildElements, forElem);
+				if (childKelem != null) return childKelem;
+			}
 		}
 		
-		return findChildElement(elems, forElem);
+		return null;
 	}
 	
 	
@@ -110,18 +114,6 @@ public class Keyframe
 	}
 	
 	
-	
-	
-	
-	KeyframeElement findChildElement(List<IDrawable> elems, Element forElem) {
-		KeyframeElement keyframeElem;
-		for (int i = 0; i < elems.size(); i++) {
-			keyframeElem = (KeyframeElement)elems.get(i);
-			if (keyframeElem != null && keyframeElem.AnimatedElement == forElem) return keyframeElem;
-		}
-		
-		return null;
-	}
 	
 
 	public int getFrameNumber()

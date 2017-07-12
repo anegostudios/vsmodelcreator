@@ -333,10 +333,12 @@ public class LeftUVSidebar extends LeftSidebar
 	public void handleInput(int canvasHeight)
 	{
 		super.handleInput(canvasHeight);
-
 		
 		if (ModelCreator.currentProject.EntityTextureMode && !grabbing) {
 			grabbedElement = findElement(ModelCreator.currentProject.rootElements, Mouse.getX() - 10, (canvasHeight - Mouse.getY()) - 85);
+		}
+		if (!ModelCreator.currentProject.EntityTextureMode) {
+			grabbedElement = ModelCreator.currentProject.SelectedElement;
 		}
 		
 		boolean newGrabbing = Mouse.isButtonDown(0) || Mouse.isButtonDown(1);
@@ -347,65 +349,92 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			ModelCreator.currentProject.selectElement(grabbedElement);
 		}
+		
+		grabbing = newGrabbing;
 
-		if (grabbing = newGrabbing)
+		if (grabbing)
 		{
 			int newMouseX = Mouse.getX();
 			int newMouseY = Mouse.getY();
 			
-			int xMovement = (int) ((newMouseX - this.lastMouseX) / scaledTexWidth);
-			int yMovement = (int) ((newMouseY - this.lastMouseY) / scaledTexHeight);
+			int xMovement = 0;
+			int yMovement = 0;
+			
 
-			if (xMovement != 0 || yMovement != 0)
-			{
-				if (ModelCreator.currentProject.EntityTextureMode) {
-					if (grabbedElement != null && Mouse.isButtonDown(0))
-					{
-						grabbedElement.setTexUVStart(grabbedElement.getTexUStart() + xMovement, grabbedElement.getTexVStart() - yMovement);
-					}
-					
-				} else {
+			if (ModelCreator.currentProject.EntityTextureMode) {
+				xMovement = (int) ((newMouseX - this.lastMouseX) / scaledTexWidth);
+				yMovement = (int) ((newMouseY - this.lastMouseY) / scaledTexHeight);
+				
+				if ((xMovement != 0 || yMovement != 0) && grabbedElement != null && Mouse.isButtonDown(0))
+				{
+					grabbedElement.setTexUVStart(grabbedElement.getTexUStart() + xMovement, grabbedElement.getTexVStart() - yMovement);
+				}
+			} else {
 
-					Element cube = manager.getCurrentElement();
-					if (cube == null) return;
-					
-					int side = getFace(canvasHeight, newMouseX, newMouseY);
-					if (side == -1) return;
+				Element cube = manager.getCurrentElement();
+				if (cube == null) return;
+				
+				int side = getFace(canvasHeight, newMouseX, newMouseY);
+				if (side == -1) return;
+				Face face = cube.getAllFaces()[side];
+				
+				double texWidth = ModelCreator.currentProject.TextureWidth;
+				double texHeight = ModelCreator.currentProject.TextureHeight;
+				
+				double scaleX = 2;
+				double scaleY = 2;
+				
+				TextureEntry texEntry = face.getTextureEntry();
+				if (texEntry != null) {
+					scaleX = texEntry.Width / texWidth;
+					scaleY = texEntry.Height / texHeight;					
+				}
+				texWidth *= scaleX / 2;
+				texHeight *= scaleY / 2;
+				int texBoxWidth = (int)(2 * WIDTH);
+				int texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
+				scaledTexWidth = texBoxWidth / texWidth;
+				scaledTexHeight = texBoxHeight / texHeight;
 
-					Face face = cube.getAllFaces()[side];
+				xMovement = (int) ((newMouseX - this.lastMouseX) / scaledTexWidth);
+				yMovement = (int) ((newMouseY - this.lastMouseY) / scaledTexHeight);
 
-					if (Mouse.isButtonDown(0))
-					{
-						if ((face.getStartU() + xMovement) >= 0.0 && (face.getEndU() + xMovement) <= 16.0)
-							face.moveTextureU(xMovement);
-						if ((face.getStartV() - yMovement) >= 0.0 && (face.getEndV() - yMovement) <= 16.0)
-							face.moveTextureV(-yMovement);
-					}
-					else
-					{
-						face.setAutoUVEnabled(false);
 
-						if ((face.getEndU() + xMovement) <= 16.0)
-							face.addTextureXEnd(xMovement);
-						if ((face.getEndV() - yMovement) <= 16.0)
-							face.addTextureYEnd(-yMovement);
+				
 
-						face.setAutoUVEnabled(false);
-					}
-					
-					face.updateUV();
-					
+				if (Mouse.isButtonDown(0))
+				{
+					if ((face.getStartU() + xMovement) >= 0.0 && (face.getEndU() + xMovement) <= 16.0)
+						face.moveTextureU(xMovement);
+					if ((face.getStartV() - yMovement) >= 0.0 && (face.getEndV() - yMovement) <= 16.0)
+						face.moveTextureV(-yMovement);
+				}
+				else
+				{
+					face.setAutoUVEnabled(false);
+
+					if ((face.getEndU() + xMovement) <= 16.0)
+						face.addTextureXEnd(xMovement);
+					if ((face.getEndV() - yMovement) <= 16.0)
+						face.addTextureYEnd(-yMovement);
+
+					face.setAutoUVEnabled(false);
 				}
 				
-
-				if (xMovement != 0)
-					this.lastMouseX = newMouseX;
-				if (yMovement != 0)
-					this.lastMouseY = newMouseY;
-				
-				
-				ModelCreator.updateValues(null);
+				face.updateUV();
 			}
+				
+
+			if (xMovement != 0)
+				this.lastMouseX = newMouseX;
+			if (yMovement != 0)
+				this.lastMouseY = newMouseY;
+			
+			
+			if (xMovement != 0 || yMovement != 0) {
+				ModelCreator.updateValues(null);	
+			}
+			
 		}
 	}
 	

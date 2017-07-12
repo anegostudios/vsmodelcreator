@@ -20,6 +20,7 @@ public class TextureEntry
 	public int Width;
 	public int Height;
 
+	DirectoryWatchService watchService;
 
 	public TextureEntry(String name, Texture texture, ImageIcon image, String textureLocation)
 	{
@@ -35,7 +36,7 @@ public class TextureEntry
 		File f = new File(textureLocation);
 
         try {
-            DirectoryWatchService watchService = new SimpleDirectoryWatchService(); // May throw
+            watchService = new SimpleDirectoryWatchService(); // May throw
             watchService.register( // May throw
                     new DirectoryWatchService.OnFileChangeListener() {
                         @Override
@@ -55,6 +56,10 @@ public class TextureEntry
         } catch (IOException e) {
             System.out.println("Unable to register file change listener for " + textureLocation);
         }
+	}
+	
+	public void Dispose() {
+		watchService.stop();
 	}
 
 	public String getName()

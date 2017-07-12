@@ -2,6 +2,8 @@ package at.vintagestory.modelcreator.gui.right;
 
 import java.awt.Toolkit;
 import java.util.Enumeration;
+
+import javax.swing.DropMode;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -29,6 +31,8 @@ public class ElementTree
         jtree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jtree.setShowsRootHandles(true);
         jtree.setCellRenderer(new ElementTreeCellRenderer());
+        jtree.setDragEnabled(false);
+        jtree.setDropMode(DropMode.ON_OR_INSERT);
         
 		jtree.addTreeSelectionListener(new TreeSelectionListener()
 		{
@@ -39,8 +43,10 @@ public class ElementTree
 					ModelCreator.currentProject.SelectedElement = getSelectedElement();
 					ModelCreator.updateValues(jtree);	
 				}
-			}
+			}	
 		});
+		
+		jtree.setTransferHandler(new TreeTransferHandler(this));
 		
 	}
 	
@@ -139,7 +145,7 @@ public class ElementTree
             parentNode = (DefaultMutableTreeNode) ((DefaultMutableTreeNode)(parentPath.getLastPathComponent())).getParent();
         }
 
-        DefaultMutableTreeNode node =  addElement(parentNode, child, true);
+        DefaultMutableTreeNode node = addElement(parentNode, child, true);
         selectElement(child);
         return node;
     }

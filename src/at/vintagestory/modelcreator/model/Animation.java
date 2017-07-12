@@ -98,11 +98,9 @@ public class Animation
 				if (frames < 0) frames = nextkelem.FrameNumber + (quantityFrames - curKelem.FrameNumber);
 			}
 			
-			//System.out.println("lerp frames " + (startFrame) + " - " + (startFrame + frames));
 			
 			for (int x = 0; x < frames; x++) {
-				int frame = (startFrame + x) % quantityFrames;
-				
+				int frame = (startFrame + x) % quantityFrames;				
 				KeyframeElement kelem = allFrames.get(frame).GetKeyFrameElement(curKelem.AnimatedElement);
 				lerpKeyFrameElement(kelem, curKelem, nextkelem, flag, x);
 			}
@@ -150,7 +148,7 @@ public class Animation
 	}
 	
 	
-	void lerpKeyFrameElement(KeyframeElement frameElem, KeyframeElement prev, KeyframeElement next, int forFlag, int relativeFrame) { 
+	void lerpKeyFrameElement(KeyframeElement kElem, KeyframeElement prev, KeyframeElement next, int forFlag, int relativeFrame) { 
 		if (prev == null && next == null) return;
 		
 		double t = 0;
@@ -163,20 +161,20 @@ public class Animation
 		}
 		
 		if (forFlag == 0) {
-			frameElem.setOffsetX(lerp(t, prev.getOffsetX(), next.getOffsetX()));
-			frameElem.setOffsetY(lerp(t, prev.getOffsetY(), next.getOffsetY()));
-			frameElem.setOffsetZ(lerp(t, prev.getOffsetZ(), next.getOffsetZ()));		
-			frameElem.PositionSet = true;
+			kElem.setOffsetX(lerp(t, prev.getOffsetX(), next.getOffsetX()));
+			kElem.setOffsetY(lerp(t, prev.getOffsetY(), next.getOffsetY()));
+			kElem.setOffsetZ(lerp(t, prev.getOffsetZ(), next.getOffsetZ()));		
+			kElem.PositionSet = true;
 		} else if(forFlag == 1) {			
-			frameElem.setRotationX(lerp(t, prev.getRotationX(), next.getRotationX()));
-			frameElem.setRotationY(lerp(t, prev.getRotationY(), next.getRotationY()));
-			frameElem.setRotationZ(lerp(t, prev.getRotationZ(), next.getRotationZ()));
-			frameElem.RotationSet = true;
+			kElem.setRotationX(lerp(t, prev.getRotationX(), next.getRotationX()));
+			kElem.setRotationY(lerp(t, prev.getRotationY(), next.getRotationY()));
+			kElem.setRotationZ(lerp(t, prev.getRotationZ(), next.getRotationZ()));
+			kElem.RotationSet = true;
 		} else {
-			frameElem.setStretchX(lerp(t, prev.getRotationX(), next.getRotationX()));
-			frameElem.setStretchY(lerp(t, prev.getRotationY(), next.getRotationY()));
-			frameElem.setStretchZ(lerp(t, prev.getRotationZ(), next.getRotationZ()));
-			frameElem.StretchSet = true;
+			kElem.setStretchX(lerp(t, prev.getRotationX(), next.getRotationX()));
+			kElem.setStretchY(lerp(t, prev.getRotationY(), next.getRotationY()));
+			kElem.setStretchZ(lerp(t, prev.getRotationZ(), next.getRotationZ()));
+			kElem.StretchSet = true;
 		}
 	}
 	
@@ -328,6 +326,10 @@ public class Animation
 	{
 		for (int i = 0; i < keyframes.length; i++) {
 			KeyframeElement kelem = keyframes[i].GetKeyFrameElement(curElem);
+			if (kelem == null) {
+				continue;
+			}
+			
 			if (RemoveKeyFrameElement(kelem, keyframes[i])) {
 				i--;
 			}

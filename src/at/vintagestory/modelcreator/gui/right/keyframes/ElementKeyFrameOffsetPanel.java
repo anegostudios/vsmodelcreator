@@ -77,10 +77,14 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 			KeyframeElement element = keyFramesPanel.getCurrentElement();
 			if (element == null) return;
 			
-			if (xPositionField.getText().length() == 0) return;
-			
-			element.setOffsetX(Parser.parseDouble(xPositionField.getText(), element.getOffsetX()));
-			ModelCreator.updateValues(xPositionField);
+			String text = xPositionField.getText(); 			
+			if (text.length() == 0) return;
+			if (!Parser.isDouble(text)) return;
+			double newValue = Parser.parseDouble(text, 0);
+			if (newValue != element.getOffsetX()) {
+				element.setOffsetX(newValue);
+				ModelCreator.updateValues(xPositionField);				
+			}
 		});
 		
 		xPositionField.addMouseWheelListener(new MouseWheelListener()
@@ -103,10 +107,14 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 			KeyframeElement element = keyFramesPanel.getCurrentElement();
 			if (element == null) return;
 			
-			if (yPositionField.getText().length() == 0) return;
-			
-			element.setOffsetY(Parser.parseDouble(yPositionField.getText(), element.getOffsetY()));
-			ModelCreator.updateValues(yPositionField);
+			String text = yPositionField.getText(); 			
+			if (text.length() == 0) return;
+			if (!Parser.isDouble(text)) return;
+			double newValue = Parser.parseDouble(text, 0);
+			if (newValue != element.getOffsetY()) {
+				element.setOffsetY(newValue);
+				ModelCreator.updateValues(yPositionField);				
+			}
 		});
 
 		
@@ -128,11 +136,15 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		AwtUtil.addChangeListener(zPositionField, e -> {
 			KeyframeElement element = keyFramesPanel.getCurrentElement();
 			if (element == null) return;
-			if (zPositionField.getText().length() == 0) return;
-			
-			
-			element.setOffsetZ(Parser.parseDouble(zPositionField.getText(), element.getOffsetZ()));
-			ModelCreator.updateValues(zPositionField);
+
+			String text = zPositionField.getText(); 			
+			if (text.length() == 0) return;
+			if (!Parser.isDouble(text)) return;
+			double newValue = Parser.parseDouble(text, 0);
+			if (newValue != element.getOffsetZ()) {
+				element.setOffsetZ(newValue);
+				ModelCreator.updateValues(zPositionField);				
+			}
 		});
 		
 		zPositionField.addMouseWheelListener(new MouseWheelListener()

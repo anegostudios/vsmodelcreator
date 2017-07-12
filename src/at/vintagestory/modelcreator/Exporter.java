@@ -361,11 +361,24 @@ public class Exporter
 			writer.write(space(indentation) + "\"tintIndex\": " + cuboid.getTintIndex() + ",");
 			writer.newLine();
 		}
-		if (cuboid.getUnwrapMode() > 0)
-		{
-			writer.write(space(indentation) + "\"unwrapMode\": " + cuboid.getUnwrapMode() + ",");
+		
+		if (project.EntityTextureMode) {
+			if (cuboid.getUnwrapMode() > 0)
+			{
+				writer.write(space(indentation) + "\"unwrapMode\": " + cuboid.getUnwrapMode() + ",");
+				writer.newLine();
+			}
+			if (cuboid.getUnwrapRotation() > 0)
+			{
+				writer.write(space(indentation) + "\"unwrapRotation\": " + cuboid.getUnwrapRotation() + ",");
+				writer.newLine();
+			}
+			
+			writer.write(space(indentation) + "\"uv\": [ " + d2s(cuboid.getTexUStart()) + ", " + d2s(cuboid.getTexVStart()) + " ],");
 			writer.newLine();
 		}
+		
+		
 
 		
 		if (cuboid.getRotationX() != 0 || cuboid.getRotationY() != 0 || cuboid.getRotationZ() != 0 || cuboid.getOriginX() != 0 || cuboid.getOriginY() != 0 || cuboid.getOriginZ() != 0)

@@ -95,9 +95,13 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 			if (element == null) return;
 			if (rotationFields[num].getText().length() == 0) return;
 			
-			if (num == 0) element.setRotationX(Parser.parseDouble(rotationFields[num].getText(), element.getRotationX()));
-			if (num == 1) element.setRotationY(Parser.parseDouble(rotationFields[num].getText(), element.getRotationY()));
-			if (num == 2) element.setRotationZ(Parser.parseDouble(rotationFields[num].getText(), element.getRotationZ()));
+			if (!Parser.isDouble(rotationFields[num].getText())) return;
+			double newRotation = Parser.parseDouble(rotationFields[num].getText(), 0);
+			
+			
+			if (num == 0) { if (element.getRotationX() == newRotation) return; element.setRotationX(newRotation); }
+			if (num == 1) { if (element.getRotationY() == newRotation) return; element.setRotationY(newRotation); }
+			if (num == 2) { if (element.getRotationZ() == newRotation) return; element.setRotationZ(newRotation); }
 			ModelCreator.updateValues(rotationFields[num]);
 		});
 		
@@ -163,6 +167,8 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 
 	
 	public void modifyAngle(int num, int direction, int modifiers) {
+		if (ModelCreator.ignoreValueUpdates) return;
+		
 		KeyframeElement elem = keyFramesPanel.getCurrentElement();
 		if (elem == null) return;		
 		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);

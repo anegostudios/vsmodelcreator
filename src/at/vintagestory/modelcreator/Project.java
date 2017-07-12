@@ -145,7 +145,7 @@ public class Project
 		
 		if (SelectedAnimation.allFrames.size() == 0 || SelectedAnimation.currentFrame >= SelectedAnimation.allFrames.size()) {
 			SelectedAnimation.calculateAllFrames(this);
-			SelectedAnimation.currentFrame = Math.min(SelectedAnimation.currentFrame - 1, SelectedAnimation.allFrames.size());
+			SelectedAnimation.currentFrame = Math.max(0, Math.min(SelectedAnimation.currentFrame - 1, SelectedAnimation.allFrames.size()));
 			ModelCreator.updateFrame();
 		}
 		
@@ -215,11 +215,15 @@ public class Project
 			rootElements.remove(curElem);
 		}
 		
-		if (SelectedAnimation != null) SelectedAnimation.RemoveElement(curElem);
+		if (SelectedAnimation != null) {
+			SelectedAnimation.RemoveElement(curElem);
+			SelectedAnimation.calculateAllFrames(this);
+		}
 		
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.DidModify();
 		ModelCreator.updateValues(null);
+		
 	}
 	
 
@@ -231,6 +235,9 @@ public class Project
 		Animations.clear();
 		SelectedElement = null;
 		PendingTextures.clear();
+		for (TextureEntry entry : Textures.values()) {
+			entry.Dispose();
+		}
 		Textures.clear();
 		tree.clearElements();
 		SelectedAnimation = null;
@@ -458,6 +465,11 @@ public class Project
 		
 		if (textureName == null) {
 			textureName = image.getName().replace(".png", "");	
+		}
+		
+		if (EntityTextureMode) {
+			for(TextureEntry entry : Textures.values()) entry.Dispose();
+			Textures.clear();
 		}
 		
 		if (Textures.containsKey(textureName)) {

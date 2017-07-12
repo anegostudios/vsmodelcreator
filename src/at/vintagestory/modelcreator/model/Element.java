@@ -79,6 +79,7 @@ public class Element implements IDrawable
 	protected Sphere sphere = new Sphere();
 	
 	protected int unwrapMode;
+	protected int unwrapRotation;
 	
 	
 	public float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 };
@@ -460,13 +461,13 @@ public class Element implements IDrawable
 
 	
 	// Cases:
-	// N center, E left, W right, U above, D below, S besides
-	// E center, S left, N right, U above, D below, W besides 
-	// S center, W left, E right, U above, D below, N besides
-	// W center, N left, S right, U above, D below, E besides
-	// U center, W left, E right, S above, N below, D besides 
-	// D center, E left, W right, N above, S below, U besides
-
+	// N center, E left, W right, U above, D below, S very right
+	// E center, S left, N right, U above, D below, W very right
+	// S center, W left, E right, U above, D below, N very right
+	// W center, N left, S right, U above, D below, E very right
+	// U center, W left, E right, S above, N below, D very right
+	// D center, E left, W right, N above, S below, U very right
+	
 	// First index = blockfacing.index
 	// Second index:
 	// 0 = center
@@ -496,6 +497,28 @@ public class Element implements IDrawable
 		// D
 		new int[] { 5, 1, 3, 0, 2, 4 },
 	};
+	
+	// Cases:
+	// N center, D left, U right, W above, E below, S very right
+	// E center, D left, U right, N above, S below, W very right
+	// S center, D left, U right, E above, W below, N very right
+	// W center, D left, U right, S above, N below, E very right
+	// U center, N left, S right, E above, W below, D very right
+	// D center, S left, N right, W above, E below, U very right
+	int[][] allUvPositionsAlternate = new int[][] {
+		// N
+		new int[] { 0, 5, 4, 3, 1, 2 },
+		// E
+		new int[] { 1, 5, 4, 0, 2, 3 },
+		// S
+		new int[] { 2, 5, 4, 1, 3, 0 },
+		// W
+		new int[] { 3, 5, 4, 2, 0, 1 },
+		// U
+		new int[] { 4, 0, 2, 1, 3, 5 },
+		// D
+		new int[] { 5, 2, 0, 3, 1, 4 },
+	};
 
 	void setUnwrappedCubeUV() {
 		if (unwrapMode == 0) {
@@ -504,32 +527,37 @@ public class Element implements IDrawable
 		}
 		
 		
-		
 		for (int i = 0; i < 6; i++) {
-			faces[i].rotation = 0;
+			faces[i].rotation = unwrapRotation;
 		}
-		if (unwrapMode - 1 == 0) faces[4].rotation = 2;
-		if (unwrapMode - 1 == 2) faces[5].rotation = 2;
+		
+		if (unwrapMode - 1 == 0) faces[4].rotation = (unwrapRotation + 2) % 4;
+		if (unwrapMode - 1 == 2) faces[5].rotation = (unwrapRotation + 2) % 4;
+		
 		if (unwrapMode - 1 == 1) {
-			faces[4].rotation = 3;
-			faces[5].rotation = 3;
+			faces[4].rotation = (unwrapRotation + 3) % 4;
+			faces[5].rotation = (unwrapRotation + 3) % 4;
 		}
 		if (unwrapMode - 1 == 3) {
-			faces[4].rotation = 1;
-			faces[5].rotation = 1;
+			faces[4].rotation = (unwrapRotation + 1) % 4;
+			faces[5].rotation = (unwrapRotation + 1) % 4;
 		}
 		if (unwrapMode - 1 == 4) {
-			faces[0].rotation = 2;
-			faces[1].rotation = 1;
-			faces[3].rotation = 3;
+			faces[0].rotation = (unwrapRotation + 2) % 4;
+			faces[1].rotation = (unwrapRotation + 1) % 4;
+			faces[3].rotation = (unwrapRotation + 3) % 4;
+			
+			if (unwrapRotation == 1) {
+				faces[5].rotation = (unwrapRotation + 2) % 4;
+			}
 		}
 		if (unwrapMode - 1 == 5) {
-			faces[2].rotation = 2;
-			faces[1].rotation = 1;
-			faces[3].rotation = 3;
+			faces[2].rotation = (unwrapRotation + 2) % 4;
+			faces[1].rotation = (unwrapRotation + 1) % 4;
+			faces[3].rotation = (unwrapRotation + 3) % 4;
 		}
 		
-		int[] uvPositions = allUvPositions[unwrapMode - 1];
+		int[] uvPositions = unwrapRotation == 1 ? allUvPositionsAlternate[unwrapMode - 1] : allUvPositions[unwrapMode - 1];
 		double scales[] = faces[0].textureScale();
 		
 		Face aboveFace = faces[uvPositions[3]];
@@ -1014,12 +1042,31 @@ public class Element implements IDrawable
 
 	public void setUnwrapMode(int selectedIndex)
 	{
-		unwrapMode = selectedIndex;
-		
+		unwrapMode = selectedIndex;		
 	}
 	
 	public int getUnwrapMode() {
 		return unwrapMode;
 	}
 
+
+	public void setUnwrapRotation(int rot)
+	{
+		unwrapRotation = rot;
+	}
+	
+	public int getUnwrapRotation() {
+		return unwrapRotation;
+	}
+
+	public void setAlternateUnrwapDir(boolean b)
+	{
+		unwrapRotation = b ? 1 : 0;
+	}
+
+	public boolean getAlternateUnrwapDir()
+	{
+		return unwrapRotation > 0;
+	}
+	
 }
