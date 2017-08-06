@@ -2,8 +2,6 @@ package at.vintagestory.modelcreator.model;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import javax.swing.ImageIcon;
 import org.newdawn.slick.opengl.Texture;
 
@@ -14,7 +12,7 @@ public class TextureEntry
 {
 	public String name;
 	public ImageIcon icon;
-	public List<Texture> textures;
+	public Texture texture;
 	public String filePath;
 	
 	public int Width;
@@ -25,7 +23,7 @@ public class TextureEntry
 	public TextureEntry(String name, Texture texture, ImageIcon image, String textureLocation)
 	{
 		this.name = name;
-		this.textures = Arrays.asList(texture);
+		this.texture = texture;
 		this.icon = image;
 		this.filePath = textureLocation;
 		Width = texture.getImageWidth();
@@ -69,13 +67,9 @@ public class TextureEntry
 
 	public Texture getTexture()
 	{
-		return textures.get(0);
+		return texture;
 	}
 
-	public Texture getNextTexture()
-	{
-		return textures.get(0);
-	}
 
 	public ImageIcon getIcon()
 	{

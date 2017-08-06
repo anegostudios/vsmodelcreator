@@ -26,8 +26,8 @@ public class Project
 	public ArrayList<Element> rootElements = new ArrayList<Element>();
 	public ArrayList<Animation> Animations = new ArrayList<Animation>();
 	
-	public int TextureWidth = 32;
-	public int TextureHeight = 32;
+	public int TextureWidth = 16;
+	public int TextureHeight = 16;
 	public boolean EntityTextureMode;
 	public boolean AllAngles;
 	
@@ -445,20 +445,22 @@ public class Project
 		}
 		
 		entry.icon = upscaleIcon(new ImageIcon(entry.getFilePath()), 256);
-		entry.textures = Arrays.asList(texture);
+		entry.texture = texture;
 	}
 	
 
 	public String loadTexture(String textureName, File image) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
+		
 		Texture texture = TextureLoader.getTexture("PNG", is);
+		
 		is.close();
 
-		if (texture.getImageHeight() % 16 != 0 || texture.getImageWidth() % 16 != 0)
+		if (texture.getImageHeight() % 8 != 0 || texture.getImageWidth() % 8 != 0)
 		{
 			texture.release();
-			return "Cannot load this texture, the width or length is not a multiple of 16 ("+texture.getImageHeight()+"x"+texture.getImageWidth()+")";
+			return "Cannot load this texture, the width or length is not a multiple of 8 ("+texture.getImageHeight()+"x"+texture.getImageWidth()+")";
 		}
 		
 		ImageIcon icon = upscaleIcon(new ImageIcon(image.getAbsolutePath()), 256);

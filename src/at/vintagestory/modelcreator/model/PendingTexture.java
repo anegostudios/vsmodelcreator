@@ -46,7 +46,7 @@ public class PendingTexture
 			String errormessge = null;
 			boolean isnew = false;
 			
-			String fileName = this.texture.getName().replace(".png", ""); //.replaceAll("\\d*$", "");
+			String fileName = this.texture.getName().replace(".png", "");
 			Texture texture = ModelCreator.currentProject.getTexture(fileName);
 			
 			if (texture == null)

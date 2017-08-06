@@ -61,6 +61,10 @@ public class GuiMenu extends JMenuBar
 	private JMenu menuView;
 	private JCheckBoxMenuItem itemGrid;
 	private JCheckBoxMenuItem itemTransparency;
+	private JMenuItem modelFromBelow;
+	private JMenuItem modelFromAbove;
+	private JMenuItem modelFromSide;
+	private JMenuItem modelFromFront;
 	
 	/* Add */
 	private JMenu menuAdd;
@@ -124,13 +128,16 @@ public class GuiMenu extends JMenuBar
 		menuView = new JMenu("View");
 		{
 			itemGrid = createCheckboxItem("Grid", "Toggles the voxel grid", KeyEvent.VK_G, Icons.transparent);
-			itemGrid.setSelected(ModelCreator.transparent);
+			itemGrid.setSelected(ModelCreator.showGrid);
 			
 			itemTransparency = createCheckboxItem("Transparency", "Toggles transparent rendering in program", KeyEvent.VK_T, Icons.transparent);
 			itemTransparency.setSelected(ModelCreator.transparent);
 			
-			itemGrid.setSelected(ModelCreator.showGrid);
-			itemTransparency.setSelected(ModelCreator.transparent);
+						
+			modelFromBelow = createItem("Model from Below", "Rotate camera to show model from below", KeyEvent.VK_T, Icons.transparent);
+			modelFromAbove = createItem("Model from Above", "Rotate camera to show model from above", KeyEvent.VK_T, Icons.transparent);
+			modelFromSide = createItem("Model from Side", "Rotate camera to show model from the side", KeyEvent.VK_T, Icons.transparent);
+			modelFromFront = createItem("Model from Front", "Rotate camera to show model from the front", KeyEvent.VK_T, Icons.transparent);
 		}
 
 		menuAdd = new JMenu("Add");

@@ -150,16 +150,15 @@ public class Face
 			int uvBaseIndex = blockFacing.GetIndex() * 8;
 			int uvIndex = 0;
 			
-			double[] scale = textureScale();
+			double[] scale = renderTextureScale();
 
 			
 			GL11.glBegin(GL11.GL_QUADS);
 			{
 				for (int j = 0; j < 4; j++) {
-					GL11.glTexCoord2d(
-							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureU : textureUEnd) / scale[0] / 16, 
-							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureV : textureVEnd) / scale[1] / 16
-					);
+					double u = (cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureU : textureUEnd) / scale[0] / 16;
+					double v = (cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureV : textureVEnd) / scale[1] / 16;
+					GL11.glTexCoord2d(u, v);
 					GL11.glVertex3d(cuboid.getWidth() * CubeVertices[coordIndex++], cuboid.getHeight() * CubeVertices[coordIndex++], cuboid.getDepth() * CubeVertices[coordIndex++]);
 				}
 			}
@@ -183,6 +182,26 @@ public class Face
 			if (entry != null) {
 				scaleX = entry.Width / texWidth * (texWidth / 32);
 				scaleY = entry.Height / texHeight * (texHeight / 32);				
+			}
+		}
+		
+		return new double[] { scaleX, scaleY };
+	}
+	
+	
+	// Argh, the lwjgl texture loader upscales textures to the next power of 2 size, so a 96x32 textures gets loaded as 128x32 
+	public double[] renderTextureScale() {
+		double scaleX = ModelCreator.noTexScale;
+		double scaleY = ModelCreator.noTexScale;
+		
+		if (ModelCreator.currentProject != null) {
+			double texWidth = ModelCreator.currentProject.TextureWidth;
+			double texHeight = ModelCreator.currentProject.TextureHeight;
+			
+			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(textureName);
+			if (entry != null) {
+				scaleX = entry.texture.getTextureWidth() / texWidth * (texWidth / 32);
+				scaleY = entry.texture.getTextureHeight() / texHeight * (texHeight / 32);				
 			}
 		}
 		

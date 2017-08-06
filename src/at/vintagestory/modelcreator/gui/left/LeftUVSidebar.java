@@ -211,112 +211,125 @@ public class LeftUVSidebar extends LeftSidebar
 
 	void drawRectsBlockTextureMode(int canvasHeight) {
 		Element elem = manager.getCurrentElement();
+		if (elem == null) return;
 		
 		float[] bright = elem != null ? elem.brightnessByFace : brightnessByFace;
 		
 		
+		Face[] faces = elem.getAllFaces();
+
 		glPushMatrix();
 		{
 			glTranslatef(10, 30, 0);
 
-			int count = 0;
+			
+			int countleft = 0;
+			int countright = 0;
 
 			for (int i = 0; i < 6; i++) {
+				
+				Face face = faces[i];
+				if (!face.isEnabled()) continue;
+				
 				glPushMatrix(); {
 					if (30 + i * (WIDTH + 10) + (WIDTH + 10) > canvasHeight) {
-						glTranslatef(10 + WIDTH, count * (WIDTH + 10), 0);
+						glTranslatef(10 + WIDTH, countright * (WIDTH + 10), 0);
 						startX[i] = 20 + WIDTH;
-						startY[i] = count * (WIDTH + 10) + 40;
-						count++;
+						startY[i] = countright * (WIDTH + 10) + 40;
+						countright++;
 					}
 					else
 					{
-						glTranslatef(0, i * (WIDTH + 10), 0);
+						glTranslatef(0, countleft * (WIDTH + 10), 0);
 						startX[i] = 10;
-						startY[i] = i * (WIDTH + 10) + 40;
+						startY[i] = countleft * (WIDTH + 10) + 40;
+						countleft++;
 					}
 
 					Color color = Face.getFaceColour(i);
 					glColor3f(color.r * bright[i], color.g * bright[i], color.b * bright[i]);
 
-					Face[] faces = null;
-					if (elem != null) {
-						faces = elem.getAllFaces();
-					}
+					face.bindTexture();
 
-					if (faces != null)
+
+					double scaleX = 0.5;
+					double scaleY = 0.5;
+					double texWidth = ModelCreator.currentProject.TextureWidth;
+					double texHeight = ModelCreator.currentProject.TextureHeight; 
+					
+					texWidth *= scaleX;
+					texHeight *= scaleY;
+
+					TextureEntry entry = ModelCreator.currentProject.getTextureEntry(face.getTextureName());
+					
+					float endu = 1f;
+					float endv = 1f;
+					if (entry != null) {
+						texWidth = entry.Width / 2.0;
+						texHeight = entry.Height / 2.0;
+						scaleX = entry.Width / texWidth;
+						scaleY = entry.Height / texHeight;
+						
+						endu = (float)entry.Width / entry.texture.getTextureWidth();
+						endv = (float)entry.Height / entry.texture.getTextureHeight();
+					}
+					
+					double scaledTexWidth = WIDTH / texWidth;
+					double scaledTexHeight = WIDTH / texHeight;
+					int scaledHeight = (int)(WIDTH * texHeight/texWidth);
+					
+					
+					
+					glBegin(GL_QUADS);
 					{
-						faces[i].bindTexture();
-
-
-						double scaleX = 0.5;
-						double scaleY = 0.5;
-						double texWidth = ModelCreator.currentProject.TextureWidth;
-						double texHeight = ModelCreator.currentProject.TextureHeight; 
-						
-						texWidth *= scaleX;
-						texHeight *= scaleY;
-
-						TextureEntry entry = ModelCreator.currentProject.getTextureEntry(faces[i].getTextureName());
-						
-						if (entry != null) {
-							texWidth = entry.Width / 2.0;
-							texHeight = entry.Height / 2.0;
-							scaleX = entry.Width / texWidth;
-							scaleY = entry.Height / texHeight;
+						if (face.isBinded()) {
+							glTexCoord2f(0, endv);
 						}
-						
-						double scaledTexWidth = WIDTH / texWidth;
-						double scaledTexHeight = WIDTH / texHeight;
-						int scaledHeight = (int)(WIDTH * texHeight/texWidth);
-						
-						glBegin(GL_QUADS);
-						{
-							if (faces[i].isBinded())
-								glTexCoord2f(0, 1);
-							glVertex2i(0, scaledHeight);
+						glVertex2i(0, scaledHeight);
 
-							if (faces[i].isBinded())
-								glTexCoord2f(1, 1);
-							glVertex2i(WIDTH, scaledHeight);
-
-							if (faces[i].isBinded())
-								glTexCoord2f(1, 0);
-							glVertex2i(WIDTH, 0);
-
-							if (faces[i].isBinded())
-								glTexCoord2f(0, 0);
-							glVertex2i(0, 0);
+						if (face.isBinded()) {
+							glTexCoord2f(endu, endv);
 						}
-						glEnd();
+						glVertex2i(WIDTH, scaledHeight);
 
-						TextureImpl.bindNone();
-
-						glColor3f(1, 1, 1);
-
-						glBegin(GL_LINES);
-						{
-							glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
-							glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
-
-							glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
-							glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
-
-							glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getEndV() * scaledTexHeight);
-							glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
-
-							glVertex2d(faces[i].getEndU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
-							glVertex2d(faces[i].getStartU() * scaledTexWidth, faces[i].getStartV() * scaledTexHeight);
-
+						if (face.isBinded()) {
+							glTexCoord2f(endu, 0);
 						}
-						glEnd();
+						glVertex2i(WIDTH, 0);
 
-						glEnable(GL_BLEND);
-						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-						EnumFonts.BEBAS_NEUE_20.drawString(5, 5, Face.getFaceName(i), BLACK_ALPHA);
-						glDisable(GL_BLEND);
+						if (face.isBinded()) {
+							glTexCoord2f(0, 0);
+						}
+						glVertex2i(0, 0);
 					}
+					glEnd();
+
+					TextureImpl.bindNone();
+
+					glColor3f(1, 1, 1);
+
+					glBegin(GL_LINES);
+					{
+						glVertex2d(face.getStartU() * scaledTexWidth, face.getStartV() * scaledTexHeight);
+						glVertex2d(face.getStartU() * scaledTexWidth, face.getEndV() * scaledTexHeight);
+
+						glVertex2d(face.getStartU() * scaledTexWidth, face.getEndV() * scaledTexHeight);
+						glVertex2d(face.getEndU() * scaledTexWidth, face.getEndV() * scaledTexHeight);
+
+						glVertex2d(face.getEndU() * scaledTexWidth, face.getEndV() * scaledTexHeight);
+						glVertex2d(face.getEndU() * scaledTexWidth, face.getStartV() * scaledTexHeight);
+
+						glVertex2d(face.getEndU() * scaledTexWidth, face.getStartV() * scaledTexHeight);
+						glVertex2d(face.getStartU() * scaledTexWidth, face.getStartV() * scaledTexHeight);
+					}
+					glEnd();
+
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					EnumFonts.BEBAS_NEUE_20.drawString(5, 5, Face.getFaceName(i), BLACK_ALPHA);
+					glDisable(GL_BLEND);
 				}
+			
 				glPopMatrix();
 			}
 		}
