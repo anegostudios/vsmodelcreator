@@ -21,6 +21,7 @@ public class Parser
 		double value;
 		try
 		{
+			text = text.replace(',', '.');
 			value = Double.parseDouble(text);
 		}
 		catch (NumberFormatException e)

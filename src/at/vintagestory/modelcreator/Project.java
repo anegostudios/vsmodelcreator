@@ -215,9 +215,12 @@ public class Project
 			rootElements.remove(curElem);
 		}
 		
-		if (SelectedAnimation != null) {
-			SelectedAnimation.RemoveElement(curElem);
-			SelectedAnimation.calculateAllFrames(this);
+		for (int i = 0; i < Animations.size(); i++) {
+			Animations.get(i).RemoveElement(curElem);
+			
+			if (Animations.get(i) == SelectedAnimation) {
+				Animations.get(i).calculateAllFrames(this);	
+			}
 		}
 		
 		SelectedElement = tree.getSelectedElement();

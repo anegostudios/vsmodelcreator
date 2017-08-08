@@ -81,6 +81,7 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 			Element element = manager.getCurrentElement();
 			if (element == null) return;
 			
+			
 			element.setStartX((Parser.parseDouble(xPositionField.getText(), element.getStartX())));
 			element.updateUV();
 			ModelCreator.updateValues(xPositionField);
