@@ -43,7 +43,6 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemSave;
 	private JMenuItem itemSaveAs;
 	private JMenuItem itemExportUvMap;
-	private JMenuItem itemTexturePath;
 	private JMenuItem itemExit;
 
 	/* Edit */
@@ -61,6 +60,7 @@ public class GuiMenu extends JMenuBar
 	private JMenu menuView;
 	private JCheckBoxMenuItem itemGrid;
 	private JCheckBoxMenuItem itemTransparency;
+	private JCheckBoxMenuItem itemTexture;
 	private JMenuItem modelFromBelow;
 	private JMenuItem modelFromAbove;
 	private JMenuItem modelFromSide;
@@ -72,13 +72,14 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemAddFace;
 
 
-	/* Other */
-	private JMenu otherMenu;
+	/* Export */
+	private JMenu exportMenu;
 	private JMenuItem itemSaveScreenshot;
 	public JMenuItem itemSaveAnimation;
 	private JMenuItem itemReloadTextures;
 	private JCheckBoxMenuItem itemAutoReloadTextures;
 	private JMenuItem itemImgurLink;
+	private JMenuItem itemTexturePath;
 	
 	/* Help */
 	private JMenu helpMenu;
@@ -101,7 +102,6 @@ public class GuiMenu extends JMenuBar
 			itemSave = createItem("Save...", "Save JSON", KeyEvent.VK_S, new ImageIcon(getClass().getClassLoader().getResource("icons/disk.png")));
 			itemSaveAs = createItem("Save as...", "Save JSON", KeyEvent.VK_E, new ImageIcon(getClass().getClassLoader().getResource("icons/export.png")));
 			itemTexturePath = createItem("Set Texture Path...", "Set the base path to look for textures", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
-			itemExportUvMap = createItem("Export UV Map...", "Lets you export a UV map when in single texture mode", KeyEvent.VK_U, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
 			itemExit = createItem("Exit", "Exit Application", KeyEvent.VK_Q, new ImageIcon(getClass().getClassLoader().getResource("icons/exit.png")));
 		}
 		
@@ -130,8 +130,11 @@ public class GuiMenu extends JMenuBar
 			itemGrid = createCheckboxItem("Grid", "Toggles the voxel grid", KeyEvent.VK_G, Icons.transparent);
 			itemGrid.setSelected(ModelCreator.showGrid);
 			
-			itemTransparency = createCheckboxItem("Transparency", "Toggles transparent rendering in program", KeyEvent.VK_T, Icons.transparent);
+			itemTransparency = createCheckboxItem("Transparency", "Toggles transparent rendering", KeyEvent.VK_Y, Icons.transparent);
 			itemTransparency.setSelected(ModelCreator.transparent);
+			
+			itemTexture = createCheckboxItem("Texture", "Toggles textured rendering", KeyEvent.VK_T, Icons.transparent);
+			itemTexture.setSelected(ModelCreator.transparent);
 			
 						
 			modelFromBelow = createItem("Model from Below", "Rotate camera to show model from below", KeyEvent.VK_T, Icons.transparent);
@@ -147,11 +150,12 @@ public class GuiMenu extends JMenuBar
 		}
 
 		
-		otherMenu = new JMenu("Export");
+		exportMenu = new JMenu("Export");
 		{
 			itemSaveScreenshot = createItem("Save Screenshot to Disk...", "Save screenshot to disk.", KeyEvent.VK_F12, Icons.disk);
 			itemSaveAnimation= createItem("Export Current Animation as GIF...", "Export current Animation as GIF.", 0, Icons.disk);
 			itemImgurLink = createItem("Get Screenshot as Imgur Link", "Get an Imgur link of your screenshot to share.", KeyEvent.VK_F11, Icons.imgur);
+			itemExportUvMap = createItem("Export UV Map...", "Lets you export a UV map when in single texture mode", KeyEvent.VK_U, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
 		}
 
 		
@@ -167,6 +171,7 @@ public class GuiMenu extends JMenuBar
 	
 		menuView.add(itemGrid);
 		menuView.add(itemTransparency);
+		menuView.add(itemTexture);
 		
 		menuProject.add(itemUnlockAngles);
 		menuProject.add(itemSingleTexture);
@@ -182,11 +187,11 @@ public class GuiMenu extends JMenuBar
 		menuEdit.add(itemUndo);
 		menuEdit.add(itemRedo);
 
-		
-		otherMenu.add(itemSaveScreenshot);
-		otherMenu.add(itemImgurLink);
-		otherMenu.addSeparator();
-		otherMenu.add(itemSaveAnimation);
+		exportMenu.add(itemExportUvMap);
+		exportMenu.add(itemSaveScreenshot);
+		exportMenu.add(itemImgurLink);
+		exportMenu.addSeparator();
+		exportMenu.add(itemSaveAnimation);
 
 		helpMenu.add(itemControls);
 		helpMenu.add(itemCredits);
@@ -198,7 +203,6 @@ public class GuiMenu extends JMenuBar
 		menuFile.add(itemSaveAs);
 		menuFile.addSeparator();
 		menuFile.add(itemTexturePath);
-		menuFile.add(itemExportUvMap);
 		menuFile.addSeparator();
 		menuFile.add(itemExit);
 
@@ -207,7 +211,7 @@ public class GuiMenu extends JMenuBar
 		add(menuView);
 		add(menuProject);
 		add(menuAdd);
-		add(otherMenu);
+		add(exportMenu);
 		add(helpMenu);
 	}
 
@@ -220,6 +224,7 @@ public class GuiMenu extends JMenuBar
 			KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 			KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 			KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+			KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 		};
 		
 		itemNew.setAccelerator(strokes[0]);
@@ -355,6 +360,30 @@ public class GuiMenu extends JMenuBar
 		itemTransparency.addActionListener(a ->
 		{
 			ModelCreator.transparent = itemTransparency.isSelected();
+		});
+
+		
+		
+		Action buttonAction3 = new AbstractAction("Show Texture") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+		    public void actionPerformed(ActionEvent evt) {
+				ModelCreator.renderTexture = itemTexture.isSelected();
+				itemTexture.setSelected(ModelCreator.renderTexture);
+		    }
+		};
+		key = "Show Textxure";
+		itemTexture.setAction(buttonAction3);
+		buttonAction3.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_T);
+		itemTexture.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/transparent.png")));
+		itemTexture.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(strokes[6], key);
+		itemTexture.getActionMap().put(key, buttonAction3);
+		itemTexture.setAccelerator(strokes[6]);
+		itemTexture.addActionListener(a ->
+		{
+			ModelCreator.renderTexture = itemTexture.isSelected();
+			itemTexture.setSelected(ModelCreator.renderTexture);
 		});
 		
 		itemUnlockAngles.addActionListener(a ->
@@ -580,7 +609,8 @@ public class GuiMenu extends JMenuBar
 		
 		itemExportUvMap.setEnabled(ModelCreator.currentProject.EntityTextureMode);
 		itemUnlockAngles.setSelected(ModelCreator.currentProject.AllAngles);
-		itemSingleTexture.setSelected(ModelCreator.currentProject.EntityTextureMode);		
+		itemSingleTexture.setSelected(ModelCreator.currentProject.EntityTextureMode);
+		itemTexture.setSelected(ModelCreator.renderTexture);
 	}
 	
 	public void updateFrame() {

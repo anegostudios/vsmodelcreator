@@ -217,7 +217,7 @@ public class Face
 	public void bindTexture()
 	{
 		TextureImpl.bindNone();
-		if (textureName != null)
+		if (textureName != null && ModelCreator.renderTexture)
 		{
 			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(textureName);
 			if (entry != null)

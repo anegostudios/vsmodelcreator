@@ -387,7 +387,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			public void valueChanged(ListSelectionEvent e)
 			{
 				int row = keyFramesTable.getSelectedRow();
-				if (ModelCreator.currentProject.SelectedAnimation != null) {
+				if (ModelCreator.currentProject.SelectedAnimation != null && row >= 0) {
 				 	Keyframe keyframe = ModelCreator.currentProject.SelectedAnimation.keyframes[row];
 				 	
 				 	ModelCreator.currentProject.SelectedAnimation.SetFrame(keyframe.getFrameNumber());
@@ -414,8 +414,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		deleteFrameButton.setToolTipText("Delete Frame");
 		deleteFrameButton.addActionListener(e ->
 		{
-			
 			ModelCreator.currentProject.SelectedAnimation.DeleteCurrentFrame();
+			ModelCreator.updateFrame();
 		});
 		deleteFrameButton.setPreferredSize(new Dimension(30, 30));
 		
@@ -523,6 +523,19 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		duplicateFrameButton.setEnabled(enabled);
 		moveFrameRightButton.setEnabled(enabled);
 		moveFrameLeftButton.setEnabled(enabled);
+		
+		keyFramesTable.clearSelection();
+		
+		if (ModelCreator.currentProject.SelectedAnimation != null && ModelCreator.currentProject.SelectedAnimation.IsCurrentFrameKeyFrame()) {
+			int[] frameNumbers = ModelCreator.currentProject.GetFrameNumbers();
+			int index = 0;
+			for (; index < frameNumbers.length; index++) {
+				if (frameNumbers[index] == ModelCreator.currentProject.SelectedAnimation.currentFrame) {
+					keyFramesTable.setRowSelectionInterval(index, index);
+					break;
+				}
+			}
+		}
 	}
 	
 }

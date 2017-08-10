@@ -83,8 +83,10 @@ public class LeftUVSidebar extends LeftSidebar
 		double scaleX = 2;
 		double scaleY = 2;
 		
+		TextureEntry texEntry = null;
+		
 		if (ModelCreator.currentProject.Textures.size() > 0) {
-			TextureEntry texEntry = ModelCreator.currentProject.Textures.get(ModelCreator.currentProject.Textures.keySet().iterator().next());
+			texEntry = ModelCreator.currentProject.Textures.get(ModelCreator.currentProject.Textures.keySet().iterator().next());
 			scaleX = texEntry.Width / texWidth;
 			scaleY = texEntry.Height / texHeight;
 		}
@@ -111,16 +113,24 @@ public class LeftUVSidebar extends LeftSidebar
 					elem.getAllFaces()[0].bindTexture();
 				}
 				
+				float endu = 1f;
+				float endv = 1f;
+				if (texEntry != null) {
+					endu = (float)texEntry.Width / texEntry.texture.getTextureWidth();
+					endv = (float)texEntry.Height / texEntry.texture.getTextureHeight();
+				}
+
+				
 				glLineWidth(1F);
 				glBegin(GL_QUADS);
 				{
-					glTexCoord2f(0, 1);
+					glTexCoord2f(0, endv);
 					glVertex2i(0, texBoxHeight);
 					
-					glTexCoord2f(1, 1);
+					glTexCoord2f(endu, endv);
 					glVertex2i(texBoxWidth, texBoxHeight);
 					
-					glTexCoord2f(1, 0);
+					glTexCoord2f(endu, 0);
 					glVertex2i(texBoxWidth, 0);
 
 					glTexCoord2f(0, 0);

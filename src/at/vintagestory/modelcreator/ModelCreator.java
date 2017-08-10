@@ -74,6 +74,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	public static boolean showGrid = true;
 	public static boolean transparent = true;
+	public static boolean renderTexture = true;
 	public static boolean autoreloadTexture = true;
 	public static float noTexScale = 2;
 
@@ -455,6 +456,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	boolean yKeyDown;
 	boolean sKeyDown;
 	boolean rKeyDown;
+	boolean tKeyDown;
 	
 	
 	public void handleInput(int offset)
@@ -540,6 +542,18 @@ public class ModelCreator extends JFrame implements ITextureCallback
 							{
 								ModelCreator.currentProject.reloadTextures(ModelCreator.Instance);						
 							}
+						});
+					}
+				}
+				
+				if (Keyboard.isKeyDown(Keyboard.KEY_T)) tKeyDown = true;
+				else {
+					if (tKeyDown) {
+						tKeyDown = false;
+						renderTexture = !renderTexture;
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() { updateValues(null); } 
 						});
 					}
 				}
