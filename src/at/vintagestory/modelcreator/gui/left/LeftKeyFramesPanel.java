@@ -340,6 +340,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		{
 			ModelCreator.currentProject.PlayAnimation = !ModelCreator.currentProject.PlayAnimation;
 			playPauseButton.setIcon(ModelCreator.currentProject.PlayAnimation ? Icons.pause : Icons.play);
+			
+			if (!ModelCreator.currentProject.PlayAnimation) ModelCreator.updateFrame(); 
 		});
 		playPauseButton.setPreferredSize(new Dimension(30, 30));
 		btnContainerTop.add(playPauseButton);
@@ -386,6 +388,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			@Override
 			public void valueChanged(ListSelectionEvent e)
 			{
+				if (ModelCreator.ignoreFrameUpdates) return;
+				
 				int row = keyFramesTable.getSelectedRow();
 				if (ModelCreator.currentProject.SelectedAnimation != null && row >= 0) {
 				 	Keyframe keyframe = ModelCreator.currentProject.SelectedAnimation.keyframes[row];
@@ -526,7 +530,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		
 		keyFramesTable.clearSelection();
 		
-		if (ModelCreator.currentProject.SelectedAnimation != null && ModelCreator.currentProject.SelectedAnimation.IsCurrentFrameKeyFrame()) {
+		if (!ModelCreator.currentProject.PlayAnimation && ModelCreator.currentProject.SelectedAnimation != null && ModelCreator.currentProject.SelectedAnimation.IsCurrentFrameKeyFrame()) {
 			int[] frameNumbers = ModelCreator.currentProject.GetFrameNumbers();
 			int index = 0;
 			for (; index < frameNumbers.length; index++) {

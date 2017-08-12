@@ -507,20 +507,24 @@ public class Element implements IDrawable
 	// D center, S left, N right, W above, E below, U very right
 	int[][] allUvPositionsAlternate = new int[][] {
 		// N
-		new int[] { 0, 5, 4, 3, 1, 2 },
+		new int[] { 0, 4, 5, 3, 1, 2 },
 		// E
-		new int[] { 1, 5, 4, 0, 2, 3 },
+		new int[] { 1, 4, 5, 0, 2, 3 },
 		// S
-		new int[] { 2, 5, 4, 1, 3, 0 },
+		new int[] { 2, 4, 5, 1, 3, 0 },
 		// W
-		new int[] { 3, 5, 4, 2, 0, 1 },
+		new int[] { 3, 4, 5, 2, 0, 1 },
 		// U
 		new int[] { 4, 0, 2, 1, 3, 5 },
 		// D
-		new int[] { 5, 2, 0, 3, 1, 4 },
+		new int[] { 5, 0, 2, 3, 1, 4 },
 	};
 
+
 	void setUnwrappedCubeUV() {
+		
+		
+		
 		if (unwrapMode == 0) {
 			performDefaultUVUnwrapping();
 			return;
@@ -534,13 +538,26 @@ public class Element implements IDrawable
 		if (unwrapMode - 1 == 0) faces[4].rotation = (unwrapRotation + 2) % 4;
 		if (unwrapMode - 1 == 2) faces[5].rotation = (unwrapRotation + 2) % 4;
 		
+		if (unwrapMode - 1 == 0) {
+			if (unwrapRotation == 1) faces[2].rotation = (unwrapRotation + 2) % 4;;
+		}
+		
 		if (unwrapMode - 1 == 1) {
 			faces[4].rotation = (unwrapRotation + 3) % 4;
 			faces[5].rotation = (unwrapRotation + 3) % 4;
+			
+			if (unwrapRotation == 1) faces[3].rotation = (unwrapRotation + 2) % 4;;
 		}
+		
+		if (unwrapMode - 1 == 2) {
+			if (unwrapRotation == 1) faces[0].rotation = (unwrapRotation + 2) % 4;;
+		}
+		
 		if (unwrapMode - 1 == 3) {
 			faces[4].rotation = (unwrapRotation + 1) % 4;
 			faces[5].rotation = (unwrapRotation + 1) % 4;
+			
+			if (unwrapRotation == 1) faces[1].rotation = (unwrapRotation + 2) % 4;;
 		}
 		if (unwrapMode - 1 == 4) {
 			faces[0].rotation = (unwrapRotation + 2) % 4;
@@ -555,6 +572,8 @@ public class Element implements IDrawable
 			faces[2].rotation = (unwrapRotation + 2) % 4;
 			faces[1].rotation = (unwrapRotation + 1) % 4;
 			faces[3].rotation = (unwrapRotation + 3) % 4;
+			
+			if (unwrapRotation == 1) faces[4].rotation = (unwrapRotation + 2) % 4;;
 		}
 		
 		int[] uvPositions = unwrapRotation == 1 ? allUvPositionsAlternate[unwrapMode - 1] : allUvPositions[unwrapMode - 1];

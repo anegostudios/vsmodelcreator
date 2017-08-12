@@ -71,7 +71,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static ProjectChangeHistory changeHistory = new ProjectChangeHistory();
 	
 	public static boolean ignoreValueUpdates = false;
-
+	public static boolean ignoreFrameUpdates = false;
+	
 	public static boolean showGrid = true;
 	public static boolean transparent = true;
 	public static boolean renderTexture = true;
@@ -314,22 +315,31 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	public static void updateFrame(boolean later) {
 		if (currentProject == null) return;
+		if (ignoreFrameUpdates) return;
 		
 		if (later) {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() { 
+					ignoreFrameUpdates = true;
+					
 					leftKeyframesPanel.updateFrame();
 					((RightTopPanel)manager).updateFrame(null);
 					updateTitle();
-					guiMain.updateFrame();				
+					guiMain.updateFrame();
+					
+					ignoreFrameUpdates = false;
 				}
 			});
 		} else {
+			ignoreFrameUpdates = true;
+			
 			leftKeyframesPanel.updateFrame();
 			((RightTopPanel)manager).updateFrame(null);
 			updateTitle();
-			guiMain.updateFrame();							
+			guiMain.updateFrame();
+			
+			ignoreFrameUpdates = false;
 		}
 	}
 
