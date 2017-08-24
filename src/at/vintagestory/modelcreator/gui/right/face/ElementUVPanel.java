@@ -142,9 +142,14 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		
 		AwtUtil.addChangeListener(xStartField, e -> {
 			Element element = manager.getCurrentElement();
+			if (!ModelCreator.currentProject.EntityTextureMode || ModelCreator.ignoreValueUpdates) return;
+			
 			if (element != null)
 			{
-				element.setTexUStart((Parser.parseDouble(xStartField.getText(), element.getTexUStart())));
+				double newValue = (Parser.parseDouble(xStartField.getText(), element.getTexUStart()));
+				if (newValue == element.getTexUStart()) return;
+				
+				element.setTexUStart(newValue);
 				ModelCreator.updateValues(xStartField);
 			}
 		});
@@ -167,9 +172,13 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		
 		AwtUtil.addChangeListener(yStartField, e -> {
 			Element element = manager.getCurrentElement();
+			if (!ModelCreator.currentProject.EntityTextureMode || ModelCreator.ignoreValueUpdates) return;
+			
 			if (element != null)
 			{
-				element.setTexVStart((Parser.parseDouble(yStartField.getText(), element.getTexVStart())));
+				double newValue = (Parser.parseDouble(yStartField.getText(), element.getTexVStart()));
+				if (newValue == element.getTexVStart()) return;
+				element.setTexVStart(newValue);
 				ModelCreator.updateValues(yStartField);
 			}
 		});

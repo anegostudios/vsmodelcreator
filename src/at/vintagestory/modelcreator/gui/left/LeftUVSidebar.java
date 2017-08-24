@@ -31,6 +31,7 @@ import at.vintagestory.modelcreator.enums.EnumFonts;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.model.Sized;
 import at.vintagestory.modelcreator.model.TextureEntry;
 
 public class LeftUVSidebar extends LeftSidebar
@@ -45,7 +46,7 @@ public class LeftUVSidebar extends LeftSidebar
 	private int[] startY = { 0, 0, 0, 0, 0, 0 };
 	
 	
-	private double scaledTexWidth, scaledTexHeight;
+	private int texBoxWidth, texBoxHeight;
 	
 	float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 }; 
 	
@@ -76,29 +77,26 @@ public class LeftUVSidebar extends LeftSidebar
 		}
 	}
 	
+	
+	TextureEntry texEntry = null;
 	void drawRectsEntityTextureMode(int canvasHeight) {
 		double texWidth = ModelCreator.currentProject.TextureWidth;
 		double texHeight = ModelCreator.currentProject.TextureHeight;
 		
-		double scaleX = 2;
-		double scaleY = 2;
+		Sized scale;
 		
-		TextureEntry texEntry = null;
+		texEntry = null;
 		
 		if (ModelCreator.currentProject.Textures.size() > 0) {
 			texEntry = ModelCreator.currentProject.Textures.get(ModelCreator.currentProject.Textures.keySet().iterator().next());
-			scaleX = texEntry.Width / texWidth;
-			scaleY = texEntry.Height / texHeight;
 		}
+		scale = Face.getVoxel2PixelScale(texEntry);
 		
-		texWidth *= scaleX / 2;
-		texHeight *= scaleY / 2;
+		texWidth *= scale.W / 2;
+		texHeight *= scale.H / 2;
 		
-		int texBoxWidth = (int)(2 * WIDTH);
-		int texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
-
-		scaledTexWidth = texBoxWidth / texWidth;
-		scaledTexHeight = texBoxHeight / texHeight;
+		texBoxWidth = (int)(2 * WIDTH);
+		texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
 		
 		glPushMatrix();
 		{
@@ -140,7 +138,7 @@ public class LeftUVSidebar extends LeftSidebar
 				
 				TextureImpl.bindNone();
 				
-				drawElementList(ModelCreator.currentProject.rootElements, scaledTexWidth, scaledTexHeight, canvasHeight);
+				drawElementList(ModelCreator.currentProject.rootElements, texBoxWidth, texBoxHeight, canvasHeight);
 				
 				
 				glPopMatrix();
@@ -150,7 +148,7 @@ public class LeftUVSidebar extends LeftSidebar
 		
 	}
 	
-	private void drawElementList(ArrayList<Element> elems, double scaledTexWidth, double scaledTexHeight, int canvasHeight)
+	private void drawElementList(ArrayList<Element> elems, double texBoxWidth, double texBoxHeight, int canvasHeight)
 	{
 		Element selectedElem = ModelCreator.currentProject.SelectedElement;
 		
@@ -161,10 +159,8 @@ public class LeftUVSidebar extends LeftSidebar
 				if (!faces[i].isEnabled()) continue;
 				
 				Face face = faces[i];
-				double u = face.getStartU();
-				double v = face.getStartV();
-				double uend = face.getEndU();
-				double vend = face.getEndV();
+				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV());
+				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV());
 				
 				Color color = Face.getFaceColour(i);
 				
@@ -173,16 +169,16 @@ public class LeftUVSidebar extends LeftSidebar
 				glBegin(GL_QUADS);
 				{
 					glTexCoord2f(0, 1);
-					glVertex2d(u * scaledTexWidth, vend * scaledTexHeight);
+					glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
 					
 					glTexCoord2f(1, 1);
-					glVertex2d(uend * scaledTexWidth, vend * scaledTexHeight);
+					glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
 					
 					glTexCoord2f(1, 0);
-					glVertex2d(uend * scaledTexWidth, v * scaledTexHeight);
+					glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
 	
 					glTexCoord2f(0, 0);
-					glVertex2d(u * scaledTexWidth, v * scaledTexHeight);
+					glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
 				}
 				glEnd();
 	
@@ -199,23 +195,23 @@ public class LeftUVSidebar extends LeftSidebar
 	
 				glBegin(GL_LINES);
 				{
-					glVertex2d(u * scaledTexWidth, v * scaledTexHeight);
-					glVertex2d(u * scaledTexWidth, vend * scaledTexHeight);
+					glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
+					glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
 	
-					glVertex2d(u * scaledTexWidth, vend * scaledTexHeight);
-					glVertex2d(uend * scaledTexWidth, vend * scaledTexHeight);
+					glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
+					glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
 	
-					glVertex2d(uend * scaledTexWidth, vend * scaledTexHeight);
-					glVertex2d(uend * scaledTexWidth, v * scaledTexHeight);
+					glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
+					glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
 	
-					glVertex2d(uend * scaledTexWidth, v * scaledTexHeight);
-					glVertex2d(u * scaledTexWidth, v * scaledTexHeight);
+					glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
+					glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
 	
 				}
 				glEnd();
 			}
 			
-			drawElementList(elem.ChildElements, scaledTexWidth, scaledTexHeight, canvasHeight);
+			drawElementList(elem.ChildElements, texBoxWidth, texBoxHeight, canvasHeight);
 		}		
 	}
 
@@ -225,6 +221,7 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		float[] bright = elem != null ? elem.brightnessByFace : brightnessByFace;
 		
+		Sized texSize = GetBlockTextureModeTextureSize();
 		
 		Face[] faces = elem.getAllFaces();
 
@@ -261,56 +258,22 @@ public class LeftUVSidebar extends LeftSidebar
 
 					face.bindTexture();
 
-
-					double scaleX = 0.5;
-					double scaleY = 0.5;
-					double texWidth = ModelCreator.currentProject.TextureWidth;
-					double texHeight = ModelCreator.currentProject.TextureHeight; 
-					
-					texWidth *= scaleX;
-					texHeight *= scaleY;
-
-					TextureEntry entry = ModelCreator.currentProject.getTextureEntry(face.getTextureName());
-					
-					float endu = 1f;
-					float endv = 1f;
-					if (entry != null) {
-						texWidth = entry.Width / 2.0;
-						texHeight = entry.Height / 2.0;
-						scaleX = entry.Width / texWidth;
-						scaleY = entry.Height / texHeight;
-						
-						endu = (float)entry.Width / entry.texture.getTextureWidth();
-						endv = (float)entry.Height / entry.texture.getTextureHeight();
-					}
-					
-					double scaledTexWidth = WIDTH / texWidth;
-					double scaledTexHeight = WIDTH / texHeight;
-					int scaledHeight = (int)(WIDTH * texHeight/texWidth);
-					
-					
+					Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV());
+					Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV());					
 					
 					glBegin(GL_QUADS);
 					{
-						if (face.isBinded()) {
-							glTexCoord2f(0, endv);
-						}
-						glVertex2i(0, scaledHeight);
-
-						if (face.isBinded()) {
-							glTexCoord2f(endu, endv);
-						}
-						glVertex2i(WIDTH, scaledHeight);
-
-						if (face.isBinded()) {
-							glTexCoord2f(endu, 0);
-						}
-						glVertex2i(WIDTH, 0);
-
-						if (face.isBinded()) {
-							glTexCoord2f(0, 0);
-						}
-						glVertex2i(0, 0);
+						glTexCoord2f(0, 1);
+						glVertex2d(0, texSize.H);
+						
+						glTexCoord2f(1, 1);
+						glVertex2d(texSize.W, texSize.H);
+						
+						glTexCoord2f(1, 0);
+						glVertex2d(texSize.W, 0);
+		
+						glTexCoord2f(0, 0);
+						glVertex2d(0, 0);
 					}
 					glEnd();
 
@@ -320,17 +283,17 @@ public class LeftUVSidebar extends LeftSidebar
 
 					glBegin(GL_LINES);
 					{
-						glVertex2d(face.getStartU() * scaledTexWidth, face.getStartV() * scaledTexHeight);
-						glVertex2d(face.getStartU() * scaledTexWidth, face.getEndV() * scaledTexHeight);
-
-						glVertex2d(face.getStartU() * scaledTexWidth, face.getEndV() * scaledTexHeight);
-						glVertex2d(face.getEndU() * scaledTexWidth, face.getEndV() * scaledTexHeight);
-
-						glVertex2d(face.getEndU() * scaledTexWidth, face.getEndV() * scaledTexHeight);
-						glVertex2d(face.getEndU() * scaledTexWidth, face.getStartV() * scaledTexHeight);
-
-						glVertex2d(face.getEndU() * scaledTexWidth, face.getStartV() * scaledTexHeight);
-						glVertex2d(face.getStartU() * scaledTexWidth, face.getStartV() * scaledTexHeight);
+						glVertex2d(uv.W * texSize.W, uv.H * texSize.H);
+						glVertex2d(uv.W * texSize.W, uvend.H * texSize.H);
+		
+						glVertex2d(uv.W * texSize.W, uvend.H * texSize.H);
+						glVertex2d(uvend.W * texSize.W, uvend.H * texSize.H);
+		
+						glVertex2d(uvend.W * texSize.W, uvend.H * texSize.H);
+						glVertex2d(uvend.W * texSize.W, uv.H * texSize.H);
+		
+						glVertex2d(uvend.W * texSize.W, uv.H * texSize.H);
+						glVertex2d(uv.W * texSize.W, uv.H * texSize.H);
 					}
 					glEnd();
 
@@ -351,6 +314,7 @@ public class LeftUVSidebar extends LeftSidebar
 	private int lastMouseX, lastMouseY;
 	private boolean grabbing = false;
 	Element grabbedElement;
+	int grabbedFace;
 
 	@Override
 	public void handleInput(int canvasHeight)
@@ -370,7 +334,8 @@ public class LeftUVSidebar extends LeftSidebar
 			this.lastMouseX = Mouse.getX();
 			this.lastMouseY = Mouse.getY();
 			
-			ModelCreator.currentProject.selectElement(grabbedElement);
+			ModelCreator.currentProject.selectElement(grabbedElement);			
+			grabbedFace = getFace(canvasHeight, lastMouseX, lastMouseY);
 		}
 		
 		grabbing = newGrabbing;
@@ -383,10 +348,17 @@ public class LeftUVSidebar extends LeftSidebar
 			int xMovement = 0;
 			int yMovement = 0;
 			
+			
 
 			if (ModelCreator.currentProject.EntityTextureMode) {
-				xMovement = (int) ((newMouseX - this.lastMouseX) / scaledTexWidth);
-				yMovement = (int) ((newMouseY - this.lastMouseY) / scaledTexHeight);
+				if (texEntry != null) {
+					xMovement = (int)(texEntry.VoxelWidthWithLwJglFuckery() * (newMouseX - this.lastMouseX) / texBoxWidth);
+					yMovement = (int)(texEntry.VoxelHeighthWithLwJglFuckery() * (newMouseY - this.lastMouseY) / texBoxHeight);					
+				} else {
+					xMovement = (int)(ModelCreator.currentProject.TextureWidth * (newMouseX - this.lastMouseX) / texBoxWidth);
+					yMovement = (int)(ModelCreator.currentProject.TextureHeight * (newMouseY - this.lastMouseY) / texBoxHeight);
+				}
+
 				
 				if ((xMovement != 0 || yMovement != 0) && grabbedElement != null && Mouse.isButtonDown(0))
 				{
@@ -397,34 +369,22 @@ public class LeftUVSidebar extends LeftSidebar
 				Element cube = manager.getCurrentElement();
 				if (cube == null) return;
 				
-				int side = getFace(canvasHeight, newMouseX, newMouseY);
-				if (side == -1) return;
-				Face face = cube.getAllFaces()[side];
 				
-				double texWidth = ModelCreator.currentProject.TextureWidth;
-				double texHeight = ModelCreator.currentProject.TextureHeight;
+				if (grabbedFace == -1) return;
+				Face face = cube.getAllFaces()[grabbedFace];
 				
-				double scaleX = 2;
-				double scaleY = 2;
+				Sized texSize = GetBlockTextureModeTextureSize();
 				
 				TextureEntry texEntry = face.getTextureEntry();
 				if (texEntry != null) {
-					scaleX = texEntry.Width / texWidth;
-					scaleY = texEntry.Height / texHeight;					
+					xMovement = (int)(texEntry.VoxelWidthWithLwJglFuckery() * (newMouseX - this.lastMouseX) / texSize.W);
+					yMovement = (int)(texEntry.VoxelHeighthWithLwJglFuckery() * (newMouseY - this.lastMouseY) / texSize.H);
+				} else {
+					xMovement = (int)(ModelCreator.currentProject.TextureWidth * (newMouseX - this.lastMouseX) / texSize.W);
+					yMovement = (int)(ModelCreator.currentProject.TextureHeight * (newMouseY - this.lastMouseY) / texSize.H);
 				}
-				texWidth *= scaleX / 2;
-				texHeight *= scaleY / 2;
-				int texBoxWidth = (int)(2 * WIDTH);
-				int texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
-				scaledTexWidth = texBoxWidth / texWidth;
-				scaledTexHeight = texBoxHeight / texHeight;
-
-				xMovement = (int) ((newMouseX - this.lastMouseX) / scaledTexWidth);
-				yMovement = (int) ((newMouseY - this.lastMouseY) / scaledTexHeight);
-
 
 				
-
 				if (Mouse.isButtonDown(0))
 				{
 					if ((face.getStartU() + xMovement) >= 0.0 && (face.getEndU() + xMovement) <= 16.0)
@@ -448,10 +408,12 @@ public class LeftUVSidebar extends LeftSidebar
 			}
 				
 
-			if (xMovement != 0)
+			if (xMovement != 0) {
 				this.lastMouseX = newMouseX;
-			if (yMovement != 0)
+			}
+			if (yMovement != 0) {
 				this.lastMouseY = newMouseY;
+			}
 			
 			
 			if (xMovement != 0 || yMovement != 0) {
@@ -461,6 +423,16 @@ public class LeftUVSidebar extends LeftSidebar
 		}
 	}
 	
+	
+	
+	public Sized GetBlockTextureModeTextureSize() {
+		double texWidth = ModelCreator.currentProject.TextureWidth;
+		double texHeight = ModelCreator.currentProject.TextureHeight;
+		int texBoxWidth = (int)(WIDTH);
+		int texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
+
+		return new Sized(texBoxWidth, texBoxHeight);
+	}
 	
 
 	public int getFace(int canvasHeight, int mouseX, int mouseY)
@@ -481,19 +453,24 @@ public class LeftUVSidebar extends LeftSidebar
 	
 	private Element findElement(ArrayList<Element> elems, int mouseX, int mouseY)
 	{
+		if (texBoxHeight == 0 || texBoxWidth == 0) return null;
+		
+		double mouseU = (double)mouseX / texBoxWidth;
+		double mouseV = (double)mouseY / texBoxHeight; 
+				
 		for (Element elem : elems) {
 			Face[] faces = elem.getAllFaces();
 			
 			for (int i = 0; i < 6; i++) {
 				if (!faces[i].isEnabled()) continue;
 				
-				Face face = faces[i];
-				double u = face.getStartU();
-				double v = face.getStartV();
-				double uend = face.getEndU();
-				double vend = face.getEndV();
+				Face face = faces[i];			
+				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV());
+				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV());
+
+				//System.out.println(mouseU + "/" + mouseV + " inside " + uv.W + "/" + uv.H +" =>" + uvend.W +"/"+uvend.H);
 				
-				if (mouseX >= u * scaledTexWidth && mouseY >= v * scaledTexWidth && mouseX <= uend * scaledTexWidth && mouseY <= vend * scaledTexHeight) {
+				if (mouseU >= uv.W && mouseV >= uv.H && mouseU <= uvend.W && mouseV <= uvend.H) {
 					return elem;
 				}
 			}

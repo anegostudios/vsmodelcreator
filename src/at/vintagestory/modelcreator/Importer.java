@@ -148,14 +148,8 @@ public class Importer
 				project.TextureHeight = obj.get("textureHeight").getAsInt();
 			}
 			
-			if (obj.has("singleTexture") && obj.get("singleTexture").isJsonPrimitive())
-			{
-				project.EntityTextureMode = obj.get("singleTexture").getAsBoolean();
-			}
-			
-			if (obj.has("allAngles") && obj.get("allAngles").isJsonPrimitive())
-			{
-				project.AllAngles = obj.get("allAngles").getAsBoolean();
+			if (obj.has("editor") && obj.get("editor").isJsonObject()) {
+				LoadEditorSettings(obj.get("editor").getAsJsonObject());
 			}
 			
 			if (obj.has("animations") && obj.get("animations").isJsonArray()) {
@@ -182,6 +176,19 @@ public class Importer
 		}
 	}
 
+
+	private void LoadEditorSettings(JsonObject obj)
+	{
+		if (obj.has("singleTexture") && obj.get("singleTexture").isJsonPrimitive())
+		{
+			project.EntityTextureMode = obj.get("singleTexture").getAsBoolean();
+		}
+		
+		if (obj.has("allAngles") && obj.get("allAngles").isJsonPrimitive())
+		{
+			project.AllAngles = obj.get("allAngles").getAsBoolean();
+		}
+	}
 
 	private void loadTextures(File file, JsonObject obj)
 	{

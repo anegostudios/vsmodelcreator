@@ -577,7 +577,7 @@ public class Element implements IDrawable
 		}
 		
 		int[] uvPositions = unwrapRotation == 1 ? allUvPositionsAlternate[unwrapMode - 1] : allUvPositions[unwrapMode - 1];
-		double scales[] = faces[0].textureScale();
+		Sized scale = faces[0].getVoxel2PixelScale();		
 		
 		Face aboveFace = faces[uvPositions[3]];
 		Face veryRightFace = faces[uvPositions[5]];
@@ -590,15 +590,15 @@ public class Element implements IDrawable
 		double x = getTexUStart();
 		double y = getTexVStart();
 		
-		x += leftFace.TextureWidth();
+		x += leftFace.uvWidth();
 		
 		aboveFace.textureU = x;
 		aboveFace.textureV = y;
 		aboveFace.updateUV();
 		
 		// Row 2
-		y += aboveFace.TextureHeight();
-		y = Math.ceil(y * scales[1] * 0.5) / (scales[1] * 0.5);
+		y += aboveFace.uvHeight();
+		y = Math.ceil(y * (scale.H * 0.5)) / (scale.H * 0.5);
 		
 		x = getTexUStart();
 		
@@ -606,19 +606,19 @@ public class Element implements IDrawable
 		leftFace.textureV = y;
 		leftFace.updateUV();
 		
-		x += leftFace.TextureWidth();
+		x += leftFace.uvWidth();
 		
 		centerFace.textureU = x;
 		centerFace.textureV = y;
 		centerFace.updateUV();
 		
-		x += centerFace.TextureWidth();
+		x += centerFace.uvWidth();
 		
 		rightFace.textureU = x;
 		rightFace.textureV = y;
 		rightFace.updateUV();
 		
-		x += rightFace.TextureWidth();
+		x += rightFace.uvWidth();
 		
 		veryRightFace.textureU = x;
 		veryRightFace.textureV = y;
@@ -626,9 +626,9 @@ public class Element implements IDrawable
 
 		
 		// Row 3
-		x = getTexUStart() + leftFace.TextureWidth();
-		y += Math.max(leftFace.TextureHeight(), Math.max(centerFace.TextureHeight(), Math.max(rightFace.TextureHeight(), veryRightFace.TextureHeight())));
-		y = Math.ceil(y * scales[1] * 0.5) / (scales[1] * 0.5);
+		x = getTexUStart() + leftFace.uvWidth();
+		y += Math.max(leftFace.uvHeight(), Math.max(centerFace.uvHeight(), Math.max(rightFace.uvHeight(), veryRightFace.uvHeight())));
+		y = Math.ceil(y * (scale.H * 0.5)) / (scale.H * 0.5);
 		
 		belowFace.textureU = x;
 		belowFace.textureV = y;
@@ -646,8 +646,8 @@ public class Element implements IDrawable
 			faces[4].textureV = y;
 			faces[4].updateUV();
 			
-			maxTexHeight = faces[4].TextureHeight();
-			x += faces[4].TextureWidth();
+			maxTexHeight = faces[4].uvHeight();
+			x += faces[4].uvWidth();
 		}
 		
 		if (faces[5].isEnabled() && faces[5].isAutoUVEnabled()) {
@@ -655,14 +655,14 @@ public class Element implements IDrawable
 			faces[5].textureV = y;
 			faces[5].updateUV();
 			
-			maxTexHeight = Math.max(maxTexHeight, faces[5].TextureHeight());
+			maxTexHeight = Math.max(maxTexHeight, faces[5].uvHeight());
 		}
 		
 		x = getTexUStart();
 		y += maxTexHeight;
 		
-		double scales[] = faces[0].textureScale();
-		y = Math.ceil(y * scales[1] * 0.5) / (scales[1] * 0.5);
+		Sized scale = faces[0].getVoxel2PixelScale();
+		y = Math.ceil(y * (scale.H * 0.5)) / (scale.H * 0.5);
 		
 		for (int side = 0; side < 4; side++) {
 			Face face = faces[side];
@@ -672,7 +672,7 @@ public class Element implements IDrawable
 			face.textureV = y;
 			face.updateUV();
 			
-			x += face.TextureWidth();
+			x += face.uvWidth();
 		}
 	}
 	

@@ -6,9 +6,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
@@ -94,6 +97,10 @@ public class Exporter
 					
 					String subPath = tex.getFilePath();
 					if (subPath.contains(textureBasePath)) subPath = tex.getFilePath().substring(textureBasePath.length()  + 1);
+					else {
+						int index = tex.getFilePath().indexOf("assets"+File.separator+"textures"+File.separator);
+						if (index>0) subPath = tex.getFilePath().substring(index + "assets/textures/".length());
+					}
 					subPath = subPath.replace('\\', '/').replace(".png", "");
 					
 					textureMap.put(face.getTextureName(), subPath);
@@ -113,14 +120,14 @@ public class Exporter
 		writer.write("{");
 		writer.newLine();
 		
-		if (project.AllAngles) {
-			writer.write(space(1) + "\"allAngles\": " + project.AllAngles + ",");
-			writer.newLine();
-		}
-		if (project.EntityTextureMode) {
-			writer.write(space(1) + "\"singleTexture\": " + project.EntityTextureMode + ",");
-			writer.newLine();
-		}
+		writer.write(space(1) + "\"editor\": {");
+		writer.newLine();
+		writer.write(space(2) + "\"allAngles\": " + project.AllAngles + ",");
+		writer.newLine();
+		writer.write(space(2) + "\"singleTexture\": " + project.EntityTextureMode + "");
+		writer.newLine();
+		writer.write(space(1) + "},");
+		writer.newLine();
 		writer.write(space(1) + "\"textureWidth\": " + project.TextureWidth + ",");
 		writer.newLine();
 		writer.write(space(1) + "\"textureHeight\": " + project.TextureHeight + ",");
@@ -230,16 +237,18 @@ public class Exporter
 		writer.write(space(5) + "\"elements\": {");
 		writer.newLine();
 		
-		boolean didwrite = false;
 		
-		for (int i = 0; i < keyframe.Elements.size(); i++) {
-			KeyframeElement kElem = (KeyframeElement)keyframe.Elements.get(i);
-			if (didwrite && willWriteKeyFrameElement(kElem)) {
+		List<KeyframeElement> keyframeElementsFlat = new ArrayList<KeyframeElement>();
+		
+		collapseKeyFrameElements(keyframe.Elements, keyframeElementsFlat);
+		
+		for (int i = 0; i < keyframeElementsFlat.size(); i++) {
+			if (i > 0) {
 				writer.write(",");
 				writer.newLine();
 			}
 			
-			didwrite = writeKeyFrameElement(writer, kElem, 6);
+			writeKeyFrameElement(writer, keyframeElementsFlat.get(i), 6);
 		}
 		
 		writer.newLine();
@@ -249,74 +258,53 @@ public class Exporter
 	}
 	
 	
-	boolean willWriteKeyFrameElement(KeyframeElement kElem) {
-		if (!kElem.IsUseless()) return true;
-		
-		for (int i = 0; i < kElem.ChildElements.size(); i++)
-		{
-			if (!((KeyframeElement)kElem.ChildElements.get(i)).IsUseless()) return true;
-		}
-		
-		return false;
-	}
-	
-
-	private boolean writeKeyFrameElement(BufferedWriter writer, KeyframeElement kElem, int indent) throws IOException
+	private void collapseKeyFrameElements(List<IDrawable> kfTree, List<KeyframeElement> kfList)
 	{
-		boolean didwrite = false;
+		for (int i = 0; i < kfTree.size(); i++) {
+			KeyframeElement kElem = (KeyframeElement)kfTree.get(i);
+			
+			if (!kElem.IsUseless()) {
+				kfList.add(kElem);
+			}
+			
+			collapseKeyFrameElements(kElem.ChildElements, kfList);
+		}		
+	}
+
+
+	private void writeKeyFrameElement(BufferedWriter writer, KeyframeElement kElem, int indent) throws IOException
+	{
+		writer.write(space(indent) + "\"" + kElem.AnimatedElement.name + "\": { ");
 		
-		if (!kElem.IsUseless()) {
-			writer.write(space(indent) + "\"" + kElem.AnimatedElement.name + "\": { ");
-			
-			boolean bla = false;
-			
-			if (kElem.PositionSet) {
-				writer.write("\"offsetX\": " + kElem.getOffsetX());
-				writer.write(", \"offsetY\": " + kElem.getOffsetY());
-				writer.write(", \"offsetZ\": " + kElem.getOffsetZ());
-				bla = true;
-			}
-			
-			if (kElem.RotationSet) {
-				if (bla) {
-					writer.write(", ");
-				}
-				writer.write("\"rotationX\": " + kElem.getRotationX());
-				writer.write(", \"rotationY\": " + kElem.getRotationY());
-				writer.write(", \"rotationZ\": " + kElem.getRotationZ());
-				bla = true;
-			}
-			
-			if (kElem.StretchSet) {
-				if (bla) {
-					writer.write(", ");
-				}
-				writer.write("\"stretchX\": " + kElem.getStretchX());
-				writer.write(", \"stretchY\": " + kElem.getStretchY());
-				writer.write(", \"stretchZ\": " + kElem.getStretchZ());
-			}
-			
-			writer.write(" }");
-			didwrite = true;
+		boolean bla = false;
+		
+		if (kElem.PositionSet) {
+			writer.write("\"offsetX\": " + kElem.getOffsetX());
+			writer.write(", \"offsetY\": " + kElem.getOffsetY());
+			writer.write(", \"offsetZ\": " + kElem.getOffsetZ());
+			bla = true;
 		}
 		
-		boolean didwritechild = false;
-		boolean didwriteanychild = false;
-		for (int i = 0; i < kElem.ChildElements.size(); i++)
-		{
-			KeyframeElement childKelem = (KeyframeElement)kElem.ChildElements.get(i);
-			if ((didwritechild || (i == 0 && didwrite)) && willWriteKeyFrameElement(childKelem)) {
-				writer.write(",");
-				writer.newLine();
+		if (kElem.RotationSet) {
+			if (bla) {
+				writer.write(", ");
 			}
-			
-			didwritechild = writeKeyFrameElement(writer, childKelem, indent);
-			
-			didwriteanychild |= didwritechild;
+			writer.write("\"rotationX\": " + kElem.getRotationX());
+			writer.write(", \"rotationY\": " + kElem.getRotationY());
+			writer.write(", \"rotationZ\": " + kElem.getRotationZ());
+			bla = true;
 		}
-			
 		
-		return didwriteanychild || didwrite;
+		if (kElem.StretchSet) {
+			if (bla) {
+				writer.write(", ");
+			}
+			writer.write("\"stretchX\": " + kElem.getStretchX());
+			writer.write(", \"stretchY\": " + kElem.getStretchY());
+			writer.write(", \"stretchZ\": " + kElem.getStretchZ());
+		}
+		
+		writer.write(" }");
 	}
 	
 

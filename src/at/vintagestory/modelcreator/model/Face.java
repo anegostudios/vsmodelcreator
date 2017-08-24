@@ -137,7 +137,9 @@ public class Face
 	}
 	
 	public void renderFace(BlockFacing blockFacing, float brightness)
-	{
+	{		
+		TextureEntry entry = ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntry(textureName);
+
 		GL11.glPushMatrix();
 		{
 			GL11.glEnable(GL_TEXTURE_2D);
@@ -150,15 +152,16 @@ public class Face
 			int uvBaseIndex = blockFacing.GetIndex() * 8;
 			int uvIndex = 0;
 			
-			double[] scale = renderTextureScale();
-
-			
 			GL11.glBegin(GL11.GL_QUADS);
 			{
 				for (int j = 0; j < 4; j++) {
-					double u = (cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureU : textureUEnd) / scale[0] / 16;
-					double v = (cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureV : textureVEnd) / scale[1] / 16;
-					GL11.glTexCoord2d(u, v);
+					
+					Sized uv = translateVoxelPosToUvPos(entry,
+							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureU : textureUEnd),
+							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureV : textureVEnd)
+					);
+					
+					GL11.glTexCoord2d(uv.W, uv.H);
 					GL11.glVertex3d(cuboid.getWidth() * CubeVertices[coordIndex++], cuboid.getHeight() * CubeVertices[coordIndex++], cuboid.getDepth() * CubeVertices[coordIndex++]);
 				}
 			}
@@ -169,45 +172,40 @@ public class Face
 		GL11.glPopMatrix();
 	}
 	
-
-	public double[] textureScale() {
-		double scaleX = ModelCreator.noTexScale;
-		double scaleY = ModelCreator.noTexScale;
+	
+	public Sized translateVoxelPosToUvPos(double voxelU, double voxelV) { 
+		return translateVoxelPosToUvPos(ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntry(textureName), voxelU, voxelV);
+	}
+	
+	public static Sized translateVoxelPosToUvPos(TextureEntry entry, double voxelU, double voxelV) {
+		double textureVoxelWidth = 16;
+		double textureVoxelHeight = 16;
 		
-		if (ModelCreator.currentProject != null) {
-			double texWidth = ModelCreator.currentProject.TextureWidth;
-			double texHeight = ModelCreator.currentProject.TextureHeight;
-			
-			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(textureName);
-			if (entry != null) {
-				scaleX = entry.Width / texWidth * (texWidth / 32);
-				scaleY = entry.Height / texHeight * (texHeight / 32);				
-			}
+		if (entry != null) {
+			textureVoxelWidth = entry.VoxelWidthWithLwJglFuckery();
+			textureVoxelHeight = entry.VoxelHeighthWithLwJglFuckery();
 		}
 		
-		return new double[] { scaleX, scaleY };
+		return new Sized(voxelU / textureVoxelWidth, voxelV / textureVoxelHeight);
 	}
 	
 	
-	// Argh, the lwjgl texture loader upscales textures to the next power of 2 size, so a 96x32 textures gets loaded as 128x32 
-	public double[] renderTextureScale() {
-		double scaleX = ModelCreator.noTexScale;
-		double scaleY = ModelCreator.noTexScale;
-		
-		if (ModelCreator.currentProject != null) {
-			double texWidth = ModelCreator.currentProject.TextureWidth;
-			double texHeight = ModelCreator.currentProject.TextureHeight;
-			
-			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(textureName);
-			if (entry != null) {
-				scaleX = entry.texture.getTextureWidth() / texWidth * (texWidth / 32);
-				scaleY = entry.texture.getTextureHeight() / texHeight * (texHeight / 32);				
-			}
-		}
-		
-		return new double[] { scaleX, scaleY };
+	public Sized getVoxel2PixelScale() {
+		return getVoxel2PixelScale(ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntry(textureName));
 	}
-
+	
+	public static Sized getVoxel2PixelScale(TextureEntry entry) {
+		if (entry != null) {
+			return new Sized(
+				entry.Width / ModelCreator.currentProject.TextureWidth,
+				entry.Height / ModelCreator.currentProject.TextureHeight
+			);
+		} 
+		
+		return new Sized(ModelCreator.noTexScale, ModelCreator.noTexScale); 
+	}
+	
+	
 
 	public void setTextureName(String texture)
 	{
@@ -382,14 +380,14 @@ public class Face
 		{
 			// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
 			// without messing up the UV map
-			double[] scale = textureScale();
+			Sized scale = getVoxel2PixelScale(); 
 			
 			if (rotation == 0 || rotation == 2) {
-				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale[0] + 0.000001) / scale[0];      // Stupid rounding errors -.-
-				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale[1] + 0.000001) / scale[1];	
+				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale.W + 0.000001) / scale.W;      // Stupid rounding errors -.-
+				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale.H + 0.000001) / scale.H;	
 			} else {
-				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale[0] + 0.000001) / scale[0];
-				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale[1] + 0.000001) / scale[1];
+				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale.W + 0.000001) / scale.W;
+				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale.H + 0.000001) / scale.H;
 			}
 			
 		}
@@ -397,16 +395,16 @@ public class Face
 	
 	public boolean isCompatibleToAutoUV() {
 		return
-				(
-					(rotation == 0 || rotation == 2) &&
-					textureUEnd == textureU + cuboid.getFaceDimension(side).getWidth() && 
-					textureVEnd == textureV + cuboid.getFaceDimension(side).getHeight()
-				) ||
-				(
-					(rotation == 1 || rotation == 3) &&
-					textureUEnd == textureU + cuboid.getFaceDimension(side).getHeight() && 
-					textureVEnd == textureV + cuboid.getFaceDimension(side).getWidth()
-				)
+			(
+				(rotation == 0 || rotation == 2) &&
+				textureUEnd == textureU + cuboid.getFaceDimension(side).getWidth() && 
+				textureVEnd == textureV + cuboid.getFaceDimension(side).getHeight()
+			) ||
+			(
+				(rotation == 1 || rotation == 3) &&
+				textureUEnd == textureU + cuboid.getFaceDimension(side).getHeight() && 
+				textureVEnd == textureV + cuboid.getFaceDimension(side).getWidth()
+			)
 		;
 	}
 
@@ -499,23 +497,20 @@ public class Face
 		return cloned;
 	}
 	
-
-	public double TextureWidth() {
+	public double uvWidth() {
 		// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
 		// without messing up the UV map
-		double[] scale = textureScale();
-		//scale[0] /= 2;
+		Sized scale = getVoxel2PixelScale();
 
-		return Math.floor(Math.abs(textureUEnd - textureU) * scale[0]) / scale[0];
+		return Math.floor(Math.abs(textureUEnd - textureU) * scale.W) / scale.W;
 	}
 	
-	public double TextureHeight() {
+	public double uvHeight() {
 		// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
 		// without messing up the UV map
-		double[] scale = textureScale();
-		//scale[1] /= 2;
+		Sized scale = getVoxel2PixelScale();
 
-		return Math.floor(Math.abs(textureVEnd - textureV) * scale[1]) / scale[1];
+		return Math.floor(Math.abs(textureVEnd - textureV) * scale.H) / scale.H;
 	}
 
 }

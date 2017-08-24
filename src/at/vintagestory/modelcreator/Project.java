@@ -11,6 +11,8 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
+import org.newdawn.slick.opengl.renderer.SGL;
+
 import at.vintagestory.modelcreator.gui.right.ElementTree;
 import at.vintagestory.modelcreator.gui.right.RightTopPanel;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
@@ -456,7 +458,9 @@ public class Project
 	{
 		FileInputStream is = new FileInputStream(image);
 		
+		
 		Texture texture = TextureLoader.getTexture("PNG", is);
+		texture.setTextureFilter(SGL.GL_LINEAR);
 		
 		is.close();
 

@@ -24,13 +24,18 @@ public class TextureSizeDialog
 		
 		
 		JPanel panelRow1 = new JPanel(new GridLayout(5, 1, 5, 0));
-		JLabel label = new JLabel("Scale when no texture is applied,");
+		JLabel label = new JLabel("Texture Pack Resolution");
 		label.setPreferredSize(new Dimension(200, 20));
 		panelRow1.add(label);
 		
-		label = new JLabel("only used for the UV map exporter");
+		label = new JLabel("(= amount of pixels per voxel)");
 		label.setPreferredSize(new Dimension(200, 20));
 		panelRow1.add(label);
+
+		label = new JLabel("(only used during UV map export)");
+		label.setPreferredSize(new Dimension(200, 20));
+		panelRow1.add(label);
+
 		
 		JTextField scaleTextField = new JTextField();
 		scaleTextField.setPreferredSize(new Dimension(50, 20));
