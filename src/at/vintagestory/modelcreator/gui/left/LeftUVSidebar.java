@@ -187,8 +187,11 @@ public class LeftUVSidebar extends LeftSidebar
 				if (elem == selectedElem) {
 					glColor3f(0f, 0f, 1f);
 				}
-				if (elem == grabbedElement) {
+				if (elem == grabbedElement && face.isAutoUVEnabled()) {
 					glColor3f(0f, 0.75f, 1f);
+				}
+				if (elem == grabbedElement && !face.isAutoUVEnabled() && i == grabbedFace) {
+					glColor3f(0f, 1f, 0.75f);
 				}
 				
 
@@ -334,8 +337,11 @@ public class LeftUVSidebar extends LeftSidebar
 			this.lastMouseX = Mouse.getX();
 			this.lastMouseY = Mouse.getY();
 			
-			ModelCreator.currentProject.selectElement(grabbedElement);			
-			grabbedFace = getFace(canvasHeight, lastMouseX, lastMouseY);
+			ModelCreator.currentProject.selectElement(grabbedElement);		
+			if (!ModelCreator.currentProject.EntityTextureMode) {
+				grabbedFace = getFace(canvasHeight, lastMouseX, lastMouseY);	
+			}
+			
 		}
 		
 		grabbing = newGrabbing;
@@ -362,7 +368,18 @@ public class LeftUVSidebar extends LeftSidebar
 				
 				if ((xMovement != 0 || yMovement != 0) && grabbedElement != null && Mouse.isButtonDown(0))
 				{
-					grabbedElement.setTexUVStart(grabbedElement.getTexUStart() + xMovement, grabbedElement.getTexVStart() - yMovement);
+					Face face = null; 
+					if (grabbedFace >=0) face = grabbedElement.getAllFaces()[grabbedFace];
+					if (face != null && !face.isAutoUVEnabled()) {
+						
+						face.moveTextureU(xMovement);
+						face.moveTextureV(-yMovement);
+						
+					} else {
+						grabbedElement.setTexUVStart(grabbedElement.getTexUStart() + xMovement, grabbedElement.getTexVStart() - yMovement);	
+					}
+					
+					
 				}
 			} else {
 
@@ -471,6 +488,7 @@ public class LeftUVSidebar extends LeftSidebar
 				//System.out.println(mouseU + "/" + mouseV + " inside " + uv.W + "/" + uv.H +" =>" + uvend.W +"/"+uvend.H);
 				
 				if (mouseU >= uv.W && mouseV >= uv.H && mouseU <= uvend.W && mouseV <= uvend.H) {
+					grabbedFace = i;
 					return elem;
 				}
 			}

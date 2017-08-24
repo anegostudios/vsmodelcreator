@@ -476,6 +476,9 @@ public class Exporter
 			if (!face.isEnabled()) {
 				writer.write(", \"enabled\": false");
 			}
+			if (!face.isAutoUVEnabled()) {
+				writer.write(", \"autoUv\": false");
+			}
 			
 			writer.write(" }");
 			if (face.getSide() != cuboid.getLastValidFace())

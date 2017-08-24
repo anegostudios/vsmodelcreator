@@ -1005,10 +1005,6 @@ public class Element implements IDrawable
 		this.texUStart = texUStart;
 		this.texVStart = texVStart;
 		
-		for (Face face : faces) {
-			face.setAutoUVEnabled(true);
-		}
-		
 		ModelCreator.DidModify();
 		updateUV();
 	}
