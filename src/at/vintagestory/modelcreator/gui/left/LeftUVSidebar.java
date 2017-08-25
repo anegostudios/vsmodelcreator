@@ -159,8 +159,8 @@ public class LeftUVSidebar extends LeftSidebar
 				if (!faces[i].isEnabled()) continue;
 				
 				Face face = faces[i];
-				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV());
-				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV());
+				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
+				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);
 				
 				Color color = Face.getFaceColour(i);
 				
@@ -261,8 +261,8 @@ public class LeftUVSidebar extends LeftSidebar
 
 					face.bindTexture();
 
-					Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV());
-					Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV());					
+					Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
+					Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);					
 					
 					glBegin(GL_QUADS);
 					{
@@ -482,8 +482,8 @@ public class LeftUVSidebar extends LeftSidebar
 				if (!faces[i].isEnabled()) continue;
 				
 				Face face = faces[i];			
-				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV());
-				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV());
+				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
+				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);
 
 				//System.out.println(mouseU + "/" + mouseV + " inside " + uv.W + "/" + uv.H +" =>" + uvend.W +"/"+uvend.H);
 				

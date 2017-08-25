@@ -83,12 +83,12 @@ public class TextureEntry
 	
 	
 	public float VoxelWidthWithLwJglFuckery() {
-		float scale = texture.getImageWidth() / (float)Width; 
+		float scale = (float)Width / texture.getTextureWidth(); 
 		return ModelCreator.currentProject.TextureWidth / scale;
 	}
 	
 	public float VoxelHeighthWithLwJglFuckery() {
-		float scale = texture.getImageHeight() / (float)Height;
+		float scale = (float)Height / texture.getTextureHeight();
 		return ModelCreator.currentProject.TextureHeight / scale;
 	}
 

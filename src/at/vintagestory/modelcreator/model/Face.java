@@ -3,7 +3,14 @@ package at.vintagestory.modelcreator.model;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
+
+import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL14;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
@@ -136,6 +143,13 @@ public class Face
 		}		
 	}
 	
+	static FloatBuffer color = BufferUtils.createFloatBuffer(4);
+	static {
+		color.rewind();
+		color.put(new float[] {1,0,1,1});
+		color.rewind();
+	}
+	
 	public void renderFace(BlockFacing blockFacing, float brightness)
 	{		
 		TextureEntry entry = ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntry(textureName);
@@ -144,6 +158,12 @@ public class Face
 		{
 			GL11.glEnable(GL_TEXTURE_2D);
 			GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL13.GL_CLAMP_TO_BORDER);
+			GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL13.GL_CLAMP_TO_BORDER);
+			
+			
+			GL11.glTexParameter(GL_TEXTURE_2D, GL11.GL_TEXTURE_BORDER_COLOR, color);
+			
 			bindTexture();
 
 			if (binded) GL11.glColor3f(brightness, brightness, brightness);
@@ -158,7 +178,8 @@ public class Face
 					
 					Sized uv = translateVoxelPosToUvPos(entry,
 							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureU : textureUEnd),
-							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureV : textureVEnd)
+							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureV : textureVEnd),
+							false
 					);
 					
 					GL11.glTexCoord2d(uv.W, uv.H);
@@ -173,15 +194,15 @@ public class Face
 	}
 	
 	
-	public Sized translateVoxelPosToUvPos(double voxelU, double voxelV) { 
-		return translateVoxelPosToUvPos(ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntry(textureName), voxelU, voxelV);
+	public Sized translateVoxelPosToUvPos(double voxelU, double voxelV, boolean actualPosition) { 
+		return translateVoxelPosToUvPos(ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntry(textureName), voxelU, voxelV, actualPosition);
 	}
 	
-	public static Sized translateVoxelPosToUvPos(TextureEntry entry, double voxelU, double voxelV) {
-		double textureVoxelWidth = 16;
-		double textureVoxelHeight = 16;
+	public static Sized translateVoxelPosToUvPos(TextureEntry entry, double voxelU, double voxelV, boolean actualPosition) {
+		double textureVoxelWidth = ModelCreator.currentProject.TextureWidth;
+		double textureVoxelHeight = ModelCreator.currentProject.TextureHeight;
 		
-		if (entry != null) {
+		if (entry != null && !actualPosition) {
 			textureVoxelWidth = entry.VoxelWidthWithLwJglFuckery();
 			textureVoxelHeight = entry.VoxelHeighthWithLwJglFuckery();
 		}
