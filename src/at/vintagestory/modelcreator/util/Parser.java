@@ -6,6 +6,7 @@ public class Parser
 	public static boolean isDouble(String text) {
 		try
 		{
+			text = text.replace(',', '.');
 			Double.parseDouble(text);
 		}
 		catch (NumberFormatException e)
