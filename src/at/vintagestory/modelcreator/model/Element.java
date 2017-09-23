@@ -74,7 +74,7 @@ public class Element implements IDrawable
 	// Extra Variables
 	protected boolean shade = true;
 	private int tintIndex = 0;
-	private int renderPass = 0;
+	private int renderPass = -1;
 
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();

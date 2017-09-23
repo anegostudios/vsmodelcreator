@@ -65,14 +65,19 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 			{
 				Element elem = manager.getCurrentElement();
 				if (elem != null) {
-					elem.setTintIndex(Parser.parseInt(tintIndexField.getText(), 0));
+					int index = Parser.parseInt(tintIndexField.getText(), 0);
+					int previndex = elem.getTintIndex();
+					elem.setTintIndex(index);
+					
+					if (index != previndex) ModelCreator.DidModify();
+					ModelCreator.updateValues(tintIndexField);
 				}
-				ModelCreator.DidModify();
+				
 			}
 		});
 		
 		renderPassList = new JComboBox<String>();
-		renderPassList.setToolTipText("Default is Opaque. For foliage you might want to use OpaqueNoCull.");
+		renderPassList.setToolTipText("Leave at default to use the blocks render pass. Set to another value to override the block render pass. For foliage you might want to use OpaqueNoCull.");
 		DefaultComboBoxModel<String> model = renderPassList();		
 		renderPassList.setModel(model);
 		renderPassList.setPreferredSize(new Dimension(200, 25));
@@ -80,9 +85,15 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 		renderPassList.addActionListener(e -> {
 			Element elem = manager.getCurrentElement();
 			if (elem != null) {
-				elem.setRenderPass(renderPassList.getSelectedIndex());
+				int prevPass = elem.getRenderPass();
+				int newpass = renderPassList.getSelectedIndex() - 1;
+				elem.setRenderPass(newpass);
+				
+				if (prevPass != newpass) ModelCreator.DidModify();
+				
+				ModelCreator.updateValues(renderPassList);
 			}
-			ModelCreator.DidModify();
+			
 		});
 	}
 
@@ -110,7 +121,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 			renderPassList.setEnabled(true);
 			
 			tintIndexField.setText(cube.getTintIndex() + "");
-			renderPassList.setSelectedIndex(cube.getRenderPass());
+			renderPassList.setSelectedIndex(cube.getRenderPass() + 1);
 		}
 		else
 		{
@@ -128,6 +139,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 	{
 		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
 		
+		model.addElement("<html><b>Default</b></html>");
 		model.addElement("<html><b>Opaque</b></html>");
 		model.addElement("<html><b>OpaqueNoCull</b></html>");
 		model.addElement("<html><b>BlendNoCull</b></html>");
