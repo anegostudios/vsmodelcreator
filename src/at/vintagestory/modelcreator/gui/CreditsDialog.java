@@ -30,7 +30,7 @@ public class CreditsDialog
 		JLabel message = new JLabel();
 		message.setText("<html>All praise for this program should go to MrCrayFish for making this awesome and simply to use tool "
 				+ "originally for Minecraft. He open sourced it and so Tyron took the freedom to adjust it to his needs for Vintage Story. "
-				+ "If you like this program, show some love to MrCrayFish! &lt;3</html>");
+				+ "If you like this program, show some love to MrCrayFish! &lt;3<br><br>Some of the features added by tyron:<br>- Animations & Keyframe Editor, Gif Animation Exporter<br>- Undo/Redo capability<br>- More Streamlined loading&saving system<br>- Drag&Drop loading of models and textures<br>- Texture autoreload<br>- Entity Texture mode with box-uv-auto-unwrap<br>- UV Map exporter<br>- Attachment point editor</html>");
 		leftPanel.add(message, BorderLayout.CENTER);
 
 		container.add(leftPanel, BorderLayout.CENTER);
@@ -79,7 +79,7 @@ public class CreditsDialog
 		JDialog dialog = new JDialog(parent, "Credits", false);
 		// dialog.setLayout(new BorderLayout());
 		dialog.setResizable(false);
-		dialog.setPreferredSize(new Dimension(500, 290));
+		dialog.setPreferredSize(new Dimension(500, 390));
 		dialog.add(container);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);

@@ -422,6 +422,11 @@ public class Importer
 				element.setTintIndex(obj.get("tintIndex").getAsInt());
 			}
 			
+			if (obj.has("renderPass") && obj.get("renderPass").isJsonPrimitive())
+			{
+				element.setRenderPass(obj.get("renderPass").getAsInt());
+			}
+			
 			if (obj.has("unwrapMode") && obj.get("unwrapMode").isJsonPrimitive()) {
 				element.setUnwrapMode(obj.get("unwrapMode").getAsInt());
 			}

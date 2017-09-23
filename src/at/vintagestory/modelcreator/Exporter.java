@@ -349,6 +349,11 @@ public class Exporter
 			writer.write(space(indentation) + "\"tintIndex\": " + cuboid.getTintIndex() + ",");
 			writer.newLine();
 		}
+		if (cuboid.getRenderPass() > 0)
+		{
+			writer.write(space(indentation) + "\"renderPass\": " + cuboid.getRenderPass() + ",");
+			writer.newLine();
+		}
 		
 		if (project.EntityTextureMode) {
 			if (cuboid.getUnwrapMode() > 0)

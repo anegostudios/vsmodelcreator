@@ -74,6 +74,7 @@ public class Element implements IDrawable
 	// Extra Variables
 	protected boolean shade = true;
 	private int tintIndex = 0;
+	private int renderPass = 0;
 
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();
@@ -934,6 +935,17 @@ public class Element implements IDrawable
 		this.tintIndex = tintIndex;
 	}
 	
+
+	public int getRenderPass()
+	{
+		return renderPass;
+	}
+
+	public void setRenderPass(int pass)
+	{
+		this.renderPass = pass;
+	}
+
 	
 	public Element clone() {
 		Element cloned = new Element();
@@ -969,6 +981,7 @@ public class Element implements IDrawable
 		cloned.rescale = rescale;
 		cloned.shade = shade;
 		cloned.tintIndex = tintIndex;
+		cloned.renderPass = renderPass;
 		cloned.sphere = sphere;
 		cloned.texUStart = texUStart;
 		cloned.texVStart = texVStart;

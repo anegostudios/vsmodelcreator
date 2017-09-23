@@ -31,4 +31,21 @@ public class Parser
 		}
 		return value;
 	}
+	
+	
+	
+	public static int parseInt(String text, int def)
+	{
+		int value;
+		try
+		{
+			text = text.replace(',', '.');
+			value = Integer.parseInt(text);
+		}
+		catch (NumberFormatException e)
+		{
+			value = def;
+		}
+		return value;
+	}
 }
