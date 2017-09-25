@@ -339,7 +339,7 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			ModelCreator.currentProject.selectElement(grabbedElement);		
 			if (!ModelCreator.currentProject.EntityTextureMode) {
-				grabbedFace = getFace(canvasHeight, lastMouseX, lastMouseY);	
+				grabbedFace = getFace(grabbedElement, canvasHeight, lastMouseX, lastMouseY);	
 			}
 			
 		}
@@ -452,10 +452,13 @@ public class LeftUVSidebar extends LeftSidebar
 	}
 	
 
-	public int getFace(int canvasHeight, int mouseX, int mouseY)
+	public int getFace(Element elem, int canvasHeight, int mouseX, int mouseY)
 	{
 		for (int i = 0; i < 6; i++)
 		{
+			if (!elem.getAllFaces()[i].isEnabled()) {
+				continue;
+			}
 			if (mouseX >= startX[i] && mouseX <= startX[i] + WIDTH)
 			{
 				if ((canvasHeight - mouseY - 45) >= startY[i] && (canvasHeight - mouseY - 45) <= startY[i] + WIDTH)
