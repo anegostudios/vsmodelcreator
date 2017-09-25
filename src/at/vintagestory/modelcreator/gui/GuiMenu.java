@@ -61,10 +61,10 @@ public class GuiMenu extends JMenuBar
 	private JCheckBoxMenuItem itemGrid;
 	private JCheckBoxMenuItem itemTransparency;
 	private JCheckBoxMenuItem itemTexture;
-	private JMenuItem modelFromBelow;
+	/*private JMenuItem modelFromBelow;
 	private JMenuItem modelFromAbove;
 	private JMenuItem modelFromSide;
-	private JMenuItem modelFromFront;
+	private JMenuItem modelFromFront;*/
 	
 	/* Add */
 	private JMenu menuAdd;
@@ -137,10 +137,10 @@ public class GuiMenu extends JMenuBar
 			itemTexture.setSelected(ModelCreator.transparent);
 			
 						
-			modelFromBelow = createItem("Model from Below", "Rotate camera to show model from below", KeyEvent.VK_T, Icons.transparent);
+		/*	modelFromBelow = createItem("Model from Below", "Rotate camera to show model from below", KeyEvent.VK_T, Icons.transparent);
 			modelFromAbove = createItem("Model from Above", "Rotate camera to show model from above", KeyEvent.VK_T, Icons.transparent);
 			modelFromSide = createItem("Model from Side", "Rotate camera to show model from the side", KeyEvent.VK_T, Icons.transparent);
-			modelFromFront = createItem("Model from Front", "Rotate camera to show model from the front", KeyEvent.VK_T, Icons.transparent);
+			modelFromFront = createItem("Model from Front", "Rotate camera to show model from the front", KeyEvent.VK_T, Icons.transparent);*/
 		}
 
 		menuAdd = new JMenu("Add");

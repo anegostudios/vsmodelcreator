@@ -209,22 +209,37 @@ public class Animation
 	public void TogglePosition(Element elem, boolean on) {
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
 		keyframe.PositionSet = on;
-		if (keyframe.IsUseless()) RemoveKeyFrameElement(keyframe, currentFrame);
+		if (!on) RemoveKeyFramesIfUseless(keyframe);
 		ModelCreator.DidModify();
 	}
 
 	public void ToggleRotation(Element elem, boolean on) {
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
 		keyframe.RotationSet = on;
-		if (keyframe.IsUseless()) RemoveKeyFrameElement(keyframe, currentFrame);
+		if (!on) RemoveKeyFramesIfUseless(keyframe);
 		ModelCreator.DidModify();
 	}
 
 	public void ToggleStretch(Element elem, boolean on) {
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
 		keyframe.StretchSet = on;
-		if (keyframe.IsUseless()) RemoveKeyFrameElement(keyframe, currentFrame);
+		if (!on) RemoveKeyFramesIfUseless(keyframe);
 		ModelCreator.DidModify();
+	}
+	
+	
+	public void RemoveKeyFramesIfUseless(KeyframeElement keyframe) {
+		if (keyframe.IsUseless()) {
+			RemoveKeyFrameElement(keyframe, currentFrame);
+			Element parentElem;
+			while ((parentElem = keyframe.AnimatedElement.ParentElement) != null) {
+				KeyframeElement parentKf = GetKeyFrameElement(parentElem, currentFrame);
+				if (parentKf != null && parentKf.IsUseless()) {
+					RemoveKeyFrameElement(parentKf, currentFrame);
+				} else break;
+			}
+		}
+				
 	}
 
 	

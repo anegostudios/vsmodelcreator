@@ -79,7 +79,14 @@ public class KeyframeElement implements IDrawable
 	}
 	
 	public boolean IsUseless() {
-		return !PositionSet && !RotationSet && !StretchSet;
+		boolean useless = !PositionSet && !RotationSet && !StretchSet;
+		
+		for (IDrawable elem : ChildElements) {
+			KeyframeElement kf = (KeyframeElement)elem;
+			useless &= kf.IsUseless();
+		}
+		
+		return useless;
 	}
 	
 	public boolean IsSet(int flagIndex) {

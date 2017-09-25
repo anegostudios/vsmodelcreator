@@ -72,7 +72,6 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 					if (index != previndex) ModelCreator.DidModify();
 					ModelCreator.updateValues(tintIndexField);
 				}
-				
 			}
 		});
 		
