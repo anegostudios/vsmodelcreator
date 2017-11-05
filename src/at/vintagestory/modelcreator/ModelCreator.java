@@ -490,7 +490,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 		if (Mouse.getX() < offset)
 		{
-			modelrenderer.renderedLeftSidebar.handleInput(getHeight());
+			modelrenderer.renderedLeftSidebar.handleInput();
 		}
 		else
 		{

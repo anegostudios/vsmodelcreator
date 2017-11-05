@@ -40,11 +40,15 @@ public class ControlsDialog
 				+ "<li>Hold SHIFT and click on any of the up/down arrows to modify in increments of 0.1</li>"
 				+ "<li>Hold CTRL and click on any up/down arrows of the cubes position to also move the origin</li>"
 				+ "<li>Focus any of the position/origin/size text fields and use mouse wheel to modify increase/decrease the size in -1/+1 (also works in conjunction with the CTRL and Shift modifiers)</li>"				
-				+ "</ul>"				
+				+ "</ul>"		
+				+ "<p><b>Face Pane (Right)<b></p>"
+				+ "<ul>"
+				+ "<li>Hold SHIFT+Copy Button and then SHIFT+Paste Button to quickly assign a texture to all the faces of a cube</li>"
+				+ "</ul>"		
 				+ "</html>");
-		leftPanel.add(message, BorderLayout.CENTER);
+		leftPanel.add(message, BorderLayout.NORTH);
 
-		container.add(leftPanel, BorderLayout.CENTER);
+		container.add(leftPanel, BorderLayout.NORTH);
 
 		JPanel btnGrid = new JPanel(new GridLayout(1, 4, 5, 0));
 
@@ -59,7 +63,7 @@ public class ControlsDialog
 
 		JDialog dialog = new JDialog(parent, "Credits", false);
 		dialog.setResizable(false);
-		dialog.setPreferredSize(new Dimension(500, 450));
+		dialog.setPreferredSize(new Dimension(500, 550));
 		dialog.add(container);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);

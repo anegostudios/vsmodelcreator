@@ -50,6 +50,8 @@ public class LeftUVSidebar extends LeftSidebar
 	
 	float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 }; 
 	
+	int canvasHeight;
+	
 	public LeftUVSidebar(String title, IElementManager manager)
 	{
 		super(title);
@@ -61,6 +63,8 @@ public class LeftUVSidebar extends LeftSidebar
 	{
 		super.draw(sidebarWidth, canvasWidth, canvasHeight, frameHeight);
 
+		this.canvasHeight = canvasHeight;
+		
 		if (ModelCreator.transparent) {
 			GL11.glEnable(GL11.GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -190,7 +194,7 @@ public class LeftUVSidebar extends LeftSidebar
 				if (elem == grabbedElement && face.isAutoUVEnabled()) {
 					glColor3f(0f, 0.75f, 1f);
 				}
-				if (elem == grabbedElement && !face.isAutoUVEnabled() && i == grabbedFace) {
+				if (elem == grabbedElement && !face.isAutoUVEnabled() && i == grabbedFaceIndex) {
 					glColor3f(0f, 1f, 0.75f);
 				}
 				
@@ -228,6 +232,11 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		Face[] faces = elem.getAllFaces();
 
+		if(!Mouse.isButtonDown(0)) {
+			grabbedFaceIndex = getGrabbedFace(elem, canvasHeight, Mouse.getX(), Mouse.getY());
+		}
+		
+		
 		glPushMatrix();
 		{
 			glTranslatef(10, 30, 0);
@@ -261,9 +270,6 @@ public class LeftUVSidebar extends LeftSidebar
 
 					face.bindTexture();
 
-					Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
-					Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);					
-					
 					glBegin(GL_QUADS);
 					{
 						glTexCoord2f(0, 1);
@@ -279,10 +285,49 @@ public class LeftUVSidebar extends LeftSidebar
 						glVertex2d(0, 0);
 					}
 					glEnd();
+					
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					EnumFonts.BEBAS_NEUE_20.drawString(5, 5, Face.getFaceName(i), BLACK_ALPHA);
+					glDisable(GL_BLEND);
+				}
+			
+				glPopMatrix();
+			}
+			
+			TextureImpl.bindNone();
+			
+			countleft = 0;
+			countright = 0;
+			
+			for (int i = 0; i < 6; i++) {
+				
+				Face face = faces[i];
+				if (!face.isEnabled()) continue;
+				
+				glPushMatrix(); {
+					if (30 + i * (WIDTH + 10) + (WIDTH + 10) > canvasHeight) {
+						glTranslatef(10 + WIDTH, countright * (WIDTH + 10), 0);
+						startX[i] = 20 + WIDTH;
+						startY[i] = countright * (WIDTH + 10) + 40;
+						countright++;
+					}
+					else
+					{
+						glTranslatef(0, countleft * (WIDTH + 10), 0);
+						startX[i] = 10;
+						startY[i] = countleft * (WIDTH + 10) + 40;
+						countleft++;
+					}
 
-					TextureImpl.bindNone();
-
+					Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
+					Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);					
+					
 					glColor3f(1, 1, 1);
+					
+					if (grabbedFaceIndex == i) {
+						glColor3f(0f, 1f, 0.75f);
+					}
 
 					glBegin(GL_LINES);
 					{
@@ -300,10 +345,6 @@ public class LeftUVSidebar extends LeftSidebar
 					}
 					glEnd();
 
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					EnumFonts.BEBAS_NEUE_20.drawString(5, 5, Face.getFaceName(i), BLACK_ALPHA);
-					glDisable(GL_BLEND);
 				}
 			
 				glPopMatrix();
@@ -317,15 +358,15 @@ public class LeftUVSidebar extends LeftSidebar
 	private int lastMouseX, lastMouseY;
 	private boolean grabbing = false;
 	Element grabbedElement;
-	int grabbedFace;
+	int grabbedFaceIndex = -1;
 
 	@Override
-	public void handleInput(int canvasHeight)
+	public void handleInput()
 	{
-		super.handleInput(canvasHeight);
+		super.handleInput();
 		
 		if (ModelCreator.currentProject.EntityTextureMode && !grabbing) {
-			grabbedElement = findElement(ModelCreator.currentProject.rootElements, Mouse.getX() - 10, (canvasHeight - Mouse.getY()) - 85);
+			grabbedElement = findElement(ModelCreator.currentProject.rootElements, Mouse.getX() - 10, (canvasHeight - Mouse.getY()) - 30);
 		}
 		if (!ModelCreator.currentProject.EntityTextureMode) {
 			grabbedElement = ModelCreator.currentProject.SelectedElement;
@@ -339,7 +380,7 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			ModelCreator.currentProject.selectElement(grabbedElement);		
 			if (!ModelCreator.currentProject.EntityTextureMode) {
-				grabbedFace = getFace(grabbedElement, canvasHeight, lastMouseX, lastMouseY);	
+				grabbedFaceIndex = getGrabbedFace(grabbedElement, canvasHeight, lastMouseX, lastMouseY);	
 			}
 			
 		}
@@ -369,7 +410,7 @@ public class LeftUVSidebar extends LeftSidebar
 				if ((xMovement != 0 || yMovement != 0) && grabbedElement != null && Mouse.isButtonDown(0))
 				{
 					Face face = null; 
-					if (grabbedFace >=0) face = grabbedElement.getAllFaces()[grabbedFace];
+					if (grabbedFaceIndex >=0) face = grabbedElement.getAllFaces()[grabbedFaceIndex];
 					if (face != null && !face.isAutoUVEnabled()) {
 						
 						face.moveTextureU(xMovement);
@@ -387,8 +428,8 @@ public class LeftUVSidebar extends LeftSidebar
 				if (cube == null) return;
 				
 				
-				if (grabbedFace == -1) return;
-				Face face = cube.getAllFaces()[grabbedFace];
+				if (grabbedFaceIndex == -1) return;
+				Face face = cube.getAllFaces()[grabbedFaceIndex];
 				
 				Sized texSize = GetBlockTextureModeTextureSize();
 				
@@ -404,19 +445,15 @@ public class LeftUVSidebar extends LeftSidebar
 				
 				if (Mouse.isButtonDown(0))
 				{
-					if ((face.getStartU() + xMovement) >= 0.0 && (face.getEndU() + xMovement) <= 16.0)
-						face.moveTextureU(xMovement);
-					if ((face.getStartV() - yMovement) >= 0.0 && (face.getEndV() - yMovement) <= 16.0)
-						face.moveTextureV(-yMovement);
+					face.moveTextureU(xMovement);
+					face.moveTextureV(-yMovement);
 				}
 				else
 				{
 					face.setAutoUVEnabled(false);
 
-					if ((face.getEndU() + xMovement) <= 16.0)
-						face.addTextureXEnd(xMovement);
-					if ((face.getEndV() - yMovement) <= 16.0)
-						face.addTextureYEnd(-yMovement);
+					face.addTextureXEnd(xMovement);
+					face.addTextureYEnd(-yMovement);
 
 					face.setAutoUVEnabled(false);
 				}
@@ -452,24 +489,31 @@ public class LeftUVSidebar extends LeftSidebar
 	}
 	
 
-	public int getFace(Element elem, int canvasHeight, int mouseX, int mouseY)
+	public int getGrabbedFace(Element elem, int canvasHeight, int mouseX, int mouseY)
 	{
+		
 		for (int i = 0; i < 6; i++)
 		{
 			if (!elem.getAllFaces()[i].isEnabled()) {
 				continue;
 			}
+			
 			if (mouseX >= startX[i] && mouseX <= startX[i] + WIDTH)
 			{
-				if ((canvasHeight - mouseY - 45) >= startY[i] && (canvasHeight - mouseY - 45) <= startY[i] + WIDTH)
+				if ((canvasHeight - mouseY + 10) >= startY[i] && (canvasHeight - mouseY + 10) <= startY[i] + WIDTH)
 				{
 					return i;
 				}
 			}
 		}
+		
 		return -1;
 	}
 	
+	
+	public int Clamp(int val, int min, int max) {
+		return Math.min(Math.max(val, min), max);
+	}
 	
 	private Element findElement(ArrayList<Element> elems, int mouseX, int mouseY)
 	{
@@ -491,7 +535,7 @@ public class LeftUVSidebar extends LeftSidebar
 				//System.out.println(mouseU + "/" + mouseV + " inside " + uv.W + "/" + uv.H +" =>" + uvend.W +"/"+uvend.H);
 				
 				if (mouseU >= uv.W && mouseV >= uv.H && mouseU <= uvend.W && mouseV <= uvend.H) {
-					grabbedFace = i;
+					grabbedFaceIndex = i;
 					return elem;
 				}
 			}

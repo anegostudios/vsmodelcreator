@@ -219,7 +219,7 @@ public class Face
 				entry.Width / ModelCreator.currentProject.TextureWidth,
 				entry.Height / ModelCreator.currentProject.TextureHeight
 			);
-		} 
+		}
 		
 		return new Sized(ModelCreator.noTexScale, ModelCreator.noTexScale); 
 	}

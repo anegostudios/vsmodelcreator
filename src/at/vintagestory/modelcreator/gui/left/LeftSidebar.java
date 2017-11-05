@@ -48,7 +48,7 @@ public class LeftSidebar
 		glDisable(GL_BLEND);
 	}
 
-	public void handleInput(int canvasHeight)
+	public void handleInput()
 	{
 
 	}
