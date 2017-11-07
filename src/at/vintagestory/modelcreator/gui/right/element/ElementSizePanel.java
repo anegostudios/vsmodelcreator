@@ -48,7 +48,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 	{
 		this.manager = manager;
 		setLayout(new GridLayout(3, 3, 4, 0));
-		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Size</b></html>"));
+		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Voxel Size</b></html>"));
 		setMaximumSize(new Dimension(186, 104));
 		initComponents();
 		initProperties();

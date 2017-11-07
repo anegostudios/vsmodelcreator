@@ -599,7 +599,7 @@ public class Element implements IDrawable
 		
 		// Row 2
 		y += aboveFace.uvHeight();
-		y = Math.ceil(y * (scale.H * 0.5)) / (scale.H * 0.5);
+		y = Math.ceil(y * scale.H) / scale.H;
 		
 		x = getTexUStart();
 		
@@ -629,7 +629,7 @@ public class Element implements IDrawable
 		// Row 3
 		x = getTexUStart() + leftFace.uvWidth();
 		y += Math.max(leftFace.uvHeight(), Math.max(centerFace.uvHeight(), Math.max(rightFace.uvHeight(), veryRightFace.uvHeight())));
-		y = Math.ceil(y * (scale.H * 0.5)) / (scale.H * 0.5);
+		y = Math.ceil(y * scale.H) / scale.H;
 		
 		belowFace.textureU = x;
 		belowFace.textureV = y;
@@ -663,7 +663,7 @@ public class Element implements IDrawable
 		y += maxTexHeight;
 		
 		Sized scale = faces[0].getVoxel2PixelScale();
-		y = Math.ceil(y * (scale.H * 0.5)) / (scale.H * 0.5);
+		y = Math.ceil(y * scale.H) / scale.H;
 		
 		for (int side = 0; side < 4; side++) {
 			Face face = faces[side];
@@ -1063,9 +1063,15 @@ public class Element implements IDrawable
 
 	public void setTexFromFace()
 	{
-		Face f = faces[4];
-		texUStart = f.textureU;
-		texVStart = f.textureV;		
+		texUStart = 999;
+		texVStart = 999;
+		for (int i = 0; i < 6; i++) {
+			Face f = faces[i];
+			if (!f.isEnabled()) continue;
+			
+			texUStart = Math.min(texUStart, f.textureU);
+			texVStart = Math.min(texVStart, f.textureV);
+		}
 	}
 
 	public void setUnwrapMode(int selectedIndex)

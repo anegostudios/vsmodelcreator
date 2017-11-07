@@ -311,8 +311,6 @@ public class Importer
 		return keyframe;
 	}
 	
-	
-
 	private KeyframeElement readKeyframeElemenet(JsonObject obj, String name)
 	{
 		KeyframeElement kelem = new KeyframeElement(true);
@@ -435,7 +433,7 @@ public class Importer
 				element.setUnwrapRotation(obj.get("unwrapRotation").getAsInt());
 			}
 			
-			element.setTexFromFace();
+			
 			if (obj.has("uv") && obj.get("uv").isJsonArray())
 			{
 				JsonArray uv = obj.get("uv").getAsJsonArray();
@@ -467,7 +465,10 @@ public class Importer
 				}
 			}
 			
-
+			if (!obj.has("uv") || !obj.get("uv").isJsonArray()) {
+				element.setTexFromFace();
+			}
+			
 			if (obj.has("children") && obj.get("children").isJsonArray()) {
 				JsonArray children = obj.get("children").getAsJsonArray();
 				for(JsonElement child : children) {
