@@ -48,8 +48,13 @@ public class LeftSidebar
 		glDisable(GL_BLEND);
 	}
 
+	
 	public void handleInput()
 	{
 
+	}
+	
+	public void mouseUp() {
+		
 	}
 }

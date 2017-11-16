@@ -12,6 +12,8 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -52,6 +54,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.PendingTexture;
+import at.vintagestory.modelcreator.model.TextureEntry;
 import at.vintagestory.modelcreator.util.screenshot.AnimatedGifCapture;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCapture;
@@ -98,6 +101,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 
 	private int lastMouseX, lastMouseY;
+	boolean mouseDownOnLeftPanel;
+	boolean mouseDownOnCenterPanel;
+	
 	private boolean grabbing = false;
 	private boolean closeRequested = false;
 
@@ -140,6 +146,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		setIconImages(getIcons());
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
+		
+		
 		canvas = new Canvas();
 		
 		initComponents();
@@ -188,10 +196,17 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 				}
 				
+				
+				
 				closeRequested = true;
 			}
 		});
-
+		
+		
+		// Seriously man, fuck java. Mouse listeners on a canvas are just plain not working. 
+		// canvas.addMouseListener(ml);
+				
+		
 		
 		pack();
 		setVisible(true);
@@ -398,22 +413,16 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				height = newDim.height;
 			}
 
-			int leftSpacing = 0;
-			if (modelrenderer.renderedLeftSidebar != null) {
-				leftSpacing = project.EntityTextureMode || getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
-			}
-			
-			
-			glViewport(leftSpacing, 0, width - leftSpacing, height);
-
-			handleInput(leftSpacing);
+			int leftSidebarWidth = leftSidebarWidth();
+			glViewport(leftSidebarWidth, 0, width - leftSidebarWidth, height);
+			handleInput(leftSidebarWidth);
 			
 			
 			if (gifCapture != null && !gifCapture.isComplete()) {
 				gifCapture.PrepareFrame();
 			}
 
-			modelrenderer.Render(leftSpacing, width, height, getHeight());
+			modelrenderer.Render(leftSidebarWidth, width, height, getHeight());
 			
 
 			Display.update();
@@ -460,6 +469,17 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			
 		}
 	}
+	
+	public int leftSidebarWidth() {
+		Project project = ModelCreator.currentProject;
+		
+		int leftSpacing = 0;
+		if (modelrenderer.renderedLeftSidebar != null) {
+			leftSpacing = project.EntityTextureMode || getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
+		}
+		
+		return leftSpacing;
+	}
 
 	
 	boolean zKeyDown;
@@ -469,10 +489,12 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	boolean tKeyDown;
 	
 	
-	public void handleInput(int offset)
+	public void handleInput(int leftSidebarWidth)
 	{
 		final float cameraMod = Math.abs(modelrenderer.camera.getZ());
-
+		
+		boolean isOnLeftPanel = Mouse.getX() < leftSidebarWidth;
+		
 		if (Mouse.isButtonDown(0) | Mouse.isButtonDown(1))
 		{
 			if (!grabbing)
@@ -481,233 +503,241 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				lastMouseY = Mouse.getY();
 				grabbing = true;
 			}
+			
+			if (!mouseDownOnCenterPanel && !mouseDownOnLeftPanel) {
+				mouseDownOnLeftPanel = isOnLeftPanel;
+				mouseDownOnCenterPanel = !isOnLeftPanel;
+			}
 		}
 		else
 		{
 			grabbing = false;
 			grabbed = null;
+			if (mouseDownOnLeftPanel) modelrenderer.renderedLeftSidebar.mouseUp();
+			
+			mouseDownOnLeftPanel = false;
+			mouseDownOnCenterPanel = false;
 		}
 
-		if (Mouse.getX() < offset)
+		
+		if (mouseDownOnLeftPanel)
 		{
 			modelrenderer.renderedLeftSidebar.handleInput();
+			return;
+		}
+
+		
+		if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+		{
+			if (Keyboard.isKeyDown(Keyboard.KEY_Z)) zKeyDown = true;
+			else {
+				if (zKeyDown) {
+					zKeyDown = false;
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() { changeHistory.Undo(); } 
+					});
+				}
+			}
+			
+			
+			if (Keyboard.isKeyDown(Keyboard.KEY_Y)) yKeyDown = true;
+			else {
+				if (yKeyDown) {
+					yKeyDown = false;
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() { changeHistory.Redo(); } 
+					});
+					
+				}
+			}
+			if (Keyboard.isKeyDown(Keyboard.KEY_S)) sKeyDown = true;
+			else {
+				if (sKeyDown) {
+					sKeyDown = false;
+					
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							if (ModelCreator.currentProject.filePath == null) {
+								SaveProjectAs();
+							} else {
+								SaveProject(new File(ModelCreator.currentProject.filePath));
+							}								
+						}
+					});
+					
+				}
+			}
+			
+			if (Keyboard.isKeyDown(Keyboard.KEY_R)) rKeyDown = true;
+			else {
+				if (rKeyDown) {
+					rKeyDown = false;
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							ModelCreator.currentProject.reloadTextures(ModelCreator.Instance);						
+						}
+					});
+				}
+			}
+			
+			if (Keyboard.isKeyDown(Keyboard.KEY_T)) tKeyDown = true;
+			else {
+				if (tKeyDown) {
+					tKeyDown = false;
+					renderTexture = !renderTexture;
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() { updateValues(null); } 
+					});
+				}
+			}
+			
+			
+			if (grabbed == null)
+			{
+				int openGlName = getElementGLNameAtPos(Mouse.getX(), Mouse.getY());
+				if (openGlName >= 0)
+				{
+					currentProject.selectElementByOpenGLName(openGlName);
+					grabbed = manager.getCurrentElement();
+				}
+			}
+
+			if (grabbing && grabbed != null)
+			{
+				Element element = grabbed;
+				int state = getCameraState(modelrenderer.camera);
+
+				int newMouseX = Mouse.getX();
+				int newMouseY = Mouse.getY();
+
+				int xMovement = (int) ((newMouseX - lastMouseX) / 20);
+				int yMovement = (int) ((newMouseY - lastMouseY) / 20);
+
+				if (xMovement != 0 | yMovement != 0)
+				{
+					if (Mouse.isButtonDown(0))
+					{
+						switch (state)
+						{
+						case 0:
+							element.addStartX(xMovement);
+							element.addStartY(yMovement);
+							break;
+						case 1:
+							element.addStartZ(xMovement);
+							element.addStartY(yMovement);
+							break;
+						case 2:
+							element.addStartX(-xMovement);
+							element.addStartY(yMovement);
+							break;
+						case 3:
+							element.addStartZ(-xMovement);
+							element.addStartY(yMovement);
+							break;
+						case 4:
+							element.addStartX(xMovement);
+							element.addStartZ(-yMovement);
+							break;
+						case 5:
+							element.addStartX(yMovement);
+							element.addStartZ(xMovement);
+							break;
+						case 6:
+							element.addStartX(-xMovement);
+							element.addStartZ(yMovement);
+							break;
+						case 7:
+							element.addStartX(-yMovement);
+							element.addStartZ(-xMovement);
+							break;
+						}
+					}
+					else if (Mouse.isButtonDown(1))
+					{
+						switch (state)
+						{
+						case 0:
+							element.addHeight(yMovement);
+							element.addWidth(xMovement);
+							break;
+						case 1:
+							element.addHeight(yMovement);
+							element.addDepth(xMovement);
+							break;
+						case 2:
+							element.addHeight(yMovement);
+							element.addWidth(-xMovement);
+							break;
+						case 3:
+							element.addHeight(yMovement);
+							element.addDepth(-xMovement);
+							break;
+						case 4:
+							element.addDepth(-yMovement);
+							element.addWidth(xMovement);
+							break;
+						case 5:
+							element.addDepth(xMovement);
+							element.addWidth(yMovement);
+							break;
+						case 6:
+							element.addDepth(yMovement);
+							element.addWidth(-xMovement);
+							break;
+						case 7:
+							element.addDepth(-xMovement);
+							element.addWidth(-yMovement);
+							break;
+						case 8:
+							element.addDepth(-yMovement);
+							element.addWidth(xMovement);
+							break;
+						}
+					}
+
+					if (xMovement != 0)
+						lastMouseX = newMouseX;
+					if (yMovement != 0)
+						lastMouseY = newMouseY;
+
+					updateValues(null);
+					element.updateUV();
+				}
+			}
 		}
 		else
 		{
-
-			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+			if (Mouse.isButtonDown(0))
 			{
-				if (Keyboard.isKeyDown(Keyboard.KEY_Z)) zKeyDown = true;
-				else {
-					if (zKeyDown) {
-						zKeyDown = false;
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() { changeHistory.Undo(); } 
-						});
-					}
-				}
-				
-				
-				if (Keyboard.isKeyDown(Keyboard.KEY_Y)) yKeyDown = true;
-				else {
-					if (yKeyDown) {
-						yKeyDown = false;
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() { changeHistory.Redo(); } 
-						});
-						
-					}
-				}
-				if (Keyboard.isKeyDown(Keyboard.KEY_S)) sKeyDown = true;
-				else {
-					if (sKeyDown) {
-						sKeyDown = false;
-						
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								if (ModelCreator.currentProject.filePath == null) {
-									SaveProjectAs();
-								} else {
-									SaveProject(new File(ModelCreator.currentProject.filePath));
-								}								
-							}
-						});
-						
-					}
-				}
-				
-				if (Keyboard.isKeyDown(Keyboard.KEY_R)) rKeyDown = true;
-				else {
-					if (rKeyDown) {
-						rKeyDown = false;
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								ModelCreator.currentProject.reloadTextures(ModelCreator.Instance);						
-							}
-						});
-					}
-				}
-				
-				if (Keyboard.isKeyDown(Keyboard.KEY_T)) tKeyDown = true;
-				else {
-					if (tKeyDown) {
-						tKeyDown = false;
-						renderTexture = !renderTexture;
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() { updateValues(null); } 
-						});
-					}
-				}
-				
-				
-				if (grabbed == null)
-				{
-					if (Mouse.isButtonDown(0) | Mouse.isButtonDown(1))
-					{
-						int openGlName = getElementGLNameAtPos(Mouse.getX(), Mouse.getY());
-						if (openGlName >= 0)
-						{
-							currentProject.selectElementByOpenGLName(openGlName);
-							grabbed = manager.getCurrentElement();
-						}
-					}
-				}
-				else
-				{
-					Element element = grabbed;
-					int state = getCameraState(modelrenderer.camera);
-
-					int newMouseX = Mouse.getX();
-					int newMouseY = Mouse.getY();
-
-					int xMovement = (int) ((newMouseX - lastMouseX) / 20);
-					int yMovement = (int) ((newMouseY - lastMouseY) / 20);
-
-					if (xMovement != 0 | yMovement != 0)
-					{
-						if (Mouse.isButtonDown(0))
-						{
-							switch (state)
-							{
-							case 0:
-								element.addStartX(xMovement);
-								element.addStartY(yMovement);
-								break;
-							case 1:
-								element.addStartZ(xMovement);
-								element.addStartY(yMovement);
-								break;
-							case 2:
-								element.addStartX(-xMovement);
-								element.addStartY(yMovement);
-								break;
-							case 3:
-								element.addStartZ(-xMovement);
-								element.addStartY(yMovement);
-								break;
-							case 4:
-								element.addStartX(xMovement);
-								element.addStartZ(-yMovement);
-								break;
-							case 5:
-								element.addStartX(yMovement);
-								element.addStartZ(xMovement);
-								break;
-							case 6:
-								element.addStartX(-xMovement);
-								element.addStartZ(yMovement);
-								break;
-							case 7:
-								element.addStartX(-yMovement);
-								element.addStartZ(-xMovement);
-								break;
-							}
-						}
-						else if (Mouse.isButtonDown(1))
-						{
-							switch (state)
-							{
-							case 0:
-								element.addHeight(yMovement);
-								element.addWidth(xMovement);
-								break;
-							case 1:
-								element.addHeight(yMovement);
-								element.addDepth(xMovement);
-								break;
-							case 2:
-								element.addHeight(yMovement);
-								element.addWidth(-xMovement);
-								break;
-							case 3:
-								element.addHeight(yMovement);
-								element.addDepth(-xMovement);
-								break;
-							case 4:
-								element.addDepth(-yMovement);
-								element.addWidth(xMovement);
-								break;
-							case 5:
-								element.addDepth(xMovement);
-								element.addWidth(yMovement);
-								break;
-							case 6:
-								element.addDepth(yMovement);
-								element.addWidth(-xMovement);
-								break;
-							case 7:
-								element.addDepth(-xMovement);
-								element.addWidth(-yMovement);
-								break;
-							case 8:
-								element.addDepth(-yMovement);
-								element.addWidth(xMovement);
-								break;
-							}
-						}
-
-						if (xMovement != 0)
-							lastMouseX = newMouseX;
-						if (yMovement != 0)
-							lastMouseY = newMouseY;
-
-						updateValues(null);
-						element.updateUV();
-					}
-				}
+				final float modifier = (cameraMod * 0.05f);
+				modelrenderer.camera.addX((float) (Mouse.getDX() * 0.01F) * modifier);
+				modelrenderer.camera.addY((float) (Mouse.getDY() * 0.01F) * modifier);
 			}
-			else
+			else if (Mouse.isButtonDown(1))
 			{
-				if (Mouse.isButtonDown(0))
-				{
-					final float modifier = (cameraMod * 0.05f);
-					modelrenderer.camera.addX((float) (Mouse.getDX() * 0.01F) * modifier);
-					modelrenderer.camera.addY((float) (Mouse.getDY() * 0.01F) * modifier);
-				}
-				else if (Mouse.isButtonDown(1))
-				{
-					final float modifier = applyLimit(cameraMod * 0.1f);
-					modelrenderer.camera.rotateX(-(float) (Mouse.getDY() * 0.5F) * modifier);
-					final float rxAbs = Math.abs(modelrenderer.camera.getRX());
-					modelrenderer.camera.rotateY((rxAbs >= 90 && rxAbs < 270 ? -1 : 1) * (float) (Mouse.getDX() * 0.5F) * modifier);
-				}
+				final float modifier = applyLimit(cameraMod * 0.1f);
+				modelrenderer.camera.rotateX(-(float) (Mouse.getDY() * 0.5F) * modifier);
+				final float rxAbs = Math.abs(modelrenderer.camera.getRX());
+				modelrenderer.camera.rotateY((rxAbs >= 90 && rxAbs < 270 ? -1 : 1) * (float) (Mouse.getDX() * 0.5F) * modifier);
+			}
 
-				final float wheel = Mouse.getDWheel();
-				if (wheel != 0)
-				{
-					modelrenderer.camera.addZ(wheel * (cameraMod / 5000F));
-				}
+			final float wheel = Mouse.getDWheel();
+			if (wheel != 0)
+			{
+				modelrenderer.camera.addZ(wheel * (cameraMod / 5000F));
 			}
 		}
+	
 	}
 
 	public int getElementGLNameAtPos(int x, int y)
@@ -922,10 +952,19 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			prefs.put("filePath", filePath);
 			Importer importer = new Importer(filePath);
 			
-			currentProject = null;
+			//currentProject = null; - why is that here? it crashes the editor!
+			ignoreValueUpdates = true;
 			Project project = importer.loadFromJSON();
+			Project oldproject = currentProject;
 			currentProject = project;
+			
+			for (TextureEntry entry : oldproject.Textures.values()) {
+				entry.Dispose();
+			}
+			
+			ignoreValueUpdates = false;
 			currentProject.LoadIntoEditor(ModelCreator.manager);
+			
 			setTitle(new File(currentProject.filePath).getName() + " - " + windowTitle);
 		}
 		

@@ -361,6 +361,11 @@ public class LeftUVSidebar extends LeftSidebar
 	int grabbedFaceIndex = -1;
 
 	@Override
+	public void mouseUp() {
+		grabbing = false;
+	}
+	
+	@Override
 	public void handleInput()
 	{
 		super.handleInput();
@@ -491,10 +496,13 @@ public class LeftUVSidebar extends LeftSidebar
 
 	public int getGrabbedFace(Element elem, int canvasHeight, int mouseX, int mouseY)
 	{
+		if (elem == null) return -1;
+		Face[] faces = elem.getAllFaces();
+		if (faces == null) return -1;
 		
 		for (int i = 0; i < 6; i++)
 		{
-			if (!elem.getAllFaces()[i].isEnabled()) {
+			if (faces[i] == null || !faces[i].isEnabled()) {
 				continue;
 			}
 			
