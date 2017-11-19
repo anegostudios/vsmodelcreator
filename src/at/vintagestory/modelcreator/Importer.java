@@ -555,7 +555,7 @@ public class Importer
 			if (obj.has("texture") && obj.get("texture").isJsonPrimitive())
 			{
 				String loc = obj.get("texture").getAsString().replace("#", "");
-				face.setTextureName(loc);
+				face.setTextureCode(loc);
 			}
 
 			if (obj.has("rotation") && obj.get("rotation").isJsonPrimitive())

@@ -6,15 +6,19 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -31,6 +35,9 @@ public class TextureDialog implements ITextureCallback
 	private String texture = null;
 	DefaultListModel<String> model;
 	JButton btnImport;
+	JTextField textureCodeField;
+	
+	boolean ignoreSelects = false;
 	
 	public String display(IElementManager manager)
 	{
@@ -46,12 +53,67 @@ public class TextureDialog implements ITextureCallback
 		list.setFixedCellHeight(256);
 		list.setFixedCellWidth(256);
 		list.setBackground(new Color(221, 221, 228));
+		list.addListSelectionListener(elem -> {
+			if (ignoreSelects) return;
+			String oldCode = list.getSelectedValue();
+			textureCodeField.setEnabled(true);
+			textureCodeField.setText(oldCode);
+			
+		});
+		
 		JScrollPane scroll = new JScrollPane(list);
 		scroll.getVerticalScrollBar().setVisible(false);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-		JPanel panel = new JPanel(new GridLayout(1, 3));
-		panel.setPreferredSize(new Dimension(1000, 40));
+		
+		JPanel textFieldAndButtons = new JPanel(new GridLayout(2,1));
+
+		JPanel textFieldRow = new JPanel(new GridLayout(1,1));
+		textFieldRow.setEnabled(false);
+		textFieldRow.setPreferredSize(new Dimension(1000, 30));
+		
+		textureCodeField = new JTextField();
+		textFieldRow.add(textureCodeField);
+		
+		
+		textureCodeField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				
+				String oldCode = list.getSelectedValue();
+				String newCode = textureCodeField.getText();
+				
+				if (newCode.length() == 0) return;
+				
+				ModelCreator.currentProject.UpdateTextureCode(oldCode, newCode);
+				ignoreSelects = true;
+				model = generate();
+				list.setModel(model);
+				
+				int newIndex = 0;
+				int i=0;
+				for (TextureEntry entry : ModelCreator.currentProject.TexturesByCode.values())
+				{
+					if (entry.code.equals(newCode)) {
+						newIndex = i;
+						break;
+					}
+					i++;
+				}
+				list.setSelectedIndex(newIndex);
+				
+				ignoreSelects = false;
+			}
+		});
+		
+		JPanel buttonRow = new JPanel(new GridLayout(1, 3));
+		buttonRow.setPreferredSize(new Dimension(1000, 30));
+		
+		
+		
+		
+		
 		JButton btnSelect = new JButton("Apply");
 		btnSelect.addActionListener(a ->
 		{
@@ -62,7 +124,7 @@ public class TextureDialog implements ITextureCallback
 			}
 		});
 		btnSelect.setFont(defaultFont);
-		panel.add(btnSelect);
+		buttonRow.add(btnSelect);
 
 		JButton btnImport = new JButton("Import");
 		btnImport.addActionListener(a ->
@@ -87,7 +149,7 @@ public class TextureDialog implements ITextureCallback
 			}
 		});
 		btnImport.setFont(defaultFont);
-		panel.add(btnImport);
+		buttonRow.add(btnImport);
 
 		JButton btnClose = new JButton("Close");
 		btnClose.addActionListener(a ->
@@ -96,7 +158,7 @@ public class TextureDialog implements ITextureCallback
 			SwingUtilities.getWindowAncestor(btnClose).dispose();
 		});
 		btnClose.setFont(defaultFont);
-		panel.add(btnClose);
+		buttonRow.add(btnClose);
 
 		JDialog dialog = new JDialog(manager.getCreator(), "Texture Manager", false);
 		dialog.setLayout(new BorderLayout());
@@ -104,7 +166,11 @@ public class TextureDialog implements ITextureCallback
 		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		dialog.setPreferredSize(new Dimension(540, 480));
 		dialog.add(scroll, BorderLayout.CENTER);
-		dialog.add(panel, BorderLayout.SOUTH);
+		
+		textFieldAndButtons.add(textFieldRow);
+		textFieldAndButtons.add(buttonRow);
+		
+		dialog.add(textFieldAndButtons, BorderLayout.SOUTH);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
@@ -135,9 +201,9 @@ public class TextureDialog implements ITextureCallback
 	private DefaultListModel<String> generate()
 	{
 		DefaultListModel<String> model = new DefaultListModel<String>();
-		for (TextureEntry entry : ModelCreator.currentProject.Textures.values())
+		for (TextureEntry entry : ModelCreator.currentProject.TexturesByCode.values())
 		{
-			model.addElement(entry.getName());
+			model.addElement(entry.getCode());
 		}
 		return model;
 	}

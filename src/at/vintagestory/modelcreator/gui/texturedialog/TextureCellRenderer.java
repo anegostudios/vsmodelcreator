@@ -17,7 +17,7 @@ public class TextureCellRenderer extends DefaultListCellRenderer
 	@Override
 	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus)
 	{
-		lbl.setIcon(ModelCreator.currentProject.getIcon((String) list.getModel().getElementAt(index)));
+		lbl.setIcon(ModelCreator.currentProject.getIconByCode((String) list.getModel().getElementAt(index)));
 		lbl.revalidate();
 		if (isSelected)
 		{

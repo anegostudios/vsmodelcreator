@@ -22,7 +22,13 @@ public class ControlsDialog
 		JPanel leftPanel = new JPanel(new BorderLayout());
 
 		JLabel message = new JLabel();
-		message.setText("<html><p><b>UV Panel (Left)</b></p>"
+		message.setText("<html>"
+				+ "<p><b>Drag&Drop of files</b></p>"
+				+ "<ul>"
+				+ "<li>Drop in model json files to open them</li>"
+				+ "<li>Drop in png files to add textures</li>"
+				+ "</ul>"
+				+ "<p><b>UV Panel (Left)</b></p>"
 				+ "<ul>"
 				+ "<li>Hold left mouse button to move/resive UV Rectangles (if auto uv is on, you can only move it)"
 				+ "</ul>"
@@ -45,7 +51,8 @@ public class ControlsDialog
 				+ "<ul>"
 				+ "<li>Hold SHIFT+Copy Button and then SHIFT+Paste Button to quickly assign a texture to all the faces of a cube</li>"
 				+ "</ul>"		
-				+ "</html>");
+				+ "</html>"
+		);
 		leftPanel.add(message, BorderLayout.NORTH);
 
 		container.add(leftPanel, BorderLayout.NORTH);
@@ -61,9 +68,9 @@ public class ControlsDialog
 
 		container.add(btnGrid, BorderLayout.SOUTH);
 
-		JDialog dialog = new JDialog(parent, "Credits", false);
+		JDialog dialog = new JDialog(parent, "Quick Controls", false);
 		dialog.setResizable(false);
-		dialog.setPreferredSize(new Dimension(500, 550));
+		dialog.setPreferredSize(new Dimension(500, 610));
 		dialog.add(container);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);

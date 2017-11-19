@@ -86,9 +86,9 @@ public class Exporter
 	private void compileTextureList(Element elem) {
 		for (Face face : elem.getAllFaces())
 		{
-			if (face.getTextureName() != null && !face.getTextureName().equals("null"))
+			if (face.getTextureCode() != null && !face.getTextureCode().equals("null"))
 			{
-				if (!textureMap.containsKey(face.getTextureName()))
+				if (!textureMap.containsKey(face.getTextureCode()))
 				{
 					TextureEntry tex = face.getTextureEntry();
 					if (tex == null) continue;
@@ -103,7 +103,7 @@ public class Exporter
 					}
 					subPath = subPath.replace('\\', '/').replace(".png", "");
 					
-					textureMap.put(face.getTextureName(), subPath);
+					textureMap.put(face.getTextureCode(), subPath);
 				}
 			}
 		}
@@ -469,7 +469,7 @@ public class Exporter
 		for (Face face : cuboid.getAllFaces())
 		{
 			writer.write(space(indentation + 1) + "\"" + Face.getFaceName(face.getSide()) + "\": { ");
-			writer.write("\"texture\": \"#" + face.getTextureName() + "\"");
+			writer.write("\"texture\": \"#" + face.getTextureCode() + "\"");
 			writer.write(", \"uv\": [ " + d2s(face.getStartU()) + ", " + d2s(face.getStartV()) + ", " + d2s(face.getEndU()) + ", " + d2s(face.getEndV()) + " ]");
 			if (face.getRotation() > 0)
 				writer.write(", \"rotation\": " + (int) face.getRotation() * 90);

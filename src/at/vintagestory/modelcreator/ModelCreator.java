@@ -958,7 +958,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			Project oldproject = currentProject;
 			currentProject = project;
 			
-			for (TextureEntry entry : oldproject.Textures.values()) {
+			for (TextureEntry entry : oldproject.TexturesByCode.values()) {
 				entry.Dispose();
 			}
 			

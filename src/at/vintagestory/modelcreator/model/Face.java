@@ -107,7 +107,7 @@ public class Face
 
 	
 	
-	private String textureName = null;
+	private String textureCode = null;
 	public double textureU = 0;
 	public double textureV = 0;
 	private double textureUEnd = 16;
@@ -134,10 +134,10 @@ public class Face
 	}
 	
 	public void applySingleTextureMode() {
-		if (ModelCreator.currentProject != null && ModelCreator.currentProject.EntityTextureMode && ModelCreator.currentProject.Textures != null && ModelCreator.currentProject.Textures.size() > 0) {
+		if (ModelCreator.currentProject != null && ModelCreator.currentProject.EntityTextureMode && ModelCreator.currentProject.TexturesByCode != null && ModelCreator.currentProject.TexturesByCode.size() > 0) {
 			//this.textureName = ModelCreator.currentProject.Textures.get(0).name;
 			
-			this.textureName = ModelCreator.currentProject.Textures.values().iterator().next().name;
+			this.textureCode = ModelCreator.currentProject.TexturesByCode.values().iterator().next().code;
 		}		
 	}
 	
@@ -150,7 +150,7 @@ public class Face
 	
 	public void renderFace(BlockFacing blockFacing, float brightness)
 	{		
-		TextureEntry entry = ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntry(textureName);
+		TextureEntry entry = ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntryByCode(textureCode);
 
 		GL11.glPushMatrix();
 		{
@@ -193,7 +193,7 @@ public class Face
 	
 	
 	public Sized translateVoxelPosToUvPos(double voxelU, double voxelV, boolean actualPosition) { 
-		return translateVoxelPosToUvPos(ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntry(textureName), voxelU, voxelV, actualPosition);
+		return translateVoxelPosToUvPos(ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntryByCode(textureCode), voxelU, voxelV, actualPosition);
 	}
 	
 	public static Sized translateVoxelPosToUvPos(TextureEntry entry, double voxelU, double voxelV, boolean actualPosition) {
@@ -210,7 +210,7 @@ public class Face
 	
 	
 	public Sized getVoxel2PixelScale() {
-		return getVoxel2PixelScale(ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntry(textureName));
+		return getVoxel2PixelScale(ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntryByCode(textureCode));
 	}
 	
 	public static Sized getVoxel2PixelScale(TextureEntry entry) {
@@ -226,17 +226,17 @@ public class Face
 	
 	
 
-	public void setTextureName(String texture)
+	public void setTextureCode(String textureCode)
 	{
-		this.textureName = texture;
+		this.textureCode = textureCode;
 	}
 
 	public void bindTexture()
 	{
 		TextureImpl.bindNone();
-		if (textureName != null && ModelCreator.renderTexture)
+		if (textureCode != null && ModelCreator.renderTexture)
 		{
-			TextureEntry entry = ModelCreator.currentProject.getTextureEntry(textureName);
+			TextureEntry entry = ModelCreator.currentProject.getTextureEntryByCode(textureCode);
 			if (entry != null)
 			{
 				if (entry.getTexture() != null)
@@ -334,19 +334,19 @@ public class Face
 		ModelCreator.DidModify();
 	}
 
-	public String getTextureName()
+	public String getTextureCode()
 	{
-		return textureName;
+		return textureCode;
 	}
 
 	public Texture getTexture()
 	{
-		return ModelCreator.currentProject.getTexture(textureName);
+		return ModelCreator.currentProject.getTexture(textureCode);
 	}
 	
 	public TextureEntry getTextureEntry()
 	{
-		return ModelCreator.currentProject.getTextureEntry(textureName);
+		return ModelCreator.currentProject.getTextureEntryByCode(textureCode);
 	}
 
 
@@ -500,7 +500,7 @@ public class Face
 	
 	public Face clone(Element forElement) {
 		Face cloned = new Face();
-		cloned.textureName = textureName;
+		cloned.textureCode = textureCode;
 		cloned.textureU = textureU;
 		cloned.textureV = textureV;
 		cloned.textureUEnd = textureUEnd;

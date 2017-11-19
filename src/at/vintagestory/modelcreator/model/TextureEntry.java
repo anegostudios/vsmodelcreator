@@ -10,7 +10,7 @@ import at.vintagestory.modelcreator.util.watchservice.*;
 
 public class TextureEntry
 {
-	public String name;
+	public String code;
 	public ImageIcon icon;
 	public Texture texture;
 	public String filePath;
@@ -20,9 +20,9 @@ public class TextureEntry
 
 	DirectoryWatchService watchService;
 
-	public TextureEntry(String name, Texture texture, ImageIcon image, String textureLocation)
+	public TextureEntry(String code, Texture texture, ImageIcon image, String textureLocation)
 	{
-		this.name = name;
+		this.code = code;
 		this.texture = texture;
 		this.icon = image;
 		this.filePath = textureLocation;
@@ -60,9 +60,9 @@ public class TextureEntry
 		watchService.stop();
 	}
 
-	public String getName()
+	public String getCode()
 	{
-		return name;
+		return code;
 	}
 
 	public Texture getTexture()

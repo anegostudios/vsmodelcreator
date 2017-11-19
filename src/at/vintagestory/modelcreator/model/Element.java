@@ -143,7 +143,7 @@ public class Element implements IDrawable
 		for (int i = 0; i < faces.length; i++)
 		{
 			Face oldFace = cuboid.getAllFaces()[i];
-			faces[i].setTextureName(oldFace.getTextureName());
+			faces[i].setTextureCode(oldFace.getTextureCode());
 			//faces[i].setTextureLocation(oldFace.getTextureLocation());
 			faces[i].setStartU(oldFace.getStartU());
 			faces[i].setStartV(oldFace.getStartV());
@@ -225,7 +225,7 @@ public class Element implements IDrawable
 	{
 		for (Face face : faces)
 		{
-			face.setTextureName(null);
+			face.setTextureCode(null);
 			//face.setTextureLocation(ModelCreator.currentProject.EntityTextureMode ? "entities/" : "blocks/");
 		}
 	}
@@ -239,7 +239,7 @@ public class Element implements IDrawable
 	{
 		for (Face face : faces)
 		{
-			face.setTextureName(texture);
+			face.setTextureCode(texture);
 			//face.setTextureLocation(location);
 		}
 	}

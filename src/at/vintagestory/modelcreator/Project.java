@@ -23,7 +23,7 @@ public class Project
 	// Persistent project data
 	public boolean AmbientOcclusion;
 	public ArrayList<PendingTexture> PendingTextures = new ArrayList<PendingTexture>();
-	public HashMap<String, TextureEntry> Textures = new HashMap<String, TextureEntry>();
+	public HashMap<String, TextureEntry> TexturesByCode = new HashMap<String, TextureEntry>();
 	public ArrayList<Element> rootElements = new ArrayList<Element>();
 	public ArrayList<Animation> Animations = new ArrayList<Animation>();
 	
@@ -239,10 +239,10 @@ public class Project
 		Animations.clear();
 		SelectedElement = null;
 		PendingTextures.clear();
-		for (TextureEntry entry : Textures.values()) {
+		for (TextureEntry entry : TexturesByCode.values()) {
 			entry.Dispose();
 		}
-		Textures.clear();
+		TexturesByCode.clear();
 		tree.clearElements();
 		SelectedAnimation = null;
 		ModelCreator.ignoreValueUpdates = false;
@@ -366,7 +366,7 @@ public class Project
 	{
 		Project cloned = new Project(filePath);
 		cloned.AmbientOcclusion = AmbientOcclusion;
-		cloned.Textures = Textures;
+		cloned.TexturesByCode = TexturesByCode;
 		cloned.AllAngles = AllAngles;
 		cloned.EntityTextureMode = EntityTextureMode;
 		cloned.TextureWidth = TextureWidth;
@@ -397,31 +397,60 @@ public class Project
 		
 	
 
-
-	public TextureEntry getTextureEntry(String name)
-	{
-		return Textures.get(name);
+	public void UpdateTextureCode(String oldCode, String newCode) {
+		TextureEntry entry = TexturesByCode.get(oldCode);
+		if (entry == null) return;
+		
+		TexturesByCode.remove(oldCode);
+		TexturesByCode.put(newCode, entry);
+		entry.code = newCode;
+		UpdateTextureCode(rootElements, oldCode, newCode);
+		
+		ModelCreator.DidModify();
+		ModelCreator.updateTitle();
+	}
+	
+	void UpdateTextureCode(ArrayList<Element> elems, String oldCode, String newCode) {
+		for (int i = 0; i < elems.size(); i++) {
+			Element elem = elems.get(i);
+			
+			for (Face face : elem.getAllFaces()) {
+				if (oldCode.equals(face.getTextureCode())) {
+					face.setTextureCode(newCode);
+				}
+			}
+			
+			if (elem.ChildElements != null) {
+				UpdateTextureCode(elem.ChildElements, oldCode, newCode);
+			}
+			
+		}
 	}
 
-	public Texture getTexture(String name)
+	public TextureEntry getTextureEntryByCode(String code)
 	{
-		TextureEntry entry = getTextureEntry(name);
+		return TexturesByCode.get(code);
+	}
+
+	public Texture getTexture(String code)
+	{
+		TextureEntry entry = getTextureEntryByCode(code);
 		if (entry == null) return null;
 		
 		return entry.getTexture();
 	}
 
-	public String getTextureLocation(String name)
+	public String getTextureLocationByCode(String code)
 	{
-		TextureEntry entry = getTextureEntry(name);
+		TextureEntry entry = getTextureEntryByCode(code);
 		if (entry == null) return null;
 		return entry.getFilePath();
 	}
 	
 
-	public ImageIcon getIcon(String name)
+	public ImageIcon getIconByCode(String code)
 	{
-		TextureEntry entry = getTextureEntry(name);
+		TextureEntry entry = getTextureEntryByCode(code);
 		if (entry == null) return null;
 		return entry.getIcon();
 	}
@@ -429,7 +458,7 @@ public class Project
 
 	
 	public void reloadTextures(ModelCreator creator) {
-		for (TextureEntry entry : Textures.values()) {
+		for (TextureEntry entry : TexturesByCode.values()) {
 			try {
 				creator.pendingTextures.add(new PendingTexture(entry));
 			} catch (Exception e) {}
@@ -453,7 +482,7 @@ public class Project
 	}
 	
 
-	public String loadTexture(String textureName, File image) throws IOException
+	public String loadTexture(String textureCode, File image) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
 		
@@ -471,27 +500,27 @@ public class Project
 		
 		ImageIcon icon = upscaleIcon(new ImageIcon(image.getAbsolutePath()), 256);
 		
-		if (textureName == null) {
-			textureName = image.getName().replace(".png", "");	
+		if (textureCode == null) {
+			textureCode = image.getName().replace(".png", "");	
 		}
 		
 		if (EntityTextureMode) {
-			for(TextureEntry entry : Textures.values()) entry.Dispose();
-			Textures.clear();
+			for(TextureEntry entry : TexturesByCode.values()) entry.Dispose();
+			TexturesByCode.clear();
 		}
 		
-		if (Textures.containsKey(textureName)) {
-			TextureEntry entry = Textures.get(textureName);
+		if (TexturesByCode.containsKey(textureCode)) {
+			TextureEntry entry = TexturesByCode.get(textureCode);
 			if (entry.getFilePath().equals(image.getAbsolutePath())) {
-				Textures.put(textureName, new TextureEntry(textureName, texture, icon, image.getAbsolutePath()));
+				TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath()));
 			} else {
 				
 				int i = 2;
 				while (true) {
 					
-					String altimgName = textureName + i;
-					if (!Textures.containsKey(altimgName)) {
-						Textures.put(altimgName, new TextureEntry(altimgName, texture, icon, image.getAbsolutePath()));
+					String altimgName = textureCode + i;
+					if (!TexturesByCode.containsKey(altimgName)) {
+						TexturesByCode.put(altimgName, new TextureEntry(altimgName, texture, icon, image.getAbsolutePath()));
 						break;
 					}					
 					i++;
@@ -500,12 +529,12 @@ public class Project
 			
 			
 		} else {
-			Textures.put(textureName, new TextureEntry(textureName, texture, icon, image.getAbsolutePath()));	
+			TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath()));	
 		}
 		
 		
 		
-		if (Textures.size() == 1 && EntityTextureMode) {
+		if (TexturesByCode.size() == 1 && EntityTextureMode) {
 			applySingleTextureMode();
 		}
 		

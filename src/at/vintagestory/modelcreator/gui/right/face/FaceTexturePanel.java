@@ -53,7 +53,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 				String texture = dlg.display(manager);
 				if (texture != null)
 				{
-					manager.getCurrentElement().getSelectedFace().setTextureName(texture);
+					manager.getCurrentElement().getSelectedFace().setTextureCode(texture);
 				}
 				
 			}
@@ -73,7 +73,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 				}
 				else
 				{
-					manager.getCurrentElement().getSelectedFace().setTextureName(null);
+					manager.getCurrentElement().getSelectedFace().setTextureCode(null);
 				}
 			}
 		});
@@ -87,7 +87,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 			if (manager.getCurrentElement() != null)
 			{
 				Face face = manager.getCurrentElement().getSelectedFace();
-				Clipboard.copyTexture(face.getTextureName());
+				Clipboard.copyTexture(face.getTextureCode());
 			}
 		});
 		btnCopy.setFont(defaultFont);
@@ -109,7 +109,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 					else
 					{
 						Face face = manager.getCurrentElement().getSelectedFace();
-						face.setTextureName(texture.getTexture());
+						face.setTextureCode(texture.getTexture());
 						//face.setTextureLocation(texture.getLocation());
 					}
 				}
@@ -133,7 +133,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		if (success)
 			if (manager.getCurrentElement() != null)
 			{
-				manager.getCurrentElement().getSelectedFace().setTextureName(texture);
+				manager.getCurrentElement().getSelectedFace().setTextureCode(texture);
 			}
 	}
 }
