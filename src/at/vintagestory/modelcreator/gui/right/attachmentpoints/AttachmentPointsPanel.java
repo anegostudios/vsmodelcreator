@@ -171,9 +171,6 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 		pointList.updateUI();
 		
 		
-		posPanel.updateValues(byGuiElem);
-		rotPanel.updateValues(byGuiElem);
-		
 		Element curElem = ModelCreator.currentProject.SelectedElement;
 		pointList.setEnabled(curElem != null);
 		codeField.setEnabled(curElem != null);
@@ -182,8 +179,13 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 			ModelCreator.currentProject.SelectedAttachmentPoint = null;
 			return;
 		}
-				
-		AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint;
+		
+		int index = pointList.getSelectedIndex();
+		
+		AttachmentPoint point = ModelCreator.currentProject.SelectedAttachmentPoint = index == -1 || curElem.AttachmentPoints.size() <= index ? null : curElem.AttachmentPoints.get(index);
+		
+		posPanel.updateValues(byGuiElem);
+		rotPanel.updateValues(byGuiElem);
 		
 		codeField.setEnabled(point != null);
 		

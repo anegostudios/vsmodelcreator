@@ -20,7 +20,10 @@ public enum EnumEntityActivity
     Dead(8192),
     Climb(16384),
     SwordAttack(65536),
-    Idle(131072)
+    Idle(131072),
+    ChairSitting (262144),
+    FloorSitting (524288),
+    SneakIdle (1048576),
     ;
 	
     public int flag;

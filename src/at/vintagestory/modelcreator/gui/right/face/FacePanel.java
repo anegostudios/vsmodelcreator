@@ -113,6 +113,8 @@ public class FacePanel extends JPanel implements IValueUpdater
 		
 		rotation.addChangeListener(e ->
 		{
+			if (ModelCreator.ignoreValueUpdates) return;
+			
 			if (manager.getCurrentElement() != null) {
 				manager.getCurrentElement().getSelectedFace().setRotation(rotation.getValue());
 				ModelCreator.updateValues(rotation);				

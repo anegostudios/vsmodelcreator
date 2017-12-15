@@ -314,11 +314,22 @@ public class Element implements IDrawable
 			}
 		}
 		
+		if (ModelCreator.renderAttachmentPoints) {
+			for (int i = 0; i < AttachmentPoints.size(); i++) {
+				AttachmentPoint p = AttachmentPoints.get(i);
+				if (p == ModelCreator.currentProject.SelectedAttachmentPoint) {
+					p.draw();
+				}
+			}
+		}
+
+		
 		GL11.glPopMatrix();
 		
 		if (selectedElem == this) {
 			drawSelectionExtras();
 		}
+		
 	}
 	
 

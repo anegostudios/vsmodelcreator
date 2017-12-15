@@ -2,7 +2,6 @@ package at.vintagestory.modelcreator.gui.right;
 
 import java.awt.Toolkit;
 import java.util.Enumeration;
-
 import javax.swing.DropMode;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;

@@ -1,47 +1,16 @@
 package at.vintagestory.modelcreator.gui.middle;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-import static org.lwjgl.opengl.GL11.GL_LINES;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glColor3d;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glLineWidth;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotated;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.GL11.glVertex2i;
-import static org.lwjgl.opengl.GL11.glVertex3i;
-import static org.lwjgl.opengl.GL11.glViewport;
-
+import static org.lwjgl.opengl.GL11.*;
 import java.util.List;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.Color;
-
 import at.vintagestory.modelcreator.Camera;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.EnumFonts;
 import at.vintagestory.modelcreator.gui.left.LeftSidebar;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
-import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
 import org.lwjgl.util.glu.Sphere;
 
@@ -112,10 +81,6 @@ public class ModelRenderer
 			rootelems.get(i).draw(selectedElem);
 		}
 		
-		if (ModelCreator.renderAttachmentPoints && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAttachmentPoint != null) {
-			drawAttachmentPoint(ModelCreator.currentProject.SelectedAttachmentPoint);
-		}
-		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 
 		
@@ -142,64 +107,6 @@ public class ModelRenderer
 	}
 	
 
-	
-	private void drawAttachmentPoint(AttachmentPoint point)
-	{
-		GL11.glLineWidth(0.8f);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-		GL11.glPushMatrix();
-		{
-			GL11.glTranslated(point.getPosX(), point.getPosY(), point.getPosZ());
-			GL11.glColor3f(0.25F, 0.85F, 0.25F);
-			
-			sphere.draw(0.125F, 16, 16);
-			
-			GL11.glRotated(point.getRotationX(), 1, 0, 0);
-			GL11.glRotated(point.getRotationY(), 0, 1, 0);
-			GL11.glRotated(point.getRotationZ(), 0, 0, 1);
-			
-			GL11.glBegin(GL_LINES);
-			{
-				// 3 Axes
-				GL11.glColor3f(0.8f, 0.4f, 0.4f);
-				GL11.glVertex3f(-4, 0, 0);
-				GL11.glVertex3f(4, 0, 0);
-				
-				GL11.glVertex3f(4, 0, 0);
-				GL11.glVertex3f(3.6f, 0, 0.4f);
-				GL11.glVertex3f(4, 0, 0);
-				GL11.glVertex3f(3.6f, 0, -0.4f);
-				
-				GL11.glColor3f(0.4f, 0.8f, 0.4f);
-				GL11.glVertex3f(0, -4, 0);
-				GL11.glVertex3f(0, 4, 0);
-				
-				GL11.glVertex3f(0, 4, 0);
-				GL11.glVertex3f(0, 3.6f, 0.4f);
-				
-				GL11.glVertex3f(0, 4, 0);
-				GL11.glVertex3f(0, 3.6f, -0.4f);
-				
-				GL11.glColor3f(0.4f, 0.4f, 0.8f);
-				GL11.glVertex3f(0, 0, -4);
-				GL11.glVertex3f(0, 0, 4);
-				
-				GL11.glVertex3f(0, 0, 4);
-				GL11.glVertex3f(0.4f, 0, 3.6f);
-				
-				GL11.glVertex3f(0, 0, 4);
-				GL11.glVertex3f(-0.4f, 0, 3.6f);
-			}
-			GL11.glEnd();
-		}
-		
-		GL11.glPopMatrix();
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
-	}
 	
 	
 	public void drawPerspectiveGrid()

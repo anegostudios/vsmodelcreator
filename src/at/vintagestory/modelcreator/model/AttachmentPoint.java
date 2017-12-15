@@ -1,13 +1,20 @@
 package at.vintagestory.modelcreator.model;
 
+import static org.lwjgl.opengl.GL11.GL_LINES;
+
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.Sphere;
+
 import at.vintagestory.modelcreator.ModelCreator;
 
 public class AttachmentPoint
 {
 	private String code;
+	public Element ParentElem;
 	
 	protected double posX = 0.0, posY = 0.0, posZ = 0.0;
 	protected double rotationX = 0, rotationY = 0, rotationZ = 0;
+	Sphere sphere = new Sphere();
 	
 	
 	public void addPosX(double amt)
@@ -112,6 +119,67 @@ public class AttachmentPoint
 		
 		
 		return cloned;
+	}
+	
+	
+
+	
+	public void draw()
+	{
+		GL11.glLineWidth(0.8f);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+		GL11.glPushMatrix();
+		{
+			GL11.glTranslated(getPosX(), getPosY(), getPosZ());
+			GL11.glColor3f(0.25F, 0.85F, 0.25F);
+			
+			sphere.draw(0.125F, 16, 16);
+			
+			GL11.glRotated(getRotationX(), 1, 0, 0);
+			GL11.glRotated(getRotationY(), 0, 1, 0);
+			GL11.glRotated(getRotationZ(), 0, 0, 1);
+			
+			GL11.glBegin(GL_LINES);
+			{
+				// 3 Axes
+				GL11.glColor3f(0.8f, 0.4f, 0.4f);
+				GL11.glVertex3f(-4, 0, 0);
+				GL11.glVertex3f(4, 0, 0);
+				
+				GL11.glVertex3f(4, 0, 0);
+				GL11.glVertex3f(3.6f, 0, 0.4f);
+				GL11.glVertex3f(4, 0, 0);
+				GL11.glVertex3f(3.6f, 0, -0.4f);
+				
+				GL11.glColor3f(0.4f, 0.8f, 0.4f);
+				GL11.glVertex3f(0, -4, 0);
+				GL11.glVertex3f(0, 4, 0);
+				
+				GL11.glVertex3f(0, 4, 0);
+				GL11.glVertex3f(0, 3.6f, 0.4f);
+				
+				GL11.glVertex3f(0, 4, 0);
+				GL11.glVertex3f(0, 3.6f, -0.4f);
+				
+				GL11.glColor3f(0.4f, 0.4f, 0.8f);
+				GL11.glVertex3f(0, 0, -4);
+				GL11.glVertex3f(0, 0, 4);
+				
+				GL11.glVertex3f(0, 0, 4);
+				GL11.glVertex3f(0.4f, 0, 3.6f);
+				
+				GL11.glVertex3f(0, 0, 4);
+				GL11.glVertex3f(-0.4f, 0, 3.6f);
+			}
+			GL11.glEnd();
+		}
+		
+		GL11.glPopMatrix();
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	@Override
