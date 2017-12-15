@@ -312,24 +312,32 @@ public class Face
 
 	public void setStartU(double u)
 	{
+		if (u == textureU) return;
+		
 		textureU = u;
 		ModelCreator.DidModify();
 	}
 
 	public void setStartV(double v)
 	{
+		if (v == textureV) return;
+		
 		textureV = v;
 		ModelCreator.DidModify();
 	}
 
 	public void setEndU(double ue)
 	{
+		if (textureUEnd == ue) return;
+		
 		textureUEnd = ue;
 		ModelCreator.DidModify();
 	}
 
 	public void setEndV(double ve)
 	{
+		if (textureVEnd == ve) return;
+		
 		textureVEnd = ve;
 		ModelCreator.DidModify();
 	}
@@ -355,17 +363,6 @@ public class Face
 		return side;
 	}
 
-	public boolean isCullfaced()
-	{
-		return cullface;
-	}
-
-	public void setCullface(boolean cullface)
-	{
-		this.cullface = cullface;
-		ModelCreator.DidModify();
-	}
-
 	public boolean isEnabled()
 	{
 		return enabled;
@@ -373,6 +370,8 @@ public class Face
 
 	public void setEnabled(boolean enabled)
 	{
+		if (this.enabled == enabled) return;
+		
 		this.enabled = enabled;
 		ModelCreator.DidModify();
 	}
@@ -384,6 +383,8 @@ public class Face
 
 	public void setAutoUVEnabled(boolean enabled)
 	{
+		if (this.autoUV == enabled) return;
+		
 		this.autoUV = enabled;
 		ModelCreator.DidModify();
 	}
@@ -481,6 +482,8 @@ public class Face
 	}
 	
 	public void setGlow(int glow) {
+		if (this.glow == glow) return;
+		
 		this.glow = glow;
 		ModelCreator.DidModify();
 	}
@@ -492,6 +495,8 @@ public class Face
 
 	public void setRotation(int rotation)
 	{
+		if (this.rotation == rotation) return;
+		
 		this.rotation = rotation;
 		ModelCreator.DidModify();
 		updateUV();

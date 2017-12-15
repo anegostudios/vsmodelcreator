@@ -73,6 +73,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static Project currentProject;
 	public static ProjectChangeHistory changeHistory = new ProjectChangeHistory();
 	
+	public static boolean ignoreDidModify = false;
 	public static boolean ignoreValueUpdates = false;
 	public static boolean ignoreFrameUpdates = false;
 	
@@ -240,10 +241,12 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 
 	public static void DidModify() {
+		if (ignoreDidModify) return;
 		if (currentProject == null) return;
 		
 		currentProject.needsSaving = true;
 		changeHistory.addHistoryState(currentProject);
+		updateTitle();
 	}
 
 	
@@ -943,6 +946,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			if (returnVal == JOptionPane.NO_OPTION || returnVal == JOptionPane.CLOSED_OPTION) return;
 		}
 				
+		ignoreDidModify = true;
+		
 		if (filePath == null) {
 			setTitle("(untitled) - " + windowTitle);
 			currentProject = new Project(null);
@@ -967,6 +972,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			
 			setTitle(new File(currentProject.filePath).getName() + " - " + windowTitle);
 		}
+		
+		ignoreDidModify = false;
 		
 		changeHistory.clear();
 		changeHistory.addHistoryState(currentProject);

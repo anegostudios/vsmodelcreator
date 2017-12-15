@@ -185,20 +185,10 @@ public class Exporter
 
 		writer.write(space(3) + "\"name\": \"" + animation.getName() + "\",");
 		writer.newLine();
+		writer.write(space(3) + "\"code\": \"" + animation.getCode() + "\",");
+		writer.newLine();
 		writer.write(space(3) + "\"quantityframes\": " + animation.GetQuantityFrames() + ",");
 		writer.newLine();
-		
-		int q = animation.ForActivities.size();
-		if (q > 0) {
-			
-			writer.write(space(3) + "\"forActivities\": [");
-			for (int i = 0; i < q; i++) {
-				if (i > 0) writer.write(", ");
-				writer.write("\"" + animation.ForActivities.get(i) + "\"");
-			}
-			writer.write("],");
-			writer.newLine();			
-		}
 		
 		writer.write(space(3) + "\"onActivityStopped\": \"" + animation.OnActivityStopped + "\",");
 		writer.newLine();
@@ -473,8 +463,6 @@ public class Exporter
 			writer.write(", \"uv\": [ " + d2s(face.getStartU()) + ", " + d2s(face.getStartV()) + ", " + d2s(face.getEndU()) + ", " + d2s(face.getEndV()) + " ]");
 			if (face.getRotation() > 0)
 				writer.write(", \"rotation\": " + (int) face.getRotation() * 90);
-			if (face.isCullfaced())
-				writer.write(", \"cullface\": \"" + Face.getFaceName(face.getSide()) + "\"");
 			if (face.getGlow() > 0) {
 				writer.write(", \"glow\": " + face.getGlow());
 			}

@@ -91,7 +91,12 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 		btnAdd.setToolTipText("New Element");
 		btnAdd.addActionListener(e -> {
 			if (ModelCreator.currentProject.SelectedElement == null) return;
+			
+			ModelCreator.ignoreDidModify = true;
 			ModelCreator.currentProject.SelectedAttachmentPoint = ModelCreator.currentProject.SelectedElement.addNewAttachmentPoint();
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+			
 			updateValues(btnAdd);
 			
 		});

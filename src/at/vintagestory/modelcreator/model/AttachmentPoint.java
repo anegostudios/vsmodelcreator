@@ -54,18 +54,24 @@ public class AttachmentPoint
 
 	public void setPosX(double amt)
 	{
+		if (this.posX == amt) return;
+		
 		this.posX = amt;
 		ModelCreator.DidModify();
 	}
 
 	public void setPosY(double amt)
 	{
+		if (this.posY == amt) return;
+		
 		this.posY = amt;
 		ModelCreator.DidModify();
 	}
 
 	public void setPosZ(double amt)
 	{
+		if (this.posZ == amt) return;
+		
 		this.posZ = amt;
 		ModelCreator.DidModify();
 	}
@@ -89,18 +95,24 @@ public class AttachmentPoint
 
 	public void setRotationX(double rotation)
 	{
+		if (this.rotationX == rotation) return;
+		
 		this.rotationX = rotation;
 		ModelCreator.DidModify();
 	}
 
 	public void setRotationY(double rotation)
 	{
+		if (this.rotationY == rotation) return;
+		
 		this.rotationY = rotation;
 		ModelCreator.DidModify();
 	}
 	
 	public void setRotationZ(double rotation)
 	{
+		if (this.rotationZ == rotation) return;
+		
 		this.rotationZ = rotation;
 		ModelCreator.DidModify();
 	}
@@ -109,6 +121,7 @@ public class AttachmentPoint
 	public AttachmentPoint clone() {
 		AttachmentPoint cloned = new AttachmentPoint();
 
+		cloned.code = code;
 		cloned.posX = posX;
 		cloned.posY = posY;
 		cloned.posZ = posZ;

@@ -189,6 +189,8 @@ public class Project
 	
 	
 	public void duplicateCurrentElement() {
+		ModelCreator.ignoreDidModify = true;
+		
 		if (SelectedElement != null) {
 			Element newElem = new Element(SelectedElement);
 			newElem.ParentElement = SelectedElement.ParentElement;
@@ -202,6 +204,8 @@ public class Project
 			}
 		}
 		
+		ModelCreator.ignoreDidModify = false;
+		
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.DidModify();
 		ModelCreator.updateValues(null);
@@ -209,6 +213,8 @@ public class Project
 	
 	
 	public void removeCurrentElement() {
+		ModelCreator.ignoreDidModify = true;
+		
 		Element curElem = SelectedElement;
 		tree.removeCurrentElement();
 		
@@ -223,6 +229,9 @@ public class Project
 				Animations.get(i).calculateAllFrames(this);	
 			}
 		}
+		
+		
+		ModelCreator.ignoreDidModify = false;
 		
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.DidModify();

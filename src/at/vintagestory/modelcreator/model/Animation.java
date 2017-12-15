@@ -12,9 +12,9 @@ public class Animation
 	// Persistent animation data
 	int quantityFrames;
 	private String name;
+	private String code;
 	public Keyframe[] keyframes = new Keyframe[0];
 	
-	public ArrayList<EnumEntityActivity> ForActivities = new ArrayList<EnumEntityActivity>();
     public EnumEntityActivityStoppedHandling OnActivityStopped = EnumEntityActivityStoppedHandling.Rewind;
     public EnumEntityAnimationEndHandling OnAnimationEnd = EnumEntityAnimationEndHandling.Repeat;
 	
@@ -208,22 +208,36 @@ public class Animation
 	
 	public void TogglePosition(Element elem, boolean on) {
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
+		
+		if (keyframe.PositionSet == on) return;
+		
 		keyframe.PositionSet = on;
+		ModelCreator.ignoreDidModify = true;
 		if (!on) RemoveKeyFramesIfUseless(keyframe);
+		ModelCreator.ignoreDidModify = false;
 		ModelCreator.DidModify();
 	}
 
 	public void ToggleRotation(Element elem, boolean on) {
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
+		
+		if (keyframe.RotationSet == on) return;
+		
 		keyframe.RotationSet = on;
+		ModelCreator.ignoreDidModify = true;
 		if (!on) RemoveKeyFramesIfUseless(keyframe);
+		ModelCreator.ignoreDidModify = false;
 		ModelCreator.DidModify();
 	}
 
 	public void ToggleStretch(Element elem, boolean on) {
 		KeyframeElement keyframe = GetOrCreateKeyFrameElement(elem);
 		keyframe.StretchSet = on;
+		
+		if (keyframe.StretchSet == on) return;
+		ModelCreator.ignoreDidModify = true;
 		if (!on) RemoveKeyFramesIfUseless(keyframe);
+		ModelCreator.ignoreDidModify = false;
 		ModelCreator.DidModify();
 	}
 	
@@ -435,9 +449,22 @@ public class Animation
 		this.name = name;
 		ModelCreator.DidModify();
 	}
+	
+	public String getCode()
+	{
+		return code;
+	}
+
+	public void setCode(String code)
+	{
+		this.code = code;
+		ModelCreator.DidModify();
+	}
 
 	public void MoveSelectedFrame(int direction)
 	{
+		ModelCreator.ignoreDidModify = true;
+		
 		Keyframe curFrame = null;
 		Keyframe prevFrame = null;
 		Keyframe nextFrame = null;
@@ -464,8 +491,10 @@ public class Animation
 		
 		curFrame.setFrameNumber(nextFrameNumber);
 		this.currentFrame = nextFrameNumber;
-		
 		ReloadFrameNumbers();
+		
+		ModelCreator.ignoreDidModify = false;
+		
 		ModelCreator.DidModify();
 		ModelCreator.updateValues(null);
 	}
@@ -495,7 +524,7 @@ public class Animation
 		
 		cloned.name = name;
 		cloned.quantityFrames = quantityFrames;
-		cloned.ForActivities = new ArrayList<EnumEntityActivity>(ForActivities);
+		cloned.code = code;
 		cloned.OnActivityStopped = OnActivityStopped;
 		cloned.OnAnimationEnd = OnAnimationEnd;
 		

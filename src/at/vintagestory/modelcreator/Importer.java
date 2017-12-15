@@ -18,7 +18,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import at.vintagestory.modelcreator.enums.EnumEntityActivity;
 import at.vintagestory.modelcreator.enums.EnumEntityActivityStoppedHandling;
 import at.vintagestory.modelcreator.enums.EnumEntityAnimationEndHandling;
 import at.vintagestory.modelcreator.model.Animation;
@@ -270,12 +269,8 @@ public class Importer
 			anim.keyframes = keyframes.toArray(new Keyframe[0]);
 		}
 		
-		if (obj.has("forActivities") && obj.get("forActivities").isJsonArray()) {
-			JsonArray activities = obj.get("forActivities").getAsJsonArray();
-			for (int i = 0; i < activities.size(); i++) {
-				String activity = activities.get(i).getAsString(); 
-				anim.ForActivities.add(EnumEntityActivity.valueOf(activity));	
-			}
+		if (obj.has("code") && obj.get("code").isJsonPrimitive()) {
+			anim.setCode(obj.get("code").getAsString());
 		}
 
 		if (obj.has("onActivityStopped") && obj.get("onActivityStopped").isJsonPrimitive()) {

@@ -83,33 +83,6 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		model.addElement("Up is front");
 		model.addElement("Down is front");
 		
-		/*Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-		labelTable.put(new Integer(0), new JLabel("0\u00b0"));
-		labelTable.put(new Integer(1), new JLabel("90\u00b0"));
-		labelTable.put(new Integer(2), new JLabel("180\u00b0"));
-		labelTable.put(new Integer(3), new JLabel("270\u00b0"));
-		sliderPanel = new JPanel(new GridLayout(1, 1));
-		sliderPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Rotation (all faces)</b></html>"));
-		rotation = new JSlider(JSlider.HORIZONTAL, ROTATION_MIN, ROTATION_MAX, ROTATION_INIT);
-		rotation.setMajorTickSpacing(4);
-		rotation.setPaintTicks(true);
-		rotation.setPaintLabels(true);
-		rotation.setLabelTable(labelTable);
-		
-		
-		rotation.addChangeListener(e ->
-		{
-			Element elem = manager.getCurrentElement();
-			if (elem == null) return;
-			
-			elem.setUnwrapRotation(rotation.getValue());
-			elem.updateUV();
-			ModelCreator.updateValues(rotation);
-		});
-		
-		rotation.setToolTipText("<html>The rotation of the texture<br>Default: 0\u00b0</html>");
-		sliderPanel.setMaximumSize(new Dimension(190, 80));*/
-		//sliderPanel.add(rotation);
 
 		checkbox = new Checkbox("Alternate unwrap direction");
 		checkbox.addItemListener(new ItemListener()
@@ -124,6 +97,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 				elem.updateUV();
 				elem.updateUV();
 				ModelCreator.updateValues(null);
+				ModelCreator.DidModify();
 			}
 		});
 		
@@ -262,6 +236,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 				manager.getCurrentElement().setUnwrapMode(menuList.getSelectedIndex());
 				manager.getCurrentElement().updateUV();
 				updateValues(menuList);
+				ModelCreator.DidModify();
 			}
 		});
 		

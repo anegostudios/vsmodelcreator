@@ -149,7 +149,6 @@ public class Element implements IDrawable
 			faces[i].setStartV(oldFace.getStartV());
 			faces[i].setEndU(oldFace.getEndU());
 			faces[i].setEndV(oldFace.getEndV());
-			faces[i].setCullface(oldFace.isCullfaced());
 			faces[i].setEnabled(oldFace.isEnabled());
 			faces[i].setAutoUVEnabled(oldFace.isAutoUVEnabled());
 			faces[i].setRotation(oldFace.getRotation());
@@ -740,18 +739,24 @@ public class Element implements IDrawable
 
 	public void setStartX(double amt)
 	{
+		if (amt == startX) return;
+		
 		this.startX = amt;
 		ModelCreator.DidModify();
 	}
 
 	public void setStartY(double amt)
 	{
+		if (amt == startY) return;
+		
 		this.startY = amt;
 		ModelCreator.DidModify();
 	}
 
 	public void setStartZ(double amt)
 	{
+		if (amt == startZ) return;
+		
 		this.startZ = amt;
 		ModelCreator.DidModify();
 	}
@@ -791,18 +796,24 @@ public class Element implements IDrawable
 
 	public void setWidth(double width)
 	{
+		if (this.width == width) return;
+		
 		this.width = width;
 		ModelCreator.DidModify();
 	}
 
 	public void setHeight(double height)
 	{
+		if (this.height == height) return;
+		
 		this.height = height;
 		ModelCreator.DidModify();
 	}
 
 	public void setDepth(double depth)
 	{
+		if (this.depth == depth) return;
+		
 		this.depth = depth;
 		ModelCreator.DidModify();
 	}
@@ -842,18 +853,24 @@ public class Element implements IDrawable
 
 	public void setOriginX(double amt)
 	{
+		if (this.originX == amt) return;
+		
 		this.originX = amt;
 		ModelCreator.DidModify();
 	}
 
 	public void setOriginY(double amt)
 	{
+		if (this.originY == amt) return;
+		
 		this.originY = amt;
 		ModelCreator.DidModify();
 	}
 
 	public void setOriginZ(double amt)
 	{
+		if (this.originZ == amt) return;
+		
 		this.originZ = amt;
 		ModelCreator.DidModify();
 	}
@@ -875,6 +892,8 @@ public class Element implements IDrawable
 
 	public void setRotationX(double rotation)
 	{
+		if (this.rotationX == rotation) return;
+		
 		this.rotationX = rotation;
 		recalculateBrightnessValues();
 		ModelCreator.DidModify();
@@ -882,6 +901,8 @@ public class Element implements IDrawable
 
 	public void setRotationY(double rotation)
 	{
+		if (this.rotationY == rotation) return;
+		
 		this.rotationY = rotation;
 		recalculateBrightnessValues();
 		ModelCreator.DidModify();
@@ -889,6 +910,8 @@ public class Element implements IDrawable
 	
 	public void setRotationZ(double rotation)
 	{
+		if (this.rotationZ == rotation) return;
+		
 		this.rotationZ = rotation;
 		recalculateBrightnessValues();
 		ModelCreator.DidModify();
@@ -913,6 +936,8 @@ public class Element implements IDrawable
 
 	public void setShade(boolean shade)
 	{
+		if (this.shade == shade) return;
+		
 		this.shade = shade;
 		recalculateBrightnessValues();
 		ModelCreator.DidModify();
@@ -943,6 +968,8 @@ public class Element implements IDrawable
 
 	public void setTintIndex(int tintIndex)
 	{
+		if (this.tintIndex == tintIndex) return;
+		
 		this.tintIndex = tintIndex;
 	}
 	
@@ -954,6 +981,8 @@ public class Element implements IDrawable
 
 	public void setRenderPass(int pass)
 	{
+		if (this.renderPass == pass) return;
+		
 		this.renderPass = pass;
 	}
 
@@ -967,7 +996,9 @@ public class Element implements IDrawable
 		}
 		
 		for (AttachmentPoint point : AttachmentPoints) {
-			cloned.AttachmentPoints.add(point.clone());
+			AttachmentPoint clonedpoint = point.clone();
+			clonedpoint.ParentElem = cloned;
+			cloned.AttachmentPoints.add(clonedpoint);
 		}
 		
 		cloned.name = name;

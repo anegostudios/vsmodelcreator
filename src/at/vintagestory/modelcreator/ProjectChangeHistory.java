@@ -33,7 +33,7 @@ public class ProjectChangeHistory
 		
 		ApplyState();
 		
-		//System.out.println("applied undo, state now at " + currentHistoryState);
+		System.out.println("applied undo, state now at " + currentHistoryState);
 		
 		return true;
 	}
@@ -45,7 +45,7 @@ public class ProjectChangeHistory
 		currentHistoryState--;
 		ApplyState();
 		
-		//System.out.println("applied redo, state now at " + currentHistoryState);
+		System.out.println("applied redo, state now at " + currentHistoryState);
 		
 		return true;
 	}
@@ -62,8 +62,6 @@ public class ProjectChangeHistory
 		if (oldProject.SelectedElement != null) {
 			ModelCreator.currentProject.SelectedElement = ModelCreator.currentProject.findElement(oldProject.SelectedElement.name);	
 		}
-		
-		
 		
 		if (ModelCreator.currentProject.SelectedAnimation != null && oldProject.SelectedAnimation != null) {
 			Animation anim = ModelCreator.currentProject.SelectedAnimation;
@@ -84,7 +82,7 @@ public class ProjectChangeHistory
 		}
 		
 		ProjectSnapshots.add(0, project.clone(false));
-		//System.out.println("added history state, states = " + ProjectSnapshots.size());
+		System.out.println("added history state, states = " + ProjectSnapshots.size());
 		
 		if (ProjectSnapshots.size() > maxHistoryStates) {
 			ProjectSnapshots.remove(ProjectSnapshots.size() - 1);
