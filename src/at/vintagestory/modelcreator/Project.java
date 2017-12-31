@@ -76,7 +76,7 @@ public class Project
 		
 		if (Animations.size() > 0) {
 			SelectedAnimation = Animations.get(0);
-			SelectedAnimation.calculateAllFrames(this);
+			SelectedAnimation.SetFramesDirty();
 		}
 		
 	}	
@@ -145,7 +145,7 @@ public class Project
 		if (SelectedAnimation == null || SelectedAnimation.keyframes.length == 0) return new ArrayList<IDrawable>(rootElements);
 		
 		if (SelectedAnimation.allFrames.size() == 0 || SelectedAnimation.currentFrame >= SelectedAnimation.allFrames.size()) {
-			SelectedAnimation.calculateAllFrames(this);
+			SelectedAnimation.SetFramesDirty();
 			SelectedAnimation.currentFrame = Math.max(0, Math.min(SelectedAnimation.currentFrame - 1, SelectedAnimation.allFrames.size()));
 			ModelCreator.updateFrame();
 		}
@@ -226,7 +226,7 @@ public class Project
 			Animations.get(i).RemoveElement(curElem);
 			
 			if (Animations.get(i) == SelectedAnimation) {
-				Animations.get(i).calculateAllFrames(this);	
+				Animations.get(i).SetFramesDirty();	
 			}
 		}
 		

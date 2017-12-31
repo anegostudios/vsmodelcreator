@@ -23,7 +23,7 @@ public class Animation
 	public int currentFrame;
 	public ArrayList<Keyframe> allFrames = new ArrayList<Keyframe>();
 	public int[] frameNumbers = new int[0];
-	
+	public boolean framesDirty = true;
 	
 	public Animation() {
 		quantityFrames = 30;
@@ -33,12 +33,16 @@ public class Animation
 		this.quantityFrames = quantityFrames;
 	}
 
+	public void SetFramesDirty() {
+		framesDirty = true;
+	}
 	
 	public void calculateAllFrames(Project project) {
 		// We'll use a simple, slightly memory intensive but cpu friendly solution
 		// Static models are tree hierarchies of boxes
 		// So let's just built up one complete static model for each frame (only storing the keyframe data, but still a tree hierarchy and referencing the static box)
 		
+		framesDirty = false;
 		
 		// 1. Build up an empty list of all frames
 		allFrames.clear();
@@ -188,7 +192,7 @@ public class Animation
 	
 	public void SetQuantityFrames(int quantity, Project project) {
 		quantityFrames = quantity;
-		calculateAllFrames(project);
+		SetFramesDirty();
 		ModelCreator.DidModify();
 	}
 	

@@ -228,21 +228,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			@Override
 			public void keyReleased(KeyEvent e)
 			{
-				int max = 0;
-				try {
-					max = Integer.parseInt(durationTextField.getText());
-				} catch (Exception ex) {}
-				
-				if (max == 0) return;
-				
-				if (max > 0) frameSlider.setMaximum(max - 1);
-				frameSlider.setEnabled(max > 0);
-				
-				if (max == ModelCreator.currentProject.SelectedAnimation.GetQuantityFrames()) return;
-				
-				ModelCreator.currentProject.SelectedAnimation.SetQuantityFrames(max, ModelCreator.currentProject);
-				ModelCreator.currentProject.SelectedAnimation.currentFrame = Math.min(ModelCreator.currentProject.SelectedAnimation.currentFrame, max);
-				ModelCreator.updateFrame();	
+				setNewQuantityFrames();
 			}
 		});
 		
@@ -251,35 +237,9 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			@Override
 			public void focusLost(FocusEvent e)
 			{
-				Keyframe[] keyframes = ModelCreator.currentProject.SelectedAnimation.keyframes;
-				if (keyframes.length == 0) return;
-				
-				int maxKeyFrame = 0;
-				for (int i = 0; i < keyframes.length; i++) {
-					maxKeyFrame = Math.max(maxKeyFrame, keyframes[keyframes.length - 1].getFrameNumber());	
-				}
-				
-				int quantityFrames = ModelCreator.currentProject.SelectedAnimation.GetQuantityFrames();
-				
-				if (quantityFrames < maxKeyFrame) {
-					int dialogButton = JOptionPane.YES_NO_OPTION;
-					int dialogResult = JOptionPane.showConfirmDialog (null, "You have keyframes above frame number " + quantityFrames + ", those will be deleted. Proceed?", "Warning", dialogButton);
-					if (dialogResult == JOptionPane.YES_OPTION){
-						for (int i = 0; i < keyframes.length; i++) {
-							if (keyframes[i].getFrameNumber() > quantityFrames) {
-								ModelCreator.currentProject.SelectedAnimation.RemoveKeyFrame(keyframes[i]);
-							}
-						}
-						ModelCreator.currentProject.SelectedAnimation.ReloadFrameNumbers();
-						ModelCreator.currentProject.SelectedAnimation.calculateAllFrames(ModelCreator.currentProject);
-						ModelCreator.updateFrame();
-						ModelCreator.DidModify();
-					} else {
-						durationTextField.setText("" + maxKeyFrame);
-						return;
-					}
-				}
+				setNewQuantityFrames();
 			}
+
 		});
 		
 		durationPanel.add(durationTextField);
@@ -462,7 +422,63 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		updateValues(null);
 	}
 
-	
+
+
+	private void setNewQuantityFrames()
+	{
+		if (ignoreSelectionChange) return;
+		
+		int newQuantityFrames = 0;
+		try {
+			newQuantityFrames = Integer.parseInt(durationTextField.getText());
+		} catch (Exception ex) {}
+		
+		if (newQuantityFrames == 0) return;
+		if (newQuantityFrames == ModelCreator.currentProject.SelectedAnimation.GetQuantityFrames()) return;
+		
+		ignoreSelectionChange = true;
+		
+		Keyframe[] keyframes = ModelCreator.currentProject.SelectedAnimation.keyframes;
+		if (keyframes.length > 0) {			
+			int maxKeyFrame = 0;
+			for (int i = 0; i < keyframes.length; i++) {
+				maxKeyFrame = Math.max(maxKeyFrame, keyframes[keyframes.length - 1].getFrameNumber());	
+			}
+			
+			
+			if (newQuantityFrames < maxKeyFrame) {
+				int dialogButton = JOptionPane.YES_NO_OPTION;
+				int dialogResult = JOptionPane.showConfirmDialog (null, "You have keyframes above frame number " + newQuantityFrames + ", those will be deleted. Proceed?", "Warning", dialogButton);
+				if (dialogResult == JOptionPane.YES_OPTION){
+					for (int i = 0; i < keyframes.length; i++) {
+						if (keyframes[i].getFrameNumber() > newQuantityFrames) {
+							ModelCreator.currentProject.SelectedAnimation.RemoveKeyFrame(keyframes[i]);
+						}
+					}
+					ModelCreator.currentProject.SelectedAnimation.ReloadFrameNumbers();
+					ModelCreator.currentProject.SelectedAnimation.SetFramesDirty();
+					ModelCreator.updateFrame();
+					ModelCreator.DidModify();
+				} else {
+					durationTextField.setText("" + (maxKeyFrame+1));
+					ignoreSelectionChange = false;
+					return;
+				}
+			}
+		}
+		
+		
+		if (newQuantityFrames > 0) frameSlider.setMaximum(newQuantityFrames - 1);
+		frameSlider.setEnabled(newQuantityFrames > 0);
+		
+		
+		
+		ModelCreator.currentProject.SelectedAnimation.SetQuantityFrames(newQuantityFrames, ModelCreator.currentProject);
+		ModelCreator.currentProject.SelectedAnimation.currentFrame = Math.min(ModelCreator.currentProject.SelectedAnimation.currentFrame, newQuantityFrames);
+		ModelCreator.updateFrame();
+		
+		ignoreSelectionChange = false;
+	}
 
 	private void loadAnimationList()
 	{

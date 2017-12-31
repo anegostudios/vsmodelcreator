@@ -304,7 +304,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				ignoreValueUpdates = true;
 				
 				if (currentProject.SelectedAnimation != null) {
-					currentProject.SelectedAnimation.calculateAllFrames(currentProject);
+					currentProject.SelectedAnimation.SetFramesDirty();
 				}
 				
 				guiMain.updateValues(byGuiElem);
@@ -406,6 +406,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 					texture.load();
 				}
 				pendingTextures.clear();				
+			}
+			
+			if (project.SelectedAnimation != null && project.SelectedAnimation.framesDirty) {
+				project.SelectedAnimation.calculateAllFrames(project);
 			}
 
 			newDim = newCanvasSize.getAndSet(null);
@@ -836,10 +840,15 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static List<IDrawable> getRootElementsForRender() {
 		if (currentProject == null) return null;
 		
-		if (leftKeyframesPanel.isVisible()) {
-			return currentProject.getCurrentFrameRootElements();
-		} else {
-			return new ArrayList<IDrawable>(currentProject.rootElements);
+		try {
+			if (leftKeyframesPanel.isVisible()) {
+				return currentProject.getCurrentFrameRootElements();
+			} else {
+				return new ArrayList<IDrawable>(currentProject.rootElements);
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+			return new ArrayList<IDrawable>();
 		}
 	}
 

@@ -601,14 +601,14 @@ public class Element implements IDrawable
 		double x = getTexUStart();
 		double y = getTexVStart();
 		
-		x += leftFace.uvWidth();
+		if (leftFace.isEnabled()) x += leftFace.uvWidth();
 		
 		aboveFace.textureU = x;
 		aboveFace.textureV = y;
 		aboveFace.updateUV();
 		
 		// Row 2
-		y += aboveFace.uvHeight();
+		if (aboveFace.isEnabled()) y += aboveFace.uvHeight();
 		y = Math.ceil(y * scale.H) / scale.H;
 		
 		x = getTexUStart();
@@ -617,19 +617,19 @@ public class Element implements IDrawable
 		leftFace.textureV = y;
 		leftFace.updateUV();
 		
-		x += leftFace.uvWidth();
+		if (leftFace.isEnabled()) x += leftFace.uvWidth();
 		
 		centerFace.textureU = x;
 		centerFace.textureV = y;
 		centerFace.updateUV();
 		
-		x += centerFace.uvWidth();
+		if (centerFace.isEnabled()) x += centerFace.uvWidth();
 		
 		rightFace.textureU = x;
 		rightFace.textureV = y;
 		rightFace.updateUV();
 		
-		x += rightFace.uvWidth();
+		if (rightFace.isEnabled()) x += rightFace.uvWidth();
 		
 		veryRightFace.textureU = x;
 		veryRightFace.textureV = y;
@@ -637,7 +637,9 @@ public class Element implements IDrawable
 
 		
 		// Row 3
-		x = getTexUStart() + leftFace.uvWidth();
+		x = getTexUStart();
+		if (leftFace.isEnabled()) x+= leftFace.uvWidth();
+		
 		y += Math.max(leftFace.uvHeight(), Math.max(centerFace.uvHeight(), Math.max(rightFace.uvHeight(), veryRightFace.uvHeight())));
 		y = Math.ceil(y * scale.H) / scale.H;
 		
