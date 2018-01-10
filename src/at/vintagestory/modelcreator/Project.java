@@ -90,7 +90,7 @@ public class Project
 		return -1;
 	}
 	
-	public KeyframeElement getSelectedKeyFrameElement() {
+	public KeyFrameElement getSelectedKeyFrameElement() {
 		if (SelectedAnimation == null || SelectedElement == null) return null;
 		
 		return SelectedAnimation.GetOrCreateKeyFrameElement(SelectedElement);
@@ -103,7 +103,7 @@ public class Project
 	}
 	
 	
-	public KeyframeElement GetKeyFrameElement(Element elem, int index) {
+	public KeyFrameElement GetKeyFrameElement(Element elem, int index) {
 		if (SelectedAnimation == null) return null;		
 		Keyframe keyFrame = SelectedAnimation.keyframes[index];
 		if (keyFrame == null) return null;

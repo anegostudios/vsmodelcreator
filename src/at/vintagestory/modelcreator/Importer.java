@@ -25,7 +25,7 @@ import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.Keyframe;
-import at.vintagestory.modelcreator.model.KeyframeElement;
+import at.vintagestory.modelcreator.model.KeyFrameElement;
 import at.vintagestory.modelcreator.model.PendingTexture;
 import java.util.ArrayList;
 
@@ -295,7 +295,7 @@ public class Importer
 			Set<Entry<String, JsonElement>> elems = obj.get("elements").getAsJsonObject().entrySet();
 			
 			for (Entry<String, JsonElement> elem : elems) {
-				KeyframeElement keyframeElem = readKeyframeElemenet(elem.getValue().getAsJsonObject(), elem.getKey());
+				KeyFrameElement keyframeElem = readKeyframeElemenet(elem.getValue().getAsJsonObject(), elem.getKey());
 				
 				if(!keyframe.AddElementFromImport(project, keyframeElem)) {
 					missingAnimationElements.add(keyframeElem.AnimatedElementName);
@@ -306,9 +306,9 @@ public class Importer
 		return keyframe;
 	}
 	
-	private KeyframeElement readKeyframeElemenet(JsonObject obj, String name)
+	private KeyFrameElement readKeyframeElemenet(JsonObject obj, String name)
 	{
-		KeyframeElement kelem = new KeyframeElement(true);
+		KeyFrameElement kelem = new KeyFrameElement(true);
 		
 		kelem.AnimatedElementName = name;
 		

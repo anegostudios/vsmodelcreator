@@ -10,7 +10,7 @@ import javax.swing.JToggleButton;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
-import at.vintagestory.modelcreator.model.KeyframeElement;
+import at.vintagestory.modelcreator.model.KeyFrameElement;
 
 public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 {
@@ -105,7 +105,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		if (ModelCreator.currentProject.PlayAnimation) return;
 		
 		
-		KeyframeElement keyframeElem = enabled ? ModelCreator.currentProject.SelectedAnimation.GetKeyFrameElement(elem, ModelCreator.currentProject.SelectedAnimation.currentFrame) : null;
+		KeyFrameElement keyframeElem = enabled ? ModelCreator.currentProject.SelectedAnimation.GetKeyFrameElement(elem, ModelCreator.currentProject.SelectedAnimation.currentFrame) : null;
 		
 		panelPosition.enabled = enabled && keyframeElem != null && keyframeElem.PositionSet;
 		panelRotation.enabled = enabled && keyframeElem != null && keyframeElem.RotationSet;
@@ -125,7 +125,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 	}
 	
 
-	public KeyframeElement getCurrentElement()
+	public KeyFrameElement getCurrentElement()
 	{
 		if (ModelCreator.manager == null) return null;
 		

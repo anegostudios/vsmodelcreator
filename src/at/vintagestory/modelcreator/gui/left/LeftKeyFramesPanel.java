@@ -37,7 +37,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Keyframe;
-import at.vintagestory.modelcreator.model.KeyframeElement;
+import at.vintagestory.modelcreator.model.KeyFrameElement;
 
 public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 {
@@ -118,7 +118,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 				
 				if (keyFrame == null) return "";
 				
-				KeyframeElement keyframElem = keyFrame.GetKeyFrameElement(ModelCreator.currentProject.SelectedElement);
+				KeyFrameElement keyframElem = keyFrame.GetKeyFrameElement(ModelCreator.currentProject.SelectedElement);
 				
 				if (keyframElem == null) return "";
 

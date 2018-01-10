@@ -15,7 +15,7 @@ import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 
-public class KeyframeElement implements IDrawable
+public class KeyFrameElement implements IDrawable
 {
 	// Persistent kf-elem data
 	public String AnimatedElementName;
@@ -44,24 +44,24 @@ public class KeyframeElement implements IDrawable
 	
 	public Element AnimatedElement;
 	public int FrameNumber;
-	KeyframeElement ParentElement;
+	KeyFrameElement ParentElement;
 	public boolean IsKeyFrame;
 	
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();
 
 	
-	public KeyframeElement(boolean IsKeyFrame) {
+	public KeyFrameElement(boolean IsKeyFrame) {
 		this.IsKeyFrame = IsKeyFrame; 
 	}
 	
 	
-	public KeyframeElement GetOrCreateChildElement(Element forElement) {
+	public KeyFrameElement GetOrCreateChildElement(Element forElement) {
 		for (IDrawable elem : ChildElements) {
-			if (((KeyframeElement)elem).AnimatedElement == forElement) return (KeyframeElement)elem;
+			if (((KeyFrameElement)elem).AnimatedElement == forElement) return (KeyFrameElement)elem;
 		}
 		
-		KeyframeElement elem = new KeyframeElement(forElement, IsKeyFrame);
+		KeyFrameElement elem = new KeyFrameElement(forElement, IsKeyFrame);
 		ChildElements.add(elem);
 		elem.ParentElement = this;
 		if (IsKeyFrame) ModelCreator.DidModify();
@@ -70,7 +70,7 @@ public class KeyframeElement implements IDrawable
 	}
 	
 	
-	public KeyframeElement(Element cuboid, boolean IsKeyFrame)
+	public KeyFrameElement(Element cuboid, boolean IsKeyFrame)
 	{
 		this.AnimatedElement = cuboid;
 		this.AnimatedElementName = cuboid.name;
@@ -82,7 +82,7 @@ public class KeyframeElement implements IDrawable
 		boolean useless = !PositionSet && !RotationSet && !StretchSet;
 		
 		for (IDrawable elem : ChildElements) {
-			KeyframeElement kf = (KeyframeElement)elem;
+			KeyFrameElement kf = (KeyFrameElement)elem;
 			useless &= kf.IsUseless();
 		}
 		
@@ -419,8 +419,8 @@ public class KeyframeElement implements IDrawable
 	}
 
 	
-	public KeyframeElement clone(boolean iskeyframe, boolean withElementReference) {
-		KeyframeElement cloned = new KeyframeElement(iskeyframe);
+	public KeyFrameElement clone(boolean iskeyframe, boolean withElementReference) {
+		KeyFrameElement cloned = new KeyFrameElement(iskeyframe);
 		
 		cloned.AnimatedElementName = AnimatedElement == null ? AnimatedElementName : ((Element)AnimatedElement).name;
 		cloned.AnimatedElement = AnimatedElement;
@@ -441,7 +441,7 @@ public class KeyframeElement implements IDrawable
 		cloned.originZ = originZ;
 		
 		for (IDrawable dw : ChildElements) {
-			cloned.ChildElements.add((IDrawable)((KeyframeElement)dw).clone(iskeyframe, withElementReference));
+			cloned.ChildElements.add((IDrawable)((KeyFrameElement)dw).clone(iskeyframe, withElementReference));
 		}
 		
 		cloned.FrameNumber = FrameNumber;
@@ -449,7 +449,7 @@ public class KeyframeElement implements IDrawable
 	}
 	
 	
-	public void setFrom(KeyframeElement kelem) {
+	public void setFrom(KeyFrameElement kelem) {
 		AnimatedElementName = kelem.AnimatedElementName;
 		PositionSet = kelem.PositionSet;
 		RotationSet = kelem.RotationSet;

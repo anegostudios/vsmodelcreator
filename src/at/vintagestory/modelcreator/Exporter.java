@@ -17,7 +17,7 @@ import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.Keyframe;
-import at.vintagestory.modelcreator.model.KeyframeElement;
+import at.vintagestory.modelcreator.model.KeyFrameElement;
 import at.vintagestory.modelcreator.model.TextureEntry;
 
 public class Exporter
@@ -228,7 +228,7 @@ public class Exporter
 		writer.newLine();
 		
 		
-		List<KeyframeElement> keyframeElementsFlat = new ArrayList<KeyframeElement>();
+		List<KeyFrameElement> keyframeElementsFlat = new ArrayList<KeyFrameElement>();
 		
 		collapseKeyFrameElements(keyframe.Elements, keyframeElementsFlat);
 		
@@ -248,10 +248,10 @@ public class Exporter
 	}
 	
 	
-	private void collapseKeyFrameElements(List<IDrawable> kfTree, List<KeyframeElement> kfList)
+	private void collapseKeyFrameElements(List<IDrawable> kfTree, List<KeyFrameElement> kfList)
 	{
 		for (int i = 0; i < kfTree.size(); i++) {
-			KeyframeElement kElem = (KeyframeElement)kfTree.get(i);
+			KeyFrameElement kElem = (KeyFrameElement)kfTree.get(i);
 			
 			if (!kElem.IsUseless()) {
 				kfList.add(kElem);
@@ -262,7 +262,7 @@ public class Exporter
 	}
 
 
-	private void writeKeyFrameElement(BufferedWriter writer, KeyframeElement kElem, int indent) throws IOException
+	private void writeKeyFrameElement(BufferedWriter writer, KeyFrameElement kElem, int indent) throws IOException
 	{
 		writer.write(space(indent) + "\"" + kElem.AnimatedElement.name + "\": { ");
 		

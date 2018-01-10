@@ -20,10 +20,10 @@ public class Keyframe
 	}
 	
 	
-	public boolean AddElementFromImport(Project project, KeyframeElement keyfElem) {
+	public boolean AddElementFromImport(Project project, KeyFrameElement keyfElem) {
 		Element elem = project.findElement(keyfElem.AnimatedElementName);
 		if (elem != null) {
-			KeyframeElement kelem = GetOrCreateKeyFrameElement(elem);
+			KeyFrameElement kelem = GetOrCreateKeyFrameElement(elem);
 			kelem.setFrom(keyfElem);
 			return true;
 		}
@@ -31,13 +31,13 @@ public class Keyframe
 		return false;
 	}
 	
-	public void AddElementDirectly(KeyframeElement keyfElem) {
+	public void AddElementDirectly(KeyFrameElement keyfElem) {
 		Elements.add(keyfElem);
 		if (IsKeyFrame) ModelCreator.DidModify();
 	}
 	
-	public void RemoveElement(KeyframeElement element) {
-		KeyframeElement parentElem = (KeyframeElement)element.ParentElement;
+	public void RemoveElement(KeyFrameElement element) {
+		KeyFrameElement parentElem = (KeyFrameElement)element.ParentElement;
 		
 		if (parentElem == null) {
 			Elements.remove(element);
@@ -55,18 +55,18 @@ public class Keyframe
 		return Elements.size() > 0;
 	}
 	
-	public KeyframeElement GetKeyFrameElement(Element forElem) {
+	public KeyFrameElement GetKeyFrameElement(Element forElem) {
 		return GetKeyFrameElement(Elements, forElem);
 	}
 	
-	KeyframeElement GetKeyFrameElement(List<IDrawable> elems, Element forElem) {
-		KeyframeElement kElem;
+	KeyFrameElement GetKeyFrameElement(List<IDrawable> elems, Element forElem) {
+		KeyFrameElement kElem;
 		for (int i = 0; i < elems.size(); i++) {
-			kElem = (KeyframeElement)elems.get(i);
+			kElem = (KeyFrameElement)elems.get(i);
 			if (kElem != null && kElem.AnimatedElement == forElem) return kElem;
 			
 			if (kElem.ChildElements != null) {
-				KeyframeElement childKelem = GetKeyFrameElement(kElem.ChildElements, forElem);
+				KeyFrameElement childKelem = GetKeyFrameElement(kElem.ChildElements, forElem);
 				if (childKelem != null) return childKelem;
 			}
 		}
@@ -76,8 +76,8 @@ public class Keyframe
 	
 	
 	
-	public KeyframeElement GetOrCreateKeyFrameElement(Element forElem) { 
-		KeyframeElement keyframeElem = GetKeyFrameElement(forElem);
+	public KeyFrameElement GetOrCreateKeyFrameElement(Element forElem) { 
+		KeyFrameElement keyframeElem = GetKeyFrameElement(forElem);
 		
 		if (keyframeElem != null) {
 			return keyframeElem;
@@ -87,15 +87,15 @@ public class Keyframe
 		
 		
 		if (path.size() == 0) {
-			keyframeElem = new KeyframeElement(forElem, true);
+			keyframeElem = new KeyFrameElement(forElem, true);
 			AddElementDirectly(keyframeElem);	
 			ModelCreator.DidModify();
 		} else if (path.size() == 1) {
-			KeyframeElement parent = GetOrCreateKeyFrameElement(path.get(0));
+			KeyFrameElement parent = GetOrCreateKeyFrameElement(path.get(0));
 			keyframeElem = parent.GetOrCreateChildElement(forElem);
 			
 		} else {
-			KeyframeElement parent = GetOrCreateKeyFrameElement(path.get(0));
+			KeyFrameElement parent = GetOrCreateKeyFrameElement(path.get(0));
 			path.remove(0);
 			
 			while (path.size() > 0) {
@@ -131,7 +131,7 @@ public class Keyframe
 	
 	void setFrameNumber(int frameNumber, List<IDrawable> elements) {
 		for (IDrawable elem : elements) {
-			KeyframeElement kelem = (KeyframeElement)elem;
+			KeyFrameElement kelem = (KeyFrameElement)elem;
 			kelem.FrameNumber = frameNumber;
 			setFrameNumber(frameNumber, kelem.ChildElements);
 		}
@@ -147,7 +147,7 @@ public class Keyframe
 		cloned.FrameNumber = FrameNumber;
 		
 		for (IDrawable dw : Elements) {
-			cloned.Elements.add((IDrawable) ((KeyframeElement)dw).clone(iskeyframe, withElementReference));
+			cloned.Elements.add((IDrawable) ((KeyFrameElement)dw).clone(iskeyframe, withElementReference));
 		}
 		
 		

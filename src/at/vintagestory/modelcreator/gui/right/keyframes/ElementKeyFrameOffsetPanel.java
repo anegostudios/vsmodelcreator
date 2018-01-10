@@ -17,7 +17,7 @@ import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
-import at.vintagestory.modelcreator.model.KeyframeElement;
+import at.vintagestory.modelcreator.model.KeyFrameElement;
 import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
@@ -74,7 +74,7 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		xPositionField.setHorizontalAlignment(JTextField.CENTER);
 		
 		AwtUtil.addChangeListener(xPositionField, e -> {
-			KeyframeElement element = keyFramesPanel.getCurrentElement();
+			KeyFrameElement element = keyFramesPanel.getCurrentElement();
 			if (element == null) return;
 			
 			String text = xPositionField.getText(); 			
@@ -104,7 +104,7 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		yPositionField.setHorizontalAlignment(JTextField.CENTER);
 		
 		AwtUtil.addChangeListener(yPositionField, e -> {
-			KeyframeElement element = keyFramesPanel.getCurrentElement();
+			KeyFrameElement element = keyFramesPanel.getCurrentElement();
 			if (element == null) return;
 			
 			String text = yPositionField.getText(); 			
@@ -134,7 +134,7 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		zPositionField.setHorizontalAlignment(JTextField.CENTER);
 		
 		AwtUtil.addChangeListener(zPositionField, e -> {
-			KeyframeElement element = keyFramesPanel.getCurrentElement();
+			KeyFrameElement element = keyFramesPanel.getCurrentElement();
 			if (element == null) return;
 
 			String text = zPositionField.getText(); 			
@@ -210,7 +210,7 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 	
 	
 	public void modifyPosition(EnumAxis axis, int direction, int modifiers) {
-		KeyframeElement cube = keyFramesPanel.getCurrentElement();
+		KeyFrameElement cube = keyFramesPanel.getCurrentElement();
 		if (cube == null) return;
 		
 		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
@@ -257,12 +257,12 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 	@Override
 	public void updateValues(JComponent byGuiElem)
 	{
-		KeyframeElement cube = keyFramesPanel.getCurrentElement();
+		KeyFrameElement cube = keyFramesPanel.getCurrentElement();
 		toggleFields(cube, byGuiElem);
 	}
 	
 	
-	public void toggleFields(KeyframeElement cube, JComponent byGuiElem) {
+	public void toggleFields(KeyFrameElement cube, JComponent byGuiElem) {
 		boolean enabled = cube != null && this.enabled;
 		btnPlusX.setEnabled(enabled);
 		btnPlusY.setEnabled(enabled);
