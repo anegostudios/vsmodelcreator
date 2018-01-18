@@ -4,7 +4,8 @@ public enum EnumEntityActivityStoppedHandling
 {
 	PlayTillEnd,
 	Rewind,
-	Stop
+	Stop,
+	EaseOut
 	;
 	
 	
