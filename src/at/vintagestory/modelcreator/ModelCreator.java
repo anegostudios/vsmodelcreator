@@ -165,15 +165,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 		});
 
-		addWindowFocusListener(new WindowAdapter()
-		{
-			@Override
-			public void windowGainedFocus(WindowEvent e)
-			{
-				canvas.requestFocusInWindow();
-			}
-		});
-
 		addWindowListener(new WindowAdapter()
 		{
 			@Override
