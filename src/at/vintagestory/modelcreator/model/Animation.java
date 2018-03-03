@@ -456,6 +456,7 @@ public class Animation
 	
 	public String getCode()
 	{
+		if (code == null || code == "null") return name.toLowerCase(); 
 		return code;
 	}
 
