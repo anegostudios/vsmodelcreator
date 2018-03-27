@@ -52,3 +52,4 @@ test.json
 /bin1/
 output-bin/*
 output-jar/*
+/build-signed.bat

@@ -30,18 +30,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <assembly>
-	<id>workdir-solaris</id>
+	<id>workdir-linux64</id>
 	<formats>
 		<format>jar</format>
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
 		<fileSet>
-			<directory>bin/solaris</directory>
-			<outputDirectory>${finalName}-workdir-solaris/bin</outputDirectory>
+			<directory>bin/bin-linux64</directory>
+			<outputDirectory>${finalName}-workdir-linux64/bin</outputDirectory>
 		</fileSet>
-		<fileSet>
-			<outputDirectory>${finalName}-workdir-solaris</outputDirectory>
+		<fileSet>			
+			<outputDirectory>${finalName}-workdir-linux64</outputDirectory>
 			<includes>
 				<include>w32api/**/*</include>
 				<include>w32api_jni/**/*</include>
