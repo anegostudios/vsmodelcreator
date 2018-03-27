@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -127,7 +128,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	}
 	
 	
-	public ModelCreator(String title)
+	public ModelCreator(String title) throws LWJGLException
 	{
 		super(title);
 		
@@ -227,7 +228,24 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		catch (Exception e1)
 		{
 			e1.printStackTrace();
+			JOptionPane.showMessageDialog(
+				null, 
+				"Main loop crashed, please make a screenshot of this message and report it, program will exit now. Sorry about that :(\nException: " + e1 + "\n" + stackTraceToString(e1), 
+				"Crash!", 
+				JOptionPane.ERROR_MESSAGE, 
+				null
+			);
+			System.exit(0);
 		}
+	}
+	
+	public static String stackTraceToString(Throwable e) {
+	    StringBuilder sb = new StringBuilder();
+	    for (StackTraceElement element : e.getStackTrace()) {
+	        sb.append(element.toString());
+	        sb.append("\n");
+	    }
+	    return sb.toString();
 	}
 	
 
@@ -361,18 +379,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		}
 	}
 	
-	public void initDisplay()
+	public void initDisplay() throws LWJGLException
 	{
-		try
-		{
-			Display.setParent(canvas);
-			Display.setVSyncEnabled(true);
-			Display.setInitialBackground(0.92F, 0.92F, 0.93F);
-		}
-		catch (LWJGLException e)
-		{
-			e.printStackTrace();
-		}
+		Display.setParent(canvas);
+		Display.setVSyncEnabled(true);
+		Display.setInitialBackground(0.92F, 0.92F, 0.93F);
 	}
 
 	private void loop() throws Exception

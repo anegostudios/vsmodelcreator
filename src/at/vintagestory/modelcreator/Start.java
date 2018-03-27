@@ -68,8 +68,20 @@ public class Start
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e);
 		}
 
-		new ModelCreator("(untitled) - " + ModelCreator.windowTitle);
+		try {
+			new ModelCreator("(untitled) - " + ModelCreator.windowTitle);	
+		} catch(Exception e1) {
+			JOptionPane.showMessageDialog(
+				null, 
+				"Program crashed, please make a screenshot of this message and report it, program will exit now sorry about that :(\nException: " + e1.getMessage() + "\n" + ModelCreator.stackTraceToString(e1), 
+				"Crash!", 
+				JOptionPane.ERROR_MESSAGE, 
+				null
+			);
+		}
+		
 	}
 }
