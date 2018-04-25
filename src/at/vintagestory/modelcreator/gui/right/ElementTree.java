@@ -9,6 +9,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -74,10 +75,9 @@ public class ElementTree
 	public void selectElement(Element elem) {
 		jtree.clearSelection();
 		
-		@SuppressWarnings("unchecked")
-		Enumeration<DefaultMutableTreeNode> enumer = rootNode.breadthFirstEnumeration();
+		Enumeration<TreeNode> enumer = rootNode.breadthFirstEnumeration();
 		while (enumer.hasMoreElements()) {
-			DefaultMutableTreeNode node = enumer.nextElement();
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode)enumer.nextElement();
 			if (node.getUserObject().equals(elem)) {
 				jtree.setSelectionPath(new TreePath(node.getPath()));
 				break;
@@ -88,11 +88,10 @@ public class ElementTree
 	public void selectElementByOpenGLName(int opengglname) {
 		jtree.clearSelection();
 		
-		@SuppressWarnings("unchecked")
-		Enumeration<DefaultMutableTreeNode> enumer = rootNode.breadthFirstEnumeration();
+		Enumeration<TreeNode> enumer = rootNode.breadthFirstEnumeration();
 		
 		while (enumer.hasMoreElements()) {
-			DefaultMutableTreeNode node = enumer.nextElement();
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode)enumer.nextElement();
 			
 			if (node.getUserObject() instanceof Element) {
 				if (((Element)node.getUserObject()).openGlName == opengglname) {
