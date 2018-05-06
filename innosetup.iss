@@ -5,7 +5,7 @@
 #define MyAppVersion "_"
 #define MyAppPublisher "Anego Systems"
 #define MyAppURL "http://www.vintagestory.at/"
-#define MyAppExeName "VSModelCreator.exe"
+#define MyAppExeName "launch.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -21,7 +21,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DisableProgramGroupPage=yes
 OutputDir=output-installer
-OutputBaseFilename=vsmodelcreator_installer
+OutputBaseFilename=vsmodelcreator_release
 DefaultDirName={pf}\VSModelCreator
 SetupIconFile=assets\appicon.ico
 Compression=lzma

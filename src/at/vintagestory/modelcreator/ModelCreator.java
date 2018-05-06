@@ -17,6 +17,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -147,7 +149,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		setLayout(new BorderLayout(10, 0));
 		setIconImages(getIcons());
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-
+		
 		
 		
 		canvas = new Canvas();
@@ -293,10 +295,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	private List<Image> getIcons()
 	{
 		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("res/icons/set/icon_16x.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("res/icons/set/icon_32x.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("res/icons/set/icon_64x.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("res/icons/set/icon_128x.png"));
+		icons.add(Toolkit.getDefaultToolkit().getImage("assets/appicon_16x.png"));
+		icons.add(Toolkit.getDefaultToolkit().getImage("assets/appicon_32x.png"));
+		icons.add(Toolkit.getDefaultToolkit().getImage("assets/appicon_64x.png"));
+		icons.add(Toolkit.getDefaultToolkit().getImage("assets/appicon_128x.png"));
 		return icons;
 	}
 

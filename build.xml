@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project modelcreator with Jar-in-Jar Loader">
-    <!--this file was created by Eclipse Runnable JAR file Export Wizard-->
-    <!--ANT 1.7 is required-->
+<project default="create_run_jar" name="Create Runnable Jar for Project modelcreator with libraries in sub-folder">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
     <!--define folder properties-->
     <property name="dir.buildfile" value="."/>
     <property name="dir.workspace" value="${dir.buildfile}/.."/>
     <property name="dir.jarfile" value="${dir.buildfile}/output-jar"/>
     <target name="create_run_jar">
-        <jar destfile="${dir.jarfile}/modelcreator.jar">
+        <jar destfile="${dir.jarfile}/vsmodelcreator.jar">
             <manifest>
-                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
-                <attribute name="Rsrc-Main-Class" value="at.vintagestory.modelcreator.Start"/>
-                <attribute name="Class-Path" value="."/>
-                <attribute name="Rsrc-Class-Path" value="./ gson-2.3.1.jar JTattoo-1.6.11.jar lwjgl_util.jar slick-util.jar lwjgl.jar"/>
+                <attribute name="Main-Class" value="at.vintagestory.modelcreator.Start"/>
+                <attribute name="Class-Path" value=". vsmodelcreator_lib/gson-2.3.1.jar vsmodelcreator_lib/JTattoo-1.6.11.jar vsmodelcreator_lib/lwjgl_util.jar vsmodelcreator_lib/slick-util.jar vsmodelcreator_lib/lwjgl.jar"/>
             </manifest>
-            <zipfileset src="jar-in-jar-loader.zip"/>
             <fileset dir="${dir.buildfile}/bin"/>
-            <zipfileset dir="${dir.buildfile}/libs" includes="gson-2.3.1.jar"/>
-            <zipfileset dir="${dir.buildfile}/libs" includes="JTattoo-1.6.11.jar"/>
-            <zipfileset dir="${dir.buildfile}/libs" includes="lwjgl_util.jar"/>
-            <zipfileset dir="${dir.buildfile}/libs" includes="slick-util.jar"/>
-            <zipfileset dir="${dir.buildfile}/libs" includes="lwjgl.jar"/>
         </jar>
+        <delete dir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <mkdir dir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/gson-2.3.1.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/JTattoo-1.6.11.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/lwjgl_util.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/slick-util.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/lwjgl.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
     </target>
 </project>

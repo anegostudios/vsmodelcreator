@@ -169,6 +169,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		btnRemove.setEnabled(cube != null);
 		btnDuplicate.setEnabled(cube != null);
 		
+		ModelCreator.guiMain.itemSaveAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
 	}
 
 	

@@ -53,3 +53,5 @@ test.json
 output-bin/*
 output-jar/*
 /build-signed.bat
+/output-release
+/output-installer
