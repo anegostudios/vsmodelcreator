@@ -134,6 +134,10 @@ public class Element implements IDrawable
 		this.rotationX = cuboid.rotationX;
 		this.rotationY = cuboid.rotationY;
 		this.rotationZ = cuboid.rotationZ;
+		this.renderPass = cuboid.renderPass;
+		this.tintIndex = cuboid.tintIndex;
+		this.unwrapMode = cuboid.unwrapMode;
+		this.unwrapRotation = cuboid.unwrapRotation;
 		
 		this.rescale = cuboid.rescale;
 		this.shade = cuboid.shade;
@@ -151,6 +155,7 @@ public class Element implements IDrawable
 			faces[i].setEnabled(oldFace.isEnabled());
 			faces[i].setAutoUVEnabled(oldFace.isAutoUVEnabled());
 			faces[i].setRotation(oldFace.getRotation());
+			faces[i].setGlow(oldFace.getGlow());
 		}
 		
 		for (Element child : cuboid.ChildElements) {
@@ -693,19 +698,6 @@ public class Element implements IDrawable
 		GL11.glRotated(rotationZ, 0, 0, 1);
 	}
 
-
-	public Element copy()
-	{
-		Element elem = new Element(width, height, depth);
-		elem.shade = shade;
-		elem.tintIndex = tintIndex;
-		elem.renderPass = renderPass;
-		elem.unwrapMode = unwrapMode;
-		elem.unwrapRotation = unwrapRotation;
-		
-		return elem;
-	}
-	
 	
 	public void addStartX(double amt)
 	{
