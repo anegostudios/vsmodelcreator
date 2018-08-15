@@ -256,38 +256,38 @@ public class Face
 	{
 		this.textureU += amt;
 		this.textureUEnd += amt;
-		ModelCreator.DidModify();
+		if (amt != 0) ModelCreator.DidModify();
 	}
 
 	public void moveTextureV(double amt)
 	{
 		this.textureV += amt;
 		this.textureVEnd += amt;
-		ModelCreator.DidModify();
+		if (amt != 0) ModelCreator.DidModify();
 	}
 
 	public void addTextureX(double amt)
 	{
 		this.textureU += amt;
-		ModelCreator.DidModify();
+		if (amt != 0) ModelCreator.DidModify();
 	}
 
 	public void addTextureY(double amt)
 	{
 		this.textureV += amt;
-		ModelCreator.DidModify();
+		if (amt != 0) ModelCreator.DidModify();
 	}
 
 	public void addTextureXEnd(double amt)
 	{
 		this.textureUEnd += amt;
-		ModelCreator.DidModify();
+		if (amt != 0) ModelCreator.DidModify();
 	}
 
 	public void addTextureYEnd(double amt)
 	{
 		this.textureVEnd += amt;
-		ModelCreator.DidModify();
+		if (amt != 0) ModelCreator.DidModify();
 	}
 
 	public double getStartU()

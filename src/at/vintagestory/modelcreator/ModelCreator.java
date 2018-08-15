@@ -12,22 +12,17 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -612,7 +607,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 			
 			
-			if (grabbed == null)
+			if (grabbed == null && Mouse.isButtonDown(0))
 			{
 				int openGlName = getElementGLNameAtPos(Mouse.getX(), Mouse.getY());
 				if (openGlName >= 0)
@@ -716,11 +711,13 @@ public class ModelCreator extends JFrame implements ITextureCallback
 						}
 					}
 
-					if (xMovement != 0)
+					if (xMovement != 0) {
 						lastMouseX = newMouseX;
-					if (yMovement != 0)
+					}
+					if (yMovement != 0) {
 						lastMouseY = newMouseY;
-
+					}
+					
 					updateValues(null);
 					element.updateUV();
 				}

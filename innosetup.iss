@@ -20,14 +20,14 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DisableProgramGroupPage=yes
-OutputDir=output-installer
-OutputBaseFilename=vsmodelcreator_release
+OutputDir=output-release
+OutputBaseFilename=vsmodelcreator_installer
 DefaultDirName={pf}\VSModelCreator
 SetupIconFile=assets\appicon.ico
 Compression=lzma
 SolidCompression=yes
 DirExistsWarning=no
-SignTool=kSign /d $qVintage Story Installer$q /du $qhttps://www.vintagestory.at$q $f
+SignTool=signtool /d $qVintage Story Installer$q /du $qhttps://www.vintagestory.at$q $f
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

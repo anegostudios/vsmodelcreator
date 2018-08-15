@@ -232,7 +232,7 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		Face[] faces = elem.getAllFaces();
 
-		if(!Mouse.isButtonDown(0)) {
+		if(!Mouse.isButtonDown(0) && !Mouse.isButtonDown(1)) {
 			grabbedFaceIndex = getGrabbedFace(elem, canvasHeight, Mouse.getX(), Mouse.getY());
 		}
 		
@@ -369,17 +369,28 @@ public class LeftUVSidebar extends LeftSidebar
 	public void handleInput()
 	{
 		super.handleInput();
+		boolean nowGrabbing = Mouse.isButtonDown(0) || Mouse.isButtonDown(1);
 		
-		if (ModelCreator.currentProject.EntityTextureMode && !grabbing) {
+		if (ModelCreator.currentProject.EntityTextureMode && !nowGrabbing) {
 			grabbedElement = findElement(ModelCreator.currentProject.rootElements, Mouse.getX() - 10, (canvasHeight - Mouse.getY()) - 30);
+			
 		}
-		if (!ModelCreator.currentProject.EntityTextureMode) {
+		if (!ModelCreator.currentProject.EntityTextureMode && !nowGrabbing) {
 			grabbedElement = ModelCreator.currentProject.SelectedElement;
 		}
 		
-		boolean newGrabbing = Mouse.isButtonDown(0) || Mouse.isButtonDown(1);
 		
-		if (!grabbing && newGrabbing) {
+		
+		if (!grabbing && nowGrabbing) {
+			if (ModelCreator.currentProject.EntityTextureMode) {
+				grabbedElement = findElement(ModelCreator.currentProject.rootElements, Mouse.getX() - 10, (canvasHeight - Mouse.getY()) - 30);
+			}
+			else {
+				grabbedElement = ModelCreator.currentProject.SelectedElement;
+			}
+			
+			if (grabbedElement == null) return;
+			
 			this.lastMouseX = Mouse.getX();
 			this.lastMouseY = Mouse.getY();
 			
@@ -387,19 +398,18 @@ public class LeftUVSidebar extends LeftSidebar
 			if (!ModelCreator.currentProject.EntityTextureMode) {
 				grabbedFaceIndex = getGrabbedFace(grabbedElement, canvasHeight, lastMouseX, lastMouseY);	
 			}
-			
 		}
 		
-		grabbing = newGrabbing;
-
+		grabbing = nowGrabbing;
+		if (grabbedElement == null) return;
+		
+		
 		if (grabbing)
 		{
 			int newMouseX = Mouse.getX();
-			int newMouseY = Mouse.getY();
-			
+			int newMouseY = Mouse.getY();			
 			int xMovement = 0;
 			int yMovement = 0;
-			
 			
 
 			if (ModelCreator.currentProject.EntityTextureMode) {
@@ -429,12 +439,8 @@ public class LeftUVSidebar extends LeftSidebar
 				}
 			} else {
 
-				Element cube = manager.getCurrentElement();
-				if (cube == null) return;
-				
-				
 				if (grabbedFaceIndex == -1) return;
-				Face face = cube.getAllFaces()[grabbedFaceIndex];
+				Face face = grabbedElement.getAllFaces()[grabbedFaceIndex];
 				
 				Sized texSize = GetBlockTextureModeTextureSize();
 				

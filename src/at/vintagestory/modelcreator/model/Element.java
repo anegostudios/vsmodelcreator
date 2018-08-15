@@ -73,14 +73,13 @@ public class Element implements IDrawable
 
 	// Extra Variables
 	protected boolean shade = true;
-	private int tintIndex = 0;
-	private int renderPass = -1;
-
-	// Rotation Point Indicator
-	protected Sphere sphere = new Sphere();
-	
+	protected int tintIndex = 0;
+	protected int renderPass = -1;
 	protected int unwrapMode;
 	protected int unwrapRotation;
+	
+	// Rotation Point Indicator
+	protected Sphere sphere = new Sphere();
 	
 	
 	public float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 };
@@ -533,9 +532,6 @@ public class Element implements IDrawable
 
 
 	void setUnwrappedCubeUV() {
-		
-		
-		
 		if (unwrapMode == 0) {
 			performDefaultUVUnwrapping();
 			return;
@@ -700,7 +696,14 @@ public class Element implements IDrawable
 
 	public Element copy()
 	{
-		return new Element(width, height, depth);
+		Element elem = new Element(width, height, depth);
+		elem.shade = shade;
+		elem.tintIndex = tintIndex;
+		elem.renderPass = renderPass;
+		elem.unwrapMode = unwrapMode;
+		elem.unwrapRotation = unwrapRotation;
+		
+		return elem;
 	}
 	
 	
