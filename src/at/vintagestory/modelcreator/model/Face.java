@@ -257,6 +257,8 @@ public class Face
 	{
 		this.textureU += amt;
 		this.textureUEnd += amt;
+		cuboid.updateUV();
+		
 		if (amt != 0) ModelCreator.DidModify();
 	}
 
@@ -264,30 +266,40 @@ public class Face
 	{
 		this.textureV += amt;
 		this.textureVEnd += amt;
+		cuboid.updateUV();
+		
 		if (amt != 0) ModelCreator.DidModify();
 	}
 
 	public void addTextureX(double amt)
 	{
 		this.textureU += amt;
+		cuboid.updateUV();
+		
 		if (amt != 0) ModelCreator.DidModify();
 	}
 
 	public void addTextureY(double amt)
 	{
 		this.textureV += amt;
+		cuboid.updateUV();
+		
 		if (amt != 0) ModelCreator.DidModify();
 	}
 
 	public void addTextureXEnd(double amt)
 	{
 		this.textureUEnd += amt;
+		cuboid.updateUV();
+		
 		if (amt != 0) ModelCreator.DidModify();
 	}
 
 	public void addTextureYEnd(double amt)
 	{
 		this.textureVEnd += amt;
+		cuboid.updateUV();
+		
 		if (amt != 0) ModelCreator.DidModify();
 	}
 
@@ -531,6 +543,7 @@ public class Face
 		cloned.cuboid = forElement;
 		cloned.side = side;
 		cloned.glow = glow;
+		cloned.snapUV = snapUV;
 		return cloned;
 	}
 	

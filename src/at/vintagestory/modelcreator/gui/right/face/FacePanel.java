@@ -156,5 +156,10 @@ public class FacePanel extends JPanel implements IValueUpdater
 		panelFaceExtras.updateValues(byGuiElem);
 		panelElemUV.updateValues(byGuiElem);
 		panelElemUV.setVisible(ModelCreator.currentProject.EntityTextureMode);
+		
+		boolean manualUnwrap = !ModelCreator.currentProject.EntityTextureMode || cube == null || !cube.isAutoUnwrapEnabled() || !cube.getSelectedFace().isAutoUVEnabled();
+		panelFaceUV.setVisible(manualUnwrap);
+		sliderPanel.setVisible(manualUnwrap);
+		
 	}
 }

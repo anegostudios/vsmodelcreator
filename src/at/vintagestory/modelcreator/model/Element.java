@@ -615,7 +615,10 @@ public class Element implements IDrawable
 		double x = getTexUStart();
 		double y = getTexVStart();
 		
-		if (leftFace.isEnabled()) x += leftFace.uvWidth();
+		if (leftFace.isEnabled()) { 
+			x += leftFace.uvWidth();
+			x = Math.ceil(x * scale.W) / scale.W;
+		}
 		
 		aboveFace.textureU = x;
 		aboveFace.textureV = y;
@@ -623,7 +626,7 @@ public class Element implements IDrawable
 		
 		// Row 2
 		if (aboveFace.isEnabled()) y += aboveFace.uvHeight();
-		if (aboveFace.isSnapUvEnabled()) y = Math.ceil(y * scale.H) / scale.H;
+		y = Math.ceil(y * scale.H) / scale.H;
 		
 		x = getTexUStart();
 		
@@ -631,19 +634,28 @@ public class Element implements IDrawable
 		leftFace.textureV = y;
 		leftFace.updateUV();
 		
-		if (leftFace.isEnabled()) x += leftFace.uvWidth();
+		if (leftFace.isEnabled()) {
+			x += leftFace.uvWidth();
+			x = Math.ceil(x * scale.W) / scale.W;
+		}
 		
 		centerFace.textureU = x;
 		centerFace.textureV = y;
 		centerFace.updateUV();
 		
-		if (centerFace.isEnabled()) x += centerFace.uvWidth();
+		if (centerFace.isEnabled()) {
+			x += centerFace.uvWidth();
+			x = Math.ceil(x * scale.W) / scale.W;
+		}
 		
 		rightFace.textureU = x;
 		rightFace.textureV = y;
 		rightFace.updateUV();
 		
-		if (rightFace.isEnabled()) x += rightFace.uvWidth();
+		if (rightFace.isEnabled()) {
+			x += rightFace.uvWidth();
+			x = Math.ceil(x * scale.W) / scale.W;
+		}
 		
 		veryRightFace.textureU = x;
 		veryRightFace.textureV = y;
@@ -652,10 +664,13 @@ public class Element implements IDrawable
 		
 		// Row 3
 		x = getTexUStart();
-		if (leftFace.isEnabled()) x+= leftFace.uvWidth();
+		if (leftFace.isEnabled()) {
+			x+= leftFace.uvWidth();
+			x = Math.ceil(x * scale.W) / scale.W;
+		}
 		
 		y += Math.max(leftFace.uvHeight(), Math.max(centerFace.uvHeight(), Math.max(rightFace.uvHeight(), veryRightFace.uvHeight())));
-		if (leftFace.isSnapUvEnabled()) y = Math.ceil(y * scale.H) / scale.H;
+		y = Math.ceil(y * scale.H) / scale.H;
 		
 		belowFace.textureU = x;
 		belowFace.textureV = y;
@@ -664,6 +679,8 @@ public class Element implements IDrawable
 	
 	private void performDefaultUVUnwrapping()
 	{
+		Sized scale = faces[0].getVoxel2PixelScale();
+		
 		double x = getTexUStart();
 		double y = getTexVStart();
 		double maxTexHeight = 0;
@@ -677,6 +694,8 @@ public class Element implements IDrawable
 			x += faces[4].uvWidth();
 		}
 		
+		x = Math.ceil(x * scale.W) / scale.W;
+		
 		if (faces[5].isEnabled() && faces[5].isAutoUVEnabled()) {
 			faces[5].textureU = x;
 			faces[5].textureV = y;
@@ -688,8 +707,8 @@ public class Element implements IDrawable
 		x = getTexUStart();
 		y += maxTexHeight;
 		
-		Sized scale = faces[0].getVoxel2PixelScale();
-		if (faces[4].isSnapUvEnabled() || faces[5].isSnapUvEnabled()) y = Math.ceil(y * scale.H) / scale.H;
+		
+		y = Math.ceil(y * scale.H) / scale.H;
 		
 		for (int side = 0; side < 4; side++) {
 			Face face = faces[side];
@@ -700,6 +719,7 @@ public class Element implements IDrawable
 			face.updateUV();
 			
 			x += face.uvWidth();
+			x = Math.ceil(x * scale.W) / scale.W;
 		}
 	}
 	
@@ -1037,6 +1057,9 @@ public class Element implements IDrawable
 		cloned.sphere = sphere;
 		cloned.texUStart = texUStart;
 		cloned.texVStart = texVStart;
+		cloned.autoUnwrap = autoUnwrap;
+		cloned.unwrapMode = unwrapMode;
+		cloned.unwrapRotation = unwrapRotation;
 		
 		for (int i = 0; i < brightnessByFace.length; i++) {
 			cloned.brightnessByFace[i] = brightnessByFace[i];			

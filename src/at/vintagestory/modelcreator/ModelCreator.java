@@ -107,7 +107,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	private boolean closeRequested = false;
 
 	/* Sidebar Variables */
-	private final int SIDEBAR_WIDTH = 130;
+	private final int SIDEBAR_WIDTH = 4 * 32 + 20;
 	
 	public LeftSidebar uvSidebar;
 	public static GuiMenu guiMain;
@@ -481,7 +481,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		int leftSpacing = 0;
 		if (modelrenderer.renderedLeftSidebar != null) {
-			leftSpacing = project.EntityTextureMode || getHeight() < 805 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
+			leftSpacing = project.EntityTextureMode || getHeight() < 911 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
 		}
 		
 		return leftSpacing;

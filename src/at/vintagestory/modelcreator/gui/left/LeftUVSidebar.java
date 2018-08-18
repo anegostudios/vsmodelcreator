@@ -1,6 +1,5 @@
 package at.vintagestory.modelcreator.gui.left;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
@@ -8,8 +7,6 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glLineWidth;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
@@ -38,7 +35,7 @@ public class LeftUVSidebar extends LeftSidebar
 {
 	private IElementManager manager;
 
-	private final int WIDTH = 110;
+	private final int WIDTH = 4*32;
 
 	private final Color BLACK_ALPHA = new Color(0, 0, 0, 0.75F);
 
@@ -93,6 +90,10 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		texEntry = null;
 		
+		if(!Mouse.isButtonDown(0) && !Mouse.isButtonDown(1)) {
+			grabbedElement = findElement(ModelCreator.currentProject.rootElements, Mouse.getX() - 10, (canvasHeight - Mouse.getY()) - 30);
+		}
+		
 		if (ModelCreator.currentProject.TexturesByCode.size() > 0) {
 			texEntry = ModelCreator.currentProject.TexturesByCode.get(ModelCreator.currentProject.TexturesByCode.keySet().iterator().next());
 		}
@@ -108,6 +109,7 @@ public class LeftUVSidebar extends LeftSidebar
 		{
 			glTranslatef(10, 30, 0);
 
+			
 			glPushMatrix(); {
 				
 				glColor3f(1, 1, 1);
@@ -125,6 +127,7 @@ public class LeftUVSidebar extends LeftSidebar
 				}
 
 				
+				// Background
 				glLineWidth(1F);
 				glBegin(GL_QUADS);
 				{
@@ -141,8 +144,37 @@ public class LeftUVSidebar extends LeftSidebar
 					glVertex2i(0, 0);
 				}
 				glEnd();
-				
 				TextureImpl.bindNone();
+				
+				
+				// Pixel grid
+				if (texEntry == null) {
+					glBegin(GL_LINES);
+					{
+						glColor3f(0.9f, 0.9f, 0.9f);
+						int pixelsW = (int)(ModelCreator.currentProject.TextureWidth * scale.W);
+						int pixelsH = (int)(ModelCreator.currentProject.TextureHeight * scale.H);
+						
+						if (pixelsW <= 64 && pixelsH <= 64) {
+							double sectionWidth = (double)texBoxWidth / pixelsW;
+							for (double i = 0; i <= pixelsW; i++) {
+								glVertex2d(i * sectionWidth, 0);
+								glVertex2d(i * sectionWidth, texBoxHeight);	
+							}
+							
+							double sectionHeight = (double)texBoxHeight / pixelsH;
+							for (double i = 0; i <= pixelsH; i++) {
+								glVertex2d(0, i * sectionHeight);
+								glVertex2d(texBoxWidth, i * sectionHeight);	
+							}
+						}
+						
+	
+					}
+					glEnd();
+				}
+
+				
 				
 				drawElementList(ModelCreator.currentProject.rootElements, texBoxWidth, texBoxHeight, canvasHeight);
 				
@@ -270,6 +302,7 @@ public class LeftUVSidebar extends LeftSidebar
 					Color color = Face.getFaceColour(i);
 					glColor3f(color.r * bright[i], color.g * bright[i], color.b * bright[i]);
 
+					// Texture
 					face.bindTexture();
 
 					glBegin(GL_QUADS);
@@ -288,10 +321,41 @@ public class LeftUVSidebar extends LeftSidebar
 					}
 					glEnd();
 					
-					glEnable(GL_BLEND);
+					
+					// Pixel grid
+					TextureEntry texEntry = face.getTextureEntry();
+					if (texEntry == null) {
+						Sized scale = Face.getVoxel2PixelScale(texEntry);
+						glLineWidth(1F);
+						glBegin(GL_LINES);
+						{
+							GL11.glColor4f(0.9f, 0.9f, 0.9f, 0.3f);
+							int pixelsW = (int)(ModelCreator.currentProject.TextureWidth * scale.W);
+							int pixelsH = (int)(ModelCreator.currentProject.TextureHeight * scale.H);
+							double height = WIDTH * pixelsH/pixelsW;
+							
+							if (pixelsW <= 64 && pixelsH <= 64) {
+								double sectionWidth = (double)WIDTH / pixelsW;
+								for (double k= 0; k <= pixelsW; k++) {
+									glVertex2d(k * sectionWidth, 0);
+									glVertex2d(k * sectionWidth, height);	
+								}
+								
+								double sectionHeight = (double)height / pixelsH;
+								for (double k = 0; k <= pixelsH; k++) {
+									glVertex2d(0, k * sectionHeight);
+									glVertex2d(WIDTH, k * sectionHeight);	
+								}
+							}
+							
+		
+						}
+						glEnd();
+					}					
+					
+					
 					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 					EnumFonts.BEBAS_NEUE_20.drawString(5, 5, Face.getFaceName(i), BLACK_ALPHA);
-					glDisable(GL_BLEND);
 				}
 			
 				glPopMatrix();
@@ -375,8 +439,8 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		if (ModelCreator.currentProject.EntityTextureMode && !nowGrabbing) {
 			grabbedElement = findElement(ModelCreator.currentProject.rootElements, Mouse.getX() - 10, (canvasHeight - Mouse.getY()) - 30);
-			
 		}
+		
 		if (!ModelCreator.currentProject.EntityTextureMode && !nowGrabbing) {
 			grabbedElement = ModelCreator.currentProject.SelectedElement;
 		}
@@ -396,10 +460,15 @@ public class LeftUVSidebar extends LeftSidebar
 			this.lastMouseX = Mouse.getX();
 			this.lastMouseY = Mouse.getY();
 			
-			ModelCreator.currentProject.selectElement(grabbedElement);		
 			if (!ModelCreator.currentProject.EntityTextureMode) {
 				grabbedFaceIndex = getGrabbedFace(grabbedElement, canvasHeight, lastMouseX, lastMouseY);	
 			}
+
+			
+			if (grabbedElement.getSelectedFaceIndex() != grabbedFaceIndex) {
+				grabbedElement.setSelectedFace(grabbedFaceIndex);
+			}
+			ModelCreator.currentProject.selectElement(grabbedElement);	
 		}
 		
 		grabbing = nowGrabbing;
@@ -413,75 +482,77 @@ public class LeftUVSidebar extends LeftSidebar
 			int xMovement = 0;
 			int yMovement = 0;
 			
+			if (!ModelCreator.currentProject.EntityTextureMode && grabbedFaceIndex >= 0) {
+				texEntry = grabbedElement.getAllFaces()[grabbedFaceIndex].getTextureEntry();
+				Sized texSize = GetBlockTextureModeTextureSize();
+				texBoxWidth = (int)texSize.W;
+				texBoxHeight = (int)texSize.H;
+			}
+			
+			Sized scale = Face.getVoxel2PixelScale(texEntry);
+			
 
+			float mousedx = (newMouseX - this.lastMouseX);
+			float mousedy = (newMouseY - this.lastMouseY);
+			
+			int pixelsW = (int)(ModelCreator.currentProject.TextureWidth * scale.W);
+			int pixelsH = (int)(ModelCreator.currentProject.TextureHeight * scale.H);
+			
+			double sectionWidth = (double)texBoxWidth / pixelsW;
+			double sectionHeight = (double)texBoxHeight / pixelsH;
+			
+			xMovement = (int)(mousedx / sectionWidth);
+			yMovement = (int)(mousedy / sectionHeight);
+
+			
 			if (ModelCreator.currentProject.EntityTextureMode) {
-				if (texEntry != null) {
-					xMovement = (int)(texEntry.VoxelWidthWithLwJglFuckery() * (newMouseX - this.lastMouseX) / texBoxWidth);
-					yMovement = (int)(texEntry.VoxelHeighthWithLwJglFuckery() * (newMouseY - this.lastMouseY) / texBoxHeight);					
-				} else {
-					xMovement = (int)(ModelCreator.currentProject.TextureWidth * (newMouseX - this.lastMouseX) / texBoxWidth);
-					yMovement = (int)(ModelCreator.currentProject.TextureHeight * (newMouseY - this.lastMouseY) / texBoxHeight);
-				}
-
-				
 				if ((xMovement != 0 || yMovement != 0) && grabbedElement != null && Mouse.isButtonDown(0))
 				{
 					Face face = null; 
 					if (grabbedFaceIndex >=0) face = grabbedElement.getAllFaces()[grabbedFaceIndex];
-					if (face != null && !face.isAutoUVEnabled()) {
+					if (face != null && !grabbedElement.isAutoUnwrapEnabled()) {
 						
-						face.moveTextureU(xMovement);
-						face.moveTextureV(-yMovement);
+						face.moveTextureU(xMovement / scale.W);
+						face.moveTextureV(-yMovement / scale.H);
 						
 					} else {
-						grabbedElement.setTexUVStart(grabbedElement.getTexUStart() + xMovement, grabbedElement.getTexVStart() - yMovement);	
+						grabbedElement.setTexUVStart(grabbedElement.getTexUStart() + xMovement / scale.W, grabbedElement.getTexVStart() - yMovement / scale.H);	
 					}
-					
-					
 				}
 			} else {
 
 				if (grabbedFaceIndex == -1) return;
 				Face face = grabbedElement.getAllFaces()[grabbedFaceIndex];
 				
-				Sized texSize = GetBlockTextureModeTextureSize();
-				
-				TextureEntry texEntry = face.getTextureEntry();
-				if (texEntry != null) {
-					xMovement = (int)(texEntry.VoxelWidthWithLwJglFuckery() * (newMouseX - this.lastMouseX) / texSize.W);
-					yMovement = (int)(texEntry.VoxelHeighthWithLwJglFuckery() * (newMouseY - this.lastMouseY) / texSize.H);
-				} else {
-					xMovement = (int)(ModelCreator.currentProject.TextureWidth * (newMouseX - this.lastMouseX) / texSize.W);
-					yMovement = (int)(ModelCreator.currentProject.TextureHeight * (newMouseY - this.lastMouseY) / texSize.H);
-				}
-
 				
 				if (Mouse.isButtonDown(0))
 				{
-					face.moveTextureU(xMovement);
-					face.moveTextureV(-yMovement);
+					face.moveTextureU(xMovement / scale.W);
+					face.moveTextureV(-yMovement / scale.H);
 				}
 				else
 				{
 					face.setAutoUVEnabled(false);
 
-					face.addTextureXEnd(xMovement);
-					face.addTextureYEnd(-yMovement);
+					face.addTextureXEnd(xMovement / scale.W);
+					face.addTextureYEnd(-yMovement / scale.H);
 
 					face.setAutoUVEnabled(false);
 				}
 				
 				face.updateUV();
 			}
-				
 
+			
 			if (xMovement != 0) {
-				this.lastMouseX = newMouseX;
-			}
-			if (yMovement != 0) {
-				this.lastMouseY = newMouseY;
+				this.lastMouseX += (int)((int)(mousedx / sectionWidth) * sectionWidth);
 			}
 			
+			if (yMovement != 0) {
+				this.lastMouseY += (int)((int)(mousedy / sectionHeight) * sectionHeight);
+			}
+
+
 			
 			if (xMovement != 0 || yMovement != 0) {
 				ModelCreator.updateValues(null);	

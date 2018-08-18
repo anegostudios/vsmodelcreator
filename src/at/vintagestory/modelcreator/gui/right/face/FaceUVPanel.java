@@ -181,6 +181,8 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
+				
+				
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
 					face.addTextureX(-0.1);
@@ -328,6 +330,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
+		
 		if (cube != null)
 		{
 			xStartField.setEnabled(true);
@@ -338,6 +341,9 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			if (byGuiElem != yStartField) yStartField.setText(df.format(cube.getSelectedFace().getStartV()));
 			if (byGuiElem != xEndField) xEndField.setText(df.format(cube.getSelectedFace().getEndU()));
 			if (byGuiElem != yEndField) yEndField.setText(df.format(cube.getSelectedFace().getEndV()));
+			
+			
+
 		}
 		else
 		{
