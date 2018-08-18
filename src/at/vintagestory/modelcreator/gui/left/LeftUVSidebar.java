@@ -68,7 +68,9 @@ public class LeftUVSidebar extends LeftSidebar
 		if (ModelCreator.transparent) {
 			GL11.glEnable(GL11.GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		}		
+		}	
+		
+		if (ModelCreator.currentProject.rootElements.size() == 0) return;
 
 		if (ModelCreator.currentProject.EntityTextureMode) {
 			drawRectsEntityTextureMode(canvasHeight);

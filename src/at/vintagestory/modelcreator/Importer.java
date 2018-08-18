@@ -428,6 +428,11 @@ public class Importer
 				element.setUnwrapRotation(obj.get("unwrapRotation").getAsInt());
 			}
 			
+			if (obj.has("autoUnwrap") && obj.get("autoUnwrap").isJsonPrimitive())
+			{
+				element.setAutoUnwrap(obj.get("autoUnwrap").getAsBoolean());
+			}
+			
 			
 			if (obj.has("uv") && obj.get("uv").isJsonArray())
 			{
@@ -547,6 +552,10 @@ public class Importer
 				face.setAutoUVEnabled(obj.get("autoUv").getAsBoolean());
 			}
 
+			if (obj.has("snapUv") && obj.get("snapUv").isJsonPrimitive()) {
+				face.setSnapUVEnabled(obj.get("snapUv").getAsBoolean());
+			}
+			
 			if (obj.has("texture") && obj.get("texture").isJsonPrimitive())
 			{
 				String loc = obj.get("texture").getAsString().replace("#", "");

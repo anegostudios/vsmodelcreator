@@ -16,6 +16,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -42,13 +43,11 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 	private JButton btnNegY;
 	private JComboBox<String> menuList;
 	private JPanel unwrapPanel;
-	
-	//private JSlider rotation;
-	//private JPanel sliderPanel;
-	/*private final int ROTATION_MIN = 0;
-	private final int ROTATION_MAX = 3;
-	private final int ROTATION_INIT = 0;*/
-	Checkbox checkbox;
+	JPanel uvCoordPanel;
+	JPanel titlePanel;
+
+	protected Checkbox alternateUnwrap;
+	protected Checkbox autoUnwrap;
 
 	private DecimalFormat df = new DecimalFormat("#.#");
 	
@@ -58,7 +57,6 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 	{
 		this.manager = manager;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>UV Position (all Faces)</b></html>"));
 		setMaximumSize(new Dimension(186, 224));
 		initComponents();
 		initProperties();
@@ -84,8 +82,8 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		model.addElement("Down is front");
 		
 
-		checkbox = new Checkbox("Alternate unwrap direction");
-		checkbox.addItemListener(new ItemListener()
+		alternateUnwrap = new Checkbox("Alternate unwrap direction");
+		alternateUnwrap.addItemListener(new ItemListener()
 		{
 			@Override
 			public void itemStateChanged(ItemEvent e)
@@ -102,9 +100,21 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		});
 		
 		
-		//sliderPanel.add(checkbox);
-		
-		
+		autoUnwrap = new Checkbox("Auto-Unwrap");
+		autoUnwrap.addItemListener(new ItemListener()
+		{
+			@Override
+			public void itemStateChanged(ItemEvent e)
+			{
+				Element elem = manager.getCurrentElement();
+				if (elem == null) return;
+				
+				elem.setAutoUnwrap(e.getStateChange() == 1);
+				elem.updateUV();
+				ModelCreator.updateValues(null);
+				ModelCreator.DidModify();
+			}
+		});
 	}
 
 	public void initProperties()
@@ -235,6 +245,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			{
 				manager.getCurrentElement().setUnwrapMode(menuList.getSelectedIndex());
 				manager.getCurrentElement().updateUV();
+				manager.getCurrentElement().updateUV();
 				updateValues(menuList);
 				ModelCreator.DidModify();
 			}
@@ -246,8 +257,9 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 
 	public void addComponents()
 	{
-		JPanel uvCoordPanel = new JPanel(new GridLayout(3, 4, 4, 4));
+		uvCoordPanel = new JPanel(new GridLayout(3, 4, 4, 4));
 		
+
 		uvCoordPanel.add(btnPlusX);
 		uvCoordPanel.add(btnPlusY);
 		uvCoordPanel.add(xStartField);
@@ -255,26 +267,56 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		uvCoordPanel.add(btnNegX);
 		uvCoordPanel.add(btnNegY);
 		
+
+		titlePanel = new JPanel(new GridLayout(1, 1,1,1));
+		titlePanel.add(new JLabel("<html><b>UV Position (all Faces)</b>"));
+		
+		add(autoUnwrap);
+		add(titlePanel);
 		add(uvCoordPanel);
 		add(unwrapPanel);
-		add(checkbox);
-		//add(sliderPanel);
+		add(alternateUnwrap);
 	}
 
 	@Override
 	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
+		
+		boolean autoUnwrapEnabled = cube != null && cube.isAutoUnwrapEnabled();
 		boolean enabled = cube != null;
 		
-		xStartField.setEnabled(enabled);
-		yStartField.setEnabled(enabled);
-		menuList.setEnabled(enabled);
-		checkbox.setEnabled(enabled);
-
+		xStartField.setEnabled(enabled && autoUnwrapEnabled);
+		yStartField.setEnabled(enabled && autoUnwrapEnabled);
+		menuList.setEnabled(enabled && autoUnwrapEnabled);
+		alternateUnwrap.setEnabled(enabled && autoUnwrapEnabled);
+		btnPlusX.setEnabled(enabled && autoUnwrapEnabled);
+		btnPlusY.setEnabled(enabled && autoUnwrapEnabled);
+		btnNegX.setEnabled(enabled && autoUnwrapEnabled);
+		btnNegY.setEnabled(enabled && autoUnwrapEnabled);
+		
+		unwrapPanel.setVisible(autoUnwrapEnabled);
+		uvCoordPanel.setVisible(autoUnwrapEnabled);
+		menuList.setVisible(autoUnwrapEnabled);
+		alternateUnwrap.setVisible(autoUnwrapEnabled);
+		unwrapPanel.setVisible(autoUnwrapEnabled);
+		titlePanel.setVisible(autoUnwrapEnabled);
+		
+		if (autoUnwrapEnabled) {
+			setMaximumSize(new Dimension(186, 224));
+		} else {
+			setMaximumSize(new Dimension(186, 25));
+		}
+		
+		
+		
+		autoUnwrap.setEnabled(enabled);
+		
 		if (cube != null)
 		{			
-			checkbox.setState(cube.getAlternateUnrwapDir());
+			alternateUnwrap.setState(cube.getAlternateUnrwapDir());
+			autoUnwrap.setState(cube.isAutoUnwrapEnabled());
+			
 			if (byGuiElem != xStartField) xStartField.setText(df.format(cube.getTexUStart()));
 			if (byGuiElem != yStartField) yStartField.setText(df.format(cube.getTexVStart()));
 			if (byGuiElem != menuList) menuList.setSelectedIndex(cube.getUnwrapMode());

@@ -356,6 +356,12 @@ public class Exporter
 				writer.write(space(indentation) + "\"unwrapRotation\": " + cuboid.getUnwrapRotation() + ",");
 				writer.newLine();
 			}
+			if (!cuboid.isAutoUnwrapEnabled())
+			{
+				writer.write(space(indentation) + "\"autoUnwrap\": " + cuboid.isAutoUnwrapEnabled() + ",");
+				writer.newLine();
+			}
+			
 			
 			writer.write(space(indentation) + "\"uv\": [ " + d2s(cuboid.getTexUStart()) + ", " + d2s(cuboid.getTexVStart()) + " ],");
 			writer.newLine();
@@ -461,8 +467,9 @@ public class Exporter
 			writer.write(space(indentation + 1) + "\"" + Face.getFaceName(face.getSide()) + "\": { ");
 			writer.write("\"texture\": \"#" + face.getTextureCode() + "\"");
 			writer.write(", \"uv\": [ " + d2s(face.getStartU()) + ", " + d2s(face.getStartV()) + ", " + d2s(face.getEndU()) + ", " + d2s(face.getEndV()) + " ]");
-			if (face.getRotation() > 0)
+			if (face.getRotation() > 0) {
 				writer.write(", \"rotation\": " + (int) face.getRotation() * 90);
+			}
 			if (face.getGlow() > 0) {
 				writer.write(", \"glow\": " + face.getGlow());
 			}
@@ -472,14 +479,18 @@ public class Exporter
 			if (!face.isAutoUVEnabled()) {
 				writer.write(", \"autoUv\": false");
 			}
+			if (!face.isSnapUvEnabled()) {
+				writer.write(", \"snapUv\": false");
+			}
 			
 			writer.write(" }");
 			if (face.getSide() != cuboid.getLastValidFace())
 			{
 				writer.write(",");
 				writer.newLine();
-			}				
+			}
 		}
+		
 		writer.newLine();
 		writer.write(space(indentation) + "}");
 	}

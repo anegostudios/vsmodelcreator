@@ -28,6 +28,7 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 	private JPanel horizontalBox;
 	private JRadioButton boxEnabled;
 	private JRadioButton boxAutoUV;
+	private JRadioButton boxSnapUv;
 	private JTextField glowValue;
 
 	public FacePropertiesPanel(IElementManager manager)
@@ -56,6 +57,16 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 			manager.getCurrentElement().getSelectedFace().updateUV();
 			ModelCreator.updateValues(boxAutoUV);
 		});
+		
+		
+		boxSnapUv = ComponentUtil.createRadioButton("Snap UV", "<html>Determines if auto-uv should snap the coordinates to pixels on the texture. Disable if your element is very small or want full control over the UV Coordinates<br>Default: On</html>");
+		boxSnapUv.addActionListener(e ->
+		{
+			manager.getCurrentElement().getSelectedFace().setSnapUVEnabled(boxSnapUv.isSelected());
+			manager.getCurrentElement().updateUV();
+			ModelCreator.updateValues(boxSnapUv);
+		});
+		
 		glowValue = new JTextField();
 		
 		
@@ -68,7 +79,9 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 		});
 				
 		horizontalBox.add(boxEnabled);
+		horizontalBox.add(new JLabel(""));
 		horizontalBox.add(boxAutoUV);
+		horizontalBox.add(boxSnapUv);
 		horizontalBox.add(new JLabel("Glow Level"));
 		horizontalBox.add(glowValue);
 		
@@ -84,22 +97,20 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
+		
+		boxEnabled.setEnabled(cube != null);
+		boxEnabled.setSelected(cube != null);
+		boxAutoUV.setEnabled(cube != null);
+		boxAutoUV.setSelected(cube != null);
+		boxSnapUv.setEnabled(cube != null);
+		glowValue.setEnabled(cube != null);
+		
 		if (cube != null)
 		{
-			boxEnabled.setEnabled(true);
 			boxEnabled.setSelected(cube.getSelectedFace().isEnabled());
-			boxAutoUV.setEnabled(true);
 			boxAutoUV.setSelected(cube.getSelectedFace().isAutoUVEnabled());
-			glowValue.setEnabled(true);
+			boxSnapUv.setSelected(cube.getSelectedFace().isSnapUvEnabled());
 			if (byGuiElem != glowValue) glowValue.setText(""+cube.getSelectedFace().getGlow());
-		}
-		else
-		{
-			boxEnabled.setEnabled(false);
-			boxEnabled.setSelected(false);
-			boxAutoUV.setEnabled(false);
-			boxAutoUV.setSelected(false);
-			glowValue.setEnabled(false);
 		}
 	}
 }

@@ -116,6 +116,7 @@ public class Face
 	private boolean cullface = false;
 	private boolean enabled = true;
 	private boolean autoUV = true;
+	private boolean snapUV = true;
 	public int rotation;
 
 	private Element cuboid;
@@ -388,6 +389,21 @@ public class Face
 		this.autoUV = enabled;
 		ModelCreator.DidModify();
 	}
+	
+	
+	public void setSnapUVEnabled(boolean enabled)
+	{
+		if (this.snapUV == enabled) return;
+		
+		this.snapUV = enabled;
+		ModelCreator.DidModify();
+	}
+	
+	public boolean isSnapUvEnabled() {
+		return snapUV;
+	}
+	
+	
 
 	public boolean isBinded()
 	{
@@ -398,35 +414,32 @@ public class Face
 	{
 		if (autoUV)
 		{
-			// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
-			// without messing up the UV map
-			Sized scale = getVoxel2PixelScale(); 
-			
-			if (rotation == 0 || rotation == 2) {
-				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale.W + 0.000001) / scale.W;      // Stupid rounding errors -.-
-				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale.H + 0.000001) / scale.H;	
+			if (snapUV) {
+				// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
+				// without messing up the UV map
+				Sized scale = getVoxel2PixelScale(); 
+				
+				if (rotation == 0 || rotation == 2) {
+					textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale.W + 0.000001) / scale.W;      // Stupid rounding errors -.-
+					textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale.H + 0.000001) / scale.H;	
+				} else {
+					textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale.W + 0.000001) / scale.W;
+					textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale.H + 0.000001) / scale.H;
+				}
 			} else {
-				textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale.W + 0.000001) / scale.W;
-				textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale.H + 0.000001) / scale.H;
+				
+				
+				if (rotation == 0 || rotation == 2) {
+					textureUEnd = textureU + cuboid.getFaceDimension(side).getWidth();
+					textureVEnd = textureV + cuboid.getFaceDimension(side).getHeight();	
+				} else {
+					textureUEnd = textureU + cuboid.getFaceDimension(side).getHeight();
+					textureVEnd = textureV + cuboid.getFaceDimension(side).getWidth();
+				}
 			}
-			
 		}
 	}
 	
-	public boolean isCompatibleToAutoUV() {
-		return
-			(
-				(rotation == 0 || rotation == 2) &&
-				textureUEnd == textureU + cuboid.getFaceDimension(side).getWidth() && 
-				textureVEnd == textureV + cuboid.getFaceDimension(side).getHeight()
-			) ||
-			(
-				(rotation == 1 || rotation == 3) &&
-				textureUEnd == textureU + cuboid.getFaceDimension(side).getHeight() && 
-				textureVEnd == textureV + cuboid.getFaceDimension(side).getWidth()
-			)
-		;
-	}
 
 	public static String getFaceName(int face)
 	{
@@ -522,6 +535,8 @@ public class Face
 	}
 	
 	public double uvWidth() {
+		if (!snapUV) return Math.abs(textureUEnd - textureU);
+		
 		// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
 		// without messing up the UV map
 		Sized scale = getVoxel2PixelScale();
@@ -530,6 +545,8 @@ public class Face
 	}
 	
 	public double uvHeight() {
+		if (!snapUV) return Math.abs(textureVEnd - textureV);
+		
 		// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
 		// without messing up the UV map
 		Sized scale = getVoxel2PixelScale();

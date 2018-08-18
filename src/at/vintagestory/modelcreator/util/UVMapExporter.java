@@ -44,10 +44,10 @@ public class UVMapExporter
 
 	private void drawElementFace(BufferedImage img, Face face, Element elem)
 	{
-		int startX = clamped((int)(face.getStartU() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureWidth * ModelCreator.noTexScale));
-		int startY = clamped((int)(face.getStartV() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureHeight * ModelCreator.noTexScale));
-		int endX = clamped((int)(face.getEndU() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureWidth * ModelCreator.noTexScale));
-		int endY = clamped((int)(face.getEndV() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureHeight * ModelCreator.noTexScale));
+		double startX = clamped((face.getStartU() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureWidth * ModelCreator.noTexScale));
+		double startY = clamped((face.getStartV() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureHeight * ModelCreator.noTexScale));
+		double endX = clamped((face.getEndU() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureWidth * ModelCreator.noTexScale));
+		double endY = clamped((face.getEndV() * ModelCreator.noTexScale), 0, (int)(ModelCreator.currentProject.TextureHeight * ModelCreator.noTexScale));
 		
 		Color color = face.getFaceColor();
 		int r = (int)(255 * color.r * elem.brightnessByFace[face.getSide()]);
@@ -56,17 +56,21 @@ public class UVMapExporter
 		
 		int rgba = 76 << 24 | r << 16 | g << 8 | b;
 		
-		for (int x = Math.min(startX, endX); x < Math.max(startX, endX); x++) {
-			for (int y = Math.min(startY, endY); y < Math.max(startY, endY); y++) {
+		int minX = (int)Math.min(startX, endX);
+		int minY = (int)Math.min(startY, endY);
+		
+		int maxX = (int)Math.ceil(Math.max(startX, endX));
+		int maxY = (int)Math.ceil(Math.max(startY, endY));
+		
+		for (int x = minX; x < maxX; x++) {
+			for (int y = minY; y < maxY; y++) {
 				img.setRGB(x, y, rgba);
 			}
 		}
-		
-		//GL11.glColor4f(color.r * elem.brightnessByFace[i], color.g * elem.brightnessByFace[i], color.b * elem.brightnessByFace[i], 0.3f);
 	}
 	
 	
-	int clamped(int val, int min, int max) {
+	double clamped(double val, double min, double max) {
 		return Math.max(min, Math.min(val, max));
 	}
 

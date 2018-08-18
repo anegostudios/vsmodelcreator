@@ -60,6 +60,7 @@ public class Element implements IDrawable
 	protected Face[] faces = new Face[6];
 	private double texUStart;
 	private double texVStart;
+	protected boolean autoUnwrap = true;
 
 	// Element Variables
 	protected double startX = 0.0, startY = 0.0, startZ = 0.0;
@@ -138,6 +139,7 @@ public class Element implements IDrawable
 		this.tintIndex = cuboid.tintIndex;
 		this.unwrapMode = cuboid.unwrapMode;
 		this.unwrapRotation = cuboid.unwrapRotation;
+		this.autoUnwrap = cuboid.autoUnwrap;
 		
 		this.rescale = cuboid.rescale;
 		this.shade = cuboid.shade;
@@ -187,6 +189,17 @@ public class Element implements IDrawable
 	public int getSelectedFaceIndex()
 	{
 		return selectedFace;
+	}
+	
+	public void setAutoUnwrap(boolean enabled) {
+		if (autoUnwrap == enabled) return;
+		
+		this.autoUnwrap = enabled;
+		ModelCreator.DidModify();
+	}
+	
+	public boolean isAutoUnwrapEnabled() {
+		return autoUnwrap;
 	}
 
 	public Face[] getAllFaces()
@@ -463,7 +476,7 @@ public class Element implements IDrawable
 	{
 		if (ModelCreator.currentProject == null) return;
 		
-		if (ModelCreator.currentProject.EntityTextureMode) {
+		if (ModelCreator.currentProject.EntityTextureMode && autoUnwrap) {
 			setUnwrappedCubeUV();
 			return;
 		}
@@ -610,7 +623,7 @@ public class Element implements IDrawable
 		
 		// Row 2
 		if (aboveFace.isEnabled()) y += aboveFace.uvHeight();
-		y = Math.ceil(y * scale.H) / scale.H;
+		if (aboveFace.isSnapUvEnabled()) y = Math.ceil(y * scale.H) / scale.H;
 		
 		x = getTexUStart();
 		
@@ -642,7 +655,7 @@ public class Element implements IDrawable
 		if (leftFace.isEnabled()) x+= leftFace.uvWidth();
 		
 		y += Math.max(leftFace.uvHeight(), Math.max(centerFace.uvHeight(), Math.max(rightFace.uvHeight(), veryRightFace.uvHeight())));
-		y = Math.ceil(y * scale.H) / scale.H;
+		if (leftFace.isSnapUvEnabled()) y = Math.ceil(y * scale.H) / scale.H;
 		
 		belowFace.textureU = x;
 		belowFace.textureV = y;
@@ -676,7 +689,7 @@ public class Element implements IDrawable
 		y += maxTexHeight;
 		
 		Sized scale = faces[0].getVoxel2PixelScale();
-		y = Math.ceil(y * scale.H) / scale.H;
+		if (faces[4].isSnapUvEnabled() || faces[5].isSnapUvEnabled()) y = Math.ceil(y * scale.H) / scale.H;
 		
 		for (int side = 0; side < 4; side++) {
 			Face face = faces[side];
