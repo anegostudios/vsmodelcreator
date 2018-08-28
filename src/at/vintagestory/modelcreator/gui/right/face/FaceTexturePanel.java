@@ -128,9 +128,9 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 	}
 
 	@Override
-	public void onTextureLoaded(boolean success, String errormessage, String texture)
+	public void onTextureLoaded(boolean isNew, String errormessage, String texture)
 	{
-		if (success)
+		if (isNew)
 			if (manager.getCurrentElement() != null)
 			{
 				manager.getCurrentElement().getSelectedFace().setTextureCode(texture);

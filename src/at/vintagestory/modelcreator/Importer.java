@@ -215,25 +215,16 @@ public class Importer
 			}
 		}
 	}
+	
 
 	private void loadTexture(File dir, String textureName, String textureSubPath)
 	{
-		File assets = dir.getParentFile().getParentFile();
+		File textureFile = new File(textureSubPath + ".png");
 
-		if (assets != null)
+		if (textureFile.exists() && textureFile.isFile())
 		{
-			File textureDir = new File(assets, "textures/");
-
-			if (textureDir.exists() && textureDir.isDirectory())
-			{
-				File textureFile = new File(textureDir, textureSubPath + ".png");
-
-				if (textureFile.exists() && textureFile.isFile())
-				{
-					project.PendingTextures.add(new PendingTexture(textureName, textureFile));
-					return;
-				}
-			}
+			project.PendingTextures.add(new PendingTexture(textureName, textureFile));
+			return;
 		}
 
 		
@@ -243,8 +234,12 @@ public class Importer
 		if (f.exists())
 		{
 			project.PendingTextures.add(new PendingTexture(textureName, f));
+			return;
 		}
+		
+		project.MissingTexturesByCode.put(textureName, textureSubPath);
 	}
+	
 
 	private Animation readAnimation(JsonObject obj)
 	{

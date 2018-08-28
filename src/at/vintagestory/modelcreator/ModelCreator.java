@@ -896,8 +896,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 								return;
 							}
 							
-							if (file.getName().endsWith(".png")) {								
-								AddPendingTexture(new PendingTexture(null, file, ModelCreator.Instance));
+							if (file.getName().endsWith(".png")) {
+								String code = file.getName();
+								code = code.substring(0, code.indexOf("."));
+								AddPendingTexture(new PendingTexture(code, file, ModelCreator.Instance));
 								return;
 							}
 							
@@ -935,7 +937,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	
 	@Override
-	public void onTextureLoaded(boolean isnew, String errormessage, String texture)
+	public void onTextureLoaded(boolean isNew, String errormessage, String texture)
 	{										
 		if (errormessage != null)
 		{

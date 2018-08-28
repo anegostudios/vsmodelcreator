@@ -362,7 +362,7 @@ public class Face
 
 	public Texture getTexture()
 	{
-		return ModelCreator.currentProject.getTexture(textureCode);
+		return ModelCreator.currentProject.getTextureByCode(textureCode);
 	}
 	
 	public TextureEntry getTextureEntry()

@@ -1,16 +1,13 @@
 package at.vintagestory.modelcreator.model;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 
 public class PendingTexture
 {
-	public File texture;
+	public File textureFile;
 	public ITextureCallback callback;
 	
 	public TextureEntry entry;
@@ -24,7 +21,7 @@ public class PendingTexture
 	
 	public PendingTexture(String textureName, File texture, ITextureCallback callback)
 	{
-		this.texture = texture;
+		this.textureFile = texture;
 		this.callback = callback;
 		this.textureName = textureName;
 	}
@@ -44,22 +41,22 @@ public class PendingTexture
 			}
 			
 			String errormessge = null;
-			boolean isnew = false;
 			
-			String fileName = this.texture.getName().replace(".png", "");
-			Texture texture = ModelCreator.currentProject.getTexture(fileName);
+			String fileName = this.textureFile.getName().replace(".png", "");
+			//Texture texture = ModelCreator.currentProject.getTextureByCode(fileName); - why is this here?
+			//if (texture == null) - why is this here?
+			//{
+				//FileInputStream fileinputstream = new FileInputStream(this.textureFile);
+				//TextureLoader.getTexture("PNG", fileinputstream); - why the efff is this here?
+				
+				//fileinputstream.close();
+			//}
 			
-			if (texture == null)
-			{
-				FileInputStream is = new FileInputStream(this.texture);
-				texture = TextureLoader.getTexture("PNG", is);
-				errormessge = ModelCreator.currentProject.loadTexture(textureName, this.texture);
-				is.close();
-				isnew = true;
-			}
+			BooleanParam isNew = new BooleanParam();
+			errormessge = ModelCreator.currentProject.loadTexture(textureName, this.textureFile, isNew);
 			
 			if (callback != null) {
-				callback.onTextureLoaded(isnew, errormessge, fileName);
+				callback.onTextureLoaded(isNew.Value, errormessge, fileName);
 			}
 		
 		}

@@ -86,26 +86,23 @@ public class Exporter
 	private void compileTextureList(Element elem) {
 		for (Face face : elem.getAllFaces())
 		{
-			if (face.getTextureCode() != null && !face.getTextureCode().equals("null"))
-			{
-				if (!textureMap.containsKey(face.getTextureCode()))
-				{
-					TextureEntry tex = face.getTextureEntry();
-					if (tex == null) continue;
-					
-					String textureBasePath = ModelCreator.prefs.get("texturePath", ".");
-					
-					String subPath = tex.getFilePath();
-					if (subPath.contains(textureBasePath)) subPath = tex.getFilePath().substring(textureBasePath.length()  + 1);
-					else {
-						int index = tex.getFilePath().indexOf("assets"+File.separator+"textures"+File.separator);
-						if (index>0) subPath = tex.getFilePath().substring(index + "assets/textures/".length());
-					}
-					subPath = subPath.replace('\\', '/').replace(".png", "");
-					
-					textureMap.put(face.getTextureCode(), subPath);
-				}
+			if (face.getTextureCode() == null || face.getTextureCode().equals("null")) continue;
+			if (textureMap.containsKey(face.getTextureCode())) continue;
+		
+			TextureEntry tex = face.getTextureEntry();
+			if (tex == null) continue;
+			
+			String textureBasePath = ModelCreator.prefs.get("texturePath", ".");
+			
+			String subPath = tex.getFilePath();
+			if (subPath.contains(textureBasePath)) subPath = tex.getFilePath().substring(textureBasePath.length()  + 1);
+			else {
+				int index = tex.getFilePath().indexOf("assets"+File.separator+"textures"+File.separator);
+				if (index>0) subPath = tex.getFilePath().substring(index + "assets/textures/".length());
 			}
+			subPath = subPath.replace('\\', '/').replace(".png", "");
+			
+			textureMap.put(face.getTextureCode(), subPath);
 		}
 		
 		for (Element childelem : elem.ChildElements) {

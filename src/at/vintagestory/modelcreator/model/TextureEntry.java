@@ -26,6 +26,9 @@ public class TextureEntry
 		this.texture = texture;
 		this.icon = image;
 		this.filePath = textureLocation;
+		
+		if (image == null) return;
+		
 		Width = texture.getImageWidth();
 		Height = texture.getImageHeight();
 		

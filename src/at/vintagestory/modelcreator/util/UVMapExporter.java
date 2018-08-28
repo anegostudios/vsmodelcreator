@@ -14,9 +14,9 @@ public class UVMapExporter
 {
 	public void Export(String path) {
 		BufferedImage img = new BufferedImage(
-				(int)(ModelCreator.currentProject.TextureWidth * ModelCreator.noTexScale),
-				(int)(ModelCreator.currentProject.TextureHeight * ModelCreator.noTexScale), 
-				BufferedImage.TYPE_INT_ARGB
+			(int)(ModelCreator.currentProject.TextureWidth * ModelCreator.noTexScale),
+			(int)(ModelCreator.currentProject.TextureHeight * ModelCreator.noTexScale), 
+			BufferedImage.TYPE_INT_ARGB
 		);
 		
 		drawElementList(img, ModelCreator.currentProject.rootElements);

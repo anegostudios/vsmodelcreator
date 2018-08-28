@@ -24,6 +24,8 @@ public class Project
 	public boolean AmbientOcclusion;
 	public ArrayList<PendingTexture> PendingTextures = new ArrayList<PendingTexture>();
 	public HashMap<String, TextureEntry> TexturesByCode = new HashMap<String, TextureEntry>();
+	public HashMap<String, String> MissingTexturesByCode = new HashMap<String, String>();
+	
 	public ArrayList<Element> rootElements = new ArrayList<Element>();
 	public ArrayList<Animation> Animations = new ArrayList<Animation>();
 	
@@ -441,15 +443,17 @@ public class Project
 		return TexturesByCode.get(code);
 	}
 
-	public Texture getTexture(String code)
+	public Texture getTextureByCode(String code)
 	{
 		TextureEntry entry = getTextureEntryByCode(code);
 		if (entry == null) return null;
 		
 		return entry.getTexture();
 	}
+	
+	
 
-	public String getTextureLocationByCode(String code)
+	public String getTextureFilepathByCode(String code)
 	{
 		TextureEntry entry = getTextureEntryByCode(code);
 		if (entry == null) return null;
@@ -491,14 +495,11 @@ public class Project
 	}
 	
 
-	public String loadTexture(String textureCode, File image) throws IOException
+	public String loadTexture(String textureCode, File image, BooleanParam isNew) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
-		
-		
 		Texture texture = TextureLoader.getTexture("PNG", is);
 		texture.setTextureFilter(SGL.GL_LINEAR);
-		
 		is.close();
 
 		if (texture.getImageHeight() % 8 != 0 || texture.getImageWidth() % 8 != 0)
@@ -518,30 +519,54 @@ public class Project
 			TexturesByCode.clear();
 		}
 		
-		if (TexturesByCode.containsKey(textureCode)) {
-			TextureEntry entry = TexturesByCode.get(textureCode);
-			if (entry.getFilePath().equals(image.getAbsolutePath())) {
-				TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath()));
-			} else {
-				
-				int i = 2;
-				while (true) {
-					
-					String altimgName = textureCode + i;
-					if (!TexturesByCode.containsKey(altimgName)) {
-						TexturesByCode.put(altimgName, new TextureEntry(altimgName, texture, icon, image.getAbsolutePath()));
-						break;
-					}					
-					i++;
-				}
+		
+		ArrayList<String> nowFoundTextures = new ArrayList<String>(); 
+		
+		if (!TexturesByCode.containsKey(textureCode)) {
+			// Try and match by filename if not matched by code
+			for (String key : MissingTexturesByCode.keySet()) {
+				String val = MissingTexturesByCode.get(key);
+				String filename = val.substring(val.lastIndexOf("/")+1);
+				if (filename.equals(textureCode)) {
+					TexturesByCode.put(key, new TextureEntry(key, texture, icon, image.getAbsolutePath()));
+					nowFoundTextures.add(key);
+				}	
 			}
-			
-			
-		} else {
-			TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath()));	
 		}
 		
-		
+		if (nowFoundTextures.size() == 0) {
+			
+			if (TexturesByCode.containsKey(textureCode)) {
+				TextureEntry entry = TexturesByCode.get(textureCode);
+				if (entry.getFilePath().equals(image.getAbsolutePath())) {
+					TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath()));
+				} else {
+					
+					int i = 2;
+					while (true) {
+						
+						String altimgName = textureCode + i;
+						if (!TexturesByCode.containsKey(altimgName)) {
+							TexturesByCode.put(altimgName, new TextureEntry(altimgName, texture, icon, image.getAbsolutePath()));
+							break;
+						}					
+						i++;
+					}
+				}
+				
+				isNew.Value = false;
+			} else {
+				isNew.Value = true;
+				TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath()));	
+			}			
+		} else {
+			
+			isNew.Value = true;
+			
+			for (String key : nowFoundTextures) {
+				MissingTexturesByCode.remove(key);
+			}			
+		}		
 		
 		if (TexturesByCode.size() == 1 && EntityTextureMode) {
 			applySingleTextureMode();
