@@ -24,6 +24,7 @@ public class Icons
 	public static Icon exit;
 	public static Icon cube;
 	public static Icon smallcube;
+	public static Icon smallcubegray;
 	public static Icon point;
 	public static Icon light_on;
 	public static Icon light_off;
@@ -67,6 +68,7 @@ public class Icons
 		
 		cube = new ImageIcon(loader.getResource("icons/cube.png"));
 		smallcube = new ImageIcon(loader.getResource("icons/smallcube.png"));
+		smallcubegray = new ImageIcon(loader.getResource("icons/smallcube-gray.png"));
 		point = new ImageIcon(loader.getResource("icons/point.png"));
 		bin = new ImageIcon(loader.getResource("icons/bin.png"));
 		bin_open = new ImageIcon(loader.getResource("icons/bin_open.png"));

@@ -1,6 +1,8 @@
 package at.vintagestory.modelcreator.gui.right;
 
 import java.awt.Toolkit;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Enumeration;
 import javax.swing.DropMode;
 import javax.swing.JTree;
@@ -39,11 +41,62 @@ public class ElementTree
 			@Override
 			public void valueChanged(TreeSelectionEvent e)
 			{
+				
 				if (!ModelCreator.ignoreValueUpdates) {
 					ModelCreator.currentProject.SelectedElement = getSelectedElement();
 					ModelCreator.updateValues(jtree);	
 				}
 			}	
+		});
+		
+		jtree.addMouseListener(new MouseListener()
+		{
+			
+			@Override
+			public void mouseReleased(MouseEvent arg0)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent arg0)
+			{
+				TreePath path = jtree.getPathForLocation(arg0.getX(), arg0.getY());
+				TreePath pathLeft = jtree.getPathForLocation(arg0.getX() - 17, arg0.getY());
+				
+				if (path != null && pathLeft == null) {
+					arg0.consume();
+					
+					Object userObj = ((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject(); 
+		        	if (userObj instanceof Element) {
+		        		((Element)userObj).Render = !((Element)userObj).Render;
+		        		jtree.updateUI();
+		        	}
+				}
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent arg0)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent arg0)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0)
+			{
+				// TODO Auto-generated method stub
+				
+			}
 		});
 		
 		jtree.setTransferHandler(new TreeTransferHandler(this));

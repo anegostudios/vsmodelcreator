@@ -7,6 +7,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import at.vintagestory.modelcreator.gui.Icons;
+import at.vintagestory.modelcreator.model.Element;
 
 public class ElementTreeCellRenderer extends DefaultTreeCellRenderer 
 {
@@ -21,7 +22,16 @@ public class ElementTreeCellRenderer extends DefaultTreeCellRenderer
         if (tree.getModel().getRoot().equals(node)) {
             setIcon(null);
         } else {
-            setIcon(Icons.smallcube);
+			Object userObj = node.getUserObject(); 
+        	if (userObj instanceof Element) {
+        		if(((Element)userObj).Render) {
+        			setIcon(Icons.smallcube);
+        		} else {
+        			setIcon(Icons.smallcubegray);
+        		}
+        	}
+
+            
         }
         
         return this;

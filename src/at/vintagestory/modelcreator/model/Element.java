@@ -300,6 +300,8 @@ public class Element implements IDrawable
 
 	public void draw(IDrawable selectedElem)
 	{
+		if (!Render) return;
+		
 		float b;
 		
 		GL11.glPushMatrix();
@@ -547,6 +549,8 @@ public class Element implements IDrawable
 		// D
 		new int[] { 5, 0, 2, 3, 1, 4 },
 	};
+
+	public boolean Render = true;
 
 
 	void setUnwrappedCubeUV() {

@@ -42,7 +42,7 @@ public class ControlsDialog
 				+ "<li>Hold CTRL and hold the left mouse button to move a cube</li>"
 				+ "<li>Hold CTRL and hold the right mouse button to resize a cube</li>"
 				+ "</ul>"
-				+ "<p><b>Cube Pane (Right)<b></p>"
+				+ "<p><b>Cube Properties Pane (Right)<b></p>"
 				+ "<ul>"
 				+ "<li>Hold SHIFT and click on any of the up/down arrows to modify in increments of 0.1</li>"
 				+ "<li>Hold CTRL and click on any up/down arrows of the cubes position to also move the origin</li>"
