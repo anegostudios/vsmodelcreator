@@ -1181,5 +1181,27 @@ public class Element implements IDrawable
 	{
 		return unwrapRotation > 0;
 	}
+
+	public void scaleAll(float size, boolean scaleUV)
+	{
+		startX *= size;
+		startY *= size;
+		startZ *= size;
+		width *= size;
+		height *= size;
+		depth *= size;
+		
+		originX *= size;
+		originY *= size;
+		originZ *= size;
+		
+		if (scaleUV) {
+			for (int i = 0; i < 6; i++) {
+				Face f = faces[i];
+				f.scaleSize(size);
+			}	
+		}
+		
+	}
 	
 }

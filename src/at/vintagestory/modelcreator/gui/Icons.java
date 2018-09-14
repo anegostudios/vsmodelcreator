@@ -23,6 +23,7 @@ public class Icons
 	public static Icon disk;
 	public static Icon exit;
 	public static Icon cube;
+	public static Icon inout;
 	public static Icon smallcube;
 	public static Icon smallcubegray;
 	public static Icon point;
@@ -67,6 +68,7 @@ public class Icons
 		ClassLoader loader = clazz.getClassLoader();
 		
 		cube = new ImageIcon(loader.getResource("icons/cube.png"));
+		inout = new ImageIcon(loader.getResource("icons/arrow_inout.png"));
 		smallcube = new ImageIcon(loader.getResource("icons/smallcube.png"));
 		smallcubegray = new ImageIcon(loader.getResource("icons/smallcube-gray.png"));
 		point = new ImageIcon(loader.getResource("icons/point.png"));

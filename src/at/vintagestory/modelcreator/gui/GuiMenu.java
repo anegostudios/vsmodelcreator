@@ -49,6 +49,10 @@ public class GuiMenu extends JMenuBar
 	private JMenu menuEdit;
 	private JMenuItem itemUndo;
 	private JMenuItem itemRedo;
+	private JMenuItem itemAddCube;
+	private JMenuItem itemAddFace;
+	private JMenuItem itemResize;
+	
 	
 	/* Project */
 	private JMenu menuProject;
@@ -66,10 +70,6 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem modelFromSide;
 	private JMenuItem modelFromFront;*/
 	
-	/* Add */
-	private JMenu menuAdd;
-	private JMenuItem itemAddCube;
-	private JMenuItem itemAddFace;
 
 
 	/* Export */
@@ -109,6 +109,11 @@ public class GuiMenu extends JMenuBar
 		{
 			itemUndo = createItem("Undo", "Undo the last action", 0, new ImageIcon(getClass().getClassLoader().getResource("icons/arrow_undo.png")));
 			itemRedo = createItem("Redo", "Redo the last action", 0, new ImageIcon(getClass().getClassLoader().getResource("icons/arrow_redo.png")));
+			
+			itemAddCube = createItem("Add cube", "Add new cube", KeyEvent.VK_C, Icons.cube);
+			itemAddFace = createItem("Add face", "Add single face", KeyEvent.VK_F, Icons.cube);
+			
+			itemResize = createItem("Resize", "Resize a cube, including child elements", KeyEvent.VK_R, Icons.inout);
 		}
 
 
@@ -143,11 +148,7 @@ public class GuiMenu extends JMenuBar
 			modelFromFront = createItem("Model from Front", "Rotate camera to show model from the front", KeyEvent.VK_T, Icons.transparent);*/
 		}
 
-		menuAdd = new JMenu("Add");
-		{
-			itemAddCube = createItem("Add cube", "Add new cube", KeyEvent.VK_C, Icons.cube);
-			itemAddFace = createItem("Add face", "Add single face", KeyEvent.VK_F, Icons.cube);
-		}
+		
 
 		
 		exportMenu = new JMenu("Export");
@@ -181,12 +182,14 @@ public class GuiMenu extends JMenuBar
 		menuProject.add(itemReloadTextures);
 
 		
-		menuAdd.add(itemAddCube);
-		menuAdd.add(itemAddFace);
-		
 		menuEdit.add(itemUndo);
 		menuEdit.add(itemRedo);
-
+		menuEdit.addSeparator();
+		menuEdit.add(itemAddCube);
+		menuEdit.add(itemAddFace);
+		menuEdit.addSeparator();
+		menuEdit.add(itemResize);
+		
 		exportMenu.add(itemExportUvMap);
 		exportMenu.add(itemSaveScreenshot);
 		exportMenu.add(itemImgurLink);
@@ -210,7 +213,6 @@ public class GuiMenu extends JMenuBar
 		add(menuEdit);
 		add(menuView);
 		add(menuProject);
-		add(menuAdd);
 		add(exportMenu);
 		add(helpMenu);
 	}
@@ -404,6 +406,10 @@ public class GuiMenu extends JMenuBar
 		
 		itemNoTextureSize.addActionListener(a -> {
 			TextureSizeDialog.show(creator);
+		});
+
+		itemResize.addActionListener(a -> {
+			ResizeDialog.show(creator);
 		});
 
 		
@@ -611,6 +617,8 @@ public class GuiMenu extends JMenuBar
 		itemUnlockAngles.setSelected(ModelCreator.currentProject.AllAngles);
 		itemSingleTexture.setSelected(ModelCreator.currentProject.EntityTextureMode);
 		itemTexture.setSelected(ModelCreator.renderTexture);
+		
+		itemResize.setEnabled(ModelCreator.currentProject.SelectedElement != null);
 	}
 	
 	public void updateFrame() {

@@ -567,4 +567,13 @@ public class Face
 		return Math.floor(Math.abs(textureVEnd - textureV) * scale.H) / scale.H;
 	}
 
+	public void scaleSize(float size)
+	{
+		double width = textureUEnd - textureU;
+		double height = textureVEnd - textureV;
+		
+		textureUEnd = textureU + size * width;
+		textureVEnd = textureV + size * height;
+	}
+
 }

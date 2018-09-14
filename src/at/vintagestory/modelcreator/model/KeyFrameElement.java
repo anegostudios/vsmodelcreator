@@ -467,4 +467,18 @@ public class KeyFrameElement implements IDrawable
 		rotationY = kelem.rotationY;
 		rotationZ = kelem.rotationZ;
 	}
+
+
+	public void scaleAll(float size)
+	{
+		offsetX *= size;
+		offsetY *= size;
+		offsetZ *= size;
+		stretchX *= size;
+		stretchY *= size;
+		stretchZ *= size;
+		originX *= size;
+		originY *= size;
+		originZ *= size;
+	}
 }

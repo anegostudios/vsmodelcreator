@@ -607,7 +607,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 			
 			
-			if (grabbed == null && Mouse.isButtonDown(0))
+			if (grabbed == null && (Mouse.isButtonDown(0) || Mouse.isButtonDown(1)))
 			{
 				int openGlName = getElementGLNameAtPos(Mouse.getX(), Mouse.getY());
 				if (openGlName >= 0)
