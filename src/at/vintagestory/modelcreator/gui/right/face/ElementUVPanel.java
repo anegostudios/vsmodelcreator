@@ -49,7 +49,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 	protected Checkbox alternateUnwrap;
 	protected Checkbox autoUnwrap;
 
-	private DecimalFormat df = new DecimalFormat("#.#");
+	private DecimalFormat df = new DecimalFormat("#.##");
 	
 	private DefaultComboBoxModel<String> model;
 

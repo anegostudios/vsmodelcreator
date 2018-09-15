@@ -42,7 +42,7 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 	
 	boolean enabled = true;
 
-	private DecimalFormat df = new DecimalFormat("#.#");
+	private DecimalFormat df = new DecimalFormat("#.##");
 
 	public ElementSizePanel(IElementManager manager)
 	{

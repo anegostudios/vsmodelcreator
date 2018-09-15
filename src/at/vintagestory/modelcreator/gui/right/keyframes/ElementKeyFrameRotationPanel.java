@@ -32,7 +32,7 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 	private RightKeyFramesPanel keyFramesPanel;
 
 	
-	private DecimalFormat df = new DecimalFormat("#.#");	
+	private DecimalFormat df = new DecimalFormat("#.##");	
 	
 	private JTextField[] rotationFields;
 	private JSlider[] rotationSliders;

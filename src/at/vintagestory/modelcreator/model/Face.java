@@ -217,8 +217,8 @@ public class Face
 	public static Sized getVoxel2PixelScale(TextureEntry entry) {
 		if (entry != null) {
 			return new Sized(
-				entry.Width / ModelCreator.currentProject.TextureWidth,
-				entry.Height / ModelCreator.currentProject.TextureHeight
+				(double)entry.Width / ModelCreator.currentProject.TextureWidth,
+				(double)entry.Height / ModelCreator.currentProject.TextureHeight
 			);
 		}
 		

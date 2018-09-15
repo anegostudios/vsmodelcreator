@@ -25,7 +25,7 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 	private IElementManager manager;
 
 	
-	private DecimalFormat df = new DecimalFormat("#.#");	
+	private DecimalFormat df = new DecimalFormat("#.##");	
 	
 	private JTextField[] rotationFields;
 	private JSlider[] rotationSliders;

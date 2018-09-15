@@ -40,7 +40,7 @@ public class ElementRotationOriginPanel extends JPanel implements IValueUpdater
 	private JButton btnNegY;
 	private JButton btnNegZ;
 
-	private DecimalFormat df = new DecimalFormat("#.#");
+	private DecimalFormat df = new DecimalFormat("#.##");
 	
 	boolean enabled = true;
 

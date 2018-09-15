@@ -41,7 +41,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 	private JButton btnNegXEnd;
 	private JButton btnNegYEnd;
 
-	private DecimalFormat df = new DecimalFormat("#.#");
+	private DecimalFormat df = new DecimalFormat("#.##");
 
 	public FaceUVPanel(IElementManager manager)
 	{

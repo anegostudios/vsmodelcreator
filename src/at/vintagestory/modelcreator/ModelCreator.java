@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -128,6 +129,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public ModelCreator(String title) throws LWJGLException
 	{
 		super(title);
+		
+		EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+		queue.push(new EventQueueProxy());
 		
 		showGrid = prefs.getBoolean("showGrid", false);
 		noTexScale = prefs.getFloat("noTexScale", 2);
@@ -312,7 +316,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				if (currentProject.SelectedAnimation != null) {
 					currentProject.SelectedAnimation.SetFramesDirty();
 				}
-				
+								
 				guiMain.updateValues(byGuiElem);
 			 	((RightTopPanel)manager).updateValues(byGuiElem);
 			 	leftKeyframesPanel.updateValues(byGuiElem);
