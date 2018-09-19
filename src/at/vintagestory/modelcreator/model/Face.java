@@ -12,6 +12,8 @@ import org.lwjgl.opengl.GL13;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
+import org.newdawn.slick.opengl.renderer.SGL;
+
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 

@@ -178,11 +178,14 @@ public class Element implements IDrawable
 
 	public void setSelectedFace(int face)
 	{
+		if (face < 0) return;
 		this.selectedFace = face;
 	}
 
 	public Face getSelectedFace()
 	{
+		if (selectedFace < 0) return null;
+		
 		return faces[selectedFace];
 	}
 

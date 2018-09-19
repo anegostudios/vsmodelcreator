@@ -498,7 +498,7 @@ public class Project
 	{
 		FileInputStream is = new FileInputStream(image);
 		Texture texture = TextureLoader.getTexture("PNG", is);
-		texture.setTextureFilter(SGL.GL_LINEAR);
+		texture.setTextureFilter(SGL.GL_NEAREST);
 		is.close();
 
 		if (texture.getImageHeight() % 8 != 0 || texture.getImageWidth() % 8 != 0)
