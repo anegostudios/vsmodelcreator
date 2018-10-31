@@ -11,24 +11,31 @@ public class PendingTexture
 	public ITextureCallback callback;
 	
 	public TextureEntry entry;
+	
+	// Wait 3 frames before actually loading this file
+	// Added because gimp seems to make VSMC crash otherwise
+	public int LoadDelay = 3;
+	
 	String textureName;
 
-	public PendingTexture(String textureName, File texture)
+	public PendingTexture(String textureName, File texture, int loadDelay)
 	{
-		this(textureName, texture, (ITextureCallback) null);
+		this(textureName, texture, (ITextureCallback) null, loadDelay);
 	}
 
 	
-	public PendingTexture(String textureName, File texture, ITextureCallback callback)
+	public PendingTexture(String textureName, File texture, ITextureCallback callback, int loadDelay)
 	{
 		this.textureFile = texture;
 		this.callback = callback;
 		this.textureName = textureName;
+		this.LoadDelay = loadDelay;
 	}
 	
-	public PendingTexture(TextureEntry entry)
+	public PendingTexture(TextureEntry entry, int loadDelay)
 	{
 		this.entry = entry;
+		this.LoadDelay = loadDelay;
 	}
 
 	public void load()
@@ -40,18 +47,10 @@ public class PendingTexture
 				return;
 			}
 			
-			String errormessge = null;
-			
+			String errormessge = null;			
 			String fileName = this.textureFile.getName().replace(".png", "");
-			//Texture texture = ModelCreator.currentProject.getTextureByCode(fileName); - why is this here?
-			//if (texture == null) - why is this here?
-			//{
-				//FileInputStream fileinputstream = new FileInputStream(this.textureFile);
-				//TextureLoader.getTexture("PNG", fileinputstream); - why the efff is this here?
-				
-				//fileinputstream.close();
-			//}
 			
+
 			BooleanParam isNew = new BooleanParam();
 			errormessge = ModelCreator.currentProject.loadTexture(textureName, this.textureFile, isNew);
 			
@@ -60,8 +59,13 @@ public class PendingTexture
 			}
 		
 		}
-		catch (IOException e)
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		catch (IllegalArgumentException e)
 		{
+			// It seems like the Gimp "Overwrite file" feature saves the image in a non-traditional way?
+			// Because VSMC randomly crashes with "IllegalArgumentException: Buffer size <=0"
 			e.printStackTrace();
 		}
 	}

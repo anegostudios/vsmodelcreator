@@ -387,6 +387,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		Display.setInitialBackground(0.92F, 0.92F, 0.93F);
 	}
 
+	
+	ArrayList<PendingTexture> notLoadedPendingTexs = new ArrayList<PendingTexture>();
+	
+	
 	private void loop() throws Exception
 	{
 		modelrenderer.camera = new Camera(60F, (float) Display.getWidth() / (float) Display.getHeight(), 0.3F, 1000F);		
@@ -406,10 +410,20 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			{
 				for (PendingTexture texture : pendingTextures)
 				{
+					if (texture.LoadDelay > 0) {
+						texture.LoadDelay--;
+						notLoadedPendingTexs.add(texture);
+						continue;
+					}
+					
 					texture.load();
 				}
-				pendingTextures.clear();				
+				
+				pendingTextures.clear();	
+				pendingTextures.addAll(notLoadedPendingTexs);
+				notLoadedPendingTexs.clear();
 			}
+			
 			
 			if (project.SelectedAnimation != null && project.SelectedAnimation.framesDirty) {
 				project.SelectedAnimation.calculateAllFrames(project);
@@ -903,7 +917,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 							if (file.getName().endsWith(".png")) {
 								String code = file.getName();
 								code = code.substring(0, code.indexOf("."));
-								AddPendingTexture(new PendingTexture(code, file, ModelCreator.Instance));
+								AddPendingTexture(new PendingTexture(code, file, ModelCreator.Instance, 0));
 								return;
 							}
 							

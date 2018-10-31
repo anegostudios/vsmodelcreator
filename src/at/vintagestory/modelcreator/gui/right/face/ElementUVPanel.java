@@ -80,6 +80,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		model.addElement("West is front");
 		model.addElement("Up is front");
 		model.addElement("Down is front");
+		model.addElement("Up is front (Saratymode)");
 		
 
 		alternateUnwrap = new Checkbox("Alternate unwrap direction");
@@ -98,6 +99,11 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 				ModelCreator.DidModify();
 			}
 		});
+
+		
+		
+		
+		
 		
 		
 		autoUnwrap = new Checkbox("Auto-Unwrap");

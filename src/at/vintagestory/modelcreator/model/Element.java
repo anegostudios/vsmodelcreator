@@ -79,6 +79,7 @@ public class Element implements IDrawable
 	protected int unwrapMode;
 	protected int unwrapRotation;
 	
+	
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();
 	
@@ -200,6 +201,7 @@ public class Element implements IDrawable
 		this.autoUnwrap = enabled;
 		ModelCreator.DidModify();
 	}
+	
 	
 	public boolean isAutoUnwrapEnabled() {
 		return autoUnwrap;
@@ -529,6 +531,8 @@ public class Element implements IDrawable
 		new int[] { 4, 3, 1, 0, 2, 5 },
 		// D
 		new int[] { 5, 1, 3, 0, 2, 4 },
+		// U (Saratymode)
+		new int[] { 4, 2, 0, 3, 1, 5 }
 	};
 	
 	// Cases:
@@ -551,6 +555,8 @@ public class Element implements IDrawable
 		new int[] { 4, 0, 2, 1, 3, 5 },
 		// D
 		new int[] { 5, 0, 2, 3, 1, 4 },
+		// U (Saratymode)
+		new int[] { 4, 2, 0, 3, 1, 5 }
 	};
 
 	public boolean Render = true;
@@ -605,9 +611,19 @@ public class Element implements IDrawable
 			faces[1].rotation = (unwrapRotation + 1) % 4;
 			faces[3].rotation = (unwrapRotation + 3) % 4;
 			
-			if (unwrapRotation == 1) faces[4].rotation = (unwrapRotation + 2) % 4;;
+			if (unwrapRotation == 1) faces[4].rotation = (unwrapRotation + 2) % 4;
 		}
 		
+		if (unwrapMode - 1 == 6) {
+			faces[0].rotation = (unwrapRotation) % 4;
+			faces[1].rotation = (unwrapRotation + 3) % 4;
+			faces[2].rotation = (unwrapRotation + 2) % 4;
+			faces[3].rotation = (unwrapRotation + 1) % 4;			
+			faces[4].rotation = (unwrapRotation + 2) % 4;
+			faces[5].rotation = (unwrapRotation + 0) % 4;
+		}
+		
+
 		int[] uvPositions = unwrapRotation == 1 ? allUvPositionsAlternate[unwrapMode - 1] : allUvPositions[unwrapMode - 1];
 		Sized scale = faces[0].getVoxel2PixelScale();		
 		

@@ -472,7 +472,7 @@ public class Project
 	public void reloadTextures(ModelCreator creator) {
 		for (TextureEntry entry : TexturesByCode.values()) {
 			try {
-				creator.pendingTextures.add(new PendingTexture(entry));
+				creator.pendingTextures.add(new PendingTexture(entry, 0));
 			} catch (Exception e) {}
 		}
 	}

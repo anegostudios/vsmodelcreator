@@ -44,7 +44,7 @@ public class TextureEntry
                         public void onFileModify(String filePath) {
                             
                         	if (ModelCreator.autoreloadTexture && ModelCreator.currentProject != null) {
-                    			ModelCreator.Instance.AddPendingTexture(new PendingTexture(self));
+                    			ModelCreator.Instance.AddPendingTexture(new PendingTexture(self, 3));
                         	}
                         	
                         }

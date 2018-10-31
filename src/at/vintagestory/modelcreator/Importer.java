@@ -223,7 +223,7 @@ public class Importer
 
 		if (textureFile.exists() && textureFile.isFile())
 		{
-			project.PendingTextures.add(new PendingTexture(textureName, textureFile));
+			project.PendingTextures.add(new PendingTexture(textureName, textureFile, 0));
 			return;
 		}
 
@@ -233,7 +233,7 @@ public class Importer
 		
 		if (f.exists())
 		{
-			project.PendingTextures.add(new PendingTexture(textureName, f));
+			project.PendingTextures.add(new PendingTexture(textureName, f, 0));
 			return;
 		}
 		
