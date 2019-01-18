@@ -4,6 +4,7 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Enumeration;
+
 import javax.swing.DropMode;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
@@ -11,6 +12,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -28,12 +30,12 @@ public class ElementTree
 	public ElementTree() {
 		rootNode = new DefaultMutableTreeNode("Root");
 		treeModel = new DefaultTreeModel(rootNode);
-        jtree = new JTree(treeModel);
+        jtree = new FixedJTree(treeModel);
         jtree.setEditable(false);
         jtree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jtree.setShowsRootHandles(true);
         jtree.setCellRenderer(new ElementTreeCellRenderer());
-        jtree.setDragEnabled(false);
+        jtree.setDragEnabled(true);
         jtree.setDropMode(DropMode.ON_OR_INSERT);
         
 		jtree.addTreeSelectionListener(new TreeSelectionListener()
@@ -269,7 +271,25 @@ public class ElementTree
 	}
 
 
-	
+	public static class FixedJTree extends JTree {
+		
+		private static final long serialVersionUID = 1L;
+		
+		public FixedJTree(TreeModel arg0)
+		{
+			super(arg0);
+		}
+
+		@Override
+	    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+	        // filter property change of "dropLocation" with newValue==null, 
+	        // since this will result in a NPE in BasicTreeUI.getDropLineRect(...)
+	        if(newValue!=null || !"dropLocation".equals(propertyName)) {
+	            super.firePropertyChange(propertyName, oldValue, newValue);
+	        }
+	    }
+		
+	}
 
 
 }

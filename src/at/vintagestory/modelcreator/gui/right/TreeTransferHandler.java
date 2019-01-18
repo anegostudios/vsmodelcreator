@@ -111,13 +111,14 @@ class TreeTransferHandler extends TransferHandler {
             DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
             // Remove nodes saved in nodesToRemove in createTransferable.
             for(int i = 0; i < nodesToRemove.length; i++) {
-                model.removeNodeFromParent(nodesToRemove[i]);
+            	if(nodesToRemove[i].getParent() != null)
+            		model.removeNodeFromParent(nodesToRemove[i]);
             }
         }
     }
   
     public int getSourceActions(JComponent c) {
-        return COPY_OR_MOVE;
+        return MOVE;//COPY_OR_MOVE;
     }
   
     public boolean importData(TransferHandler.TransferSupport support) {
@@ -155,7 +156,7 @@ class TreeTransferHandler extends TransferHandler {
             Element ownElem = (Element)nodes[i].getUserObject();
             
             Element oldParent = ownElem.ParentElement; 
-            Element newParent = (Element)parent.getUserObject();
+            Element newParent = parent.getUserObject() instanceof Element ? (Element) parent.getUserObject() : null;
             
             if (oldParent != null) {
             	oldParent.ChildElements.remove(ownElem);
