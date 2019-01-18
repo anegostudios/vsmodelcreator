@@ -186,6 +186,7 @@ class TreeTransferHandler extends TransferHandler {
         
         ModelCreator.updateValues(tree);
         tree.updateUI();
+        ModelCreator.DidModify();
         
         
         return true;
