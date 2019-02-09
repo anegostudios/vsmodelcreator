@@ -21,6 +21,7 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -51,10 +52,13 @@ import at.vintagestory.modelcreator.gui.right.RightTopPanel;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
+import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.PendingTexture;
 import at.vintagestory.modelcreator.model.TextureEntry;
 import at.vintagestory.modelcreator.util.screenshot.AnimatedGifCapture;
+import at.vintagestory.modelcreator.util.screenshot.AnimationCapture;
+import at.vintagestory.modelcreator.util.screenshot.AnimationPngCapture;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCapture;
 
@@ -95,7 +99,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	// Texture Loading Cache
 	List<PendingTexture> pendingTextures = Collections.synchronizedList(new ArrayList<PendingTexture>());
 	private PendingScreenshot screenshot = null;
-	public static AnimatedGifCapture gifCapture = null;
+	public static AnimationCapture animCapture = null;
 	
 	
 	
@@ -442,8 +446,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			handleInput(leftSidebarWidth);
 			
 			
-			if (gifCapture != null && !gifCapture.isComplete()) {
-				gifCapture.PrepareFrame();
+			if (animCapture != null && !animCapture.isComplete()) {
+				animCapture.PrepareFrame();
 			}
 
 			modelrenderer.Render(leftSidebarWidth, width, height, getHeight());
@@ -461,19 +465,19 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 			
 			
-			if (gifCapture != null && !gifCapture.isComplete()) {
-				gifCapture.CaptureFrame(width, height);
+			if (animCapture != null && !animCapture.isComplete()) {
+				animCapture.CaptureFrame(width, height);
 				
-				if (gifCapture.isComplete()) {
+				if (animCapture.isComplete()) {
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run()
 						{
-							JOptionPane.showMessageDialog(null, "Gif export complete");							
+							JOptionPane.showMessageDialog(null, "Animation export complete");							
 						}
 					});
 					
-					gifCapture = null;
+					animCapture = null;
 				}
 			} else {
 				
@@ -987,7 +991,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			prefs.put("filePath", filePath);
 			Importer importer = new Importer(filePath);
 			
-			//currentProject = null; - why is that here? it crashes the editor!
 			ignoreValueUpdates = true;
 			Project project = importer.loadFromJSON();
 			Project oldproject = currentProject;
@@ -1009,6 +1012,40 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		changeHistory.addHistoryState(currentProject);
 		
 		currentProject.needsSaving = false;		
+		ModelCreator.updateValues(null);
+		currentProject.tree.jtree.updateUI();		
+	}
+	
+	
+	public void ImportFile(String filePath)
+	{
+		ignoreDidModify = true;
+		ignoreValueUpdates = true;
+		
+		Importer importer = new Importer(filePath);
+		Project importedproject = importer.loadFromJSON();
+		
+		for(Element elem : importedproject.rootElements) {
+			currentProject.rootElements.add(elem);
+		}
+		
+		for(Animation anim : importedproject.Animations) {
+			currentProject.Animations.add(anim);
+		}
+		
+		for (PendingTexture tex : importedproject.PendingTextures) {
+			currentProject.PendingTextures.add(tex);
+		}
+
+		changeHistory.addHistoryState(currentProject);
+
+		ignoreValueUpdates = false;
+		
+		currentProject.LoadIntoEditor(ModelCreator.manager);
+		
+		ignoreDidModify = false;
+		
+		currentProject.needsSaving = true;		
 		ModelCreator.updateValues(null);
 		currentProject.tree.jtree.updateUI();		
 	}

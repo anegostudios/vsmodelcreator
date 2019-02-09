@@ -122,7 +122,9 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 			
 			ModelCreator.leftKeyframesPanel.setVisible(tabbedPane.getSelectedIndex() == 2);
 			ModelCreator.renderAttachmentPoints = tabbedPane.getSelectedIndex() == 3;
-			ModelCreator.guiMain.itemSaveAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
+			ModelCreator.guiMain.itemSaveGifAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
+			ModelCreator.guiMain.itemSavePngAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
+			
 			updateValues(tabbedPane);
 		});
 		
@@ -169,7 +171,8 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		btnRemove.setEnabled(cube != null);
 		btnDuplicate.setEnabled(cube != null);
 		
-		ModelCreator.guiMain.itemSaveAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
+		ModelCreator.guiMain.itemSaveGifAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
+		ModelCreator.guiMain.itemSavePngAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
 	}
 
 	

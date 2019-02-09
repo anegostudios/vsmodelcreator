@@ -26,6 +26,7 @@ import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.util.UVMapExporter;
 import at.vintagestory.modelcreator.util.screenshot.AnimatedGifCapture;
+import at.vintagestory.modelcreator.util.screenshot.AnimationPngCapture;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCallback;
 import at.vintagestory.modelcreator.util.screenshot.Uploader;
@@ -40,6 +41,8 @@ public class GuiMenu extends JMenuBar
 	private JMenu menuFile;
 	private JMenuItem itemNew;
 	private JMenuItem itemLoad;
+	
+	private JMenuItem itemImport;
 	private JMenuItem itemSave;
 	private JMenuItem itemSaveAs;
 	private JMenuItem itemExportUvMap;
@@ -75,7 +78,8 @@ public class GuiMenu extends JMenuBar
 	/* Export */
 	private JMenu exportMenu;
 	private JMenuItem itemSaveScreenshot;
-	public JMenuItem itemSaveAnimation;
+	public JMenuItem itemSaveGifAnimation;
+	public JMenuItem itemSavePngAnimation;
 	private JMenuItem itemReloadTextures;
 	private JCheckBoxMenuItem itemAutoReloadTextures;
 	private JMenuItem itemImgurLink;
@@ -98,7 +102,8 @@ public class GuiMenu extends JMenuBar
 		menuFile = new JMenu("File");
 		{
 			itemNew = createItem("New", "New Model", KeyEvent.VK_N, new ImageIcon(getClass().getClassLoader().getResource("icons/new.png")));
-			itemLoad = createItem("Open...", "Open JSON", KeyEvent.VK_I, new ImageIcon(getClass().getClassLoader().getResource("icons/load.png")));
+			itemLoad = createItem("Open...", "Open JSON", KeyEvent.VK_O, new ImageIcon(getClass().getClassLoader().getResource("icons/load.png")));
+			itemImport = createItem("Import...", "Import JSON into existing file", KeyEvent.VK_I, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
 			itemSave = createItem("Save...", "Save JSON", KeyEvent.VK_S, new ImageIcon(getClass().getClassLoader().getResource("icons/disk.png")));
 			itemSaveAs = createItem("Save as...", "Save JSON", KeyEvent.VK_E, new ImageIcon(getClass().getClassLoader().getResource("icons/export.png")));
 			itemTexturePath = createItem("Set Texture Path...", "Set the base path to look for textures", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
@@ -132,7 +137,7 @@ public class GuiMenu extends JMenuBar
 		
 		menuView = new JMenu("View");
 		{
-			itemGrid = createCheckboxItem("Grid", "Toggles the voxel grid", KeyEvent.VK_G, Icons.transparent);
+			itemGrid = createCheckboxItem("Grid + Compass", "Toggles the voxel grid and compass overlay", KeyEvent.VK_G, Icons.transparent);
 			itemGrid.setSelected(ModelCreator.showGrid);
 			
 			itemTransparency = createCheckboxItem("Transparency", "Toggles transparent rendering", KeyEvent.VK_Y, Icons.transparent);
@@ -154,7 +159,8 @@ public class GuiMenu extends JMenuBar
 		exportMenu = new JMenu("Export");
 		{
 			itemSaveScreenshot = createItem("Save Screenshot to Disk...", "Save screenshot to disk.", KeyEvent.VK_F12, Icons.disk);
-			itemSaveAnimation= createItem("Export Current Animation as GIF...", "Export current Animation as GIF.", 0, Icons.disk);
+			itemSaveGifAnimation= createItem("Export Current Animation as GIF...", "Export current Animation as GIF.", 0, Icons.disk);
+			itemSavePngAnimation= createItem("Export Current Animation as individual PNG files...", "Export current Animation as PNGs.", 0, Icons.disk);
 			itemImgurLink = createItem("Get Screenshot as Imgur Link", "Get an Imgur link of your screenshot to share.", KeyEvent.VK_F11, Icons.imgur);
 			itemExportUvMap = createItem("Export UV Map...", "Lets you export a UV map when in single texture mode", KeyEvent.VK_U, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
 		}
@@ -194,7 +200,8 @@ public class GuiMenu extends JMenuBar
 		exportMenu.add(itemSaveScreenshot);
 		exportMenu.add(itemImgurLink);
 		exportMenu.addSeparator();
-		exportMenu.add(itemSaveAnimation);
+		exportMenu.add(itemSaveGifAnimation);
+		exportMenu.add(itemSavePngAnimation);
 
 		helpMenu.add(itemControls);
 		helpMenu.add(itemCredits);
@@ -202,6 +209,7 @@ public class GuiMenu extends JMenuBar
 		menuFile.add(itemNew);
 		menuFile.addSeparator();
 		menuFile.add(itemLoad);
+		menuFile.add(itemImport);
 		menuFile.add(itemSave);
 		menuFile.add(itemSaveAs);
 		menuFile.addSeparator();
@@ -281,6 +289,9 @@ public class GuiMenu extends JMenuBar
 
 		listener = e -> { OnLoadFile(); };	
 		itemLoad.addActionListener(listener);
+		
+		listener = e -> { OnImportFile(); };	
+		itemImport.addActionListener(listener);
 		
 
 		listener = e -> {
@@ -428,7 +439,7 @@ public class GuiMenu extends JMenuBar
 			saveScreenshot();
 		});
 		
-		itemSaveAnimation.addActionListener(a -> {
+		itemSaveGifAnimation.addActionListener(a -> {
 			JFileChooser chooser = new JFileChooser();
 			chooser.setDialogTitle("Save gif file to...");
 			chooser.setFileFilter(new FileNameExtensionFilter(".gif Files", "txt", "gif"));
@@ -437,10 +448,26 @@ public class GuiMenu extends JMenuBar
 			{
 				String filename = chooser.getSelectedFile().getAbsolutePath();
 				if (!filename.endsWith(".gif")) filename += ".gif";
-				ModelCreator.gifCapture = new AnimatedGifCapture(filename);
+				ModelCreator.animCapture = new AnimatedGifCapture(filename);
 			}
 		});
-		itemSaveAnimation.setEnabled(ModelCreator.leftKeyframesPanel.isVisible() && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
+		itemSaveGifAnimation.setEnabled(ModelCreator.leftKeyframesPanel.isVisible() && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
+		
+		
+		itemSavePngAnimation.addActionListener(a -> {
+			JFileChooser chooser = new JFileChooser();
+			chooser.setDialogTitle("Save png files to...");
+			chooser.setFileFilter(new FileNameExtensionFilter(".png Files", "txt", "png"));
+			int returnVal = chooser.showOpenDialog(null);
+			if (returnVal == JFileChooser.APPROVE_OPTION)
+			{
+				String filename = chooser.getSelectedFile().getAbsolutePath();
+				if (!filename.endsWith(".png")) filename += ".png";
+				ModelCreator.animCapture = new AnimationPngCapture(filename);
+			}
+		});
+		itemSavePngAnimation.setEnabled(ModelCreator.leftKeyframesPanel.isVisible() && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
+		
 		
 		itemImgurLink.addActionListener(a ->
 		{
@@ -479,7 +506,7 @@ public class GuiMenu extends JMenuBar
 	private void OnLoadFile()
 	{
 		JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
-		chooser.setDialogTitle("Input File");
+		chooser.setDialogTitle("File to open");
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		chooser.setApproveButtonText("Open");
 
@@ -491,6 +518,24 @@ public class GuiMenu extends JMenuBar
 		{
 			String filePath = chooser.getSelectedFile().getAbsolutePath();
 			creator.LoadFile(filePath);
+		}
+	}
+	
+	private void OnImportFile()
+	{
+		JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
+		chooser.setDialogTitle("File to import");
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setApproveButtonText("Import");
+
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON (.json)", "json");
+		chooser.setFileFilter(filter);
+
+		int returnVal = chooser.showOpenDialog(null);
+		if (returnVal == JFileChooser.APPROVE_OPTION)
+		{
+			String filePath = chooser.getSelectedFile().getAbsolutePath();
+			creator.ImportFile(filePath);
 		}
 	}
 

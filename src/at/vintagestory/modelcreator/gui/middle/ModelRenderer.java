@@ -218,6 +218,9 @@ public class ModelRenderer
 		if (renderedLeftSidebar != null)
 			renderedLeftSidebar.draw(offset, width, height, frameHeight);
 
+		
+		if (!ModelCreator.showGrid) return;
+		
 		glPushMatrix();
 		{
 			glTranslatef(width - 80, height - 80, 0);
