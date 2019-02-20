@@ -289,6 +289,10 @@ public class Face
 
 	public void addTextureXEnd(double amt)
 	{
+		if (this.autoUV) {
+			this.textureV += amt;
+		}
+		
 		this.textureUEnd += amt;
 		cuboid.updateUV();
 		
@@ -297,6 +301,10 @@ public class Face
 
 	public void addTextureYEnd(double amt)
 	{
+		if (this.autoUV) {
+			this.textureV += amt;
+		}
+		
 		this.textureVEnd += amt;
 		cuboid.updateUV();
 		

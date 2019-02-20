@@ -97,6 +97,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			Element element = manager.getCurrentElement();
 			if (element == null) return;			
 			Face face = element.getSelectedFace();
+			
 			face.setStartV(Parser.parseDouble(yStartField.getText(), face.getStartV()));
 			face.updateUV();
 			ModelCreator.updateValues(yStartField);			
@@ -111,6 +112,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			Element element = manager.getCurrentElement();
 			if (element == null) return;			
 			Face face = element.getSelectedFace();
+			face.setAutoUVEnabled(false);
 			face.setEndU(Parser.parseDouble(xEndField.getText(), face.getEndU()));
 			face.updateUV();
 			ModelCreator.updateValues(xEndField);			
@@ -124,6 +126,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			Element element = manager.getCurrentElement();
 			if (element == null) return;			
 			Face face = element.getSelectedFace();
+			face.setAutoUVEnabled(false);
 			face.setEndV(Parser.parseDouble(yEndField.getText(), face.getEndV()));
 			face.updateUV();
 			ModelCreator.updateValues(yEndField);			
@@ -235,7 +238,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 				{
 					face.addTextureXEnd(1.0);
 				}
-				face.setAutoUVEnabled(false);
+				
 				ModelCreator.updateValues(btnPlusXEnd);
 			}
 		});
@@ -257,7 +260,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 				{
 					face.addTextureYEnd(1.0);
 				}
-				face.setAutoUVEnabled(false);
+				
 				ModelCreator.updateValues(btnPlusYEnd);
 			}
 		});
@@ -279,7 +282,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 				{
 					face.addTextureXEnd(-1.0);
 				}
-				face.setAutoUVEnabled(false);
+				
 				ModelCreator.updateValues(btnNegXEnd);
 			}
 		});
@@ -301,7 +304,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 				{
 					face.addTextureYEnd(-1.0);
 				}
-				face.setAutoUVEnabled(false);
+				
 				ModelCreator.updateValues(btnNegYEnd);
 			}
 		});

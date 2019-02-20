@@ -36,21 +36,22 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 		this.manager = manager;
 		setLayout(new BorderLayout(0, 5));
 		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Properties</b></html>"));
-		setMaximumSize(new Dimension(186, 100));
+		setMaximumSize(new Dimension(250, 160));
 		initComponents();
 		addComponents();
 	}
 
 	public void initComponents()
 	{
-		horizontalBox = new JPanel(new GridLayout(0, 2));
+		horizontalBox = new JPanel(new GridLayout(0, 1));
 		
 		boxEnabled = ComponentUtil.createRadioButton("Enabled","<html>Determines if face should be rendered<br>Default: On</html>");
 		boxEnabled.addActionListener(e ->
 		{
 			manager.getCurrentElement().getSelectedFace().setEnabled(boxEnabled.isSelected());
 		});
-		boxAutoUV = ComponentUtil.createRadioButton("Auto UV", "<html>Determines if UV end coordinates should be set based on element size<br>Default: On</html>");
+		
+		boxAutoUV = ComponentUtil.createRadioButton("Auto Resolution", "<html>Automatically sets the UV end coordinates to fit the desired texture resolution<br>Default: On</html>");
 		boxAutoUV.addActionListener(e ->
 		{
 			manager.getCurrentElement().getSelectedFace().setAutoUVEnabled(boxAutoUV.isSelected());
@@ -79,13 +80,14 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 		});
 				
 		horizontalBox.add(boxEnabled);
-		horizontalBox.add(new JLabel(""));
+		//horizontalBox.add(new JLabel(""));
 		horizontalBox.add(boxAutoUV);
+		//horizontalBox.add(new JLabel(""));
 		horizontalBox.add(boxSnapUv);
-		horizontalBox.add(new JLabel("Glow Level"));
+		horizontalBox.add(new JLabel("Glow Level (0..255)"));
 		horizontalBox.add(glowValue);
 		
-		horizontalBox.add(new JLabel(""));
+		//horizontalBox.add(new JLabel(""));
 	}
 
 	public void addComponents()

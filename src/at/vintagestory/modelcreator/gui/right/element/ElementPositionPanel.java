@@ -211,20 +211,20 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 		switch (axis) {
 		case X:
 			cube.addStartX(size);
-			if (ctrl) cube.addOriginX(size);
+			if (!ctrl) cube.addOriginX(size);
 			
 			xPositionField.setText(df.format(cube.getStartX()));
 			
 			break;
 		case Y:
 			cube.addStartY(size);
-			if (ctrl) cube.addOriginY(size);
+			if (!ctrl) cube.addOriginY(size);
 			
 			yPositionField.setText(df.format(cube.getStartY()));
 			break;
 		default:
 			cube.addStartZ(size);
-			if (ctrl) cube.addOriginZ(size);
+			if (!ctrl) cube.addOriginZ(size);
 			
 			zPositionField.setText(df.format(cube.getStartZ()));
 			

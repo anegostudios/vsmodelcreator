@@ -45,7 +45,7 @@ public class ControlsDialog
 				+ "<p><b>Cube Properties Pane (Right)<b></p>"
 				+ "<ul>"
 				+ "<li>Hold SHIFT and click on any of the up/down arrows to modify in increments of 0.1</li>"
-				+ "<li>Hold CTRL and click on any up/down arrows of the cubes position to also move the origin</li>"
+				+ "<li>Hold CTRL and click on any up/down arrows of the cubes position to not move the origin</li>"
 				+ "<li>Focus any of the position/origin/size text fields and use mouse wheel to modify increase/decrease the size in -1/+1 (also works in conjunction with the CTRL and Shift modifiers)</li>"				
 				+ "</ul>"		
 				+ "<p><b>Face Pane (Right)<b></p>"

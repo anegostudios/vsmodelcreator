@@ -137,7 +137,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
 		queue.push(new EventQueueProxy());
 		
-		showGrid = prefs.getBoolean("showGrid", false);
+		showGrid = prefs.getBoolean("showGrid", true);
 		noTexScale = prefs.getFloat("noTexScale", 2);
 		autoreloadTexture = prefs.getBoolean("autoreloadTexture", true);
 		
