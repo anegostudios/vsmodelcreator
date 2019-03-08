@@ -114,7 +114,6 @@ public class KeyFrameElement implements IDrawable
 		
 		GL11.glPushMatrix();
 		{
-			GL11.glLoadName(AnimatedElement.openGlName);
 			GL11.glEnable(GL_BLEND);
 			GL11.glDisable(GL_CULL_FACE);
 			GL11.glTranslated(originX, originY, originZ);

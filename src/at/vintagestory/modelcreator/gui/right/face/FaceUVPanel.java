@@ -19,6 +19,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.model.Sized;
 import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
@@ -112,8 +113,11 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			Element element = manager.getCurrentElement();
 			if (element == null) return;			
 			Face face = element.getSelectedFace();
-			face.setAutoUVEnabled(false);
-			face.setEndU(Parser.parseDouble(xEndField.getText(), face.getEndU()));
+			
+			double nowEndU = Parser.parseDouble(xEndField.getText(), face.getEndU());
+			face.setAutoUVEnabled(nowEndU == face.getEndU()); // Disable auto-uv if user changed End U
+			
+			face.setEndU(nowEndU);
 			face.updateUV();
 			ModelCreator.updateValues(xEndField);			
 		});
@@ -126,8 +130,11 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			Element element = manager.getCurrentElement();
 			if (element == null) return;			
 			Face face = element.getSelectedFace();
-			face.setAutoUVEnabled(false);
-			face.setEndV(Parser.parseDouble(yEndField.getText(), face.getEndV()));
+			
+			double nowEndV = Parser.parseDouble(yEndField.getText(), face.getEndV());
+			face.setAutoUVEnabled(nowEndV == face.getEndV()); // Disable auto-uv if user changed End V
+			
+			face.setEndV(nowEndV);
 			face.updateUV();
 			ModelCreator.updateValues(yEndField);			
 		});
@@ -139,9 +146,11 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
+				Sized scale = face.getVoxel2PixelScale();
+				
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
-					face.addTextureX(0.1);
+					face.addTextureX(face.isSnapUvEnabled() ? 1/scale.W : 0.1);
 				}
 				else
 				{
@@ -162,9 +171,11 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
+				Sized scale = face.getVoxel2PixelScale();
+				
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
-					face.addTextureY(0.1);
+					face.addTextureY(face.isSnapUvEnabled() ? 1/scale.H : 0.1);
 				}
 				else
 				{
@@ -184,11 +195,11 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
-				
+				Sized scale = face.getVoxel2PixelScale();
 				
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
-					face.addTextureX(-0.1);
+					face.addTextureX(face.isSnapUvEnabled() ? -1/scale.W : -0.1);
 				}
 				else
 				{
@@ -208,9 +219,11 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
+				Sized scale = face.getVoxel2PixelScale();
+				
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
-					face.addTextureY(-0.1);
+					face.addTextureY(face.isSnapUvEnabled() ? -1/scale.H : -0.1);
 				}
 				else
 				{
@@ -230,9 +243,11 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
+				Sized scale = face.getVoxel2PixelScale();
+				
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
-					face.addTextureXEnd(0.1);
+					face.addTextureXEnd(face.isSnapUvEnabled() ? 1/scale.W : 0.1);
 				}
 				else
 				{
@@ -252,9 +267,11 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
+				Sized scale = face.getVoxel2PixelScale();
+				
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
-					face.addTextureYEnd(0.1);
+					face.addTextureYEnd(face.isSnapUvEnabled() ? 1/scale.H : 0.1);
 				}
 				else
 				{
@@ -274,9 +291,11 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
+				Sized scale = face.getVoxel2PixelScale();
+				
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
-					face.addTextureXEnd(-0.1);
+					face.addTextureXEnd(face.isSnapUvEnabled() ? -1/scale.W : -0.1);
 				}
 				else
 				{
@@ -296,9 +315,11 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			{
 				Element cube = manager.getCurrentElement();
 				Face face = cube.getSelectedFace();
+				Sized scale = face.getVoxel2PixelScale();
+				
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
-					face.addTextureYEnd(-0.1);
+					face.addTextureYEnd(face.isSnapUvEnabled() ? -1/scale.H : -0.1);
 				}
 				else
 				{

@@ -75,7 +75,30 @@ public class ProjectChangeHistory
 	}
 	
 	
+	boolean multiChangeState = false;
+	boolean didAttemptAdd = false;
+	public void beginMultichangeHistoryState() {
+		if (!multiChangeState) {
+			multiChangeState = true;
+			didAttemptAdd = false;
+		}
+	}
+	
+	public void endMultichangeHistoryState(Project project) {
+		multiChangeState = false;
+		if (didAttemptAdd) {
+			addHistoryState(project);
+		}
+		didAttemptAdd = false;
+	}
+	
+	
 	public void addHistoryState(Project project) {
+		if (multiChangeState) {
+			didAttemptAdd = true;
+			return;
+		}
+		
 		while (currentHistoryState > 0) {
 			ProjectSnapshots.remove(0);
 			currentHistoryState--;

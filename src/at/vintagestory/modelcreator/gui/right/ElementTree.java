@@ -149,9 +149,12 @@ public class ElementTree
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode)enumer.nextElement();
 			
 			if (node.getUserObject() instanceof Element) {
-				if (((Element)node.getUserObject()).openGlName == opengglname) {
-					jtree.setSelectionPath(new TreePath(node.getPath()));
-					return;
+				Element elem = (Element)node.getUserObject();
+				for (int i = 0; i < elem.getAllFaces().length; i++) {
+					if (elem.getAllFaces()[i].openGlName == opengglname) {
+						jtree.setSelectionPath(new TreePath(node.getPath()));
+						return;
+					}
 				}
 			}
 		}

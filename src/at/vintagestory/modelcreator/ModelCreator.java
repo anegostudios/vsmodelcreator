@@ -42,6 +42,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+
+import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.gui.GuiMenu;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.gui.left.LeftKeyFramesPanel;
@@ -76,7 +78,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static Project currentProject;
 	public static ProjectChangeHistory changeHistory = new ProjectChangeHistory();
 	
-	public static boolean ignoreDidModify = false;
+	public static boolean ignoreDidModify = false;	
 	public static boolean ignoreValueUpdates = false;
 	public static boolean ignoreFrameUpdates = false;
 	
@@ -94,7 +96,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	// Swing Components
 	private JScrollPane scroll;
 	public static IElementManager manager;
-	private Element grabbed = null;
+	private Element grabbedElem = null;
 
 	// Texture Loading Cache
 	List<PendingTexture> pendingTextures = Collections.synchronizedList(new ArrayList<PendingTexture>());
@@ -259,7 +261,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		if (currentProject == null) return;
 		
 		currentProject.needsSaving = true;
+		
 		changeHistory.addHistoryState(currentProject);
+		
 		updateTitle();
 	}
 
@@ -540,9 +544,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		else
 		{
 			grabbing = false;
-			grabbed = null;
+			grabbedElem = null;
 			if (mouseDownOnLeftPanel) modelrenderer.renderedLeftSidebar.mouseUp();
-			
+			else {
+				ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
+			}
 			mouseDownOnLeftPanel = false;
 			mouseDownOnCenterPanel = false;
 		}
@@ -629,21 +635,24 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 			
 			
-			if (grabbed == null && (Mouse.isButtonDown(0) || Mouse.isButtonDown(1)))
+			if (grabbedElem == null && (Mouse.isButtonDown(0) || Mouse.isButtonDown(1)))
 			{
 				int openGlName = getElementGLNameAtPos(Mouse.getX(), Mouse.getY());
 				if (openGlName >= 0)
 				{
-					currentProject.selectElementByOpenGLName(openGlName);
-					grabbed = manager.getCurrentElement();
+					currentProject.selectElementAndFaceByOpenGLName(openGlName);
+					grabbedElem = manager.getCurrentElement();
 				}
 			}
 
-			if (grabbing && grabbed != null)
+			if (grabbing && grabbedElem != null)
 			{
-				Element element = grabbed;
-				int state = getCameraState(modelrenderer.camera);
-
+				ModelCreator.changeHistory.beginMultichangeHistoryState();
+				
+				Element element = grabbedElem;
+				
+				int index = element.getSelectedFaceIndex();
+				
 				int newMouseX = Mouse.getX();
 				int newMouseY = Mouse.getY();
 
@@ -651,85 +660,50 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				int yMovement = (int) ((newMouseY - lastMouseY) / 20);
 
 				if (xMovement != 0 | yMovement != 0)
-				{
+				{				
 					if (Mouse.isButtonDown(0))
 					{
-						switch (state)
-						{
-						case 0:
-							element.addStartX(xMovement);
-							element.addStartY(yMovement);
-							break;
-						case 1:
-							element.addStartZ(xMovement);
-							element.addStartY(yMovement);
-							break;
-						case 2:
-							element.addStartX(-xMovement);
-							element.addStartY(yMovement);
-							break;
-						case 3:
-							element.addStartZ(-xMovement);
-							element.addStartY(yMovement);
-							break;
-						case 4:
-							element.addStartX(xMovement);
-							element.addStartZ(-yMovement);
-							break;
-						case 5:
-							element.addStartX(yMovement);
-							element.addStartZ(xMovement);
-							break;
-						case 6:
-							element.addStartX(-xMovement);
-							element.addStartZ(yMovement);
-							break;
-						case 7:
-							element.addStartX(-yMovement);
-							element.addStartZ(-xMovement);
-							break;
+						switch (index) {
+							case 0: // N
+							case 2: // S
+								element.addStartZ(xMovement);
+								break;
+							
+							case 1: // E
+							case 3: // W
+								element.addStartX(xMovement);
+								break;
+							
+							case 4:
+							case 5:
+								element.addStartY(yMovement);
+								break;
 						}
 					}
 					else if (Mouse.isButtonDown(1))
 					{
-						switch (state)
-						{
-						case 0:
-							element.addHeight(yMovement);
-							element.addWidth(xMovement);
-							break;
-						case 1:
-							element.addHeight(yMovement);
-							element.addDepth(xMovement);
-							break;
-						case 2:
-							element.addHeight(yMovement);
-							element.addWidth(-xMovement);
-							break;
-						case 3:
-							element.addHeight(yMovement);
-							element.addDepth(-xMovement);
-							break;
-						case 4:
-							element.addDepth(-yMovement);
-							element.addWidth(xMovement);
-							break;
-						case 5:
-							element.addDepth(xMovement);
-							element.addWidth(yMovement);
-							break;
-						case 6:
-							element.addDepth(yMovement);
-							element.addWidth(-xMovement);
-							break;
-						case 7:
-							element.addDepth(-xMovement);
-							element.addWidth(-yMovement);
-							break;
-						case 8:
-							element.addDepth(-yMovement);
-							element.addWidth(xMovement);
-							break;
+						
+						switch (index) {
+							case 0: // N
+								element.addStartZ(-xMovement);
+								element.addDepth(xMovement);
+								break;
+							case 2: // S
+								element.addDepth(-xMovement);
+								break;
+							
+							case 1: // E
+								element.addWidth(xMovement);
+								break;
+							case 3: // W
+								element.addStartX(-xMovement);
+								element.addWidth(xMovement);
+								break;
+							
+							case 4: // U
+							case 5: // D
+								element.addHeight(yMovement);
+								break;
 						}
 					}
 
@@ -769,6 +743,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		}
 	
 	}
+	
+	
+	
+	
 
 	public int getElementGLNameAtPos(int x, int y)
 	{
@@ -830,22 +808,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			value = 0.15F;
 		}
 		return value;
-	}
-
-	public int getCameraState(Camera camera)
-	{
-		int cameraRotY = (int) (camera.getRY() >= 0 ? camera.getRY() : 360 + camera.getRY());
-		int state = (int) ((cameraRotY * 4.0F / 360.0F) + 0.5D) & 3;
-
-		if (camera.getRX() > 45)
-		{
-			state += 4;
-		}
-		if (camera.getRX() < -45)
-		{
-			state += 8;
-		}
-		return state;
 	}
 
 

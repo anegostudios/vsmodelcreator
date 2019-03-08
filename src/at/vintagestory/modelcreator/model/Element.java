@@ -42,10 +42,6 @@ public class Element implements IDrawable
         DefaultBlockSideBrightness[3],
     };
     
-	static int nextOpenGlName = 0;
-
-	
-	
 	
 	public Element ParentElement;
 	public ArrayList<Element> ChildElements = new ArrayList<Element>();
@@ -53,7 +49,6 @@ public class Element implements IDrawable
 	
 	public String name = "Cube1";
 	
-	public int openGlName = 0;
 	
 	// Face Variables
 	protected int selectedFace = 0;
@@ -96,7 +91,6 @@ public class Element implements IDrawable
 		this.width = width;
 		this.height = height;
 		this.depth = depth;
-		openGlName = nextOpenGlName++;
 		initFaces();
 		updateUV();
 		recalculateBrightnessValues();
@@ -104,7 +98,6 @@ public class Element implements IDrawable
 	
 	public Element(double width, double height) {
 		name = "Face";
-		openGlName = nextOpenGlName++;
 		this.width = width;
 		this.height = height;
 		this.depth = 1;
@@ -121,8 +114,6 @@ public class Element implements IDrawable
 
 	public Element(Element cuboid)
 	{
-		openGlName = nextOpenGlName++;
-		
 		this.name = cuboid.name;
 		this.width = cuboid.width;
 		this.height = cuboid.height;
@@ -311,7 +302,6 @@ public class Element implements IDrawable
 		
 		GL11.glPushMatrix();
 		{
-			GL11.glLoadName(openGlName);
 			GL11.glEnable(GL_BLEND);
 			GL11.glDisable(GL_CULL_FACE);
 			GL11.glTranslated(originX, originY, originZ);
@@ -329,9 +319,7 @@ public class Element implements IDrawable
 								
 				faces[i].renderFace(BlockFacing.ALLFACES[i], b);
 			}
-			
-			GL11.glLoadName(0);
-			
+						
 			for (int i = 0; i < ChildElements.size(); i++) {
 				ChildElements.get(i).draw(selectedElem);
 			}
@@ -1055,7 +1043,6 @@ public class Element implements IDrawable
 		}
 		
 		cloned.name = name;
-		cloned.openGlName = openGlName;
 		cloned.selectedFace = selectedFace;
 		for (int i = 0; i < faces.length; i++) {
 			cloned.faces[i] = faces[i].clone(cloned);

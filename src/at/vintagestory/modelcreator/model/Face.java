@@ -17,6 +17,10 @@ import at.vintagestory.modelcreator.enums.BlockFacing;
 
 public class Face
 {
+	static int nextOpenGlName = 0;
+
+
+	
 	// NS = Z
 	// WE = X
 	// UD = Y
@@ -118,17 +122,19 @@ public class Face
 	private boolean autoUV = true;
 	private boolean snapUV = true;
 	public int rotation;
-
+	public int openGlName = 0;
+	
 	private Element cuboid;
 	private int side;
 	private int glow;
 
 	public Face() {
-		
+		openGlName = nextOpenGlName++;
 	}
 	
 	public Face(Element cuboid, int side)
 	{
+		openGlName = nextOpenGlName++;
 		this.cuboid = cuboid;
 		this.side = side;
 		applySingleTextureMode();
@@ -149,12 +155,15 @@ public class Face
 		color.rewind();
 	}
 	
+	
 	public void renderFace(BlockFacing blockFacing, float brightness)
 	{		
 		TextureEntry entry = ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntryByCode(textureCode);
 
 		GL11.glPushMatrix();
 		{
+			GL11.glLoadName(openGlName);
+			
 			GL11.glEnable(GL_TEXTURE_2D);
 			GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL13.GL_CLAMP_TO_BORDER);
@@ -188,6 +197,9 @@ public class Face
 			GL11.glEnd();
 
 			GL11.glDisable(GL_TEXTURE_2D);
+			
+			GL11.glLoadName(0);
+			
 		}
 		GL11.glPopMatrix();
 	}
@@ -438,6 +450,9 @@ public class Face
 				// We prevent subpixel UV mapping so that one can still resize elements slighty to fix z-fighting
 				// without messing up the UV map
 				Sized scale = getVoxel2PixelScale(); 
+				
+				textureU = (int)Math.round(textureU * scale.W) / scale.W;  
+				textureV = (int)Math.round((textureV * scale.H)) / scale.H;
 				
 				if (rotation == 0 || rotation == 2) {
 					textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale.W + 0.000001) / scale.W;      // Stupid rounding errors -.-

@@ -260,10 +260,20 @@ public class Project
 	}
 	
 	
-	public void selectElementByOpenGLName(int pos)
+	public void selectElementAndFaceByOpenGLName(int openGlName)
 	{
-		tree.selectElementByOpenGLName(pos);
+		tree.selectElementByOpenGLName(openGlName);
 		SelectedElement = tree.getSelectedElement();
+		
+		if (SelectedElement != null) {
+			for (int i = 0; i < SelectedElement.getAllFaces().length; i++) {
+				if (SelectedElement.getAllFaces()[i].openGlName == openGlName) {
+					SelectedElement.setSelectedFace(i);
+					break;
+				}
+			}
+		}
+		
 		ModelCreator.updateValues(null);
 	}
 	

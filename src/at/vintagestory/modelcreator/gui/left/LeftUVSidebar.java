@@ -429,6 +429,7 @@ public class LeftUVSidebar extends LeftSidebar
 	@Override
 	public void mouseUp() {
 		grabbing = false;
+		ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 	}
 	
 	@Override
@@ -477,6 +478,8 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		if (grabbing)
 		{
+			ModelCreator.changeHistory.beginMultichangeHistoryState();
+			
 			int newMouseX = Mouse.getX();
 			int newMouseY = Mouse.getY();			
 			int xMovement = 0;
