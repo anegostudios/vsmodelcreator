@@ -454,12 +454,17 @@ public class Face
 				textureU = (int)Math.round(textureU * scale.W) / scale.W;  
 				textureV = (int)Math.round((textureV * scale.H)) / scale.H;
 				
+				double width = cuboid.getFaceDimension(side).getWidth();
+				double height = cuboid.getFaceDimension(side).getHeight();
+				
 				if (rotation == 0 || rotation == 2) {
-					textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale.W + 0.000001) / scale.W;      // Stupid rounding errors -.-
-					textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale.H + 0.000001) / scale.H;	
+					// Math.max because if the element is not even a full pixel wide, we should still use a single pixel to texture it
+					
+					textureUEnd = textureU + Math.max(1/scale.W, Math.floor(width * scale.W + 0.000001) / scale.W);      // Stupid rounding errors -.-
+					textureVEnd = textureV + Math.max(1/scale.H, Math.floor(height * scale.H + 0.000001) / scale.H);	
 				} else {
-					textureUEnd = textureU + Math.floor(cuboid.getFaceDimension(side).getHeight() * scale.W + 0.000001) / scale.W;
-					textureVEnd = textureV + Math.floor(cuboid.getFaceDimension(side).getWidth() * scale.H + 0.000001) / scale.H;
+					textureUEnd = textureU + Math.max(1/scale.H, Math.floor(height * scale.W + 0.000001) / scale.W);
+					textureVEnd = textureV + Math.max(1/scale.W, Math.floor(width * scale.H + 0.000001) / scale.H);
 				}
 			} else {
 				
