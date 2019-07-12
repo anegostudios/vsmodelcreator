@@ -135,7 +135,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	}
 	
 	
-	public ModelCreator(String title) throws LWJGLException
+	public ModelCreator(String title, String[] args) throws LWJGLException
 	{
 		super(title);
 		
@@ -158,6 +158,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		setIconImages(getIcons());
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		
+		if (args.length > 0) {
+			ModelCreator.prefs.put("texturePath", args[0]);			
+		}
 		
 		
 		canvas = new Canvas();
