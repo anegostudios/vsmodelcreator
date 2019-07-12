@@ -1,5 +1,8 @@
 package at.vintagestory.modelcreator;
 
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.awt.BorderLayout;
@@ -453,9 +456,19 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			if (animCapture != null && !animCapture.isComplete()) {
 				animCapture.PrepareFrame();
 			}
+			
+			
+			if (ModelCreator.transparent) {
+				GL11.glEnable(GL11.GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			}
 
 			modelrenderer.Render(leftSidebarWidth, width, height, getHeight());
 			
+
+			if (ModelCreator.transparent) {
+				GL11.glDisable(GL11.GL_BLEND);
+			}
 
 			Display.update();
 

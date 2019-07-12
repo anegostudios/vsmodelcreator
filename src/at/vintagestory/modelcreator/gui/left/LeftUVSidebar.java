@@ -61,11 +61,7 @@ public class LeftUVSidebar extends LeftSidebar
 		super.draw(sidebarWidth, canvasWidth, canvasHeight, frameHeight);
 
 		this.canvasHeight = canvasHeight;
-		
-		if (ModelCreator.transparent) {
-			GL11.glEnable(GL11.GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		}	
+
 		
 		if (ModelCreator.currentProject.rootElements.size() == 0) return;
 
@@ -75,9 +71,6 @@ public class LeftUVSidebar extends LeftSidebar
 			drawRectsBlockTextureMode(canvasHeight);
 		}
 		
-		if (ModelCreator.transparent) {
-			GL11.glDisable(GL11.GL_BLEND);
-		}
 	}
 	
 	

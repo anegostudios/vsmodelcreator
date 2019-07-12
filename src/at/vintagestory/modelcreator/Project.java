@@ -536,7 +536,7 @@ public class Project
 			for (String key : MissingTexturesByCode.keySet()) {
 				String val = MissingTexturesByCode.get(key);
 				String filename = val.substring(val.lastIndexOf("/")+1);
-				if (filename.equals(textureCode)) {
+				if (filename.equalsIgnoreCase(textureCode)) {
 					TexturesByCode.put(key, new TextureEntry(key, texture, icon, image.getAbsolutePath()));
 					nowFoundTextures.add(key);
 				}	
@@ -547,7 +547,7 @@ public class Project
 			
 			if (TexturesByCode.containsKey(textureCode)) {
 				TextureEntry entry = TexturesByCode.get(textureCode);
-				if (entry.getFilePath().equals(image.getAbsolutePath())) {
+				if (entry.getFilePath().equalsIgnoreCase(image.getAbsolutePath())) {
 					TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath()));
 				} else {
 					
