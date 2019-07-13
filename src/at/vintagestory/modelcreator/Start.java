@@ -72,7 +72,7 @@ public class Start
 		}
 
 		try {
-			new ModelCreator("(untitled) - " + ModelCreator.windowTitle);	
+			new ModelCreator("(untitled) - " + ModelCreator.windowTitle, args);	
 		} catch(Exception e1) {
 			JOptionPane.showMessageDialog(
 				null, 
