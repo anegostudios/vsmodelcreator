@@ -62,6 +62,12 @@ public class LeftUVSidebar extends LeftSidebar
 
 		this.canvasHeight = canvasHeight;
 
+
+		if (ModelCreator.transparent) {
+			GL11.glEnable(GL11.GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+
 		
 		if (ModelCreator.currentProject.rootElements.size() == 0) return;
 
@@ -70,7 +76,12 @@ public class LeftUVSidebar extends LeftSidebar
 		} else {
 			drawRectsBlockTextureMode(canvasHeight);
 		}
-		
+
+
+		if (ModelCreator.transparent) {
+			GL11.glDisable(GL11.GL_BLEND);
+		}
+
 	}
 	
 	
@@ -83,13 +94,14 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		texEntry = null;
 		
-		if(!Mouse.isButtonDown(0) && !Mouse.isButtonDown(1)) {
+		if (!Mouse.isButtonDown(0) && !Mouse.isButtonDown(1)) {
 			grabbedElement = findElement(ModelCreator.currentProject.rootElements, Mouse.getX() - 10, (canvasHeight - Mouse.getY()) - 30);
 		}
 		
 		if (ModelCreator.currentProject.TexturesByCode.size() > 0) {
 			texEntry = ModelCreator.currentProject.TexturesByCode.get(ModelCreator.currentProject.TexturesByCode.keySet().iterator().next());
 		}
+		
 		scale = Face.getVoxel2PixelScale(texEntry);
 		
 		texWidth *= scale.W / 2;
@@ -101,7 +113,6 @@ public class LeftUVSidebar extends LeftSidebar
 		glPushMatrix();
 		{
 			glTranslatef(10, 30, 0);
-
 			
 			glPushMatrix(); {
 				
@@ -161,23 +172,19 @@ public class LeftUVSidebar extends LeftSidebar
 								glVertex2d(texBoxWidth, i * sectionHeight);	
 							}
 						}
-						
-	
 					}
 					glEnd();
 				}
-
-				
 				
 				drawElementList(ModelCreator.currentProject.rootElements, texBoxWidth, texBoxHeight, canvasHeight);
-				
 				
 				glPopMatrix();
 			}
 		}
-		glPopMatrix();
 		
+		glPopMatrix();
 	}
+	
 	
 	private void drawElementList(ArrayList<Element> elems, double texBoxWidth, double texBoxHeight, int canvasHeight)
 	{
