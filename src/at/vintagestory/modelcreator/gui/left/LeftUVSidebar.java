@@ -541,11 +541,13 @@ public class LeftUVSidebar extends LeftSidebar
 
 			
 			if (xMovement != 0) {
-				this.lastMouseX += (int)((int)(mousedx / sectionWidth) * sectionWidth);
+				//this.lastMouseX += (int)((int)(mousedx / sectionWidth) * sectionWidth);
+				this.lastMouseX += xMovement;
 			}
 			
 			if (yMovement != 0) {
-				this.lastMouseY += (int)((int)(mousedy / sectionHeight) * sectionHeight);
+				//this.lastMouseY += (int)((int)(mousedy / sectionHeight) * sectionHeight); - why so weird? this causes weird continous sliding effects on a 48x144 texture
+				this.lastMouseY += yMovement;
 			}
 
 
