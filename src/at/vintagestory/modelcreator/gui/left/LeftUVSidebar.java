@@ -225,9 +225,11 @@ public class LeftUVSidebar extends LeftSidebar
 				if (elem == selectedElem) {
 					glColor3f(0f, 0f, 1f);
 				}
+				
 				if (elem == grabbedElement && face.isAutoUVEnabled()) {
 					glColor3f(0f, 0.75f, 1f);
 				}
+				
 				if (elem == grabbedElement && !face.isAutoUVEnabled() && i == grabbedFaceIndex) {
 					glColor3f(0f, 1f, 0.75f);
 				}
@@ -247,14 +249,15 @@ public class LeftUVSidebar extends LeftSidebar
 	
 					glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
 					glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
-	
 				}
+				
 				glEnd();
 			}
 			
 			drawElementList(elem.ChildElements, texBoxWidth, texBoxHeight, canvasHeight);
-		}		
+		}
 	}
+	
 
 	void drawRectsBlockTextureMode(int canvasHeight) {
 		Element elem = manager.getCurrentElement();
@@ -549,12 +552,12 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			if (xMovement != 0) {
 				//this.lastMouseX += (int)((int)(mousedx / sectionWidth) * sectionWidth);
-				this.lastMouseX += xMovement;
+				this.lastMouseX += xMovement * sectionWidth;   // Add *sectionWidth because otherwise the rect moves too quickly
 			}
 			
 			if (yMovement != 0) {
 				//this.lastMouseY += (int)((int)(mousedy / sectionHeight) * sectionHeight); - why so weird? this causes weird continous sliding effects on a 48x144 texture
-				this.lastMouseY += yMovement;
+				this.lastMouseY += yMovement * sectionHeight;
 			}
 
 

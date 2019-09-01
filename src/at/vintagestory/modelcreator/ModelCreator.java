@@ -24,7 +24,6 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -46,7 +45,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
-import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.gui.GuiMenu;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.gui.left.LeftKeyFramesPanel;
@@ -61,9 +59,7 @@ import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.PendingTexture;
 import at.vintagestory.modelcreator.model.TextureEntry;
-import at.vintagestory.modelcreator.util.screenshot.AnimatedGifCapture;
 import at.vintagestory.modelcreator.util.screenshot.AnimationCapture;
-import at.vintagestory.modelcreator.util.screenshot.AnimationPngCapture;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCapture;
 
@@ -297,6 +293,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		scroll.setBorder(BorderFactory.createEmptyBorder());
 		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scroll.getVerticalScrollBar().setUnitIncrement(16);
+
 		add(scroll, BorderLayout.EAST);
 		
 		uvSidebar = new LeftUVSidebar("UV Editor", manager);
@@ -559,12 +557,12 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		}
 		else
 		{
-			grabbing = false;
 			grabbedElem = null;
 			if (mouseDownOnLeftPanel) modelrenderer.renderedLeftSidebar.mouseUp();
-			else {
+			else if (grabbing) {
 				ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 			}
+			grabbing = false;
 			mouseDownOnLeftPanel = false;
 			mouseDownOnCenterPanel = false;
 		}

@@ -125,7 +125,9 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 			ModelCreator.guiMain.itemSaveGifAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
 			ModelCreator.guiMain.itemSavePngAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
 			
+			ModelCreator.ignoreValueUpdates = true;
 			updateValues(tabbedPane);
+			ModelCreator.ignoreValueUpdates = false;
 		});
 		
 		add(tabbedPane);

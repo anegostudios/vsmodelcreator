@@ -56,20 +56,22 @@ public class ProjectChangeHistory
 		
 		ModelCreator.currentProject = ProjectSnapshots.get(currentHistoryState).clone(false);
 		ModelCreator.currentProject.tree = oldProject.tree;
-		if (oldProject.SelectedAnimation != null) {
-			ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.findAnimation(oldProject.SelectedAnimation.getName());	
-		}
 		if (oldProject.SelectedElement != null) {
 			ModelCreator.currentProject.SelectedElement = ModelCreator.currentProject.findElement(oldProject.SelectedElement.name);	
 		}
 		
+		ModelCreator.currentProject.LoadIntoEditor(ModelCreator.manager);
+
+		if (oldProject.SelectedAnimation != null) {
+			ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.findAnimation(oldProject.SelectedAnimation.getName());	
+		}
 		if (ModelCreator.currentProject.SelectedAnimation != null && oldProject.SelectedAnimation != null) {
 			Animation anim = ModelCreator.currentProject.SelectedAnimation;
 			anim.currentFrame = oldProject.SelectedAnimation.currentFrame;
 		}
 		
 		
-		ModelCreator.currentProject.LoadIntoEditor(ModelCreator.manager);
+
 		ModelCreator.updateValues(null);
 		ModelCreator.currentProject.tree.jtree.updateUI();
 	}

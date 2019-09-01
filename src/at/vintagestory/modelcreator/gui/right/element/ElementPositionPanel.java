@@ -210,21 +210,27 @@ public class ElementPositionPanel extends JPanel implements IValueUpdater
 		
 		switch (axis) {
 		case X:
+			ModelCreator.changeHistory.beginMultichangeHistoryState();
 			cube.addStartX(size);
 			if (!ctrl) cube.addOriginX(size);
+			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 			
 			xPositionField.setText(df.format(cube.getStartX()));
 			
 			break;
 		case Y:
+			ModelCreator.changeHistory.beginMultichangeHistoryState();
 			cube.addStartY(size);
 			if (!ctrl) cube.addOriginY(size);
+			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 			
 			yPositionField.setText(df.format(cube.getStartY()));
 			break;
 		default:
+			ModelCreator.changeHistory.beginMultichangeHistoryState();
 			cube.addStartZ(size);
 			if (!ctrl) cube.addOriginZ(size);
+			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 			
 			zPositionField.setText(df.format(cube.getStartZ()));
 			

@@ -13,8 +13,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Quaternion;
+
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.util.GameMath;
+import at.vintagestory.modelcreator.util.Mat4f;
+import at.vintagestory.modelcreator.util.QUtil;
 
 class TreeTransferHandler extends TransferHandler {
 	private static final long serialVersionUID = 1L;
@@ -74,7 +81,7 @@ class TreeTransferHandler extends TransferHandler {
             List<DefaultMutableTreeNode> copies = new ArrayList<DefaultMutableTreeNode>();
             List<DefaultMutableTreeNode> toRemove = new ArrayList<DefaultMutableTreeNode>();
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)paths[0].getLastPathComponent();
-            DefaultMutableTreeNode copy = copy(node);
+            DefaultMutableTreeNode copy = deepcopy(node);
             copies.add(copy);
             toRemove.add(node);
             
@@ -84,10 +91,10 @@ class TreeTransferHandler extends TransferHandler {
                 if(next.getLevel() < node.getLevel()) {
                     break;
                 } else if(next.getLevel() > node.getLevel()) {  // child node
-                    copy.add(copy(next));
+                    copy.add(deepcopy(next));
                     // node already contains child
                 } else {                                        // sibling
-                    copies.add(copy(next));
+                    copies.add(deepcopy(next));
                     toRemove.add(next);
                 }
             }
@@ -101,8 +108,15 @@ class TreeTransferHandler extends TransferHandler {
     }
   
     /** Defensive copy used in createTransferable. */
-    private DefaultMutableTreeNode copy(DefaultMutableTreeNode node) {
-        return (DefaultMutableTreeNode) node.clone();
+    private DefaultMutableTreeNode deepcopy(DefaultMutableTreeNode node) {
+    	DefaultMutableTreeNode clone = (DefaultMutableTreeNode) node.clone();
+    	
+    	int cnt = node.getChildCount();
+    	for (int i = 0; i < cnt; i++) {
+    		clone.add(deepcopy((DefaultMutableTreeNode)node.getChildAt(i)));
+    	}
+    	
+    	return clone;
     }
   
     protected void exportDone(JComponent source, Transferable data, int action) {
@@ -150,6 +164,8 @@ class TreeTransferHandler extends TransferHandler {
             index = parent.getChildCount();
         }
         
+        ModelCreator.changeHistory.beginMultichangeHistoryState();
+        
         // Add data to model.
         for(int i = 0; i < nodes.length; i++) {
             model.insertNodeInto(nodes[i], parent, index++);
@@ -157,24 +173,34 @@ class TreeTransferHandler extends TransferHandler {
             
             Element oldParent = ownElem.ParentElement; 
             Element newParent = parent.getUserObject() instanceof Element ? (Element) parent.getUserObject() : null;
+            if (oldParent == newParent) continue;
             
             if (oldParent != null) {
+            	
+            	// Element without parent now, let's apply the transform of its parents so it stays in place
+            	applyParentPathTransform(ownElem);
+            	
             	oldParent.ChildElements.remove(ownElem);
             } else {
             	ModelCreator.currentProject.rootElements.remove(ownElem);
             }
-            if (newParent != null) {
+            
+            if (newParent != null) {            	
             	newParent.ChildElements.add(ownElem);
             } else {
             	ModelCreator.currentProject.rootElements.add(ownElem);
             }
             
             ownElem.ParentElement = newParent;
+            
+        	// Element with a parent now, let's apply the inverse transform of its parents so it stays in place
+            applyParentPathInverseTransform(ownElem);
         }
         
         tree.expandPath(dest);
         
-        ModelCreator.ignoreValueUpdates = true;
+        // Why was this here? It expands all elements that were collapsed before. Seems to work without just as well?
+        /*ModelCreator.ignoreValueUpdates = true;
 		elemTree.clearElements();
 		ModelCreator.ignoreValueUpdates = false;
 		
@@ -182,17 +208,97 @@ class TreeTransferHandler extends TransferHandler {
 			elemTree.addRootElement(elem);
 		}
 		
-		elemTree.selectElement(ModelCreator.currentProject.SelectedElement);
+		
+        */
+        
+        elemTree.selectElement(ModelCreator.currentProject.SelectedElement);
         
         ModelCreator.updateValues(tree);
         tree.updateUI();
         ModelCreator.DidModify();
         
+        ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
         
         return true;
     }
+   
+    
   
-    public String toString() {
+    private void applyParentPathInverseTransform(Element ownElem)
+	{
+    	List<Element> parents = ownElem.GetParentPath();
+	    if (parents.size() == 0) return;
+	    	
+        float[] matrix = Mat4f.Create();
+        for (int j = 0; j < parents.size(); j++) {
+        	Element p = parents.get(j);
+        	p.ApplyTransform(matrix);
+        }
+        
+        Mat4f.Invert(matrix, matrix);
+		
+        float[] startpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getStartX(), (float)ownElem.getStartY(), (float)ownElem.getStartZ(), 1 });
+        float[] originpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getOriginX(), (float)ownElem.getOriginY(), (float)ownElem.getOriginZ(), 1 });
+        ownElem.ApplyTransform(matrix);
+        double[] angles = QUtil.MatrixToEuler(matrix);
+        
+        ModelCreator.ignoreValueUpdates = true;
+    	ownElem.setStartX(startpos[0]);
+    	ownElem.setStartY(startpos[1]);
+    	ownElem.setStartZ(startpos[2]);
+
+    	ownElem.setOriginX(originpos[0]);
+    	ownElem.setOriginY(originpos[1]);
+    	ownElem.setOriginZ(originpos[2]);
+    	
+    	ownElem.setRotationX(-angles[0] * GameMath.RAD2DEG);
+    	ownElem.setRotationY(-angles[1] * GameMath.RAD2DEG);
+    	ownElem.setRotationZ(-angles[2] * GameMath.RAD2DEG);
+    	
+    	ModelCreator.ignoreValueUpdates = false;
+	}
+    
+    
+    
+
+	private void applyParentPathTransform(Element ownElem)
+	{
+    	List<Element> parents = ownElem.GetParentPath();
+    	if (parents.size() == 0) return;
+    	
+        float[] matrix = Mat4f.Create();
+        for (int j = 0; j < parents.size(); j++) {
+        	Element p = parents.get(j);
+        	p.ApplyTransform(matrix);
+        }
+        
+        
+        float[] startpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getStartX(), (float)ownElem.getStartY(), (float)ownElem.getStartZ(), 1 });
+        float[] originpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getOriginX(), (float)ownElem.getOriginY(), (float)ownElem.getOriginZ(), 1 });
+        ownElem.ApplyTransform(matrix);        
+		double[] angles = QUtil.MatrixToEuler(matrix);
+
+        ModelCreator.ignoreValueUpdates = true;
+    	ownElem.setStartX(startpos[0]);
+    	ownElem.setStartY(startpos[1]);
+    	ownElem.setStartZ(startpos[2]);
+
+    	ownElem.setOriginX(originpos[0]);
+    	ownElem.setOriginY(originpos[1]);
+    	ownElem.setOriginZ(originpos[2]);
+    	
+    	ownElem.setRotationX(-angles[0] * GameMath.RAD2DEG);
+    	ownElem.setRotationY(-angles[1] * GameMath.RAD2DEG);
+    	ownElem.setRotationZ(-angles[2] * GameMath.RAD2DEG);
+    	
+    	ModelCreator.ignoreValueUpdates = false;
+	}
+
+    
+    
+    
+    
+	public String toString() {
         return getClass().getName();
     }
   

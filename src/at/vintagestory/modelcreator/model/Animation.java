@@ -106,6 +106,9 @@ public class Animation
 			for (int x = 0; x < frames; x++) {
 				int frame = (startFrame + x) % quantityFrames;				
 				KeyFrameElement kelem = allFrames.get(frame).GetKeyFrameElement(curKelem.AnimatedElement);
+				if (kelem == null) {
+					System.out.println("kelem for frame " + frame + " is null, will crash.");
+				}
 				lerpKeyFrameElement(kelem, curKelem, nextkelem, flag, x);
 			}
 		}

@@ -79,7 +79,13 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 			Element element = manager.getCurrentElement();
 			if (element == null) return;
 			
-			element.setWidth(Parser.parseDouble(xSizeField.getText(), element.getWidth()));
+			double width = Parser.parseDouble(xSizeField.getText(), element.getWidth());
+			if (width < 0) { 
+				width = 0;
+				xSizeField.setText("0");
+			}
+			
+			element.setWidth(width);
 			element.updateUV();
 			ModelCreator.updateValues(xSizeField);			
 		});
@@ -101,7 +107,13 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 			Element element = manager.getCurrentElement();
 			if (element == null) return;
 			
-			element.setHeight(Parser.parseDouble(ySizeField.getText(), element.getHeight()));
+			double height = Parser.parseDouble(ySizeField.getText(), element.getHeight());
+			if (height < 0) {
+				height = 0;
+				ySizeField.setText("0");
+			}
+			
+			element.setHeight(height);
 			element.updateUV();
 			ModelCreator.updateValues(ySizeField);			
 		});
@@ -124,7 +136,13 @@ public class ElementSizePanel extends JPanel implements IValueUpdater
 			Element element = manager.getCurrentElement();
 			if (element == null) return;
 			
-			element.setDepth(Parser.parseDouble(zSizeField.getText(), element.getDepth()));
+			double depth = Parser.parseDouble(zSizeField.getText(), element.getDepth());
+			if (depth < 0) {
+				depth = 0;
+				zSizeField.setText("0");
+			}
+			
+			element.setDepth(depth);
 			element.updateUV();
 			ModelCreator.updateValues(zSizeField);			
 		});

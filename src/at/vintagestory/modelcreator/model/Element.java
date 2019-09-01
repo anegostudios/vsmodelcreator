@@ -80,7 +80,6 @@ public class Element implements IDrawable
 	
 	
 	public float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 };
-
     
     public Element() {
     	
@@ -819,43 +818,43 @@ public class Element implements IDrawable
 
 	public void addWidth(double amt)
 	{
-		this.width += amt;
+		this.width = Math.max(width + amt, 0);
 		ModelCreator.DidModify();
 	}
 
 	public void addHeight(double amt)
 	{
-		this.height += amt;
+		this.height = Math.max(height + amt, 0);
 		ModelCreator.DidModify();
 	}
 
 	public void addDepth(double amt)
 	{
-		this.depth += amt;
+		this.depth = Math.max(depth + amt, 0);;
 		ModelCreator.DidModify();
 	}
 
 	public void setWidth(double width)
 	{
-		if (this.width == width) return;
+		if (this.width == Math.max(0, width)) return;
 		
-		this.width = width;
+		this.width = Math.max(0, width);
 		ModelCreator.DidModify();
 	}
 
 	public void setHeight(double height)
 	{
-		if (this.height == height) return;
+		if (this.height == Math.max(0, height)) return;
 		
-		this.height = height;
+		this.height = Math.max(0, height);
 		ModelCreator.DidModify();
 	}
 
 	public void setDepth(double depth)
 	{
-		if (this.depth == depth) return;
+		if (this.depth == Math.max(0, depth)) return;
 		
-		this.depth = depth;
+		this.depth = Math.max(0, depth);
 		ModelCreator.DidModify();
 	}
 
@@ -1208,6 +1207,17 @@ public class Element implements IDrawable
 			}	
 		}
 		
+	}
+
+	public void ApplyTransform(float[] matrix)
+	{
+		Mat4f.Translate(matrix, matrix, new float[] { (float)originX, (float)originY, (float)originZ });
+		Mat4f.RotateX(matrix, matrix, (float)rotationX * GameMath.DEG2RAD);
+		Mat4f.RotateY(matrix, matrix, (float)rotationY * GameMath.DEG2RAD);
+		Mat4f.RotateZ(matrix, matrix, (float)rotationZ * GameMath.DEG2RAD);
+		Mat4f.Translate(matrix, matrix, new float[] { (float)-originX, (float)-originY, (float)-originZ });
+		
+		Mat4f.Translate(matrix, matrix, new float[] { (float)startX, (float)startY, (float)startZ });
 	}
 	
 }

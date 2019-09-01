@@ -4,9 +4,12 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Enumeration;
+import java.util.HashSet;
 
 import javax.swing.DropMode;
 import javax.swing.JTree;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -26,6 +29,12 @@ public class ElementTree
 	public DefaultMutableTreeNode rootNode;
 	public DefaultTreeModel treeModel;
 	private Toolkit toolkit = Toolkit.getDefaultToolkit();
+	
+	public HashSet<String> collapsedPaths = new HashSet<String>();
+	
+	boolean ignoreExpandCollapse;
+	
+	
 		
 	public ElementTree() {
 		rootNode = new DefaultMutableTreeNode("Root");
@@ -51,6 +60,27 @@ public class ElementTree
 			}	
 		});
 		
+		jtree.addTreeExpansionListener(new TreeExpansionListener()
+		{
+			
+			@Override
+			public void treeExpanded(TreeExpansionEvent arg0)
+			{
+				if (ignoreExpandCollapse) return;
+				TreePath path = arg0.getPath();
+				collapsedPaths.remove(path.toString());
+			}
+			
+			@Override
+			public void treeCollapsed(TreeExpansionEvent arg0)
+			{
+				if (ignoreExpandCollapse) return;
+				
+				TreePath path = arg0.getPath();		        
+		        collapsedPaths.add(path.toString());
+			}
+		});
+		
 		jtree.addMouseListener(new MouseListener()
 		{
 			
@@ -68,12 +98,12 @@ public class ElementTree
 				TreePath pathLeft = jtree.getPathForLocation(arg0.getX() - 17, arg0.getY());
 				
 				if (path != null && pathLeft == null) {
-					arg0.consume();
 					
 					Object userObj = ((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject(); 
 		        	if (userObj instanceof Element) {
 		        		((Element)userObj).Render = !((Element)userObj).Render;
 		        		jtree.updateUI();
+		        		arg0.consume();
 		        	}
 				}
 				
@@ -202,6 +232,7 @@ public class ElementTree
         }
 
         DefaultMutableTreeNode node = addElement(parentNode, child, true);
+        
         selectElement(child);
         return node;
     }
@@ -219,7 +250,7 @@ public class ElementTree
             parentNode = (DefaultMutableTreeNode)(parentPath.getLastPathComponent());
         }
 
-        DefaultMutableTreeNode node =  addElement(parentNode, child, true);
+        DefaultMutableTreeNode node = addElement(parentNode, child, true);
         selectElement(child);
         return node;
     }
@@ -250,6 +281,8 @@ public class ElementTree
         		parentElem.ChildElements.add(elem);	
         	}
         }
+        
+        ignoreExpandCollapse = true;
                 
         // It is key to invoke this on the TreeModel, and NOT DefaultMutableTreeNode
         treeModel.insertNodeInto(childNode, parent, parent.getChildCount());
@@ -262,6 +295,16 @@ public class ElementTree
         for (Element child : elem.ChildElements) {
         	addElement(childNode, child, shouldBeVisible);
         }
+        
+        String path = new TreePath(childNode.getPath()).toString();
+        if (collapsedPaths.contains(path)) {
+        	jtree.collapsePath(new TreePath(childNode.getPath()));
+        } else {
+            jtree.expandPath(new TreePath(childNode.getPath()));
+        }
+        
+        ignoreExpandCollapse = false;
+        
         
         return childNode;
     }
