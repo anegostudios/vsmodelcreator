@@ -462,6 +462,9 @@ public class LeftUVSidebar extends LeftSidebar
 	public void onMouseDownOnPanel()
 	{
 		super.onMouseDownOnPanel();
+		
+		if (nowResizingSidebar) return;
+		
 		boolean nowGrabbing = Mouse.isButtonDown(0) || Mouse.isButtonDown(1);
 		
 		if (ModelCreator.currentProject.EntityTextureMode && !nowGrabbing) {

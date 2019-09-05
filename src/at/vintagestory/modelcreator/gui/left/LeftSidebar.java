@@ -29,7 +29,7 @@ public abstract class LeftSidebar
 	
 	public int nowSidebarWidth = SIDEBAR_WIDTH;
 	
-	boolean nowGrabbing;
+	boolean nowResizingSidebar;
 	int lastGrabMouseX;
 	boolean overSidebar;
 	
@@ -99,17 +99,17 @@ public abstract class LeftSidebar
 		
 		if (Math.abs(nowMouseX - width) < 4) {
 			if (Mouse.isButtonDown(0)) {
-				if (!nowGrabbing) {
+				if (!nowResizingSidebar) {
 					lastGrabMouseX = Mouse.getX(); 
 				}
 				
-				nowGrabbing = true;
+				nowResizingSidebar = true;
 			}
 			
 			overSidebar = true;
 		}
 		
-		if (nowGrabbing) {
+		if (nowResizingSidebar) {
 			nowSidebarWidth += nowMouseX - lastGrabMouseX;
 			lastGrabMouseX = nowMouseX;
 			
@@ -118,7 +118,7 @@ public abstract class LeftSidebar
 	}
 	
 	public void mouseUp() {
-		nowGrabbing = false;
+		nowResizingSidebar = false;
 	}
 	
 	public void onResized() {
