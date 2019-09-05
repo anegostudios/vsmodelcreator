@@ -35,7 +35,7 @@ public class LeftUVSidebar extends LeftSidebar
 {
 	private IElementManager manager;
 
-	private final int WIDTH = 4*32;
+	private static int DEFAULT_WIDTH = 4*32;
 
 	private final Color BLACK_ALPHA = new Color(0, 0, 0, 0.75F);
 
@@ -53,6 +53,21 @@ public class LeftUVSidebar extends LeftSidebar
 	{
 		super(title);
 		this.manager = manager;
+		
+		blockFaceTextureWidth = DEFAULT_WIDTH;
+	}
+	
+	@Override
+	public void onResized()
+	{
+		/*if (!ModelCreator.currentProject.EntityTextureMode) {
+			int extraWidth = GetSidebarWidth() - DEFAULT_WIDTH + 20;
+			if (canvasHeight < 6*(10 + DEFAULT_WIDTH + extraWidth)) {
+				extraWidth /= 2;
+			}
+			
+			blockFaceTextureWidth = DEFAULT_WIDTH + extraWidth;
+		}*/
 	}
 
 	@Override
@@ -107,7 +122,7 @@ public class LeftUVSidebar extends LeftSidebar
 		texWidth *= scale.W / 2;
 		texHeight *= scale.H / 2;
 		
-		texBoxWidth = (int)(2 * WIDTH);
+		texBoxWidth = (int)(GetSidebarWidth() - 20);
 		texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
 		
 		glPushMatrix();
@@ -258,6 +273,8 @@ public class LeftUVSidebar extends LeftSidebar
 		}
 	}
 	
+	
+	int blockFaceTextureWidth;
 
 	void drawRectsBlockTextureMode(int canvasHeight) {
 		Element elem = manager.getCurrentElement();
@@ -274,6 +291,8 @@ public class LeftUVSidebar extends LeftSidebar
 		}
 		
 		
+		blockFaceTextureWidth = (GetSidebarWidth() - 30) / 2;
+		
 		glPushMatrix();
 		{
 			glTranslatef(10, 30, 0);
@@ -288,17 +307,17 @@ public class LeftUVSidebar extends LeftSidebar
 				if (!face.isEnabled()) continue;
 				
 				glPushMatrix(); {
-					if (30 + i * (WIDTH + 10) + (WIDTH + 10) > canvasHeight) {
-						glTranslatef(10 + WIDTH, countright * (WIDTH + 10), 0);
-						startX[i] = 20 + WIDTH;
-						startY[i] = countright * (WIDTH + 10) + 40;
+					if (i >= 3 && canvasHeight < 6*(10 + blockFaceTextureWidth)) {
+						glTranslatef(10 + blockFaceTextureWidth, countright * (blockFaceTextureWidth + 10), 0);
+						startX[i] = 20 + blockFaceTextureWidth;
+						startY[i] = countright * (blockFaceTextureWidth + 10) + 40;
 						countright++;
 					}
 					else
 					{
-						glTranslatef(0, countleft * (WIDTH + 10), 0);
+						glTranslatef(0, countleft * (blockFaceTextureWidth + 10), 0);
 						startX[i] = 10;
-						startY[i] = countleft * (WIDTH + 10) + 40;
+						startY[i] = countleft * (blockFaceTextureWidth + 10) + 40;
 						countleft++;
 					}
 
@@ -335,10 +354,10 @@ public class LeftUVSidebar extends LeftSidebar
 							GL11.glColor4f(0.9f, 0.9f, 0.9f, 0.3f);
 							int pixelsW = (int)(ModelCreator.currentProject.TextureWidth * scale.W);
 							int pixelsH = (int)(ModelCreator.currentProject.TextureHeight * scale.H);
-							double height = WIDTH * pixelsH/pixelsW;
+							double height = blockFaceTextureWidth * pixelsH/pixelsW;
 							
 							if (pixelsW <= 64 && pixelsH <= 64) {
-								double sectionWidth = (double)WIDTH / pixelsW;
+								double sectionWidth = (double)blockFaceTextureWidth / pixelsW;
 								for (double k= 0; k <= pixelsW; k++) {
 									glVertex2d(k * sectionWidth, 0);
 									glVertex2d(k * sectionWidth, height);	
@@ -347,7 +366,7 @@ public class LeftUVSidebar extends LeftSidebar
 								double sectionHeight = (double)height / pixelsH;
 								for (double k = 0; k <= pixelsH; k++) {
 									glVertex2d(0, k * sectionHeight);
-									glVertex2d(WIDTH, k * sectionHeight);	
+									glVertex2d(blockFaceTextureWidth, k * sectionHeight);	
 								}
 							}
 							
@@ -375,17 +394,17 @@ public class LeftUVSidebar extends LeftSidebar
 				if (!face.isEnabled()) continue;
 				
 				glPushMatrix(); {
-					if (30 + i * (WIDTH + 10) + (WIDTH + 10) > canvasHeight) {
-						glTranslatef(10 + WIDTH, countright * (WIDTH + 10), 0);
-						startX[i] = 20 + WIDTH;
-						startY[i] = countright * (WIDTH + 10) + 40;
+					if (i >= 3 && canvasHeight < 6*(10 + blockFaceTextureWidth)) {
+						glTranslatef(10 + blockFaceTextureWidth, countright * (blockFaceTextureWidth + 10), 0);
+						startX[i] = 20 + blockFaceTextureWidth;
+						startY[i] = countright * (blockFaceTextureWidth + 10) + 40;
 						countright++;
 					}
 					else
 					{
-						glTranslatef(0, countleft * (WIDTH + 10), 0);
+						glTranslatef(0, countleft * (blockFaceTextureWidth + 10), 0);
 						startX[i] = 10;
-						startY[i] = countleft * (WIDTH + 10) + 40;
+						startY[i] = countleft * (blockFaceTextureWidth + 10) + 40;
 						countleft++;
 					}
 
@@ -431,14 +450,18 @@ public class LeftUVSidebar extends LeftSidebar
 
 	@Override
 	public void mouseUp() {
+		super.mouseUp();
+		
+		if (grabbing) {
+			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
+		}
 		grabbing = false;
-		ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 	}
 	
 	@Override
-	public void handleInput()
+	public void onMouseDownOnPanel()
 	{
-		super.handleInput();
+		super.onMouseDownOnPanel();
 		boolean nowGrabbing = Mouse.isButtonDown(0) || Mouse.isButtonDown(1);
 		
 		if (ModelCreator.currentProject.EntityTextureMode && !nowGrabbing) {
@@ -574,7 +597,7 @@ public class LeftUVSidebar extends LeftSidebar
 	public Sized GetBlockTextureModeTextureSize() {
 		double texWidth = ModelCreator.currentProject.TextureWidth;
 		double texHeight = ModelCreator.currentProject.TextureHeight;
-		int texBoxWidth = (int)(WIDTH);
+		int texBoxWidth = (int)(blockFaceTextureWidth);
 		int texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
 
 		return new Sized(texBoxWidth, texBoxHeight);
@@ -593,9 +616,9 @@ public class LeftUVSidebar extends LeftSidebar
 				continue;
 			}
 			
-			if (mouseX >= startX[i] && mouseX <= startX[i] + WIDTH)
+			if (mouseX >= startX[i] && mouseX <= startX[i] + blockFaceTextureWidth)
 			{
-				if ((canvasHeight - mouseY + 10) >= startY[i] && (canvasHeight - mouseY + 10) <= startY[i] + WIDTH)
+				if ((canvasHeight - mouseY + 10) >= startY[i] && (canvasHeight - mouseY + 10) <= startY[i] + blockFaceTextureWidth)
 				{
 					return i;
 				}

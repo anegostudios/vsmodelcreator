@@ -89,7 +89,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	// Canvas Variables
 	private final static AtomicReference<Dimension> newCanvasSize = new AtomicReference<Dimension>();
-	private final Canvas canvas;
+	public final Canvas canvas;
 	private int width = 990, height = 700;
 
 	// Swing Components
@@ -112,8 +112,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	private boolean grabbing = false;
 	private boolean closeRequested = false;
 
-	/* Sidebar Variables */
-	private final int SIDEBAR_WIDTH = 4 * 32 + 20;
 	
 	public LeftSidebar uvSidebar;
 	public static GuiMenu guiMain;
@@ -517,11 +515,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	}
 	
 	public int leftSidebarWidth() {
-		Project project = ModelCreator.currentProject;
-		
 		int leftSpacing = 0;
 		if (modelrenderer.renderedLeftSidebar != null) {
-			leftSpacing = project.EntityTextureMode || getHeight() < 911 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
+		 	leftSpacing = modelrenderer.renderedLeftSidebar.GetSidebarWidth();
+			
 		}
 		
 		return leftSpacing;
@@ -541,7 +538,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		boolean isOnLeftPanel = Mouse.getX() < leftSidebarWidth;
 		
-		if (Mouse.isButtonDown(0) | Mouse.isButtonDown(1))
+		if (Mouse.isButtonDown(0) || Mouse.isButtonDown(1))
 		{
 			if (!grabbing)
 			{
@@ -558,8 +555,12 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		else
 		{
 			grabbedElem = null;
-			if (mouseDownOnLeftPanel) modelrenderer.renderedLeftSidebar.mouseUp();
-			else if (grabbing) {
+			
+			if (modelrenderer.renderedLeftSidebar != null) {
+				modelrenderer.renderedLeftSidebar.mouseUp();
+			}
+			
+			if (!mouseDownOnLeftPanel && grabbing) {
 				ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 			}
 			grabbing = false;
@@ -570,9 +571,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		if (mouseDownOnLeftPanel)
 		{
-			modelrenderer.renderedLeftSidebar.handleInput();
+			modelrenderer.renderedLeftSidebar.onMouseDownOnPanel();
 			return;
-		}
+		}		
 
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))

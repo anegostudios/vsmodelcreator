@@ -12,13 +12,33 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glVertex2i;
 
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 
+import com.sun.glass.ui.Cursor;
+
+import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.EnumFonts;
 
-public class LeftSidebar
+public abstract class LeftSidebar
 {
+	/* Sidebar Variables */
+	private final int SIDEBAR_WIDTH = 4 * 32 + 20;
+
 	private String title;
+	
+	public int nowSidebarWidth = SIDEBAR_WIDTH;
+	
+	boolean nowGrabbing;
+	int lastGrabMouseX;
+	boolean overSidebar;
+	
+	public int GetSidebarWidth() {
+		return nowSidebarWidth;
+		
+		//Project project = ModelCreator.currentProject;
+		//return project.EntityTextureMode || ModelCreator.Instance.getHeight() < 911 ? SIDEBAR_WIDTH * 2 : SIDEBAR_WIDTH;
+	}
 
 	public LeftSidebar(String title)
 	{
@@ -37,7 +57,30 @@ public class LeftSidebar
 		}
 		glEnd();
 
+		glColor3f(0.166F, 0.166F, 0.194F);
+		glBegin(GL_QUADS);
+		{
+			glVertex2i(sidebarWidth - 2, 0);
+			glVertex2i(sidebarWidth, 0);
+			glVertex2i(sidebarWidth, canvasHeight);
+			glVertex2i(sidebarWidth - 2, canvasHeight);
+		}
+		glEnd();
+
+		
 		drawTitle();
+		
+		int width = GetSidebarWidth();
+		int nowMouseX = Mouse.getX();
+		if (width - nowMouseX > 0 && width - nowMouseX < 7) {
+			ModelCreator.Instance.canvas.setCursor(new java.awt.Cursor(Cursor.CURSOR_RESIZE_LEFTRIGHT));
+			overSidebar = true;
+		} else {
+			if (overSidebar) {
+				ModelCreator.Instance.canvas.setCursor(java.awt.Cursor.getDefaultCursor());				
+				overSidebar = false;
+			}
+		}
 	}
 
 	private void drawTitle()
@@ -49,12 +92,36 @@ public class LeftSidebar
 	}
 
 	
-	public void handleInput()
+	public void onMouseDownOnPanel()
 	{
-
+		int width = GetSidebarWidth();
+		int nowMouseX = Mouse.getX();
+		
+		if (Math.abs(nowMouseX - width) < 4) {
+			if (Mouse.isButtonDown(0)) {
+				if (!nowGrabbing) {
+					lastGrabMouseX = Mouse.getX(); 
+				}
+				
+				nowGrabbing = true;
+			}
+			
+			overSidebar = true;
+		}
+		
+		if (nowGrabbing) {
+			nowSidebarWidth += nowMouseX - lastGrabMouseX;
+			lastGrabMouseX = nowMouseX;
+			
+			onResized();
+		}
 	}
 	
 	public void mouseUp() {
+		nowGrabbing = false;
+	}
+	
+	public void onResized() {
 		
 	}
 }

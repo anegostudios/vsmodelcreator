@@ -28,13 +28,13 @@ public class ModelRenderer
 		this.manager = manager;
 	}
 	
-	public void Render(int leftSpacing, int width, int height, int frameHeight) {
+	public void Render(int leftSidebarWidth, int width, int height, int frameHeight) {
 		this.width = width;
 		this.height = height;
 		
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		GLU.gluPerspective(60F, (float) (width - leftSpacing) / (float) height, 0.3F, 1000F);
+		GLU.gluPerspective(60F, (float) (width - leftSidebarWidth) / (float) height, 0.3F, 1000F);
 
 		drawGridAndElements();
 
@@ -50,7 +50,7 @@ public class ModelRenderer
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
-		renderLeftPane(leftSpacing, frameHeight);
+		renderLeftPane(leftSidebarWidth, frameHeight);
 	}
 	
 	
@@ -194,7 +194,7 @@ public class ModelRenderer
 	}
 
 
-	public void renderLeftPane(int offset, int frameHeight)
+	public void renderLeftPane(int sidebarWidth, int frameHeight)
 	{
 		glPushMatrix();
 		{
@@ -202,13 +202,13 @@ public class ModelRenderer
 			glLineWidth(2F);
 			glBegin(GL_LINES);
 			{
-				glVertex2i(offset, 0);
+				glVertex2i(sidebarWidth, 0);
 				glVertex2i(width, 0);
 				glVertex2i(width, 0);
 				glVertex2i(width, height);
-				glVertex2i(offset, height);
-				glVertex2i(offset, 0);
-				glVertex2i(offset, height);
+				glVertex2i(sidebarWidth, height);
+				glVertex2i(sidebarWidth, 0);
+				glVertex2i(sidebarWidth, height);
 				glVertex2i(width, height);
 			}
 			glEnd();
@@ -216,7 +216,7 @@ public class ModelRenderer
 		glPopMatrix();
 
 		if (renderedLeftSidebar != null)
-			renderedLeftSidebar.draw(offset, width, height, frameHeight);
+			renderedLeftSidebar.draw(sidebarWidth, width, height, frameHeight);
 
 		
 		if (!ModelCreator.showGrid) return;

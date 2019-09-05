@@ -1,6 +1,8 @@
 package at.vintagestory.modelcreator.gui.right;
 
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Enumeration;
@@ -43,6 +45,7 @@ public class ElementTree
         jtree.setEditable(false);
         jtree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jtree.setShowsRootHandles(true);
+        jtree.setFocusable(true);
         jtree.setCellRenderer(new ElementTreeCellRenderer());
         jtree.setDragEnabled(true);
         jtree.setDropMode(DropMode.ON_OR_INSERT);
@@ -58,6 +61,46 @@ public class ElementTree
 					ModelCreator.updateValues(jtree);	
 				}
 			}	
+		});
+		
+		// does not work, wtf?
+		jtree.addKeyListener(new KeyListener()
+		{
+			
+			@Override
+			public void keyTyped(KeyEvent e)
+			{
+				if (e.getKeyCode() == KeyEvent.VK_UP) {
+					jtree.setSelectionRow(Math.max(0, jtree.getSelectionRows()[0] - 1));
+				}
+				if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+					jtree.setSelectionRow(Math.max(0, jtree.getSelectionRows()[0] + 1));
+				}
+				if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+					DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)jtree.getLastSelectedPathComponent();
+					jtree.collapsePath(new TreePath(selectedNode.getPath()));
+				}
+				if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+					DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)jtree.getLastSelectedPathComponent();
+					jtree.expandPath(new TreePath(selectedNode.getPath()));
+				}
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e)
+			{
+				
+				
+				
+			}
 		});
 		
 		jtree.addTreeExpansionListener(new TreeExpansionListener()

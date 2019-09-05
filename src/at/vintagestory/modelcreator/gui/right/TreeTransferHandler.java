@@ -166,6 +166,9 @@ class TreeTransferHandler extends TransferHandler {
         
         ModelCreator.changeHistory.beginMultichangeHistoryState();
         
+        List<Element> oldParentPath = new ArrayList<Element>();
+        List<Element> newParentPath = new ArrayList<Element>();
+        
         // Add data to model.
         for(int i = 0; i < nodes.length; i++) {
             model.insertNodeInto(nodes[i], parent, index++);
@@ -176,10 +179,7 @@ class TreeTransferHandler extends TransferHandler {
             if (oldParent == newParent) continue;
             
             if (oldParent != null) {
-            	
-            	// Element without parent now, let's apply the transform of its parents so it stays in place
-            	applyParentPathTransform(ownElem);
-            	
+            	oldParentPath = ownElem.GetParentPath();            	
             	oldParent.ChildElements.remove(ownElem);
             } else {
             	ModelCreator.currentProject.rootElements.remove(ownElem);
@@ -193,25 +193,14 @@ class TreeTransferHandler extends TransferHandler {
             
             ownElem.ParentElement = newParent;
             
-        	// Element with a parent now, let's apply the inverse transform of its parents so it stays in place
-            applyParentPathInverseTransform(ownElem);
+            newParentPath = ownElem.GetParentPath();
+            
+            applyReparentTransform(ownElem, oldParentPath, newParentPath);
+            
+            tree.setSelectionPath(new TreePath(nodes[i].getPath()));
         }
         
         tree.expandPath(dest);
-        
-        // Why was this here? It expands all elements that were collapsed before. Seems to work without just as well?
-        /*ModelCreator.ignoreValueUpdates = true;
-		elemTree.clearElements();
-		ModelCreator.ignoreValueUpdates = false;
-		
-		for (Element elem : ModelCreator.currentProject.rootElements) {
-			elemTree.addRootElement(elem);
-		}
-		
-		
-        */
-        
-        elemTree.selectElement(ModelCreator.currentProject.SelectedElement);
         
         ModelCreator.updateValues(tree);
         tree.updateUI();
@@ -224,24 +213,30 @@ class TreeTransferHandler extends TransferHandler {
    
     
   
-    private void applyParentPathInverseTransform(Element ownElem)
+    private void applyReparentTransform(Element ownElem, List<Element> oldParentPath, List<Element> newParentPath)
 	{
-    	List<Element> parents = ownElem.GetParentPath();
-	    if (parents.size() == 0) return;
-	    	
         float[] matrix = Mat4f.Create();
-        for (int j = 0; j < parents.size(); j++) {
-        	Element p = parents.get(j);
+        
+        for (int j = 0; j < newParentPath.size(); j++) {
+        	Element p = newParentPath.get(j);
         	p.ApplyTransform(matrix);
         }
-        
         Mat4f.Invert(matrix, matrix);
-		
-        float[] startpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getStartX(), (float)ownElem.getStartY(), (float)ownElem.getStartZ(), 1 });
+        
+        for (int j = 0; j < oldParentPath.size(); j++) {
+        	Element p = oldParentPath.get(j);
+        	p.ApplyTransform(matrix);
+        }
+
+        
         float[] originpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getOriginX(), (float)ownElem.getOriginY(), (float)ownElem.getOriginZ(), 1 });
-        ownElem.ApplyTransform(matrix);
+        float[] startpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getStartX(), (float)ownElem.getStartY(), (float)ownElem.getStartZ(), 1 });
+        
+        ownElem.ApplyTransform(matrix);        
         double[] angles = QUtil.MatrixToEuler(matrix);
         
+        
+        
         ModelCreator.ignoreValueUpdates = true;
     	ownElem.setStartX(startpos[0]);
     	ownElem.setStartY(startpos[1]);
@@ -254,46 +249,10 @@ class TreeTransferHandler extends TransferHandler {
     	ownElem.setRotationX(-angles[0] * GameMath.RAD2DEG);
     	ownElem.setRotationY(-angles[1] * GameMath.RAD2DEG);
     	ownElem.setRotationZ(-angles[2] * GameMath.RAD2DEG);
-    	
     	ModelCreator.ignoreValueUpdates = false;
 	}
     
     
-    
-
-	private void applyParentPathTransform(Element ownElem)
-	{
-    	List<Element> parents = ownElem.GetParentPath();
-    	if (parents.size() == 0) return;
-    	
-        float[] matrix = Mat4f.Create();
-        for (int j = 0; j < parents.size(); j++) {
-        	Element p = parents.get(j);
-        	p.ApplyTransform(matrix);
-        }
-        
-        
-        float[] startpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getStartX(), (float)ownElem.getStartY(), (float)ownElem.getStartZ(), 1 });
-        float[] originpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getOriginX(), (float)ownElem.getOriginY(), (float)ownElem.getOriginZ(), 1 });
-        ownElem.ApplyTransform(matrix);        
-		double[] angles = QUtil.MatrixToEuler(matrix);
-
-        ModelCreator.ignoreValueUpdates = true;
-    	ownElem.setStartX(startpos[0]);
-    	ownElem.setStartY(startpos[1]);
-    	ownElem.setStartZ(startpos[2]);
-
-    	ownElem.setOriginX(originpos[0]);
-    	ownElem.setOriginY(originpos[1]);
-    	ownElem.setOriginZ(originpos[2]);
-    	
-    	ownElem.setRotationX(-angles[0] * GameMath.RAD2DEG);
-    	ownElem.setRotationY(-angles[1] * GameMath.RAD2DEG);
-    	ownElem.setRotationZ(-angles[2] * GameMath.RAD2DEG);
-    	
-    	ModelCreator.ignoreValueUpdates = false;
-	}
-
     
     
     
