@@ -187,6 +187,11 @@ public class Importer
 		{
 			project.AllAngles = obj.get("allAngles").getAsBoolean();
 		}
+		
+		if (obj.has("backDropShape") && obj.get("backDropShape").isJsonPrimitive())
+		{
+			project.backDropShape = obj.get("backDropShape").getAsString();
+		}
 	}
 
 	private void loadTextures(File file, JsonObject obj)
@@ -334,12 +339,17 @@ public class Importer
 	private Element readElement(JsonObject obj, Element parent)
 	{
 		String name = "Element";
+		String stepparentname = null;
 		JsonArray from = null;
 		JsonArray to = null;
 
 		if (obj.has("name") && obj.get("name").isJsonPrimitive())
 		{
 			name = obj.get("name").getAsString();
+		}
+		if (obj.has("stepParentName") && obj.get("stepParentName").isJsonPrimitive())
+		{
+			stepparentname = obj.get("stepParentName").getAsString();
 		}
 		else if (obj.has("comment") && obj.get("comment").isJsonPrimitive())
 		{
@@ -365,6 +375,7 @@ public class Importer
 			double d = to.get(2).getAsDouble() - z;
 
 			Element element = new Element(w, h, d);
+			element.stepparentName = stepparentname;
 			element.setName(name);
 			element.setStartX(x);
 			element.setStartY(y);

@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -17,6 +18,7 @@ import javax.swing.JTextField;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.gui.ComponentUtil;
+import at.vintagestory.modelcreator.gui.StepparentSelectionDialog;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
@@ -32,14 +34,16 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 	
 	JTextField tintIndexField;
 	private JComboBox<String> renderPassList;
+	JButton stepparentButton;
 
 
 	public ElementPropertiesPanel(IElementManager manager)
 	{
 		this.manager = manager;
-		setLayout(new GridLayout(3, 2));
+		setLayout(new GridLayout(4, 2, 0, 5));
+		
 		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Element Properties</b></html>"));
-		setPreferredSize(new Dimension(200, 100));
+		setPreferredSize(new Dimension(200, 120));
 		setAlignmentX(JPanel.LEFT_ALIGNMENT);
 		initComponents();
 		addComponents();
@@ -56,7 +60,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 		
 		tintIndexField = new JTextField();
 		tintIndexField.setToolTipText("0 for no tint, 1 = for climate foliage tint, 2 = for climate water tint");
-		tintIndexField.setPreferredSize(new Dimension(200, 25));
+		tintIndexField.setPreferredSize(new Dimension(190, 25));
 		
 		tintIndexField.addKeyListener(new KeyAdapter()
 		{
@@ -79,7 +83,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 		renderPassList.setToolTipText("Leave at default to use the blocks render pass. Set to another value to override the block render pass. For foliage you might want to use OpaqueNoCull.");
 		DefaultComboBoxModel<String> model = renderPassList();		
 		renderPassList.setModel(model);
-		renderPassList.setPreferredSize(new Dimension(200, 25));
+		renderPassList.setPreferredSize(new Dimension(190, 25));
 		
 		renderPassList.addActionListener(e -> {
 			Element elem = manager.getCurrentElement();
@@ -106,6 +110,18 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 		
 		add(new JLabel("Render pass"));
 		add(renderPassList);
+		
+		JLabel label = new JLabel("Stepparent element");
+		stepparentButton = new JButton();
+		stepparentButton.setText("Select...");
+		stepparentButton.addActionListener(e ->
+		{
+			StepparentSelectionDialog.show(manager, ModelCreator.Instance, ModelCreator.currentProject.SelectedElement);
+		});
+		
+		label.setToolTipText("To define a parent element, without actually having it be part of the model. Useful for defining child elements of backdrop models.");
+		add(label);
+		add(stepparentButton);
 	}
 
 	@Override
@@ -121,6 +137,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 			
 			tintIndexField.setText(cube.getTintIndex() + "");
 			renderPassList.setSelectedIndex(cube.getRenderPass() + 1);
+			stepparentButton.setEnabled(true);
 		}
 		else
 		{
@@ -130,6 +147,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 			
 			tintIndexField.setEnabled(false);
 			tintIndexField.setText("");
+			stepparentButton.setEnabled(false);
 		}
 	}
 	

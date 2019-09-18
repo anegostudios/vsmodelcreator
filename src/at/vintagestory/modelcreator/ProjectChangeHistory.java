@@ -57,7 +57,7 @@ public class ProjectChangeHistory
 		ModelCreator.currentProject = ProjectSnapshots.get(currentHistoryState).clone(false);
 		ModelCreator.currentProject.tree = oldProject.tree;
 		if (oldProject.SelectedElement != null) {
-			ModelCreator.currentProject.SelectedElement = ModelCreator.currentProject.findElement(oldProject.SelectedElement.name);	
+			ModelCreator.currentProject.SelectedElement = ModelCreator.currentProject.findElement(oldProject.SelectedElement.getName());	
 		}
 		
 		ModelCreator.currentProject.LoadIntoEditor(ModelCreator.manager);
@@ -71,7 +71,8 @@ public class ProjectChangeHistory
 		}
 		
 		
-
+		ModelCreator.reloadStepparentRelationShips();	
+		
 		ModelCreator.updateValues(null);
 		ModelCreator.currentProject.tree.jtree.updateUI();
 	}

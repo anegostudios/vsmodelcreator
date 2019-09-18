@@ -1,6 +1,8 @@
 package at.vintagestory.modelcreator.gui.middle;
 
 import static org.lwjgl.opengl.GL11.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
@@ -79,6 +81,14 @@ public class ModelRenderer
 		for (int i = 0; i < rootelems.size(); i++)
 		{
 			rootelems.get(i).draw(selectedElem);
+		}
+		
+		if (ModelCreator.currentBackdropProject != null) {
+			ArrayList<Element> elems = ModelCreator.currentBackdropProject.rootElements;
+			
+			for (int i = 0; i < elems.size(); i++) {
+				elems.get(i).draw(selectedElem);
+			}
 		}
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);

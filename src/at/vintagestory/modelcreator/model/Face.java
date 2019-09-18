@@ -13,6 +13,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 
 public class Face
@@ -127,6 +128,13 @@ public class Face
 	private Element cuboid;
 	private int side;
 	private int glow;
+	
+	
+	public boolean isInBackdropProject;
+	
+	public Project getProject() {
+		return isInBackdropProject ? ModelCreator.currentBackdropProject : ModelCreator.currentProject;
+	}
 
 	public Face() {
 		openGlName = nextOpenGlName++;
@@ -141,10 +149,11 @@ public class Face
 	}
 	
 	public void applySingleTextureMode() {
-		if (ModelCreator.currentProject != null && ModelCreator.currentProject.EntityTextureMode && ModelCreator.currentProject.TexturesByCode != null && ModelCreator.currentProject.TexturesByCode.size() > 0) {
+		Project project = getProject();
+		if (project != null && project.EntityTextureMode && project.TexturesByCode != null && project.TexturesByCode.size() > 0) {
 			//this.textureName = ModelCreator.currentProject.Textures.get(0).name;
 			
-			this.textureCode = ModelCreator.currentProject.TexturesByCode.values().iterator().next().code;
+			this.textureCode = project.TexturesByCode.values().iterator().next().code;
 		}		
 	}
 	
@@ -157,12 +166,13 @@ public class Face
 	
 	
 	public void renderFace(BlockFacing blockFacing, float brightness)
-	{		
-		TextureEntry entry = ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntryByCode(textureCode);
+	{	
+		Project project = getProject();
+		TextureEntry entry = project == null ? null : project.getTextureEntryByCode(textureCode);
 
 		GL11.glPushMatrix();
 		{
-			GL11.glLoadName(openGlName);
+			if (!isInBackdropProject) GL11.glLoadName(openGlName);
 			
 			GL11.glEnable(GL_TEXTURE_2D);
 			GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -172,7 +182,7 @@ public class Face
 			
 			GL11.glTexParameter(GL_TEXTURE_2D, GL11.GL_TEXTURE_BORDER_COLOR, color);
 			
-			bindTexture();
+			bindTexture(entry);
 
 			if (binded) GL11.glColor3f(brightness, brightness, brightness);
 			
@@ -184,7 +194,7 @@ public class Face
 			{
 				for (int j = 0; j < 4; j++) {
 					
-					Sized uv = translateVoxelPosToUvPos(entry,
+					Sized uv = translateVoxelPosToUvPos(project, entry,
 							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureU : textureUEnd),
 							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureV : textureVEnd),
 							false
@@ -198,24 +208,25 @@ public class Face
 
 			GL11.glDisable(GL_TEXTURE_2D);
 			
-			GL11.glLoadName(0);
+			if (!isInBackdropProject) GL11.glLoadName(0);
 			
 		}
 		GL11.glPopMatrix();
 	}
 	
 	
-	public Sized translateVoxelPosToUvPos(double voxelU, double voxelV, boolean actualPosition) { 
-		return translateVoxelPosToUvPos(ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntryByCode(textureCode), voxelU, voxelV, actualPosition);
+	public Sized translateVoxelPosToUvPos(double voxelU, double voxelV, boolean actualPosition) {
+		Project project = getProject();
+		return translateVoxelPosToUvPos(project, project == null ? null : project.getTextureEntryByCode(textureCode), voxelU, voxelV, actualPosition);
 	}
 	
-	public static Sized translateVoxelPosToUvPos(TextureEntry entry, double voxelU, double voxelV, boolean actualPosition) {
-		double textureVoxelWidth = ModelCreator.currentProject.TextureWidth;
-		double textureVoxelHeight = ModelCreator.currentProject.TextureHeight;
+	public static Sized translateVoxelPosToUvPos(Project project, TextureEntry entry, double voxelU, double voxelV, boolean actualPosition) {
+		double textureVoxelWidth = project.TextureWidth;
+		double textureVoxelHeight = project.TextureHeight;
 		
 		if (entry != null && !actualPosition) {
-			textureVoxelWidth = entry.VoxelWidthWithLwJglFuckery();
-			textureVoxelHeight = entry.VoxelHeighthWithLwJglFuckery();
+			textureVoxelWidth = entry.VoxelWidthWithLwJglFuckery(project);
+			textureVoxelHeight = entry.VoxelHeighthWithLwJglFuckery(project);
 		}
 		
 		return new Sized(voxelU / textureVoxelWidth, voxelV / textureVoxelHeight);
@@ -223,14 +234,15 @@ public class Face
 	
 	
 	public Sized getVoxel2PixelScale() {
-		return getVoxel2PixelScale(ModelCreator.currentProject == null ? null : ModelCreator.currentProject.getTextureEntryByCode(textureCode));
+		Project project = getProject();
+		return getVoxel2PixelScale(project, project == null ? null : project.getTextureEntryByCode(textureCode));
 	}
 	
-	public static Sized getVoxel2PixelScale(TextureEntry entry) {
+	public static Sized getVoxel2PixelScale(Project project, TextureEntry entry) {
 		if (entry != null) {
 			return new Sized(
-				(double)entry.Width / ModelCreator.currentProject.TextureWidth,
-				(double)entry.Height / ModelCreator.currentProject.TextureHeight
+				(double)entry.Width / project.TextureWidth,
+				(double)entry.Height / project.TextureHeight
 			);
 		}
 		
@@ -243,13 +255,17 @@ public class Face
 	{
 		this.textureCode = textureCode;
 	}
+	
+	public void bindTexture() {
+		TextureEntry entry = ModelCreator.currentProject.getTextureEntryByCode(textureCode);
+		bindTexture(entry);
+	}
 
-	public void bindTexture()
+	public void bindTexture(TextureEntry entry)
 	{
 		TextureImpl.bindNone();
-		if (textureCode != null && ModelCreator.renderTexture)
+		if (entry != null && ModelCreator.renderTexture)
 		{
-			TextureEntry entry = ModelCreator.currentProject.getTextureEntryByCode(textureCode);
 			if (entry != null)
 			{
 				if (entry.getTexture() != null)
@@ -602,6 +618,11 @@ public class Face
 		
 		textureUEnd = textureU + size * width;
 		textureVEnd = textureV + size * height;
+	}
+
+	public void setIsBackdrop()
+	{
+		isInBackdropProject = true;
 	}
 
 }

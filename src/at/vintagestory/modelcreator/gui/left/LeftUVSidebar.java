@@ -117,7 +117,7 @@ public class LeftUVSidebar extends LeftSidebar
 			texEntry = ModelCreator.currentProject.TexturesByCode.get(ModelCreator.currentProject.TexturesByCode.keySet().iterator().next());
 		}
 		
-		scale = Face.getVoxel2PixelScale(texEntry);
+		scale = Face.getVoxel2PixelScale(ModelCreator.currentProject, texEntry);
 		
 		texWidth *= scale.W / 2;
 		texHeight *= scale.H / 2;
@@ -347,7 +347,7 @@ public class LeftUVSidebar extends LeftSidebar
 					// Pixel grid
 					TextureEntry texEntry = face.getTextureEntry();
 					if (texEntry == null) {
-						Sized scale = Face.getVoxel2PixelScale(texEntry);
+						Sized scale = Face.getVoxel2PixelScale(ModelCreator.currentProject, texEntry);
 						glLineWidth(1F);
 						glBegin(GL_LINES);
 						{
@@ -521,7 +521,7 @@ public class LeftUVSidebar extends LeftSidebar
 				texBoxHeight = (int)texSize.H;
 			}
 			
-			Sized scale = Face.getVoxel2PixelScale(texEntry);
+			Sized scale = Face.getVoxel2PixelScale(ModelCreator.currentProject, texEntry);
 			
 
 			float mousedx = (newMouseX - this.lastMouseX);

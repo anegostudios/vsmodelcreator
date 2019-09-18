@@ -41,6 +41,9 @@ public class GuiMenu extends JMenuBar
 	private JMenu menuFile;
 	private JMenuItem itemNew;
 	private JMenuItem itemLoad;
+	private JMenuItem itemTexturePath;
+	private JMenuItem itemShapePath;
+
 	
 	private JMenuItem itemImport;
 	private JMenuItem itemSave;
@@ -55,6 +58,7 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemAddCube;
 	private JMenuItem itemAddFace;
 	private JMenuItem itemResize;
+	private JCheckBoxMenuItem itemRepositionWhenReparented;
 	
 	
 	/* Project */
@@ -62,6 +66,8 @@ public class GuiMenu extends JMenuBar
 	private JCheckBoxMenuItem itemUnlockAngles;
 	private JCheckBoxMenuItem itemSingleTexture;
 	private JMenuItem itemNoTextureSize;
+	private JMenuItem itemLoadAsBackdrop;
+	private JMenuItem itemClearBackdrop;
 	
 	/* View */
 	private JMenu menuView;
@@ -83,7 +89,6 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemReloadTextures;
 	private JCheckBoxMenuItem itemAutoReloadTextures;
 	private JMenuItem itemImgurLink;
-	private JMenuItem itemTexturePath;
 	
 	/* Help */
 	private JMenu helpMenu;
@@ -104,9 +109,11 @@ public class GuiMenu extends JMenuBar
 			itemNew = createItem("New", "New Model", KeyEvent.VK_N, new ImageIcon(getClass().getClassLoader().getResource("icons/new.png")));
 			itemLoad = createItem("Open...", "Open JSON", KeyEvent.VK_O, new ImageIcon(getClass().getClassLoader().getResource("icons/load.png")));
 			itemImport = createItem("Import...", "Import JSON into existing file", KeyEvent.VK_I, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
+			
 			itemSave = createItem("Save...", "Save JSON", KeyEvent.VK_S, new ImageIcon(getClass().getClassLoader().getResource("icons/disk.png")));
 			itemSaveAs = createItem("Save as...", "Save JSON", KeyEvent.VK_E, new ImageIcon(getClass().getClassLoader().getResource("icons/export.png")));
-			itemTexturePath = createItem("Set Texture Path...", "Set the base path to look for textures", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
+			itemTexturePath = createItem("Set Texture base path...", "Set the base path to look for textures", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
+			itemShapePath = createItem("Set Shape base path...", "Set the base path to look for backdrop models", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/cube.png")));
 			itemExit = createItem("Exit", "Exit Application", KeyEvent.VK_Q, new ImageIcon(getClass().getClassLoader().getResource("icons/exit.png")));
 		}
 		
@@ -119,6 +126,8 @@ public class GuiMenu extends JMenuBar
 			itemAddFace = createItem("Add face", "Add single face", KeyEvent.VK_F, Icons.cube);
 			
 			itemResize = createItem("Resize", "Resize a cube, including child elements", KeyEvent.VK_R, Icons.inout);
+			
+			itemRepositionWhenReparented = createCheckboxItem("Keep reparented Elements in place", "When performing a drag&drop operation, the editor will attempt to keep the element in place by changing its position and rotation, but its currently not very successfull at that. This setting lets you disable this feature", 0, null);
 		}
 
 
@@ -132,7 +141,12 @@ public class GuiMenu extends JMenuBar
 			itemUnlockAngles.setSelected(ModelCreator.currentProject.AllAngles);
 			
 			itemSingleTexture = createCheckboxItem("Entity Texturing Mode", "When creating entities, it is often more useful to use only a single texture and have the uv boxes unwrap side by side.", 0, Icons.transparent);
-			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);		
+			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);
+			
+			itemLoadAsBackdrop = createItem("Set backdrop...", "Set a model as a backdrop", KeyEvent.VK_B, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
+			
+			itemClearBackdrop = createItem("Clear backdrop", "Remove the backdrop again", KeyEvent.VK_B, new ImageIcon(getClass().getClassLoader().getResource("icons/clear.png")));
+			itemClearBackdrop.setEnabled(false);
 		}
 		
 		menuView = new JMenu("View");
@@ -186,6 +200,9 @@ public class GuiMenu extends JMenuBar
 		menuProject.addSeparator();
 		menuProject.add(itemAutoReloadTextures);
 		menuProject.add(itemReloadTextures);
+		menuProject.addSeparator();
+		menuProject.add(itemLoadAsBackdrop);
+		menuProject.add(itemClearBackdrop);
 
 		
 		menuEdit.add(itemUndo);
@@ -195,6 +212,8 @@ public class GuiMenu extends JMenuBar
 		menuEdit.add(itemAddFace);
 		menuEdit.addSeparator();
 		menuEdit.add(itemResize);
+		menuEdit.addSeparator();
+		menuEdit.add(itemRepositionWhenReparented);
 		
 		exportMenu.add(itemExportUvMap);
 		exportMenu.add(itemSaveScreenshot);
@@ -214,6 +233,7 @@ public class GuiMenu extends JMenuBar
 		menuFile.add(itemSaveAs);
 		menuFile.addSeparator();
 		menuFile.add(itemTexturePath);
+		menuFile.add(itemShapePath);
 		menuFile.addSeparator();
 		menuFile.add(itemExit);
 
@@ -282,6 +302,15 @@ public class GuiMenu extends JMenuBar
 		itemRedo.getActionMap().put(key, buttonAction2);
 		itemRedo.setAccelerator(strokes[5]);
 		
+		
+		itemRepositionWhenReparented.addActionListener(a ->
+		{
+			ModelCreator.repositionWhenReparented = !ModelCreator.repositionWhenReparented;
+			ModelCreator.prefs.putBoolean("repositionWhenReparented", ModelCreator.repositionWhenReparented);
+		});
+		itemRepositionWhenReparented.setSelected(ModelCreator.repositionWhenReparented);
+		
+		
 
 		ActionListener listener = a -> { OnNewModel(); }; 
 		itemNew.addActionListener(listener);
@@ -292,6 +321,12 @@ public class GuiMenu extends JMenuBar
 		
 		listener = e -> { OnImportFile(); };	
 		itemImport.addActionListener(listener);
+		
+		listener = e -> { OnLoadBackdropFile(); };	
+		itemLoadAsBackdrop.addActionListener(listener);
+		
+		listener = e -> { OnClearBackdrop(); };	
+		itemClearBackdrop.addActionListener(listener);
 		
 
 		listener = e -> {
@@ -323,6 +358,24 @@ public class GuiMenu extends JMenuBar
 
 		itemTexturePath.addActionListener(listener);
 
+		
+		
+		listener = e ->
+		{
+			JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("shapePath", "."));
+			chooser.setDialogTitle("Shape Path");
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			int returnVal = chooser.showOpenDialog(null);
+			if (returnVal == JFileChooser.APPROVE_OPTION)
+			{
+				ModelCreator.prefs.put("shapePath", chooser.getSelectedFile().getAbsolutePath());
+			}
+		};
+
+		itemShapePath.addActionListener(listener);
+
+		
+		
 		itemExportUvMap.setEnabled(ModelCreator.currentProject.EntityTextureMode);
 		itemExportUvMap.addActionListener(e -> {
 			JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
@@ -538,6 +591,36 @@ public class GuiMenu extends JMenuBar
 			creator.ImportFile(filePath);
 		}
 	}
+	
+	
+	private void OnLoadBackdropFile()
+	{
+		JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
+		chooser.setDialogTitle("File to import as backdrop");
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setApproveButtonText("Import backdrop");
+
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON (.json)", "json");
+		chooser.setFileFilter(filter);
+
+		int returnVal = chooser.showOpenDialog(null);
+		if (returnVal == JFileChooser.APPROVE_OPTION)
+		{
+			String filePath = chooser.getSelectedFile().getAbsolutePath();
+			creator.LoadBackdropFile(filePath);
+			
+			if (ModelCreator.currentBackdropProject != null) {
+				itemClearBackdrop.setEnabled(true);
+			}
+		}
+	}
+	
+	private void OnClearBackdrop() {
+		ModelCreator.currentBackdropProject = null;
+		ModelCreator.currentProject.backDropShape = null;
+		itemClearBackdrop.setEnabled(false);
+	}
+	
 
 	private void OnNewModel()
 	{

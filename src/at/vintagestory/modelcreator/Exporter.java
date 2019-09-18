@@ -119,10 +119,14 @@ public class Exporter
 		
 		writer.write(space(1) + "\"editor\": {");
 		writer.newLine();
+		if (project.backDropShape != null) {
+			writer.write(space(2) + "\"backDropShape\": \"" + project.backDropShape + "\",");
+			writer.newLine();
+		}
 		writer.write(space(2) + "\"allAngles\": " + project.AllAngles + ",");
 		writer.newLine();
 		writer.write(space(2) + "\"singleTexture\": " + project.EntityTextureMode + "");
-		writer.newLine();
+		writer.newLine();	
 		writer.write(space(1) + "},");
 		writer.newLine();
 		writer.write(space(1) + "\"textureWidth\": " + project.TextureWidth + ",");
@@ -261,7 +265,7 @@ public class Exporter
 
 	private void writeKeyFrameElement(BufferedWriter writer, KeyFrameElement kElem, int indent) throws IOException
 	{
-		writer.write(space(indent) + "\"" + kElem.AnimatedElement.name + "\": { ");
+		writer.write(space(indent) + "\"" + kElem.AnimatedElement.getName() + "\": { ");
 		
 		boolean bla = false;
 		
@@ -322,8 +326,14 @@ public class Exporter
 		
 		indentation++;
 		
-		writer.write(space(indentation) + "\"name\": \"" + cuboid.toString() + "\",");
+		writer.write(space(indentation) + "\"name\": \"" + cuboid.getName() + "\",");
 		writer.newLine();
+		
+		if (cuboid.stepparentName != null) {
+			writer.write(space(indentation) + "\"stepParentName\": \"" + cuboid.stepparentName + "\",");
+			writer.newLine();			
+		}
+		
 		writeBounds(writer, cuboid, indentation);
 		writer.newLine();
 		if (!cuboid.isShaded())

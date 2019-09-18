@@ -75,16 +75,20 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static Preferences prefs;
 	
 	public static Project currentProject;
+	public static Project currentBackdropProject;
 	public static ProjectChangeHistory changeHistory = new ProjectChangeHistory();
 	
 	public static boolean ignoreDidModify = false;	
 	public static boolean ignoreValueUpdates = false;
 	public static boolean ignoreFrameUpdates = false;
 	
+	
 	public static boolean showGrid = true;
 	public static boolean transparent = true;
 	public static boolean renderTexture = true;
 	public static boolean autoreloadTexture = true;
+	public static boolean repositionWhenReparented = true;
+	
 	public static float noTexScale = 2;
 
 	// Canvas Variables
@@ -139,6 +143,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		showGrid = prefs.getBoolean("showGrid", true);
 		noTexScale = prefs.getFloat("noTexScale", 2);
 		autoreloadTexture = prefs.getBoolean("autoreloadTexture", true);
+		repositionWhenReparented = prefs.getBoolean("repositionWhenReparented", true);
 		
 		Instance = this;
 		
@@ -988,7 +993,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		changeHistory.clear();
 		changeHistory.addHistoryState(currentProject);
 		
-		currentProject.needsSaving = false;		
+		currentProject.needsSaving = false;
+		currentProject.reloadStepparentRelationShips();
+		if (currentBackdropProject != null) {
+			currentBackdropProject.reloadStepparentRelationShips();
+		}
 		ModelCreator.updateValues(null);
 		currentProject.tree.jtree.updateUI();		
 	}
@@ -1022,9 +1031,43 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		ignoreDidModify = false;
 		
+		currentProject.reloadStepparentRelationShips();
+		if (currentBackdropProject != null) {
+			currentBackdropProject.reloadStepparentRelationShips();
+		}
+		
 		currentProject.needsSaving = true;		
 		ModelCreator.updateValues(null);
 		currentProject.tree.jtree.updateUI();		
+	}
+	
+
+	public void LoadBackdropFile(String filePath)
+	{		
+		ignoreDidModify = true;
+		ignoreValueUpdates = true;
+
+		Importer importer = new Importer(filePath);
+		Project project = importer.loadFromJSON();
+		project.setIsBackdrop();
+		project.reloadStepparentRelationShips();
+		
+		currentBackdropProject = project;
+		
+		
+		String shapeBasePath = ModelCreator.prefs.get("shapePath", ".");
+		
+		String subPath = filePath;
+		if (filePath.contains(shapeBasePath)) subPath = filePath.substring(shapeBasePath.length()  + 1);
+		else {
+			int index = filePath.indexOf("assets"+File.separator+"shapes"+File.separator);
+			if (index>0) subPath = filePath.substring(index + "assets/shapes/".length());
+		}
+		subPath = subPath.replace('\\', '/').replace(".json", "");
+		
+		currentProject.backDropShape = subPath;
+		ignoreValueUpdates = false;
+		ignoreDidModify = false;
 	}
 	
 
@@ -1068,5 +1111,19 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				SaveProject(chooser.getSelectedFile());
 			}
 		}
+	}
+
+	public static void reloadStepparentRelationShips()
+	{
+		ModelCreator.currentProject.clearStepparentRelationShips();
+		if (ModelCreator.currentBackdropProject != null) {
+			ModelCreator.currentBackdropProject.clearStepparentRelationShips();
+		}
+
+		ModelCreator.currentProject.reloadStepparentRelationShips();
+		if (ModelCreator.currentBackdropProject != null) {
+			ModelCreator.currentBackdropProject.reloadStepparentRelationShips();
+		}
+		
 	}
 }

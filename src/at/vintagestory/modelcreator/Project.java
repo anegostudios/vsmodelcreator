@@ -32,6 +32,7 @@ public class Project
 	public int TextureHeight = 16;
 	public boolean EntityTextureMode;
 	public boolean AllAngles;
+	public String backDropShape;
 	
 	// Non-persistent project data
 	public AttachmentPoint SelectedAttachmentPoint;
@@ -80,6 +81,17 @@ public class Project
 			SelectedAnimation.SetFramesDirty();
 		}
 		
+		if (backDropShape != null) {
+			if (new File(backDropShape + ".json").exists()) {
+				ModelCreator.Instance.LoadBackdropFile(backDropShape);
+			} else {
+				String shapeBasePath = ModelCreator.prefs.get("shapePath", ".");
+				String path = shapeBasePath + File.separator + backDropShape + ".json";
+				if (new File(path).exists()) {
+					ModelCreator.Instance.LoadBackdropFile(path);
+				}
+			}
+		}
 	}	
 	
 	public int getSelectedAnimationIndex()
@@ -217,6 +229,7 @@ public class Project
 		ModelCreator.ignoreDidModify = true;
 		
 		Element curElem = SelectedElement;
+		
 		tree.removeCurrentElement();
 		
 		if (curElem.ParentElement == null) {
@@ -231,6 +244,7 @@ public class Project
 			}
 		}
 		
+		curElem.onRemoved();
 		
 		ModelCreator.ignoreDidModify = false;
 		
@@ -292,24 +306,24 @@ public class Project
 	
 	
 	void EnsureUniqueElementName(Element elem, IntRef totalQuantityElems) {
-		if (IsElementNameUsed(elem.name, elem)) {
+		if (IsElementNameUsed(elem.getName(), elem)) {
 			
 			String numberStr = "";
-			int pos = elem.name.length() - 1;
+			int pos = elem.getName().length() - 1;
 			while (pos > 0) {
-				if (Character.isDigit(elem.name.charAt(pos))) {
-					numberStr = elem.name.charAt(pos) + numberStr;
+				if (Character.isDigit(elem.getName().charAt(pos))) {
+					numberStr = elem.getName().charAt(pos) + numberStr;
 				} else break;
 				pos--;
 			}
 			
 			int nextNumber = TotalQuantityElements() + 1 + totalQuantityElems.value;
-			String baseName = elem.name.substring(0, elem.name.length() - numberStr.length());
+			String baseName = elem.getName().substring(0, elem.getName().length() - numberStr.length());
 			
-			elem.name = baseName + nextNumber;
-			while(IsElementNameUsed(elem.name, elem)) {
+			elem.setName(baseName + nextNumber);
+			while(IsElementNameUsed(elem.getName(), elem)) {
 				nextNumber++;
-				elem.name = baseName + nextNumber;
+				elem.setName(baseName + nextNumber);
 			}
 			
 			totalQuantityElems.value++;
@@ -342,7 +356,7 @@ public class Project
 		for (Element elem : elems) {
 			if (elem == exceptElement) continue;
 			
-			if (elem.name.equals(name)) return true;
+			if (elem.getName().equals(name)) return true;
 			if (IsElementNameUsed(name, elem.ChildElements, exceptElement)) return true;
 		}
 		
@@ -371,7 +385,7 @@ public class Project
 	
 	public Element findElement(String elementName, List<Element> list) {
 		for (Element elem : list) {
-			if (elem.name.equals(elementName)) return elem;
+			if (elem.getName().equals(elementName)) return elem;
 			
 			Element foundElem = findElement(elementName, elem.ChildElements);
 			if (foundElem != null) return foundElem;
@@ -504,7 +518,7 @@ public class Project
 	}
 	
 
-	public String loadTexture(String textureCode, File image, BooleanParam isNew) throws IOException
+	public String loadTexture(String textureCode, File image, BooleanParam isNew, boolean fromBackdrop) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
 		Texture texture = TextureLoader.getTexture("PNG", is);
@@ -537,7 +551,7 @@ public class Project
 				String val = MissingTexturesByCode.get(key);
 				String filename = val.substring(val.lastIndexOf("/")+1);
 				if (filename.equalsIgnoreCase(textureCode)) {
-					TexturesByCode.put(key, new TextureEntry(key, texture, icon, image.getAbsolutePath()));
+					TexturesByCode.put(key, new TextureEntry(key, texture, icon, image.getAbsolutePath(), fromBackdrop));
 					nowFoundTextures.add(key);
 				}	
 			}
@@ -548,7 +562,7 @@ public class Project
 			if (TexturesByCode.containsKey(textureCode)) {
 				TextureEntry entry = TexturesByCode.get(textureCode);
 				if (entry.getFilePath().equalsIgnoreCase(image.getAbsolutePath())) {
-					TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath()));
+					TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath(), fromBackdrop));
 				} else {
 					
 					int i = 2;
@@ -556,7 +570,7 @@ public class Project
 						
 						String altimgName = textureCode + i;
 						if (!TexturesByCode.containsKey(altimgName)) {
-							TexturesByCode.put(altimgName, new TextureEntry(altimgName, texture, icon, image.getAbsolutePath()));
+							TexturesByCode.put(altimgName, new TextureEntry(altimgName, texture, icon, image.getAbsolutePath(), fromBackdrop));
 							break;
 						}					
 						i++;
@@ -566,7 +580,7 @@ public class Project
 				isNew.Value = false;
 			} else {
 				isNew.Value = true;
-				TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath()));	
+				TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath(), fromBackdrop));	
 			}			
 		} else {
 			
@@ -598,6 +612,32 @@ public class Project
 			elem.applySingleTextureMode();
 		}
 	}
+
+
+	public void setIsBackdrop()
+	{
+		for (Element elem : rootElements) {
+			elem.setIsBackdrop();
+		}
+
+		for (PendingTexture tex : PendingTextures) {
+			tex.SetIsBackDrop();
+			ModelCreator.Instance.AddPendingTexture(tex);
+		}
+	}
+
+	public void clearStepparentRelationShips() {
+		for (Element elem : rootElements) {
+			elem.clearStepparentRelationShip();
+		}
+	}
+	
+	public void reloadStepparentRelationShips() {
+		for (Element elem : rootElements) {
+			elem.setStepParent(elem.stepparentName);
+		}
+	}
+
 
 
 

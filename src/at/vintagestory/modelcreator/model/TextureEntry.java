@@ -6,6 +6,7 @@ import javax.swing.ImageIcon;
 import org.newdawn.slick.opengl.Texture;
 
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.util.watchservice.*;
 
 public class TextureEntry
@@ -14,18 +15,20 @@ public class TextureEntry
 	public ImageIcon icon;
 	public Texture texture;
 	public String filePath;
+	public boolean isFromBackdrop = true;
 	
 	public int Width;
 	public int Height;
 
 	DirectoryWatchService watchService;
 
-	public TextureEntry(String code, Texture texture, ImageIcon image, String textureLocation)
+	public TextureEntry(String code, Texture texture, ImageIcon image, String textureLocation, boolean isFromBackdrop)
 	{
 		this.code = code;
 		this.texture = texture;
 		this.icon = image;
 		this.filePath = textureLocation;
+		this.isFromBackdrop = isFromBackdrop;
 		
 		if (image == null) return;
 		
@@ -42,10 +45,21 @@ public class TextureEntry
                     new DirectoryWatchService.OnFileChangeListener() {
                         @Override
                         public void onFileModify(String filePath) {
+                            if (!ModelCreator.autoreloadTexture) return;
                             
-                        	if (ModelCreator.autoreloadTexture && ModelCreator.currentProject != null) {
-                    			ModelCreator.Instance.AddPendingTexture(new PendingTexture(self, 3));
+                        	if (isFromBackdrop) {
+                        		if (ModelCreator.currentBackdropProject != null) {
+                        			PendingTexture ptex = new PendingTexture(self, 3);
+                        			ptex.SetIsBackDrop();
+                        			ModelCreator.Instance.AddPendingTexture(ptex);
+                            	}
+                        	} else {
+                        		if (ModelCreator.currentProject != null) {
+                        			ModelCreator.Instance.AddPendingTexture(new PendingTexture(self, 3));
+                            	}	
                         	}
+                        	
+                        	
                         	
                         }
                     },
@@ -85,14 +99,14 @@ public class TextureEntry
 	}
 	
 	
-	public float VoxelWidthWithLwJglFuckery() {
+	public float VoxelWidthWithLwJglFuckery(Project project) {
 		float scale = (float)Width / texture.getTextureWidth(); 
-		return ModelCreator.currentProject.TextureWidth / scale;
+		return project.TextureWidth / scale;
 	}
 	
-	public float VoxelHeighthWithLwJglFuckery() {
+	public float VoxelHeighthWithLwJglFuckery(Project project) {
 		float scale = (float)Height / texture.getTextureHeight();
-		return ModelCreator.currentProject.TextureHeight / scale;
+		return project.TextureHeight / scale;
 	}
 
 }

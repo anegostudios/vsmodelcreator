@@ -3,12 +3,14 @@ package at.vintagestory.modelcreator.model;
 import java.io.File;
 import java.io.IOException;
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 
 public class PendingTexture
 {
 	public File textureFile;
 	public ITextureCallback callback;
+	public boolean fromBackdrop;
 	
 	public TextureEntry entry;
 	
@@ -42,8 +44,10 @@ public class PendingTexture
 	{
 		try
 		{
+			Project project = fromBackdrop ? ModelCreator.currentBackdropProject : ModelCreator.currentProject;
+			
 			if (entry != null) {
-				ModelCreator.currentProject.reloadExternalTexture(entry);
+				project.reloadExternalTexture(entry);
 				return;
 			}
 			
@@ -52,7 +56,7 @@ public class PendingTexture
 			
 
 			BooleanParam isNew = new BooleanParam();
-			errormessge = ModelCreator.currentProject.loadTexture(textureName, this.textureFile, isNew);
+			errormessge = project.loadTexture(textureName, this.textureFile, isNew, fromBackdrop);
 			
 			if (callback != null) {
 				callback.onTextureLoaded(isNew.Value, errormessge, fileName);
@@ -68,5 +72,11 @@ public class PendingTexture
 			// Because VSMC randomly crashes with "IllegalArgumentException: Buffer size <=0"
 			e.printStackTrace();
 		}
+	}
+
+
+	public void SetIsBackDrop()
+	{
+		fromBackdrop = true;
 	}
 }

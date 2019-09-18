@@ -47,8 +47,11 @@ public class Element implements IDrawable
 	public ArrayList<Element> ChildElements = new ArrayList<Element>();
 	public ArrayList<AttachmentPoint> AttachmentPoints = new ArrayList<AttachmentPoint>();
 	
-	public String name = "Cube1";
+	public ArrayList<Element> StepChildElements = new ArrayList<Element>();
+	Element stepParentElement;
 	
+	protected String name = "Cube1";
+	public String stepparentName;
 	
 	// Face Variables
 	protected int selectedFace = 0;
@@ -295,7 +298,11 @@ public class Element implements IDrawable
 
 	public void draw(IDrawable selectedElem)
 	{
-		if (!Render) return;
+		draw(selectedElem, false);
+	}
+	
+	public void draw(IDrawable selectedElem, boolean drawCallFromStepParent) {
+		if (!Render || (stepParentElement != null && !drawCallFromStepParent)) return;
 		
 		float b;
 		
@@ -322,6 +329,11 @@ public class Element implements IDrawable
 			for (int i = 0; i < ChildElements.size(); i++) {
 				ChildElements.get(i).draw(selectedElem);
 			}
+			
+			for (int i = 0; i < StepChildElements.size(); i++) {
+				StepChildElements.get(i).draw(selectedElem, true);
+			}
+			
 		}
 		
 		if (ModelCreator.renderAttachmentPoints) {
@@ -982,12 +994,6 @@ public class Element implements IDrawable
 		recalculateBrightnessValues();
 		ModelCreator.DidModify();
 	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-		ModelCreator.DidModify();
-	}
 	
 	
 	public List<Element> GetParentPath() {
@@ -1069,6 +1075,7 @@ public class Element implements IDrawable
 		cloned.autoUnwrap = autoUnwrap;
 		cloned.unwrapMode = unwrapMode;
 		cloned.unwrapRotation = unwrapRotation;
+		cloned.stepparentName = stepparentName;
 		
 		for (int i = 0; i < brightnessByFace.length; i++) {
 			cloned.brightnessByFace[i] = brightnessByFace[i];			
@@ -1219,5 +1226,89 @@ public class Element implements IDrawable
 		
 		Mat4f.Translate(matrix, matrix, new float[] { (float)startX, (float)startY, (float)startZ });
 	}
+
 	
+	public void setIsBackdrop()
+	{
+		for (Face face : faces) {
+			face.setIsBackdrop();
+		}
+		
+		for (Element elem : ChildElements) {
+			elem.setIsBackdrop();
+		}
+	}
+	
+	
+	public void onRemoved() {
+		setStepParent(null);
+		for (Element elem : ChildElements) {
+			elem.onRemoved();
+		}
+		
+		for (Element elem : StepChildElements) {
+			elem.setStepParent(null);
+		}
+	}
+
+	public String getStepParent() {
+		return stepparentName;
+	}
+	
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+		
+		for (Element elem : StepChildElements) {
+			elem.stepparentName = name;
+		}
+		
+		ModelCreator.DidModify();
+	}
+	
+	
+
+	public void setStepParent(String elemName)
+	{
+		if (stepParentElement != null) {
+			stepParentElement.StepChildElements.remove(stepParentElement);
+			stepParentElement = null;
+		}
+		
+		stepparentName = elemName;
+		
+		if (elemName != null) {		
+			Element element = ModelCreator.currentProject.findElement(elemName);
+			
+			if (element != null) {
+				element.StepChildElements.add(this);
+				stepParentElement = element;
+				return;
+			}
+			
+			
+			if (ModelCreator.currentBackdropProject != null) {
+				element = ModelCreator.currentBackdropProject.findElement(elemName);
+			
+				if (element != null) {
+					element.StepChildElements.add(this);
+					stepParentElement = element;
+				}
+			}
+		}
+	}
+	
+
+	public void clearStepparentRelationShip()
+	{
+		StepChildElements.clear();
+		for (Element elem : StepChildElements) {
+			elem.clearStepparentRelationShip();
+		}
+	}
 }
+

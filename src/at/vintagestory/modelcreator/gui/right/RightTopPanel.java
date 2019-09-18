@@ -38,7 +38,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 	{
 		this.creator = creator;
 		setLayout(layout = new SpringLayout());
-		setPreferredSize(new Dimension(215, 1050));
+		setPreferredSize(new Dimension(215, 1150));
 		initComponents();
 		setLayoutConstaints();
 	}
@@ -107,7 +107,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		tabbedPane.add("Keyframe", rightKeyFramesPanel = new RightKeyFramesPanel());
 		tabbedPane.add("P", new AttachmentPointsPanel());
 		
-		tabbedPane.setPreferredSize(new Dimension(205, 750));
+		tabbedPane.setPreferredSize(new Dimension(205, 850));
 		tabbedPane.setTabPlacement(JTabbedPane.TOP);
 		
 		tabbedPane.addChangeListener(c ->
@@ -161,7 +161,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		Element cube = getCurrentElement();
 		if (cube != null)
 		{
-			nameField.setText(cube.name);
+			nameField.setText(cube.getName());
 			if (ModelCreator.currentProject.IsElementNameUsed(nameField.getText(), cube)) {
 				nameField.setBackground(new Color(50, 0, 0));
 			} else {

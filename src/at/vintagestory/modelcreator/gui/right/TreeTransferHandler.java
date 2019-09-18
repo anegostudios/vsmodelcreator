@@ -195,7 +195,9 @@ class TreeTransferHandler extends TransferHandler {
             
             newParentPath = ownElem.GetParentPath();
             
-            applyReparentTransform(ownElem, oldParentPath, newParentPath);
+            if (ModelCreator.repositionWhenReparented ) {
+            	applyReparentTransform(ownElem, oldParentPath, newParentPath);
+            }
             
             tree.setSelectionPath(new TreePath(nodes[i].getPath()));
         }
