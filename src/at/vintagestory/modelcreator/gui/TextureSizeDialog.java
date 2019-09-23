@@ -7,6 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -81,6 +82,13 @@ public class TextureSizeDialog
 			try {
 				int width = Integer.parseInt(widthTextField.getText());
 				int height = Integer.parseInt(heightTextField.getText());
+				float scale = Float.parseFloat(scaleTextField.getText());
+				
+				if (((scale * width) % 8) != 0 || ((scale * height) % 8) != 0) {
+					JOptionPane.showMessageDialog(null, "Width and Height, multiplied with the scale, must be a multiple of 8!", "Invalid values", JOptionPane.ERROR_MESSAGE, null);
+					return;
+				}
+				
 				
 				if (width != ModelCreator.currentProject.TextureWidth || height != ModelCreator.currentProject.TextureHeight) {
 					ModelCreator.DidModify();
@@ -88,7 +96,7 @@ public class TextureSizeDialog
 				
 				ModelCreator.currentProject.TextureWidth = width;
 				ModelCreator.currentProject.TextureHeight = height;
-				ModelCreator.noTexScale = Float.parseFloat(scaleTextField.getText());
+				ModelCreator.noTexScale = scale;
 				ModelCreator.prefs.putFloat("texScale", ModelCreator.noTexScale);
 				
 				

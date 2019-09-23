@@ -1274,6 +1274,8 @@ public class Element implements IDrawable
 
 	public void setStepParent(String elemName)
 	{
+		Element prevStepElem = stepParentElement;
+		
 		if (stepParentElement != null) {
 			stepParentElement.StepChildElements.remove(stepParentElement);
 			stepParentElement = null;
@@ -1287,6 +1289,7 @@ public class Element implements IDrawable
 			if (element != null) {
 				element.StepChildElements.add(this);
 				stepParentElement = element;
+				if (element != prevStepElem) ModelCreator.DidModify();				
 				return;
 			}
 			
@@ -1297,6 +1300,7 @@ public class Element implements IDrawable
 				if (element != null) {
 					element.StepChildElements.add(this);
 					stepParentElement = element;
+					if (element != prevStepElem) ModelCreator.DidModify();
 				}
 			}
 		}
@@ -1305,10 +1309,10 @@ public class Element implements IDrawable
 
 	public void clearStepparentRelationShip()
 	{
-		StepChildElements.clear();
-		for (Element elem : StepChildElements) {
+		for (Element elem : ChildElements) {
 			elem.clearStepparentRelationShip();
 		}
+		StepChildElements.clear();
 	}
 }
 
