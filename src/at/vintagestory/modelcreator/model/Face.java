@@ -117,7 +117,7 @@ public class Face
 	public double textureV = 0;
 	private double textureUEnd = 16;
 	private double textureVEnd = 16;
-	private boolean binded = false;
+	private boolean textureBound = false;
 	private boolean cullface = false;
 	private boolean enabled = true;
 	private boolean autoUV = true;
@@ -145,17 +145,17 @@ public class Face
 		openGlName = nextOpenGlName++;
 		this.cuboid = cuboid;
 		this.side = side;
-		applySingleTextureMode();
+		//applyEntityTextureMode();
 	}
 	
-	public void applySingleTextureMode() {
+	/*public void applyEntityTextureMode() {
 		Project project = getProject();
 		if (project != null && project.EntityTextureMode && project.TexturesByCode != null && project.TexturesByCode.size() > 0) {
 			//this.textureName = ModelCreator.currentProject.Textures.get(0).name;
 			
 			this.textureCode = project.TexturesByCode.values().iterator().next().code;
 		}		
-	}
+	}*/
 	
 	static FloatBuffer color = BufferUtils.createFloatBuffer(4);
 	static {
@@ -182,9 +182,9 @@ public class Face
 			
 			GL11.glTexParameter(GL_TEXTURE_2D, GL11.GL_TEXTURE_BORDER_COLOR, color);
 			
-			bindTexture(entry);
+			bindTexture();
 
-			if (binded) GL11.glColor3f(brightness, brightness, brightness);
+			if (textureBound) GL11.glColor3f(brightness, brightness, brightness);
 			
 			int coordIndex = blockFacing.GetIndex() * 12;
 			int uvBaseIndex = blockFacing.GetIndex() * 8;
@@ -257,13 +257,14 @@ public class Face
 	}
 	
 	public void bindTexture() {
-		TextureEntry entry = ModelCreator.currentProject.getTextureEntryByCode(textureCode);
-		bindTexture(entry);
+		TextureEntry entry = isInBackdropProject ? ModelCreator.currentBackdropProject.getTextureEntryByCode(textureCode) : ModelCreator.currentProject.getTextureEntryByCode(textureCode);
+		textureBound = bindTexture(entry);
 	}
-
-	public void bindTexture(TextureEntry entry)
+	
+	public static boolean bindTexture(TextureEntry entry)
 	{
 		TextureImpl.bindNone();
+		
 		if (entry != null && ModelCreator.renderTexture)
 		{
 			if (entry != null)
@@ -274,12 +275,13 @@ public class Face
 					entry.getTexture().bind();
 				}
 
-				binded = true;
+				return true;
 			}
-		} else {
-			binded = false;
 		}
+		
+		return false;
 	}
+	
 
 	public void moveTextureU(double amt)
 	{
@@ -455,7 +457,7 @@ public class Face
 
 	public boolean isBinded()
 	{
-		return binded;
+		return textureBound;
 	}
 
 	public void updateUV()
@@ -579,7 +581,7 @@ public class Face
 		cloned.textureV = textureV;
 		cloned.textureUEnd = textureUEnd;
 		cloned.textureVEnd = textureVEnd;
-		cloned.binded = binded;
+		cloned.textureBound = textureBound;
 		cloned.cullface = cullface;
 		cloned.enabled = enabled;
 		cloned.autoUV = autoUV;

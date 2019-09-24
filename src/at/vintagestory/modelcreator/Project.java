@@ -222,6 +222,8 @@ public class Project
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.DidModify();
 		ModelCreator.updateValues(null);
+		
+		ModelCreator.reloadStepparentRelationShips();
 	}
 	
 	
@@ -252,6 +254,7 @@ public class Project
 		ModelCreator.DidModify();
 		ModelCreator.updateValues(null);
 		
+		ModelCreator.reloadStepparentRelationShips();
 	}
 	
 
@@ -537,10 +540,10 @@ public class Project
 			textureCode = image.getName().replace(".png", "");	
 		}
 		
-		if (EntityTextureMode) {
+		/*if (EntityTextureMode) {
 			for(TextureEntry entry : TexturesByCode.values()) entry.Dispose();
 			TexturesByCode.clear();
-		}
+		}*/
 		
 		
 		ArrayList<String> nowFoundTextures = new ArrayList<String>(); 
@@ -591,9 +594,9 @@ public class Project
 			}			
 		}		
 		
-		if (TexturesByCode.size() == 1 && EntityTextureMode) {
+		/*if (TexturesByCode.size() == 1 && EntityTextureMode) {
 			applySingleTextureMode();
-		}
+		}*/
 		
 		return null;
 	}
@@ -606,12 +609,12 @@ public class Project
 	}
 
 
-	public void applySingleTextureMode()
+/*	public void applySingleTextureMode()
 	{
 		for (Element elem : rootElements) {
 			elem.applySingleTextureMode();
 		}
-	}
+	}*/
 
 
 	public void setIsBackdrop()
@@ -634,7 +637,7 @@ public class Project
 	
 	public void reloadStepparentRelationShips() {
 		for (Element elem : rootElements) {
-			elem.setStepParent(elem.stepparentName);
+			elem.reloadStepparentRelationShip();
 		}
 	}
 

@@ -100,21 +100,40 @@ public class LeftUVSidebar extends LeftSidebar
 	}
 	
 	
-	TextureEntry texEntry = null;
 	void drawRectsEntityTextureMode(int canvasHeight) {
-		double texWidth = ModelCreator.currentProject.TextureWidth;
-		double texHeight = ModelCreator.currentProject.TextureHeight;
-		
-		Sized scale;
-		
-		texEntry = null;
 		
 		if (!Mouse.isButtonDown(0) && !Mouse.isButtonDown(1)) {
-			grabbedElement = findElement(ModelCreator.currentProject.rootElements, Mouse.getX() - 10, (canvasHeight - Mouse.getY()) - 30);
-		}
+			grabbedElement = currentHoveredElementEntityTextureMode(ModelCreator.currentProject.rootElements);
+		}			
 		
 		if (ModelCreator.currentProject.TexturesByCode.size() > 0) {
-			texEntry = ModelCreator.currentProject.TexturesByCode.get(ModelCreator.currentProject.TexturesByCode.keySet().iterator().next());
+			int offsetY = 0;
+			
+			glPushMatrix();
+			
+			for (String textureCode : ModelCreator.currentProject.TexturesByCode.keySet()) {
+				offsetY = drawRectsAndTexture(textureCode);				
+				glTranslatef(0, offsetY, 0);
+			}
+			
+			glPopMatrix();
+			
+		} else {
+			
+			drawRectsAndTexture(null);
+		}
+	}
+	
+	
+	int drawRectsAndTexture(String textureCode) {
+		
+		double texWidth = ModelCreator.currentProject.TextureWidth;
+		double texHeight = ModelCreator.currentProject.TextureHeight;
+		Sized scale;
+		
+		TextureEntry texEntry = null;
+		if (textureCode != null) {
+			texEntry = ModelCreator.currentProject.TexturesByCode.get(textureCode);
 		}
 		
 		scale = Face.getVoxel2PixelScale(ModelCreator.currentProject, texEntry);
@@ -132,11 +151,8 @@ public class LeftUVSidebar extends LeftSidebar
 			glPushMatrix(); {
 				
 				glColor3f(1, 1, 1);
-
-				if (ModelCreator.currentProject.rootElements.size() > 0) {
-					Element elem = ModelCreator.currentProject.rootElements.get(0);	
-					elem.getAllFaces()[0].bindTexture();
-				}
+				
+				Face.bindTexture(texEntry);
 				
 				float endu = 1f;
 				float endv = 1f;
@@ -144,7 +160,6 @@ public class LeftUVSidebar extends LeftSidebar
 					endu = (float)texEntry.Width / texEntry.texture.getTextureWidth();
 					endv = (float)texEntry.Height / texEntry.texture.getTextureHeight();
 				}
-
 				
 				// Background
 				glLineWidth(1F);
@@ -191,17 +206,21 @@ public class LeftUVSidebar extends LeftSidebar
 					glEnd();
 				}
 				
-				drawElementList(ModelCreator.currentProject.rootElements, texBoxWidth, texBoxHeight, canvasHeight);
+				drawElementList(textureCode, ModelCreator.currentProject.rootElements, texBoxWidth, texBoxHeight, canvasHeight);
 				
 				glPopMatrix();
 			}
 		}
 		
 		glPopMatrix();
+		
+		return texBoxHeight + 20;
 	}
 	
 	
-	private void drawElementList(ArrayList<Element> elems, double texBoxWidth, double texBoxHeight, int canvasHeight)
+	
+
+	private void drawElementList(String textureCode, ArrayList<Element> elems, double texBoxWidth, double texBoxHeight, int canvasHeight)
 	{
 		Element selectedElem = ModelCreator.currentProject.SelectedElement;
 		
@@ -209,9 +228,9 @@ public class LeftUVSidebar extends LeftSidebar
 			Face[] faces = elem.getAllFaces();
 			
 			for (int i = 0; i < 6; i++) {
-				if (!faces[i].isEnabled()) continue;
-				
 				Face face = faces[i];
+				if (!face.isEnabled() || (textureCode != null && !textureCode.equals(face.getTextureCode()))) continue;
+				
 				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
 				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);
 				
@@ -269,7 +288,7 @@ public class LeftUVSidebar extends LeftSidebar
 				glEnd();
 			}
 			
-			drawElementList(elem.ChildElements, texBoxWidth, texBoxHeight, canvasHeight);
+			drawElementList(textureCode, elem.ChildElements, texBoxWidth, texBoxHeight, canvasHeight);
 		}
 	}
 	
@@ -461,14 +480,16 @@ public class LeftUVSidebar extends LeftSidebar
 	@Override
 	public void onMouseDownOnPanel()
 	{
-		super.onMouseDownOnPanel();
+		if (grabbedElement == null) {
+			super.onMouseDownOnPanel();
+		}
 		
 		if (nowResizingSidebar) return;
 		
 		boolean nowGrabbing = Mouse.isButtonDown(0) || Mouse.isButtonDown(1);
 		
 		if (ModelCreator.currentProject.EntityTextureMode && !nowGrabbing) {
-			grabbedElement = findElement(ModelCreator.currentProject.rootElements, Mouse.getX() - 10, (canvasHeight - Mouse.getY()) - 30);
+			grabbedElement = currentHoveredElementEntityTextureMode(ModelCreator.currentProject.rootElements);
 		}
 		
 		if (!ModelCreator.currentProject.EntityTextureMode && !nowGrabbing) {
@@ -479,7 +500,7 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		if (!grabbing && nowGrabbing) {
 			if (ModelCreator.currentProject.EntityTextureMode) {
-				grabbedElement = findElement(ModelCreator.currentProject.rootElements, Mouse.getX() - 10, (canvasHeight - Mouse.getY()) - 30);
+				grabbedElement = currentHoveredElementEntityTextureMode(ModelCreator.currentProject.rootElements);
 			}
 			else {
 				grabbedElement = ModelCreator.currentProject.SelectedElement;
@@ -513,6 +534,7 @@ public class LeftUVSidebar extends LeftSidebar
 			int newMouseY = Mouse.getY();			
 			int xMovement = 0;
 			int yMovement = 0;
+			TextureEntry texEntry = null;
 			
 			if (!ModelCreator.currentProject.EntityTextureMode && grabbedFaceIndex >= 0) {
 				texEntry = grabbedElement.getAllFaces()[grabbedFaceIndex].getTextureEntry();
@@ -636,9 +658,40 @@ public class LeftUVSidebar extends LeftSidebar
 		return Math.min(Math.max(val, min), max);
 	}
 	
-	private Element findElement(ArrayList<Element> elems, int mouseX, int mouseY)
+	private Element currentHoveredElementEntityTextureMode(ArrayList<Element> elems)
 	{
 		if (texBoxHeight == 0 || texBoxWidth == 0) return null;
+		
+		int mouseX = Mouse.getX() - 10;
+		int mouseY = (canvasHeight - Mouse.getY()) - 30;
+		String currentHoveredTextureCode = null;
+		
+		for (String textureCode : ModelCreator.currentProject.TexturesByCode.keySet()) {
+			double texWidth = ModelCreator.currentProject.TextureWidth;
+			double texHeight = ModelCreator.currentProject.TextureHeight;
+			Sized scale;
+			
+			TextureEntry texEntry = null;
+			if (textureCode != null) {
+				texEntry = ModelCreator.currentProject.TexturesByCode.get(textureCode);
+			}
+			
+			scale = Face.getVoxel2PixelScale(ModelCreator.currentProject, texEntry);
+			
+			texWidth *= scale.W / 2;
+			texHeight *= scale.H / 2;
+			
+			texBoxWidth = (int)(GetSidebarWidth() - 20);
+			texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
+			
+			if (mouseY >= 0 && mouseY < texBoxHeight) {
+				currentHoveredTextureCode = textureCode;
+				break;
+			}
+			
+			mouseY -= texBoxHeight + 20;
+		}
+		
 		
 		double mouseU = (double)mouseX / texBoxWidth;
 		double mouseV = (double)mouseY / texBoxHeight; 
@@ -647,9 +700,9 @@ public class LeftUVSidebar extends LeftSidebar
 			Face[] faces = elem.getAllFaces();
 			
 			for (int i = 0; i < 6; i++) {
-				if (!faces[i].isEnabled()) continue;
+				Face face = faces[i];
+				if (!face.isEnabled() || (currentHoveredTextureCode != null && !currentHoveredTextureCode.equals(face.getTextureCode()))) continue;
 				
-				Face face = faces[i];			
 				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
 				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);
 
@@ -661,7 +714,7 @@ public class LeftUVSidebar extends LeftSidebar
 				}
 			}
 			
-			Element foundElem = findElement(elem.ChildElements, mouseX, mouseY);
+			Element foundElem = currentHoveredElementEntityTextureMode(elem.ChildElements);
 			if (foundElem != null) return foundElem;
 		}
 		

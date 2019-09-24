@@ -463,7 +463,7 @@ public class GuiMenu extends JMenuBar
 		itemSingleTexture.addActionListener(a ->
 		{
 			ModelCreator.currentProject.EntityTextureMode = itemSingleTexture.isSelected();
-			if (ModelCreator.currentProject.EntityTextureMode) ModelCreator.currentProject.applySingleTextureMode();
+			//if (ModelCreator.currentProject.EntityTextureMode) ModelCreator.currentProject.applySingleTextureMode();
 			ModelCreator.DidModify();
 			ModelCreator.updateValues(itemSingleTexture);
 		});

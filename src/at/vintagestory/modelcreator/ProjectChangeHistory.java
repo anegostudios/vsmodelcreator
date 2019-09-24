@@ -52,6 +52,9 @@ public class ProjectChangeHistory
 	
 	
 	void ApplyState() {
+		
+		ModelCreator.ignoreDidModify = true;
+		
 		Project oldProject = ModelCreator.currentProject;
 		
 		ModelCreator.currentProject = ProjectSnapshots.get(currentHistoryState).clone(false);
@@ -75,6 +78,8 @@ public class ProjectChangeHistory
 		
 		ModelCreator.updateValues(null);
 		ModelCreator.currentProject.tree.jtree.updateUI();
+		
+		ModelCreator.ignoreDidModify = false;
 	}
 	
 	

@@ -1140,17 +1140,17 @@ public class Element implements IDrawable
 		ModelCreator.DidModify();
 	}
 
-	public void applySingleTextureMode()
+/*	public void applySingleTextureMode()
 	{
 		for (int i = 0; i < faces.length; i++) {
-			faces[i].applySingleTextureMode();
+			faces[i].applyEntityTextureMode();
 		}
 		
 		for (Element elem : ChildElements) {
 			elem.applySingleTextureMode();
 		}
 		
-	}
+	}*/
 
 	public void setTexFromFace()
 	{
@@ -1305,7 +1305,18 @@ public class Element implements IDrawable
 			}
 		}
 	}
+
 	
+	public void reloadStepparentRelationShip() {
+		
+		clearStepparentRelationShip();
+		
+		for (Element elem : ChildElements) {
+			elem.reloadStepparentRelationShip();
+		}
+		
+		setStepParent(stepparentName);
+	}
 
 	public void clearStepparentRelationShip()
 	{

@@ -995,9 +995,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		currentProject.needsSaving = false;
 		currentProject.reloadStepparentRelationShips();
+		
 		if (currentBackdropProject != null) {
 			currentBackdropProject.reloadStepparentRelationShips();
 		}
+		
 		ModelCreator.updateValues(null);
 		currentProject.tree.jtree.updateUI();		
 	}
@@ -1051,7 +1053,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		Project project = importer.loadFromJSON();
 		project.setIsBackdrop();
 		project.reloadStepparentRelationShips();
-		
+			
 		currentBackdropProject = project;
 		
 		
@@ -1115,15 +1117,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	public static void reloadStepparentRelationShips()
 	{
-		ModelCreator.currentProject.clearStepparentRelationShips();
-		if (ModelCreator.currentBackdropProject != null) {
-			ModelCreator.currentBackdropProject.clearStepparentRelationShips();
-		}
-
-		ModelCreator.currentProject.reloadStepparentRelationShips();
 		if (ModelCreator.currentBackdropProject != null) {
 			ModelCreator.currentBackdropProject.reloadStepparentRelationShips();
 		}
+		
+		ModelCreator.currentProject.reloadStepparentRelationShips();
 		
 	}
 }
