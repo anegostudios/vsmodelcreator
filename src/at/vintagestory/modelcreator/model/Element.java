@@ -240,21 +240,25 @@ public class Element implements IDrawable
 		for (Face face : faces)
 		{
 			face.setTextureCode(null);
-			//face.setTextureLocation(ModelCreator.currentProject.EntityTextureMode ? "entities/" : "blocks/");
 		}
 	}
 	
-	public void setAllTextures(ClipboardTexture texture)
+	public void setTexture(ClipboardTexture texture, boolean recursive)
 	{
-		setAllTextureNames(texture.getTexture());
+		setTextureCode(texture.getTexture(), recursive);
 	}
 
-	public void setAllTextureNames(String texture)
+	public void setTextureCode(String texture, boolean recursive)
 	{
 		for (Face face : faces)
 		{
 			face.setTextureCode(texture);
-			//face.setTextureLocation(location);
+		}
+		
+		if (recursive) {		
+			for (Element elem : ChildElements) {
+				elem.setTextureCode(texture, recursive);
+			}
 		}
 	}
 	
@@ -1140,17 +1144,7 @@ public class Element implements IDrawable
 		ModelCreator.DidModify();
 	}
 
-/*	public void applySingleTextureMode()
-	{
-		for (int i = 0; i < faces.length; i++) {
-			faces[i].applyEntityTextureMode();
-		}
-		
-		for (Element elem : ChildElements) {
-			elem.applySingleTextureMode();
-		}
-		
-	}*/
+	
 
 	public void setTexFromFace()
 	{

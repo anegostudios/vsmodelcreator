@@ -83,7 +83,7 @@ public class Project
 		
 		if (backDropShape != null) {
 			if (new File(backDropShape + ".json").exists()) {
-				ModelCreator.Instance.LoadBackdropFile(backDropShape);
+				ModelCreator.Instance.LoadBackdropFile(backDropShape + ".json");
 			} else {
 				String shapeBasePath = ModelCreator.prefs.get("shapePath", ".");
 				String path = shapeBasePath + File.separator + backDropShape + ".json";
@@ -534,6 +534,8 @@ public class Project
 			return "Cannot load this texture, the width or length is not a multiple of 8 ("+texture.getImageHeight()+"x"+texture.getImageWidth()+")";
 		}
 		
+		int beforeSize = TexturesByCode.size();
+		
 		ImageIcon icon = upscaleIcon(new ImageIcon(image.getAbsolutePath()), 256);
 		
 		if (textureCode == null) {
@@ -594,9 +596,11 @@ public class Project
 			}			
 		}		
 		
-		/*if (TexturesByCode.size() == 1 && EntityTextureMode) {
-			applySingleTextureMode();
-		}*/
+		if (beforeSize == 0 && TexturesByCode.size() == 1 && EntityTextureMode) {
+			for (Element elem : rootElements) {
+				elem.setTextureCode(textureCode, true);
+			}
+		}
 		
 		return null;
 	}
@@ -609,12 +613,6 @@ public class Project
 	}
 
 
-/*	public void applySingleTextureMode()
-	{
-		for (Element elem : rootElements) {
-			elem.applySingleTextureMode();
-		}
-	}*/
 
 
 	public void setIsBackdrop()

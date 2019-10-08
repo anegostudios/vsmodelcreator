@@ -12,10 +12,11 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glVertex2i;
 
+import java.awt.Cursor;
+
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 
-import com.sun.glass.ui.Cursor;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.EnumFonts;
@@ -73,7 +74,7 @@ public abstract class LeftSidebar
 		int width = GetSidebarWidth();
 		int nowMouseX = Mouse.getX();
 		if (width - nowMouseX > 0 && width - nowMouseX < 7) {
-			ModelCreator.Instance.canvas.setCursor(new java.awt.Cursor(Cursor.CURSOR_RESIZE_LEFTRIGHT));
+			ModelCreator.Instance.canvas.setCursor(new java.awt.Cursor(Cursor.E_RESIZE_CURSOR));
 			overSidebar = true;
 		} else {
 			if (overSidebar) {
@@ -112,6 +113,8 @@ public abstract class LeftSidebar
 		if (nowResizingSidebar) {
 			nowSidebarWidth += nowMouseX - lastGrabMouseX;
 			lastGrabMouseX = nowMouseX;
+			
+			nowSidebarWidth = Math.max(4, Math.min(nowSidebarWidth, ModelCreator.Instance.canvWidth - 1));
 			
 			onResized();
 		}

@@ -69,7 +69,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 			{
 				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 				{
-					manager.getCurrentElement().setAllTextureNames(null);
+					manager.getCurrentElement().setTextureCode(null, false);
 				}
 				else
 				{
@@ -104,7 +104,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 				{
 					if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
 					{
-						manager.getCurrentElement().setAllTextures(texture);
+						manager.getCurrentElement().setTexture(texture, false);
 					}
 					else
 					{

@@ -38,6 +38,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -94,7 +95,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	// Canvas Variables
 	private final static AtomicReference<Dimension> newCanvasSize = new AtomicReference<Dimension>();
 	public final Canvas canvas;
-	private int width = 990, height = 700;
+	public int canvWidth = 990, canvHeight = 700;
 
 	// Swing Components
 	private JScrollPane scroll;
@@ -448,12 +449,12 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 			if (newDim != null)
 			{
-				width = newDim.width;
-				height = newDim.height;
+				canvWidth = newDim.width;
+				canvHeight = newDim.height;
 			}
 
 			int leftSidebarWidth = leftSidebarWidth();
-			glViewport(leftSidebarWidth, 0, width - leftSidebarWidth, height);
+			glViewport(leftSidebarWidth, 0, canvWidth - leftSidebarWidth, canvHeight);
 			handleInput(leftSidebarWidth);
 			
 			
@@ -467,7 +468,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			}
 
-			modelrenderer.Render(leftSidebarWidth, width, height, getHeight());
+			modelrenderer.Render(leftSidebarWidth, canvWidth, canvHeight, getHeight());
 			
 
 			if (ModelCreator.transparent) {
@@ -479,15 +480,15 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			if (screenshot != null)
 			{
 				if (screenshot.getFile() != null)
-					ScreenshotCapture.getScreenshot(width, height, screenshot.getCallback(), screenshot.getFile());
+					ScreenshotCapture.getScreenshot(canvWidth, canvHeight, screenshot.getCallback(), screenshot.getFile());
 				else
-					ScreenshotCapture.getScreenshot(width, height, screenshot.getCallback());
+					ScreenshotCapture.getScreenshot(canvWidth, canvHeight, screenshot.getCallback());
 				screenshot = null;
 			}
 			
 			
 			if (animCapture != null && !animCapture.isComplete()) {
-				animCapture.CaptureFrame(width, height);
+				animCapture.CaptureFrame(canvWidth, canvHeight);
 				
 				if (animCapture.isComplete()) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -789,7 +790,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GLU.gluPickMatrix(x, y, 1, 1, IntBuffer.wrap(viewport));
-			GLU.gluPerspective(60F, (float) (width) / (float) height, 0.3F, 1000F);
+			GLU.gluPerspective(60F, (float) (canvWidth) / (float) canvHeight, 0.3F, 1000F);
 
 			modelrenderer.drawGridAndElements();
 		}
@@ -885,11 +886,23 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			@Override
 		    public synchronized void drop(DropTargetDropEvent evt) {
 				DataFlavor flavor = evt.getCurrentDataFlavors()[0];
-		        evt.acceptDrop(evt.getDropAction());
 				
 				try {
+					if (flavor.getHumanPresentableName().contains("file")) {
+						evt.acceptDrop(evt.getDropAction());						
+					}
+					
+					Object obj = evt.getTransferable().getTransferData(flavor);
+					
+					if (obj instanceof DefaultMutableTreeNode[]) {
+						//evt.rejectDrop();
+						return;
+					}
+					
+					
+					
 					@SuppressWarnings("rawtypes")
-					List data = (List)evt.getTransferable().getTransferData(flavor);
+					List data = (List)obj;
 					
 					for (Object elem : data) {
 						if (elem instanceof File) {
@@ -994,11 +1007,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		changeHistory.addHistoryState(currentProject);
 		
 		currentProject.needsSaving = false;
-		currentProject.reloadStepparentRelationShips();
-		
 		if (currentBackdropProject != null) {
 			currentBackdropProject.reloadStepparentRelationShips();
 		}
+		currentProject.reloadStepparentRelationShips();
+		
 		
 		ModelCreator.updateValues(null);
 		currentProject.tree.jtree.updateUI();		
@@ -1060,7 +1073,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		String shapeBasePath = ModelCreator.prefs.get("shapePath", ".");
 		
 		String subPath = filePath;
-		if (filePath.contains(shapeBasePath)) subPath = filePath.substring(shapeBasePath.length()  + 1);
+		if (filePath.contains(shapeBasePath) && shapeBasePath != ".") {
+			subPath = filePath.substring(shapeBasePath.length()  + 1);
+		}
 		else {
 			int index = filePath.indexOf("assets"+File.separator+"shapes"+File.separator);
 			if (index>0) subPath = filePath.substring(index + "assets/shapes/".length());

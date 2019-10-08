@@ -141,7 +141,7 @@ public class LeftUVSidebar extends LeftSidebar
 		texWidth *= scale.W / 2;
 		texHeight *= scale.H / 2;
 		
-		texBoxWidth = (int)(GetSidebarWidth() - 20);
+		texBoxWidth = (int)Math.max(0, (GetSidebarWidth() - 20));
 		texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
 		
 		glPushMatrix();
@@ -310,11 +310,32 @@ public class LeftUVSidebar extends LeftSidebar
 		}
 		
 		
-		blockFaceTextureWidth = (GetSidebarWidth() - 30) / 2;
+		int topPadding = 30;
+		int leftPadding = 5;
+		int rightpadding = 5;
+		int bottompadding = 10;
+
+		int betweenpadding = 10;
+
+		double horizontalSpace = GetSidebarWidth() - rightpadding - leftPadding;
+		double verticalSpace = canvasHeight - topPadding - bottompadding - 5*betweenpadding;
+		
+		boolean doDoubleColumn = horizontalSpace / (verticalSpace/6) >= 2;
+		
+		if (doDoubleColumn) {
+			horizontalSpace = GetSidebarWidth() - leftPadding - rightpadding - betweenpadding;
+			verticalSpace = canvasHeight - topPadding - bottompadding - 2*betweenpadding;
+			
+			blockFaceTextureWidth = (int)Math.min(horizontalSpace / 2, verticalSpace / 3);	
+		} else {
+			blockFaceTextureWidth = (int)Math.min(horizontalSpace, verticalSpace / 6);
+		}
+		
+		
 		
 		glPushMatrix();
 		{
-			glTranslatef(10, 30, 0);
+			glTranslatef(leftPadding, topPadding, 0);
 
 			
 			int countleft = 0;
@@ -326,17 +347,17 @@ public class LeftUVSidebar extends LeftSidebar
 				if (!face.isEnabled()) continue;
 				
 				glPushMatrix(); {
-					if (i >= 3 && canvasHeight < 6*(10 + blockFaceTextureWidth)) {
-						glTranslatef(10 + blockFaceTextureWidth, countright * (blockFaceTextureWidth + 10), 0);
-						startX[i] = 20 + blockFaceTextureWidth;
-						startY[i] = countright * (blockFaceTextureWidth + 10) + 40;
+					if (i >= 3 && doDoubleColumn) {
+						glTranslatef(betweenpadding + blockFaceTextureWidth, countright * (blockFaceTextureWidth + betweenpadding), 0);
+						startX[i] = leftPadding + betweenpadding + blockFaceTextureWidth;
+						startY[i] = countright * (blockFaceTextureWidth + betweenpadding) + topPadding;
 						countright++;
 					}
 					else
 					{
-						glTranslatef(0, countleft * (blockFaceTextureWidth + 10), 0);
-						startX[i] = 10;
-						startY[i] = countleft * (blockFaceTextureWidth + 10) + 40;
+						glTranslatef(0, countleft * (blockFaceTextureWidth + betweenpadding), 0);
+						startX[i] = leftPadding;
+						startY[i] = countleft * (blockFaceTextureWidth + betweenpadding) + topPadding;
 						countleft++;
 					}
 
@@ -413,19 +434,19 @@ public class LeftUVSidebar extends LeftSidebar
 				if (!face.isEnabled()) continue;
 				
 				glPushMatrix(); {
-					if (i >= 3 && canvasHeight < 6*(10 + blockFaceTextureWidth)) {
-						glTranslatef(10 + blockFaceTextureWidth, countright * (blockFaceTextureWidth + 10), 0);
-						startX[i] = 20 + blockFaceTextureWidth;
-						startY[i] = countright * (blockFaceTextureWidth + 10) + 40;
+					if (i >= 3 && doDoubleColumn) {
+						glTranslatef(betweenpadding + blockFaceTextureWidth, countright * (blockFaceTextureWidth + betweenpadding), 0);
+						startX[i] = leftPadding + betweenpadding + blockFaceTextureWidth;
+						startY[i] = countright * (blockFaceTextureWidth + betweenpadding) + topPadding;
 						countright++;
 					}
 					else
 					{
-						glTranslatef(0, countleft * (blockFaceTextureWidth + 10), 0);
-						startX[i] = 10;
-						startY[i] = countleft * (blockFaceTextureWidth + 10) + 40;
+						glTranslatef(0, countleft * (blockFaceTextureWidth + betweenpadding), 0);
+						startX[i] = leftPadding;
+						startY[i] = countleft * (blockFaceTextureWidth + betweenpadding) + topPadding;
 						countleft++;
-					}
+					}	
 
 					Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
 					Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);					
@@ -480,13 +501,24 @@ public class LeftUVSidebar extends LeftSidebar
 	@Override
 	public void onMouseDownOnPanel()
 	{
+		boolean nowGrabbing = Mouse.isButtonDown(0) || Mouse.isButtonDown(1);
+		
+		if (!grabbing && !ModelCreator.currentProject.EntityTextureMode && nowGrabbing) {
+			int width = GetSidebarWidth();
+			int nowMouseX = Mouse.getX();
+			
+			if (Math.abs(nowMouseX - width) < 4) {
+				grabbedElement = null;
+			}
+		}
+		
 		if (grabbedElement == null) {
 			super.onMouseDownOnPanel();
 		}
 		
 		if (nowResizingSidebar) return;
 		
-		boolean nowGrabbing = Mouse.isButtonDown(0) || Mouse.isButtonDown(1);
+		
 		
 		if (ModelCreator.currentProject.EntityTextureMode && !nowGrabbing) {
 			grabbedElement = currentHoveredElementEntityTextureMode(ModelCreator.currentProject.rootElements);

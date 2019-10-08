@@ -53,7 +53,15 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 
 		btnAdd.setIcon(Icons.cube);
 		btnAdd.setToolTipText("New Element");
-		btnAdd.addActionListener(e -> { ModelCreator.currentProject.addElementAsChild(new Element(1,1,1)); });
+		btnAdd.addActionListener(e -> { 
+			Element elem = new Element(1,1,1);
+			
+			if (ModelCreator.currentProject.TexturesByCode.size() > 0) {
+				elem.setTextureCode(ModelCreator.currentProject.TexturesByCode.values().iterator().next().code, false);
+			}
+			
+			ModelCreator.currentProject.addElementAsChild(elem); 
+		});
 		btnAdd.setPreferredSize(new Dimension(30, 30));
 		btnContainer.add(btnAdd);
 
