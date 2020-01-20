@@ -101,11 +101,23 @@ public class TextureEntry
 	
 	public float VoxelWidthWithLwJglFuckery(Project project) {
 		float scale = (float)Width / texture.getTextureWidth(); 
+		
+		int[] size = project.TextureSizes.get(code);
+		if (size != null) {
+			return size[0] / scale;
+		}
+		
 		return project.TextureWidth / scale;
 	}
 	
 	public float VoxelHeighthWithLwJglFuckery(Project project) {
 		float scale = (float)Height / texture.getTextureHeight();
+		
+		int[] size = project.TextureSizes.get(code);
+		if (size != null) {
+			return size[1] / scale;
+		}
+		
 		return project.TextureHeight / scale;
 	}
 

@@ -185,7 +185,6 @@ public class GuiMenu extends JMenuBar
 			itemControls = createItem("Quick Controls", "Some useful controls", 0, Icons.keyboard);
 			itemCredits = createItem("Credits", "Who made this tool", 0, Icons.drink);
 		}
-
 		
 		initActions();
 

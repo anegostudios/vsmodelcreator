@@ -32,6 +32,8 @@ import java.util.ArrayList;
 public class Importer
 {
 	private Map<String, String> textureMap = new HashMap<String, String>();
+	private HashMap<String, int[]> textureSizesMap = new HashMap<String, int[]>();
+	
 	private String[] faceNames = { "north", "east", "south", "west", "up", "down" };
 
 	
@@ -101,6 +103,8 @@ public class Importer
 			}
 		}
 		
+		project.TextureSizes = this.textureSizesMap;
+		
 		return project;
 	}
 
@@ -146,6 +150,8 @@ public class Importer
 			{
 				project.TextureHeight = obj.get("textureHeight").getAsInt();
 			}
+			
+			loadTextureSizes(dir, obj);
 			
 			if (obj.has("editor") && obj.get("editor").isJsonObject()) {
 				LoadEditorSettings(obj.get("editor").getAsJsonObject());
@@ -216,6 +222,24 @@ public class Importer
 					}
 					
 					loadTexture(file, entry.getKey(), textureSubPath);
+				}
+			}
+		}
+	}
+	
+	
+	private void loadTextureSizes(File file, JsonObject obj)
+	{
+		if (obj.has("textureSizes") && obj.get("textureSizes").isJsonObject())
+		{
+			JsonObject textures = obj.get("textureSizes").getAsJsonObject();
+
+			for (Entry<String, JsonElement> entry : textures.entrySet())
+			{
+				if (entry.getValue().isJsonArray())
+				{
+					JsonArray wdthgt = entry.getValue().getAsJsonArray();
+					textureSizesMap.put(entry.getKey().replace("#", ""), new int[] { wdthgt.get(0).getAsInt(), wdthgt.get(1).getAsInt() });
 				}
 			}
 		}
@@ -414,6 +438,11 @@ public class Importer
 			if (obj.has("shade") && obj.get("shade").isJsonPrimitive())
 			{
 				element.setShade(obj.get("shade").getAsBoolean());
+			}
+			
+			if (obj.has("gradientShade") && obj.get("gradientShade").isJsonPrimitive())
+			{
+				element.setGradientShade(obj.get("gradientShade").getAsBoolean());
 			}
 			
 			if (obj.has("tintIndex") && obj.get("tintIndex").isJsonPrimitive())

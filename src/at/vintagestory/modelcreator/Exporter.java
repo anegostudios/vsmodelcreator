@@ -134,7 +134,10 @@ public class Exporter
 		writer.write(space(1) + "\"textureHeight\": " + project.TextureHeight + ",");
 		writer.newLine();
 		
-		
+		writeTextureSizes(writer);
+
+		writer.newLine();
+
 		writeTextures(writer);
 		
 		writer.newLine();
@@ -316,6 +319,24 @@ public class Exporter
 		}
 		writer.write(space(1) + "},");
 	}
+	
+	private void writeTextureSizes(BufferedWriter writer) throws IOException
+	{
+		writer.write(space(1) + "\"textureSizes\": {");
+		writer.newLine();
+		int i = 0;
+		for (String texturename : project.TextureSizes.keySet())
+		{
+			writer.write(space(2) + "\"" + texturename + "\": [" + project.TextureSizes.get(texturename)[0] + "," + project.TextureSizes.get(texturename)[0] + "]");
+			if (i < project.TextureSizes.size() - 1)
+			{
+				writer.write(",");
+			}
+			writer.newLine();
+			i++;
+		}
+		writer.write(space(1) + "},");
+	}
 
 	
 	private void writeElement(BufferedWriter writer, Element cuboid, int indentation) throws IOException
@@ -339,6 +360,11 @@ public class Exporter
 		if (!cuboid.isShaded())
 		{
 			writeShade(writer, cuboid, indentation);
+			writer.newLine();
+		}
+		if (cuboid.isGradientShaded())
+		{
+			writeGradientShade(writer, cuboid, indentation);
 			writer.newLine();
 		}
 		if (cuboid.getTintIndex() > 0)
@@ -454,6 +480,11 @@ public class Exporter
 	private void writeShade(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
 		writer.write(space(indentation) + "\"shade\": " + cuboid.isShaded() + ",");
+	}
+	
+	private void writeGradientShade(BufferedWriter writer, Element cuboid, int indentation) throws IOException
+	{
+		writer.write(space(indentation) + "\"gradientShade\": " + cuboid.isGradientShaded() + ",");
 	}
 
 	private void writeRotation(BufferedWriter writer, Element cuboid, int indentation) throws IOException

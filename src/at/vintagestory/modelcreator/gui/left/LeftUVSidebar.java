@@ -129,6 +129,13 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		double texWidth = ModelCreator.currentProject.TextureWidth;
 		double texHeight = ModelCreator.currentProject.TextureHeight;
+		
+		int[] size = ModelCreator.currentProject.TextureSizes.get(textureCode);
+		if (size != null) {
+			texWidth = size[0];
+			texHeight = size[1];
+		}
+		
 		Sized scale;
 		
 		TextureEntry texEntry = null;
@@ -301,7 +308,7 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		float[] bright = elem != null ? elem.brightnessByFace : brightnessByFace;
 		
-		Sized texSize = GetBlockTextureModeTextureSize();
+		
 		
 		Face[] faces = elem.getAllFaces();
 
@@ -345,6 +352,8 @@ public class LeftUVSidebar extends LeftSidebar
 				
 				Face face = faces[i];
 				if (!face.isEnabled()) continue;
+				
+				Sized texSize = GetBlockTextureModeTextureSize(face.getTextureCode());
 				
 				glPushMatrix(); {
 					if (i >= 3 && doDoubleColumn) {
@@ -394,6 +403,7 @@ public class LeftUVSidebar extends LeftSidebar
 							GL11.glColor4f(0.9f, 0.9f, 0.9f, 0.3f);
 							int pixelsW = (int)(ModelCreator.currentProject.TextureWidth * scale.W);
 							int pixelsH = (int)(ModelCreator.currentProject.TextureHeight * scale.H);
+							
 							double height = blockFaceTextureWidth * pixelsH/pixelsW;
 							
 							if (pixelsW <= 64 && pixelsH <= 64) {
@@ -432,6 +442,8 @@ public class LeftUVSidebar extends LeftSidebar
 				
 				Face face = faces[i];
 				if (!face.isEnabled()) continue;
+				
+				Sized texSize = GetBlockTextureModeTextureSize(face.getTextureCode());
 				
 				glPushMatrix(); {
 					if (i >= 3 && doDoubleColumn) {
@@ -570,7 +582,7 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			if (!ModelCreator.currentProject.EntityTextureMode && grabbedFaceIndex >= 0) {
 				texEntry = grabbedElement.getAllFaces()[grabbedFaceIndex].getTextureEntry();
-				Sized texSize = GetBlockTextureModeTextureSize();
+				Sized texSize = GetBlockTextureModeTextureSize(texEntry.code);
 				texBoxWidth = (int)texSize.W;
 				texBoxHeight = (int)texSize.H;
 			}
@@ -583,6 +595,14 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			int pixelsW = (int)(ModelCreator.currentProject.TextureWidth * scale.W);
 			int pixelsH = (int)(ModelCreator.currentProject.TextureHeight * scale.H);
+			
+			if (texEntry != null) {			
+				int[] size = ModelCreator.currentProject.TextureSizes.get(texEntry.code);
+				if (size != null) {
+					pixelsW = (int)(size[0] * scale.W);
+					pixelsH = (int)(size[1] * scale.H);
+				}
+			}
 			
 			double sectionWidth = (double)texBoxWidth / pixelsW;
 			double sectionHeight = (double)texBoxHeight / pixelsH;
@@ -651,9 +671,16 @@ public class LeftUVSidebar extends LeftSidebar
 	
 	
 	
-	public Sized GetBlockTextureModeTextureSize() {
+	public Sized GetBlockTextureModeTextureSize(String textureCode) {
 		double texWidth = ModelCreator.currentProject.TextureWidth;
 		double texHeight = ModelCreator.currentProject.TextureHeight;
+		
+		int[] size = ModelCreator.currentProject.TextureSizes.get(textureCode);
+		if (size != null) {
+			texWidth = size[0];
+			texHeight = size[1];
+		}
+		
 		int texBoxWidth = (int)(blockFaceTextureWidth);
 		int texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
 

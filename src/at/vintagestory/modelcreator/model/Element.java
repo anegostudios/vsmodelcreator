@@ -72,6 +72,7 @@ public class Element implements IDrawable
 
 	// Extra Variables
 	protected boolean shade = true;
+	protected boolean gradientShade = false;
 	protected int tintIndex = 0;
 	protected int renderPass = -1;
 	protected int unwrapMode;
@@ -989,6 +990,11 @@ public class Element implements IDrawable
 	{
 		return shade;
 	}
+	
+	public boolean isGradientShaded()
+	{
+		return gradientShade;
+	}
 
 	public void setShade(boolean shade)
 	{
@@ -997,6 +1003,10 @@ public class Element implements IDrawable
 		this.shade = shade;
 		recalculateBrightnessValues();
 		ModelCreator.DidModify();
+	}
+	public void setGradientShade(boolean shade)
+	{
+		this.gradientShade = shade;
 	}
 	
 	

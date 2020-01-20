@@ -227,7 +227,15 @@ public class Face
 		if (entry != null && !actualPosition) {
 			textureVoxelWidth = entry.VoxelWidthWithLwJglFuckery(project);
 			textureVoxelHeight = entry.VoxelHeighthWithLwJglFuckery(project);
+		} else if(entry != null) {
+			
+			int[] size = project.TextureSizes.get(entry.code);
+			if (size != null) {
+				textureVoxelWidth = size[0];
+				textureVoxelHeight = size[1];
+			}
 		}
+		
 		
 		return new Sized(voxelU / textureVoxelWidth, voxelV / textureVoxelHeight);
 	}

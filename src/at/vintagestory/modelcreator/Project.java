@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.*;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.opengl.renderer.SGL;
@@ -23,6 +25,7 @@ public class Project
 	public boolean AmbientOcclusion;
 	public ArrayList<PendingTexture> PendingTextures = new ArrayList<PendingTexture>();
 	public HashMap<String, TextureEntry> TexturesByCode = new HashMap<String, TextureEntry>();
+	public HashMap<String, int[]> TextureSizes = new HashMap<String, int[]>();
 	public HashMap<String, String> MissingTexturesByCode = new HashMap<String, String>();
 	
 	public ArrayList<Element> rootElements = new ArrayList<Element>();
@@ -89,6 +92,17 @@ public class Project
 				String path = shapeBasePath + File.separator + backDropShape + ".json";
 				if (new File(path).exists()) {
 					ModelCreator.Instance.LoadBackdropFile(path);
+				} else {
+					
+					JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("shapePath", "."));
+					chooser.setDialogTitle("Back drop shape file not found, select desired back drop shape file");
+					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					
+					int returnVal = chooser.showOpenDialog(null);
+					if (returnVal == JFileChooser.APPROVE_OPTION)
+					{
+						ModelCreator.Instance.LoadBackdropFile(chooser.getSelectedFile().getAbsolutePath());
+					}					
 				}
 			}
 		}
