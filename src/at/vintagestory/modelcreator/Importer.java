@@ -440,6 +440,12 @@ public class Importer
 				element.setShade(obj.get("shade").getAsBoolean());
 			}
 			
+			element.setReflective(false);
+			if (obj.has("reflective") && obj.get("reflective").isJsonPrimitive())
+			{
+				element.setReflective(obj.get("reflective").getAsBoolean());
+			}
+			
 			if (obj.has("gradientShade") && obj.get("gradientShade").isJsonPrimitive())
 			{
 				element.setGradientShade(obj.get("gradientShade").getAsBoolean());

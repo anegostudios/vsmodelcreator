@@ -362,6 +362,11 @@ public class Exporter
 			writeShade(writer, cuboid, indentation);
 			writer.newLine();
 		}
+		if (cuboid.isReflective())
+		{
+			writeReflective(writer, cuboid, indentation);
+			writer.newLine();
+		}
 		if (cuboid.isGradientShaded())
 		{
 			writeGradientShade(writer, cuboid, indentation);
@@ -481,7 +486,12 @@ public class Exporter
 	{
 		writer.write(space(indentation) + "\"shade\": " + cuboid.isShaded() + ",");
 	}
-	
+
+	private void writeReflective(BufferedWriter writer, Element cuboid, int indentation) throws IOException
+	{
+		writer.write(space(indentation) + "\"reflective\": " + cuboid.isReflective() + ",");
+	}
+
 	private void writeGradientShade(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
 		writer.write(space(indentation) + "\"gradientShade\": " + cuboid.isGradientShaded() + ",");
