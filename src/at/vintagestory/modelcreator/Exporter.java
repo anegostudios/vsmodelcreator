@@ -405,6 +405,11 @@ public class Exporter
 			writer.newLine();
 		}
 		
+		if (!cuboid.getRenderInEditor()) {
+			writer.write(space(indentation) + "\"renderInEditor\": " + cuboid.getRenderInEditor() + ",");
+			writer.newLine();
+		}
+		
 		
 
 		

@@ -3,12 +3,14 @@ package at.vintagestory.modelcreator.gui.right.keyframes;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
+import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.KeyFrameElement;
 
@@ -53,8 +55,24 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		btnRot.setFont(defaultFont);
 		btnRot.addActionListener(a ->
 		{
-			ModelCreator.currentProject.SelectedAnimation.ToggleRotation(ModelCreator.manager.getCurrentElement(), btnRot.isSelected());
+			ModelCreator.changeHistory.beginMultichangeHistoryState();
+			
+			Element elem = ModelCreator.manager.getCurrentElement();
+			KeyFrameElement keyFrameElem = ModelCreator.currentProject.SelectedAnimation.ToggleRotation(elem, btnRot.isSelected());
+			
+			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) == 1) {
+				Animation anim = ModelCreator.currentProject.SelectedAnimation;
+				int currentFrame = anim.currentFrame;
+				
+				KeyFrameElement frameElem = anim.allFrames.get(currentFrame).GetKeyFrameElement(elem);
+				
+				keyFrameElem.setRotationX(frameElem.getRotationX());
+				keyFrameElem.setRotationY(frameElem.getRotationY());
+				keyFrameElem.setRotationZ(frameElem.getRotationZ());
+			}			
+			
 			ModelCreator.updateValues(btnRot);
+			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 		});
 		btnContainer.add(btnRot);
 		
@@ -63,9 +81,26 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		btnPos.setFont(defaultFont);
 		btnPos.addActionListener(a ->
 		{
-			ModelCreator.currentProject.SelectedAnimation.TogglePosition(ModelCreator.manager.getCurrentElement(), btnPos.isSelected());
+			ModelCreator.changeHistory.beginMultichangeHistoryState();
+			
+			Element elem = ModelCreator.manager.getCurrentElement();
+			KeyFrameElement keyFrameElem = ModelCreator.currentProject.SelectedAnimation.TogglePosition(ModelCreator.manager.getCurrentElement(), btnPos.isSelected());
+			
+			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) == 1) {
+				Animation anim = ModelCreator.currentProject.SelectedAnimation;
+				int currentFrame = anim.currentFrame;
+				
+				KeyFrameElement frameElem = anim.allFrames.get(currentFrame).GetKeyFrameElement(elem);
+				
+				keyFrameElem.setOffsetX(frameElem.getOffsetX());
+				keyFrameElem.setOffsetY(frameElem.getOffsetY());
+				keyFrameElem.setOffsetZ(frameElem.getOffsetZ());
+			}
+			
 			ModelCreator.updateValues(btnPos);
+			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 		});
+		
 		btnContainer.add(btnPos);
 		
 		
@@ -74,9 +109,28 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		btnStretch.setFont(defaultFont);
 		btnStretch.addActionListener(a ->
 		{
-			ModelCreator.currentProject.SelectedAnimation.ToggleStretch(ModelCreator.manager.getCurrentElement(), btnStretch.isSelected());
+			ModelCreator.changeHistory.beginMultichangeHistoryState();
+			
+			Element elem = ModelCreator.manager.getCurrentElement();
+			KeyFrameElement keyFrameElem = ModelCreator.currentProject.SelectedAnimation.ToggleStretch(ModelCreator.manager.getCurrentElement(), btnStretch.isSelected());
+			
+			
+			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) == 1) {
+				Animation anim = ModelCreator.currentProject.SelectedAnimation;
+				int currentFrame = anim.currentFrame;
+				
+				KeyFrameElement frameElem = anim.allFrames.get(currentFrame).GetKeyFrameElement(elem);
+				
+				keyFrameElem.setStretchX(frameElem.getStretchX());
+				keyFrameElem.setStretchY(frameElem.getStretchY());
+				keyFrameElem.setStretchZ(frameElem.getStretchZ());
+			}
+			
 			ModelCreator.updateValues(btnStretch);
+			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 		});
+		
+		
 		btnContainer.add(btnStretch);
 		
 		

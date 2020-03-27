@@ -535,7 +535,7 @@ public class Project
 	}
 	
 
-	public String loadTexture(String textureCode, File image, BooleanParam isNew, boolean fromBackdrop) throws IOException
+	public String loadTexture(String textureCode, File image, BooleanParam isNew, boolean fromBackdrop, boolean replaceMode, String toReplaceTextureCode) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
 		Texture texture = TextureLoader.getTexture("PNG", is);
@@ -556,10 +556,15 @@ public class Project
 			textureCode = image.getName().replace(".png", "");	
 		}
 		
-		/*if (EntityTextureMode) {
-			for(TextureEntry entry : TexturesByCode.values()) entry.Dispose();
-			TexturesByCode.clear();
-		}*/
+		if (replaceMode && TexturesByCode.size() > 0) {
+			for(String texCode : TexturesByCode.keySet()) {
+				if (toReplaceTextureCode == null || texCode.equals(toReplaceTextureCode)) {
+					TexturesByCode.get(texCode).Dispose();
+					TexturesByCode.put(texCode, new TextureEntry(texCode, texture, icon, image.getAbsolutePath(), fromBackdrop));
+				}
+			}
+			return null;
+		}
 		
 		
 		ArrayList<String> nowFoundTextures = new ArrayList<String>(); 
@@ -618,6 +623,24 @@ public class Project
 		
 		return null;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	public ImageIcon upscaleIcon(ImageIcon source, int length)
 	{

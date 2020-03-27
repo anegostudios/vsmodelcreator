@@ -24,7 +24,7 @@ public class ElementTreeCellRenderer extends DefaultTreeCellRenderer
         } else {
 			Object userObj = node.getUserObject(); 
         	if (userObj instanceof Element) {
-        		if(((Element)userObj).Render) {
+        		if(((Element)userObj).getRenderInEditor()) {
         			setIcon(Icons.smallcube);
         		} else {
         			setIcon(Icons.smallcubegray);

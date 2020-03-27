@@ -115,7 +115,11 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			Face face = element.getSelectedFace();
 			
 			double nowEndU = Parser.parseDouble(xEndField.getText(), face.getEndU());
-			face.setAutoUVEnabled(nowEndU == face.getEndU()); // Disable auto-uv if user changed End U
+			// Disable auto-uv if user changed End U
+			if (nowEndU != face.getEndU()) {
+				face.setAutoUVEnabled(false);
+			}
+			 
 			
 			face.setEndU(nowEndU);
 			face.updateUV();
@@ -132,7 +136,10 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			Face face = element.getSelectedFace();
 			
 			double nowEndV = Parser.parseDouble(yEndField.getText(), face.getEndV());
-			face.setAutoUVEnabled(nowEndV == face.getEndV()); // Disable auto-uv if user changed End V
+			// Disable auto-uv if user changed End V
+			if (nowEndV != face.getEndV()) {
+				face.setAutoUVEnabled(false);
+			}
 			
 			face.setEndV(nowEndV);
 			face.updateUV();

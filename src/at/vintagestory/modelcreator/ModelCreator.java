@@ -58,6 +58,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.PendingTexture;
 import at.vintagestory.modelcreator.model.TextureEntry;
 import at.vintagestory.modelcreator.util.screenshot.AnimationCapture;
@@ -536,6 +537,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	boolean sKeyDown;
 	boolean rKeyDown;
 	boolean tKeyDown;
+	boolean bKeyDown;
 	
 	
 	public void handleInput(int leftSidebarWidth)
@@ -655,6 +657,25 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				}
 			}
 			
+			if (Keyboard.isKeyDown(Keyboard.KEY_B)) bKeyDown = true;
+			else {
+				if (bKeyDown) {
+					bKeyDown = false;
+					
+					Element elem = ModelCreator.currentProject.SelectedElement;
+			    	if (elem != null) {		
+						ModelCreator.changeHistory.beginMultichangeHistoryState();
+						elem.RandomizeTexture();
+						ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
+					}
+					
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() { updateValues(null); } 
+					});
+				}
+			}
+			
 			
 			if (grabbedElem == null && (Mouse.isButtonDown(0) || Mouse.isButtonDown(1)))
 			{
@@ -663,6 +684,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				{
 					currentProject.selectElementAndFaceByOpenGLName(openGlName);
 					grabbedElem = manager.getCurrentElement();
+					currentProject.selectElement(grabbedElem);
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() { updateValues(null); } 
+					});
 				}
 			}
 
@@ -916,7 +942,25 @@ public class ModelCreator extends JFrame implements ITextureCallback
 							if (file.getName().endsWith(".png")) {
 								String code = file.getName();
 								code = code.substring(0, code.indexOf("."));
-								AddPendingTexture(new PendingTexture(code, file, ModelCreator.Instance, 0));
+								PendingTexture pendingTexture = new PendingTexture(code, file, ModelCreator.Instance, 0);
+								
+								int x = evt.getLocation().x;
+								if (x >= leftSidebarWidth()) {
+									String textureCode = null;
+									Element curelem = currentProject.SelectedElement;
+									for (int i = 0; curelem != null && i < curelem.getAllFaces().length; i++) {
+										Face face = curelem.getAllFaces()[i];
+										if (face.isEnabled() && face.getTextureCode() != null) {
+											textureCode = face.getTextureCode();
+											break;
+										}
+									}
+									
+									pendingTexture.SetReplaceAllPrevious(textureCode);
+								}
+								
+								AddPendingTexture(pendingTexture);
+								
 								return;
 							}
 							

@@ -213,39 +213,45 @@ public class Animation
 		currentFrame = (currentFrame - 1) % quantityFrames;
 	}
 	
-	public void TogglePosition(Element elem, boolean on) {
+	public KeyFrameElement TogglePosition(Element elem, boolean on) {
 		KeyFrameElement keyframe = GetOrCreateKeyFrameElement(elem);
 		
-		if (keyframe.PositionSet == on) return;
+		if (keyframe.PositionSet == on) return keyframe;
 		
 		keyframe.PositionSet = on;
 		ModelCreator.ignoreDidModify = true;
 		if (!on) RemoveKeyFramesIfUseless(keyframe);
 		ModelCreator.ignoreDidModify = false;
 		ModelCreator.DidModify();
+		
+		return keyframe;
 	}
 
-	public void ToggleRotation(Element elem, boolean on) {
+	public KeyFrameElement ToggleRotation(Element elem, boolean on) {
 		KeyFrameElement keyframe = GetOrCreateKeyFrameElement(elem);
 		
-		if (keyframe.RotationSet == on) return;
+		if (keyframe.RotationSet == on) return keyframe;
 		
 		keyframe.RotationSet = on;
 		ModelCreator.ignoreDidModify = true;
 		if (!on) RemoveKeyFramesIfUseless(keyframe);
 		ModelCreator.ignoreDidModify = false;
 		ModelCreator.DidModify();
+		
+		return keyframe;
 	}
 
-	public void ToggleStretch(Element elem, boolean on) {
+	public KeyFrameElement ToggleStretch(Element elem, boolean on) {
 		KeyFrameElement keyframe = GetOrCreateKeyFrameElement(elem);
 		keyframe.StretchSet = on;
 		
-		if (keyframe.StretchSet == on) return;
+		if (keyframe.StretchSet == on) return keyframe;
 		ModelCreator.ignoreDidModify = true;
 		if (!on) RemoveKeyFramesIfUseless(keyframe);
 		ModelCreator.ignoreDidModify = false;
 		ModelCreator.DidModify();
+		
+		return keyframe;
 	}
 	
 	

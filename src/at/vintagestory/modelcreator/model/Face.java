@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 
 import java.nio.FloatBuffer;
+import java.util.Random;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -20,6 +21,7 @@ public class Face
 {
 	static int nextOpenGlName = 0;
 
+	static Random rand = new Random();
 
 	
 	// NS = Z
@@ -115,8 +117,8 @@ public class Face
 	private String textureCode = null;
 	public double textureU = 0;
 	public double textureV = 0;
-	private double textureUEnd = 16;
-	private double textureVEnd = 16;
+	public double textureUEnd = 16;
+	public double textureVEnd = 16;
 	private boolean textureBound = false;
 	private boolean cullface = false;
 	private boolean enabled = true;
@@ -633,6 +635,32 @@ public class Face
 	public void setIsBackdrop()
 	{
 		isInBackdropProject = true;
+	}
+
+	public void RandomizeTexture()
+	{
+		double texWidth = ModelCreator.currentProject.TextureWidth;
+		double texHeight = ModelCreator.currentProject.TextureHeight;
+		Sized scale = getVoxel2PixelScale();
+		
+		if (textureCode != null) {
+			TextureEntry entry = getTextureEntry();
+			texWidth = entry.Width  / scale.W;
+			texHeight = entry.Height / scale.H;
+		}
+		
+		double facewidth = Math.abs(textureUEnd - textureU);
+		double faceheight = Math.abs(textureVEnd - textureV);
+		
+		double ustart = Math.floor(rand.nextFloat() * (texWidth - facewidth) * scale.W) / scale.W;
+		double vstart = Math.floor(rand.nextFloat() * (texHeight - faceheight) * scale.H) / scale.H;
+		
+		setStartU(ustart);
+		setStartV(vstart);
+		
+		setEndU(ustart + facewidth); 
+		setEndV(vstart + faceheight);
+		
 	}
 
 }

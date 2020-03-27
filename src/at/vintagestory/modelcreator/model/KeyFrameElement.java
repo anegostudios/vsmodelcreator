@@ -75,7 +75,6 @@ public class KeyFrameElement implements IDrawable
 		this.AnimatedElement = cuboid;
 		this.AnimatedElementName = cuboid.name;
 		this.IsKeyFrame = IsKeyFrame;
-		
 	}
 	
 	public boolean IsUseless() {
@@ -101,6 +100,8 @@ public class KeyFrameElement implements IDrawable
 	@Override
 	public void draw(IDrawable selectedElem)
 	{
+		if (!AnimatedElement.getRenderInEditor()) return;
+		
 		float b;
 		
 		double originX = AnimatedElement.originX + this.getOriginX();

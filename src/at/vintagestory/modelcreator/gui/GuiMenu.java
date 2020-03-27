@@ -58,6 +58,8 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemAddCube;
 	private JMenuItem itemAddFace;
 	private JMenuItem itemResize;
+	private JMenuItem itemRandomizeTexture;
+	
 	private JCheckBoxMenuItem itemRepositionWhenReparented;
 	
 	
@@ -125,7 +127,8 @@ public class GuiMenu extends JMenuBar
 			itemAddCube = createItem("Add cube", "Add new cube", KeyEvent.VK_C, Icons.cube);
 			itemAddFace = createItem("Add face", "Add single face", KeyEvent.VK_F, Icons.cube);
 			
-			itemResize = createItem("Resize", "Resize a cube, including child elements", KeyEvent.VK_R, Icons.inout);
+			itemResize = createItem("Resize Element", "Resize a cube, including child elements", KeyEvent.VK_R, Icons.inout);
+			itemRandomizeTexture = createItem("Randomize Element Texture", "Randomizes an element texture, including child elements", KeyEvent.VK_B, Icons.inout);
 			
 			itemRepositionWhenReparented = createCheckboxItem("Keep reparented Elements in place", "When performing a drag&drop operation, the editor will attempt to keep the element in place by changing its position and rotation, but its currently not very successfull at that. This setting lets you disable this feature", 0, null);
 		}
@@ -143,9 +146,9 @@ public class GuiMenu extends JMenuBar
 			itemSingleTexture = createCheckboxItem("Entity Texturing Mode", "When creating entities, it is often more useful to use only a single texture and have the uv boxes unwrap side by side.", 0, Icons.transparent);
 			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);
 			
-			itemLoadAsBackdrop = createItem("Set backdrop...", "Set a model as a backdrop", KeyEvent.VK_B, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
+			itemLoadAsBackdrop = createItem("Set backdrop...", "Set a model as a backdrop", KeyEvent.VK_K, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
 			
-			itemClearBackdrop = createItem("Clear backdrop", "Remove the backdrop again", KeyEvent.VK_B, new ImageIcon(getClass().getClassLoader().getResource("icons/clear.png")));
+			itemClearBackdrop = createItem("Clear backdrop", "Remove the backdrop again", KeyEvent.VK_L, new ImageIcon(getClass().getClassLoader().getResource("icons/clear.png")));
 			itemClearBackdrop.setEnabled(false);
 		}
 		
@@ -211,6 +214,7 @@ public class GuiMenu extends JMenuBar
 		menuEdit.add(itemAddFace);
 		menuEdit.addSeparator();
 		menuEdit.add(itemResize);
+		menuEdit.add(itemRandomizeTexture);
 		menuEdit.addSeparator();
 		menuEdit.add(itemRepositionWhenReparented);
 		
@@ -254,6 +258,7 @@ public class GuiMenu extends JMenuBar
 			KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 			KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 			KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+			KeyStroke.getKeyStroke(KeyEvent.VK_B, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
 		};
 		
 		itemNew.setAccelerator(strokes[0]);
@@ -277,9 +282,6 @@ public class GuiMenu extends JMenuBar
 		buttonAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Z);
 		itemUndo.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(strokes[4], key);
 		itemUndo.getActionMap().put(key, buttonAction);
-		
-		 
-		
 		itemUndo.setAccelerator(strokes[4]);
 		
 		
@@ -300,6 +302,33 @@ public class GuiMenu extends JMenuBar
 		itemRedo.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(strokes[5], key);
 		itemRedo.getActionMap().put(key, buttonAction2);
 		itemRedo.setAccelerator(strokes[5]);
+		
+		
+		
+		
+		Action buttonActionRandomize = new AbstractAction("Randomize") {		 
+			private static final long serialVersionUID = 1L;
+
+			@Override
+		    public void actionPerformed(ActionEvent evt) {
+		    	Element elem = ModelCreator.currentProject.SelectedElement;
+		    	if (elem != null) {		
+					ModelCreator.changeHistory.beginMultichangeHistoryState();
+					elem.RandomizeTexture();
+					ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
+				}
+		    }
+		};
+		String rkey = "Randomize";
+		itemRandomizeTexture.setAction(buttonActionRandomize);
+		itemRandomizeTexture.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/cube.png")));
+		buttonAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_B);
+		itemRandomizeTexture.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(strokes[7], key);
+		itemRandomizeTexture.getActionMap().put(rkey, buttonAction);
+		itemRandomizeTexture.setAccelerator(strokes[7]);
+		
+
+
 		
 		
 		itemRepositionWhenReparented.addActionListener(a ->
@@ -473,6 +502,13 @@ public class GuiMenu extends JMenuBar
 
 		itemResize.addActionListener(a -> {
 			ResizeDialog.show(creator);
+		});
+		
+		itemRandomizeTexture.addActionListener(a -> {
+			Element elem = ModelCreator.currentProject.SelectedElement;			
+			ModelCreator.changeHistory.beginMultichangeHistoryState();
+			elem.RandomizeTexture();
+			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 		});
 
 		
@@ -746,6 +782,7 @@ public class GuiMenu extends JMenuBar
 		itemTexture.setSelected(ModelCreator.renderTexture);
 		
 		itemResize.setEnabled(ModelCreator.currentProject.SelectedElement != null);
+		itemRandomizeTexture.setEnabled(ModelCreator.currentProject.SelectedElement != null);
 	}
 	
 	public void updateFrame() {

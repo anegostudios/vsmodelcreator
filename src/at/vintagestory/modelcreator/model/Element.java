@@ -52,6 +52,7 @@ public class Element implements IDrawable
 	
 	protected String name = "Cube1";
 	public String stepparentName;
+	protected boolean renderInEditor = true;
 	
 	// Face Variables
 	protected int selectedFace = 0;
@@ -201,6 +202,19 @@ public class Element implements IDrawable
 	public boolean isAutoUnwrapEnabled() {
 		return autoUnwrap;
 	}
+	
+	public void setRenderInEditor(boolean enabled) {
+		if (renderInEditor == enabled) return;
+		
+		this.renderInEditor = enabled;
+		ModelCreator.DidModify();
+	}
+	
+	
+	public boolean getRenderInEditor() {
+		return renderInEditor;
+	}
+	
 
 	public Face[] getAllFaces()
 	{
@@ -308,7 +322,7 @@ public class Element implements IDrawable
 	}
 	
 	public void draw(IDrawable selectedElem, boolean drawCallFromStepParent) {
-		if (!Render || (stepParentElement != null && !drawCallFromStepParent)) return;
+		if (!renderInEditor || (stepParentElement != null && !drawCallFromStepParent)) return;
 		
 		float b;
 		
@@ -564,7 +578,7 @@ public class Element implements IDrawable
 		new int[] { 4, 2, 0, 3, 1, 5 }
 	};
 
-	public boolean Render = true;
+	
 
 
 	void setUnwrappedCubeUV() {
@@ -1106,6 +1120,7 @@ public class Element implements IDrawable
 		cloned.unwrapMode = unwrapMode;
 		cloned.unwrapRotation = unwrapRotation;
 		cloned.stepparentName = stepparentName;
+		cloned.renderInEditor = renderInEditor;
 		
 		for (int i = 0; i < brightnessByFace.length; i++) {
 			cloned.brightnessByFace[i] = brightnessByFace[i];			
@@ -1344,6 +1359,58 @@ public class Element implements IDrawable
 			elem.clearStepparentRelationShip();
 		}
 		StepChildElements.clear();
+	}
+
+	public void RandomizeTexture()
+	{
+		if (autoUnwrap) {
+			double uMin = 9999, vMin = 9999, uMax = -9999, vMax = -9999;
+			
+			Sized scale=null;
+			
+			double texWidth = ModelCreator.currentProject.TextureWidth;
+			double texHeight = ModelCreator.currentProject.TextureHeight;
+			
+			
+			for (int i = 0; i < faces.length; i++) {
+				Face face = faces[i];
+				if (!face.isEnabled()) continue;
+				
+				uMin = Math.min(face.textureU, uMin);
+				vMin = Math.min(face.textureV, vMin);
+				
+				uMax = Math.max(face.textureUEnd, uMax);
+				vMax = Math.max(face.textureVEnd, vMax);
+				
+				TextureEntry entry = face.getTextureEntry();
+				scale = face.getVoxel2PixelScale();
+				if (entry != null) {
+					texWidth = entry.Width  / scale.W;
+					texHeight = entry.Height / scale.H;
+				}				
+			}
+			
+			double wiggleRoomU = texWidth - (uMax - uMin); 			
+			double wiggleRoomV = texHeight - (vMax - vMin);
+			
+			double ustart = Math.floor(Face.rand.nextFloat() * wiggleRoomU * scale.W) / scale.W;
+			double vstart = Math.floor(Face.rand.nextFloat() * wiggleRoomV * scale.H) / scale.H;
+
+			texUStart = ustart;
+			texVStart = vstart;
+			updateUV();
+			
+		} else {
+			for (int i = 0; i < faces.length; i++) {
+				faces[i].RandomizeTexture();
+			}	
+		}
+		
+		for (Element elem : ChildElements) { 
+			elem.RandomizeTexture();
+		}
+		
+		ModelCreator.DidModify();
 	}
 }
 

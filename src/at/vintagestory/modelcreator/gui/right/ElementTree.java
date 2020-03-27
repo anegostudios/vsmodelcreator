@@ -144,7 +144,7 @@ public class ElementTree
 					
 					Object userObj = ((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject(); 
 		        	if (userObj instanceof Element) {
-		        		((Element)userObj).Render = !((Element)userObj).Render;
+		        		((Element)userObj).setRenderInEditor(!((Element)userObj).getRenderInEditor());
 		        		jtree.updateUI();
 		        		arg0.consume();
 		        	}

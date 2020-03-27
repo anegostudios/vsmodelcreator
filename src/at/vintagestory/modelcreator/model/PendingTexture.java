@@ -12,6 +12,9 @@ public class PendingTexture
 	public ITextureCallback callback;
 	public boolean fromBackdrop;
 	
+	boolean doReplaceAll;
+	String doReplaceAllTextureCode;
+	
 	public TextureEntry entry;
 	
 	// Wait 3 frames before actually loading this file
@@ -55,8 +58,8 @@ public class PendingTexture
 			String fileName = this.textureFile.getName().replace(".png", "");
 			
 
-			BooleanParam isNew = new BooleanParam();
-			errormessge = project.loadTexture(textureName, this.textureFile, isNew, fromBackdrop);
+			BooleanParam isNew = new BooleanParam();			
+			errormessge = project.loadTexture(textureName, this.textureFile, isNew, fromBackdrop, doReplaceAll, doReplaceAllTextureCode);
 			
 			if (callback != null) {
 				callback.onTextureLoaded(isNew.Value, errormessge, fileName);
@@ -78,5 +81,12 @@ public class PendingTexture
 	public void SetIsBackDrop()
 	{
 		fromBackdrop = true;
+	}
+
+
+	public void SetReplaceAllPrevious(String code)
+	{
+		doReplaceAllTextureCode = code;
+		doReplaceAll = true;
 	}
 }

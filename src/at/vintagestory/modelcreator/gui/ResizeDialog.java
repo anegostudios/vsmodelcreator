@@ -64,6 +64,7 @@ public class ResizeDialog
 		btnSubmit.addActionListener(a ->
 		{
 			try {
+				ModelCreator.changeHistory.beginMultichangeHistoryState();
 				
 				Element elem = ModelCreator.currentProject.SelectedElement;
 				float size = Float.parseFloat(scaleTextField.getText());
@@ -71,6 +72,7 @@ public class ResizeDialog
 				
 				Resize(elem, size, 0, scaleUV);
 				
+				ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 				
 				dialog.dispose();
 			} catch (Exception e) {
