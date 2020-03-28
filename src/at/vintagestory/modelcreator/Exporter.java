@@ -125,7 +125,7 @@ public class Exporter
 		}
 		writer.write(space(2) + "\"allAngles\": " + project.AllAngles + ",");
 		writer.newLine();
-		writer.write(space(2) + "\"singleTexture\": " + project.EntityTextureMode + "");
+		writer.write(space(2) + "\"entityTextureMode\": " + project.EntityTextureMode + "");
 		writer.newLine();	
 		writer.write(space(1) + "},");
 		writer.newLine();

@@ -184,9 +184,13 @@ public class Importer
 
 	private void LoadEditorSettings(JsonObject obj)
 	{
-		if (obj.has("singleTexture") && obj.get("singleTexture").isJsonPrimitive())
+		if (obj.has("singleTexture") && obj.get("singleTexture").isJsonPrimitive()) // Deprecated syntax
 		{
 			project.EntityTextureMode = obj.get("singleTexture").getAsBoolean();
+		}
+		if (obj.has("entityTextureMode") && obj.get("entityTextureMode").isJsonPrimitive())
+		{
+			project.EntityTextureMode = obj.get("entityTextureMode").getAsBoolean();
 		}
 		
 		if (obj.has("allAngles") && obj.get("allAngles").isJsonPrimitive())

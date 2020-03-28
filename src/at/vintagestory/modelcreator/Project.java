@@ -615,11 +615,11 @@ public class Project
 			}			
 		}		
 		
-		if (beforeSize == 0 && TexturesByCode.size() == 1 && EntityTextureMode) {
+		/*if (beforeSize == 0 && TexturesByCode.size() == 1 && EntityTextureMode) {
 			for (Element elem : rootElements) {
 				elem.setTextureCode(textureCode, true);
 			}
-		}
+		}*/
 		
 		return null;
 	}
