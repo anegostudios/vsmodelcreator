@@ -137,6 +137,8 @@ public class Element implements IDrawable
 		this.unwrapMode = cuboid.unwrapMode;
 		this.unwrapRotation = cuboid.unwrapRotation;
 		this.autoUnwrap = cuboid.autoUnwrap;
+		this.texUStart = cuboid.texUStart;
+		this.texVStart = cuboid.texVStart;
 		
 		this.rescale = cuboid.rescale;
 		this.shade = cuboid.shade;

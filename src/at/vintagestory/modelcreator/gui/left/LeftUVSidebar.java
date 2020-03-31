@@ -582,7 +582,7 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			if (!ModelCreator.currentProject.EntityTextureMode && grabbedFaceIndex >= 0) {
 				texEntry = grabbedElement.getAllFaces()[grabbedFaceIndex].getTextureEntry();
-				Sized texSize = GetBlockTextureModeTextureSize(texEntry.code);
+				Sized texSize = GetBlockTextureModeTextureSize(texEntry == null ? null : texEntry.code);
 				texBoxWidth = (int)texSize.W;
 				texBoxHeight = (int)texSize.H;
 			}
@@ -675,10 +675,12 @@ public class LeftUVSidebar extends LeftSidebar
 		double texWidth = ModelCreator.currentProject.TextureWidth;
 		double texHeight = ModelCreator.currentProject.TextureHeight;
 		
-		int[] size = ModelCreator.currentProject.TextureSizes.get(textureCode);
-		if (size != null) {
-			texWidth = size[0];
-			texHeight = size[1];
+		if (textureCode != null) {
+			int[] size = ModelCreator.currentProject.TextureSizes.get(textureCode);
+			if (size != null) {
+				texWidth = size[0];
+				texHeight = size[1];
+			}
 		}
 		
 		int texBoxWidth = (int)(blockFaceTextureWidth);

@@ -210,7 +210,8 @@ public class Animation
 	
 	public void PrevFrame() {
 		if (quantityFrames == 0) return;
-		currentFrame = (currentFrame - 1) % quantityFrames;
+		
+		currentFrame = mod(currentFrame - 1, quantityFrames);
 	}
 	
 	public KeyFrameElement TogglePosition(Element elem, boolean on) {
@@ -492,6 +493,7 @@ public class Animation
 		}
 		
 		int nextFrameNumber = mod(curFrame.getFrameNumber() + direction, quantityFrames);
+		
 		
 		if (direction > 0 && curFrame != nextFrame && curFrame.getFrameNumber() < nextFrame.getFrameNumber()) {
 			nextFrameNumber = Math.min(curFrame.getFrameNumber() + direction, nextFrame.getFrameNumber() - 1);
