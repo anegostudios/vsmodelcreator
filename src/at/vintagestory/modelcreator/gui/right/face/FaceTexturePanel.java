@@ -67,9 +67,12 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		{
 			if (manager.getCurrentElement() != null)
 			{
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
+				boolean haveShift = (e.getModifiers() & ActionEvent.SHIFT_MASK) == 1;
+				boolean haveCtrl = (e.getModifiers() & ActionEvent.CTRL_MASK) == 1;
+				
+				if (haveShift)
 				{
-					manager.getCurrentElement().setTextureCode(null, false);
+					manager.getCurrentElement().setTextureCode(null, haveCtrl);
 				}
 				else
 				{
@@ -97,24 +100,24 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		btnPaste.setIcon(Icons.clipboard);
 		btnPaste.addActionListener(e ->
 		{
-			if (manager.getCurrentElement() != null)
+			ClipboardTexture texture = Clipboard.getTexture();
+			if (manager.getCurrentElement() != null && texture != null)
 			{
-				ClipboardTexture texture = Clipboard.getTexture();
-				if (texture != null)
+				boolean haveShift = (e.getModifiers() & ActionEvent.SHIFT_MASK) > 0;
+				boolean haveCtrl = (e.getModifiers() & ActionEvent.CTRL_MASK) > 0;
+
+				if (haveShift)
 				{
-					if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-					{
-						manager.getCurrentElement().setTexture(texture, false);
-					}
-					else
-					{
-						Face face = manager.getCurrentElement().getSelectedFace();
-						face.setTextureCode(texture.getTexture());
-						//face.setTextureLocation(texture.getLocation());
-					}
+					manager.getCurrentElement().setTexture(texture, haveCtrl);
+				}
+				else
+				{
+					Face face = manager.getCurrentElement().getSelectedFace();
+					face.setTextureCode(texture.getTexture());
 				}
 			}
 		});
+		
 		btnPaste.setFont(defaultFont);
 		btnPaste.setToolTipText("<html>Pastes the clipboard texture to this face.<br><b>Hold shift to paste to all faces</b></html>");
 	}
