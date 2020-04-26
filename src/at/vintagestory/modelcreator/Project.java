@@ -423,6 +423,10 @@ public class Project
 		cloned.TextureWidth = TextureWidth;
 		cloned.TextureHeight = TextureHeight;
 		
+		for (String key : TextureSizes.keySet()) {
+			cloned.TextureSizes.put(key, TextureSizes.get(key));
+		}
+		
 		for (Element elem : rootElements) {
 			cloned.rootElements.add(elem.clone());
 		}
