@@ -539,7 +539,7 @@ public class Project
 	}
 	
 
-	public String loadTexture(String textureCode, File image, BooleanParam isNew, boolean fromBackdrop, boolean replaceMode, String toReplaceTextureCode) throws IOException
+	public String loadTexture(String textureCode, File image, BooleanParam isNew, boolean fromBackdrop, String toReplaceTextureCode) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
 		Texture texture = TextureLoader.getTexture("PNG", is);
@@ -552,7 +552,6 @@ public class Project
 			return "Cannot load this texture, the width or length is not a multiple of 8 ("+texture.getImageHeight()+"x"+texture.getImageWidth()+")";
 		}
 		
-		int beforeSize = TexturesByCode.size();
 		
 		ImageIcon icon = upscaleIcon(new ImageIcon(image.getAbsolutePath()), 256);
 		
@@ -560,13 +559,15 @@ public class Project
 			textureCode = image.getName().replace(".png", "");	
 		}
 		
-		if (replaceMode && TexturesByCode.size() > 0) {
+		
+		if (toReplaceTextureCode != null && TexturesByCode.size() > 0) {
 			for(String texCode : TexturesByCode.keySet()) {
-				if (toReplaceTextureCode == null || texCode.equals(toReplaceTextureCode)) {
+				if (texCode.equals(toReplaceTextureCode)) {
 					TexturesByCode.get(texCode).Dispose();
 					TexturesByCode.put(texCode, new TextureEntry(texCode, texture, icon, image.getAbsolutePath(), fromBackdrop));
 				}
 			}
+			
 			return null;
 		}
 		
@@ -618,12 +619,6 @@ public class Project
 				MissingTexturesByCode.remove(key);
 			}			
 		}		
-		
-		/*if (beforeSize == 0 && TexturesByCode.size() == 1 && EntityTextureMode) {
-			for (Element elem : rootElements) {
-				elem.setTextureCode(textureCode, true);
-			}
-		}*/
 		
 		return null;
 	}

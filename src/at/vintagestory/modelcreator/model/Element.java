@@ -75,7 +75,9 @@ public class Element implements IDrawable
 	protected boolean shade = true;
 	protected boolean reflective = false;
 	protected boolean gradientShade = false;
-	protected int tintIndex = 0;
+	protected String climateColorMap = null;
+	protected String seasonColorMap = null;
+	
 	protected int renderPass = -1;
 	protected int unwrapMode;
 	protected int unwrapRotation;
@@ -133,7 +135,8 @@ public class Element implements IDrawable
 		this.rotationY = cuboid.rotationY;
 		this.rotationZ = cuboid.rotationZ;
 		this.renderPass = cuboid.renderPass;
-		this.tintIndex = cuboid.tintIndex;
+		this.climateColorMap = cuboid.climateColorMap;
+		this.seasonColorMap = cuboid.climateColorMap;
 		this.unwrapMode = cuboid.unwrapMode;
 		this.unwrapRotation = cuboid.unwrapRotation;
 		this.autoUnwrap = cuboid.autoUnwrap;
@@ -1053,16 +1056,29 @@ public class Element implements IDrawable
 		return path;
 	}
 
-	public int getTintIndex()
+	public String getClimateColorMap()
 	{
-		return tintIndex;
+		return climateColorMap;
 	}
 
-	public void setTintIndex(int tintIndex)
+	public void setClimateColorMap(String climateColorMap)
 	{
-		if (this.tintIndex == tintIndex) return;
+		if (this.climateColorMap == climateColorMap) return;
 		
-		this.tintIndex = tintIndex;
+		this.climateColorMap = climateColorMap;
+	}
+	
+	
+	public String getSeasonColorMap()
+	{
+		return seasonColorMap;
+	}
+
+	public void setSeasonColorMap(String seasonColorMap)
+	{
+		if (this.seasonColorMap == seasonColorMap) return;
+		
+		this.seasonColorMap = seasonColorMap;
 	}
 	
 
@@ -1113,7 +1129,8 @@ public class Element implements IDrawable
 		cloned.rotationZ = rotationZ;
 		cloned.rescale = rescale;
 		cloned.shade = shade;
-		cloned.tintIndex = tintIndex;
+		cloned.climateColorMap = climateColorMap;
+		cloned.seasonColorMap = seasonColorMap;
 		cloned.renderPass = renderPass;
 		cloned.sphere = sphere;
 		cloned.texUStart = texUStart;

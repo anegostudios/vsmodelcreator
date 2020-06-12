@@ -32,7 +32,8 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 
 	private JRadioButton btnShade;
 	
-	JTextField tintIndexField;
+	JTextField climateColorMapField;
+	JTextField seasonColorMapField;
 	private JComboBox<String> renderPassList;
 	JButton stepparentButton;
 
@@ -40,10 +41,10 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 	public ElementPropertiesPanel(IElementManager manager)
 	{
 		this.manager = manager;
-		setLayout(new GridLayout(4, 2, 0, 5));
+		setLayout(new GridLayout(10, 2, 0, 5));
 		
 		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Element Properties</b></html>"));
-		setPreferredSize(new Dimension(200, 120));
+		setPreferredSize(new Dimension(200, 240));
 		setAlignmentX(JPanel.LEFT_ALIGNMENT);
 		initComponents();
 		addComponents();
@@ -58,26 +59,52 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 			if (elem2 != null) elem2.setShade(btnShade.isSelected());
 		});
 		
-		tintIndexField = new JTextField();
-		tintIndexField.setToolTipText("0 for no tint, 1 = for climate foliage tint, 2 = for climate water tint");
-		tintIndexField.setPreferredSize(new Dimension(190, 25));
+		climateColorMapField = new JTextField();
+		climateColorMapField.setToolTipText("Leave empty for no color mapping, 'climatePlantColor' for climate foliage tint, 'climateWaterColor' = for climate water tint");
+		climateColorMapField.setPreferredSize(new Dimension(190, 25));
 		
-		tintIndexField.addKeyListener(new KeyAdapter()
+		climateColorMapField.addKeyListener(new KeyAdapter()
 		{
 			@Override
 			public void keyReleased(KeyEvent e)
 			{
 				Element elem = manager.getCurrentElement();
 				if (elem != null) {
-					int index = Parser.parseInt(tintIndexField.getText(), 0);
-					int previndex = elem.getTintIndex();
-					elem.setTintIndex(index);
+					String nowColorMap = climateColorMapField.getText();
+					String prevColorMap = elem.getClimateColorMap();
+					elem.setClimateColorMap(nowColorMap);
 					
-					if (index != previndex) ModelCreator.DidModify();
-					ModelCreator.updateValues(tintIndexField);
+					if (prevColorMap != nowColorMap) ModelCreator.DidModify();
+					ModelCreator.updateValues(climateColorMapField);
 				}
 			}
 		});
+		
+		
+		
+		seasonColorMapField = new JTextField();
+		seasonColorMapField.setToolTipText("Leave empty for no season color mapping");
+		seasonColorMapField.setPreferredSize(new Dimension(190, 25));
+		
+		seasonColorMapField.addKeyListener(new KeyAdapter()
+		{
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				Element elem = manager.getCurrentElement();
+				if (elem != null) {
+					String nowColorMap = seasonColorMapField.getText();
+					String prevColorMap = elem.getSeasonColorMap();
+					elem.setSeasonColorMap(nowColorMap);
+					
+					if (prevColorMap != nowColorMap) ModelCreator.DidModify();
+					ModelCreator.updateValues(seasonColorMapField);
+				}
+			}
+		});
+		
+		
+		
 		
 		renderPassList = new JComboBox<String>();
 		renderPassList.setToolTipText("Leave at default to use the blocks render pass. Set to another value to override the block render pass. For foliage you might want to use OpaqueNoCull.");
@@ -105,8 +132,11 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 		add(btnShade);
 		add(new JLabel());
 		
-		add(new JLabel("Tint index"));
-		add(tintIndexField);
+		add(new JLabel("Climate color map"));
+		add(climateColorMapField);
+		
+		add(new JLabel("Season color map"));
+		add(seasonColorMapField);
 		
 		add(new JLabel("Render pass"));
 		add(renderPassList);
@@ -132,10 +162,11 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 		{
 			btnShade.setEnabled(true);
 			btnShade.setSelected(cube.isShaded());
-			tintIndexField.setEnabled(true);
+			climateColorMapField.setEnabled(true);
 			renderPassList.setEnabled(true);
 			
-			tintIndexField.setText(cube.getTintIndex() + "");
+			climateColorMapField.setText(cube.getClimateColorMap() == null ? "" : cube.getClimateColorMap());
+			seasonColorMapField.setText(cube.getSeasonColorMap() == null ? "" : cube.getSeasonColorMap());
 			renderPassList.setSelectedIndex(cube.getRenderPass() + 1);
 			stepparentButton.setEnabled(true);
 		}
@@ -145,8 +176,8 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 			btnShade.setSelected(false);
 			renderPassList.setEnabled(false);
 			
-			tintIndexField.setEnabled(false);
-			tintIndexField.setText("");
+			climateColorMapField.setEnabled(false);
+			climateColorMapField.setText("");
 			stepparentButton.setEnabled(false);
 		}
 	}

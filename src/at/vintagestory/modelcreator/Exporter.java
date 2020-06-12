@@ -372,11 +372,18 @@ public class Exporter
 			writeGradientShade(writer, cuboid, indentation);
 			writer.newLine();
 		}
-		if (cuboid.getTintIndex() > 0)
+		if (cuboid.getClimateColorMap() != null)
 		{
-			writer.write(space(indentation) + "\"tintIndex\": " + cuboid.getTintIndex() + ",");
+			writer.write(space(indentation) + "\"climateColorMap\": \"" + cuboid.getClimateColorMap() + "\",");
 			writer.newLine();
 		}
+		
+		if (cuboid.getSeasonColorMap() != null)
+		{
+			writer.write(space(indentation) + "\"seasonColorMap\": \"" + cuboid.getSeasonColorMap() + "\",");
+			writer.newLine();
+		}
+		
 		if (cuboid.getRenderPass() > -1)
 		{
 			writer.write(space(indentation) + "\"renderPass\": " + cuboid.getRenderPass() + ",");

@@ -956,7 +956,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 										}
 									}
 									
-									pendingTexture.SetReplaceAllPrevious(textureCode);
+									pendingTexture.SetReplacesTexture(textureCode);
 								}
 								
 								AddPendingTexture(pendingTexture);

@@ -455,9 +455,14 @@ public class Importer
 				element.setGradientShade(obj.get("gradientShade").getAsBoolean());
 			}
 			
-			if (obj.has("tintIndex") && obj.get("tintIndex").isJsonPrimitive())
+			if (obj.has("climateColorMap") && obj.get("tintIndex").isJsonPrimitive())
 			{
-				element.setTintIndex(obj.get("tintIndex").getAsInt());
+				element.setClimateColorMap(obj.get("climateColorMap").getAsString());
+			}
+			
+			if (obj.has("seasonColorMap") && obj.get("tintIndex").isJsonPrimitive())
+			{
+				element.setSeasonColorMap(obj.get("seasonColorMap").getAsString());
 			}
 			
 			if (obj.has("renderPass") && obj.get("renderPass").isJsonPrimitive())

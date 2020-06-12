@@ -59,7 +59,7 @@ public class PendingTexture
 			
 
 			BooleanParam isNew = new BooleanParam();			
-			errormessge = project.loadTexture(textureName, this.textureFile, isNew, fromBackdrop, doReplaceAll, doReplaceAllTextureCode);
+			errormessge = project.loadTexture(textureName, this.textureFile, isNew, fromBackdrop, doReplaceAllTextureCode);
 			
 			if (callback != null) {
 				callback.onTextureLoaded(isNew.Value, errormessge, fileName);
@@ -84,9 +84,8 @@ public class PendingTexture
 	}
 
 
-	public void SetReplaceAllPrevious(String code)
+	public void SetReplacesTexture(String code)
 	{
 		doReplaceAllTextureCode = code;
-		doReplaceAll = true;
 	}
 }

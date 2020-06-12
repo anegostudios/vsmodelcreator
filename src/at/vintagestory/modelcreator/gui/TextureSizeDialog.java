@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -51,7 +53,7 @@ public class TextureSizeDialog
 		
 		
 		
-		int count = ModelCreator.currentProject.TexturesByCode.size();
+		int count = ModelCreator.currentProject.TexturesByCode.size() + ModelCreator.currentProject.MissingTexturesByCode.size();
 
 		
 		
@@ -69,9 +71,12 @@ public class TextureSizeDialog
 		
 		HashMap<String, JTextField[]> textureSizes = new HashMap<String, JTextField[]>();
 		
+		Set<String> entries = new HashSet<String>();
+		entries.addAll(ModelCreator.currentProject.TexturesByCode.keySet());
+		entries.addAll(ModelCreator.currentProject.MissingTexturesByCode.keySet());
 		
 		if (count > 1) {
-			for (String keycode : ModelCreator.currentProject.TexturesByCode.keySet()) {
+			for (String keycode : entries) {
 				
 				label = new JLabel(keycode);
 				label.setPreferredSize(new Dimension(30, 20));
