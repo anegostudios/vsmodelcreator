@@ -37,10 +37,20 @@ public enum EnumFonts
 	public void drawString(int x, int y, String text)
 	{
 		font.drawString(x, y, text);
+		
 	}
 
 	public void drawString(int x, int y, String text, Color color)
 	{
 		font.drawString(x, y, text, color);
+	}
+	
+	public float getWidth(String text) {
+		
+		return font.getWidth(text);
+	}
+	
+	public float getHeight(String text) {
+		return font.getHeight(text);
 	}
 }

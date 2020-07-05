@@ -59,6 +59,7 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemAddFace;
 	private JMenuItem itemResize;
 	private JMenuItem itemRandomizeTexture;
+	private JMenuItem itemGenSnowLayer;
 	
 	private JCheckBoxMenuItem itemRepositionWhenReparented;
 	
@@ -129,6 +130,7 @@ public class GuiMenu extends JMenuBar
 			
 			itemResize = createItem("Resize Element", "Resize a cube, including child elements", KeyEvent.VK_R, Icons.inout);
 			itemRandomizeTexture = createItem("Randomize Element Texture", "Randomizes an element texture, including child elements", KeyEvent.VK_B, Icons.inout);
+			itemGenSnowLayer = createItem("Generate Snow Layer", "Attempts to generate a snow layer on all horizontal faces", KeyEvent.VK_B, Icons.inout);
 			
 			itemRepositionWhenReparented = createCheckboxItem("Keep reparented Elements in place", "When performing a drag&drop operation, the editor will attempt to keep the element in place by changing its position and rotation, but its currently not very successfull at that. This setting lets you disable this feature", 0, null);
 		}
@@ -162,15 +164,7 @@ public class GuiMenu extends JMenuBar
 			
 			itemTexture = createCheckboxItem("Texture", "Toggles textured rendering", KeyEvent.VK_T, Icons.transparent);
 			itemTexture.setSelected(ModelCreator.transparent);
-			
-						
-		/*	modelFromBelow = createItem("Model from Below", "Rotate camera to show model from below", KeyEvent.VK_T, Icons.transparent);
-			modelFromAbove = createItem("Model from Above", "Rotate camera to show model from above", KeyEvent.VK_T, Icons.transparent);
-			modelFromSide = createItem("Model from Side", "Rotate camera to show model from the side", KeyEvent.VK_T, Icons.transparent);
-			modelFromFront = createItem("Model from Front", "Rotate camera to show model from the front", KeyEvent.VK_T, Icons.transparent);*/
 		}
-
-		
 
 		
 		exportMenu = new JMenu("Export");
@@ -215,6 +209,7 @@ public class GuiMenu extends JMenuBar
 		menuEdit.addSeparator();
 		menuEdit.add(itemResize);
 		menuEdit.add(itemRandomizeTexture);
+		menuEdit.add(itemGenSnowLayer);
 		menuEdit.addSeparator();
 		menuEdit.add(itemRepositionWhenReparented);
 		
@@ -266,7 +261,7 @@ public class GuiMenu extends JMenuBar
 		itemSave.setAccelerator(strokes[2]);
 		itemReloadTextures.setAccelerator(strokes[3]);
 
-		// So much code for setting up a hotkey
+		// So much code just for setting up a hotkey
 		// Java swing is so mentally retarded -_-
 		Action buttonAction = new AbstractAction("Undo") {		 
 			private static final long serialVersionUID = 1L;
@@ -319,6 +314,7 @@ public class GuiMenu extends JMenuBar
 				}
 		    }
 		};
+		
 		String rkey = "Randomize";
 		itemRandomizeTexture.setAction(buttonActionRandomize);
 		itemRandomizeTexture.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/cube.png")));
@@ -328,7 +324,8 @@ public class GuiMenu extends JMenuBar
 		itemRandomizeTexture.setAccelerator(strokes[7]);
 		
 
-
+		ActionListener glistener = a -> { ModelCreator.currentProject.TryGenSnowLayer(); }; 
+		itemGenSnowLayer.addActionListener(glistener);
 		
 		
 		itemRepositionWhenReparented.addActionListener(a ->
@@ -661,6 +658,7 @@ public class GuiMenu extends JMenuBar
 	{
 		creator.LoadFile(null);
 	}
+	
 
 
 	private JMenuItem createItem(String name, String tooltip, int mnemonic, Icon icon)

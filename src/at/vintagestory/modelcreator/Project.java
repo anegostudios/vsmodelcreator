@@ -539,7 +539,7 @@ public class Project
 	}
 	
 
-	public String loadTexture(String textureCode, File image, BooleanParam isNew, boolean fromBackdrop, String toReplaceTextureCode) throws IOException
+	public String loadTexture(String textureCode, File image, BooleanParam isNew, boolean fromBackdrop, boolean doReplaceAll, boolean doReplacedForSelectedElement) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
 		Texture texture = TextureLoader.getTexture("PNG", is);
@@ -557,18 +557,6 @@ public class Project
 		
 		if (textureCode == null) {
 			textureCode = image.getName().replace(".png", "");	
-		}
-		
-		
-		if (toReplaceTextureCode != null && TexturesByCode.size() > 0) {
-			for(String texCode : TexturesByCode.keySet()) {
-				if (texCode.equals(toReplaceTextureCode)) {
-					TexturesByCode.get(texCode).Dispose();
-					TexturesByCode.put(texCode, new TextureEntry(texCode, texture, icon, image.getAbsolutePath(), fromBackdrop));
-				}
-			}
-			
-			return null;
 		}
 		
 		
@@ -618,7 +606,22 @@ public class Project
 			for (String key : nowFoundTextures) {
 				MissingTexturesByCode.remove(key);
 			}			
-		}		
+		}
+		
+		if (doReplaceAll || doReplacedForSelectedElement && SelectedElement != null) {
+			ModelCreator.changeHistory.beginMultichangeHistoryState();
+		
+			if (doReplaceAll) {
+				for (Element elem : rootElements) {
+					elem.setTextureCode(textureCode, true);
+				}
+			}
+			if (doReplacedForSelectedElement && SelectedElement != null) {
+				SelectedElement.setTextureCode(textureCode, true);
+			}
+			ModelCreator.DidModify();
+			ModelCreator.changeHistory.endMultichangeHistoryState(this);
+		}
 		
 		return null;
 	}
@@ -676,7 +679,92 @@ public class Project
 	}
 
 
+	public void TryGenSnowLayer()
+	{
+		ModelCreator.changeHistory.beginMultichangeHistoryState();
+		
+		for (Element elem : rootElements) {
+			TryGenSnowLayer(elem);
+		}
+
+		if (!TexturesByCode.containsKey("snowcover")) {
+			loadSnowTexture();
+		}
+		
+		
+		ModelCreator.DidModify();
+		ModelCreator.updateValues(null);
+
+		ModelCreator.ignoreValueUpdates = true;
+		tree.clearElements();
+		ModelCreator.ignoreValueUpdates = false;
+		
+		for (Element elem : rootElements) {
+			tree.addRootElement(elem);
+		}
+		
+		tree.selectElement(SelectedElement);
+		
+		ModelCreator.changeHistory.endMultichangeHistoryState(this);
+	}
 
 
+	private void TryGenSnowLayer(Element elem)
+	{		
+		for (Element celem : elem.ChildElements) {
+			if (celem.getName().contains("-snow")) return;
+			
+			TryGenSnowLayer(celem);
+		}
+	
+		if (Math.abs(elem.getRotationX()) < 5 && Math.abs(elem.getRotationZ()) < 5) {
+			if (!elem.getAllFaces()[4].isEnabled()) return;
+			if (elem.getName().contains("-snow")) return;
+			
+			Element snowElem = elem.clone();
+			snowElem.ChildElements.clear();
+			snowElem.setRotationX(0);
+			snowElem.setRotationY(0);
+			snowElem.setRotationZ(0);
+			snowElem.setStartX(0);
+			snowElem.setStartZ(0);
+			snowElem.setStartY(elem.getHeight() + 0.01);
+			snowElem.setHeight(2);
+			snowElem.setName(elem.getName() + "-snow");
+			snowElem.setAutoUnwrap(true);
+			snowElem.updateUV();
+			
+			for (int i = 0; i < 6; i++) {
+				snowElem.getAllFaces()[i].setTextureCode("snowcover");
+			}
+			
+			elem.ChildElements.add(snowElem);
+		}
+	}
+	
+	private void loadSnowTexture()
+	{
+		File textureFile = new File("block"+ File.separator +"snow"+ File.separator +"normal1.png");
+
+		if (textureFile.exists() && textureFile.isFile())
+		{
+			synchronized (ModelCreator.Instance.pendingTextures) {
+				ModelCreator.Instance.pendingTextures.add(new PendingTexture("snowcover", textureFile, 0));
+			}
+			return;
+		}
+
+		
+		String textureBasePath = ModelCreator.prefs.get("texturePath", ".");
+		File f = new File(textureBasePath + File.separator + "block"+ File.separator +"snow"+ File.separator +"normal1.png");
+		
+		if (f.exists())
+		{
+			synchronized (ModelCreator.Instance.pendingTextures) {
+				ModelCreator.Instance.pendingTextures.add(new PendingTexture("snowcover", f, 0));
+			}
+			return;
+		}
+	}
 
 }

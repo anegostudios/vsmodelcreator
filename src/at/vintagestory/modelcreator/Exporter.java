@@ -384,6 +384,11 @@ public class Exporter
 			writer.newLine();
 		}
 		
+		if (cuboid.getZOffset() != 0) {
+			writer.write(space(indentation) + "\"zOffset\": \"" + cuboid.getZOffset() + "\",");
+			writer.newLine();
+		}
+		
 		if (cuboid.getRenderPass() > -1)
 		{
 			writer.write(space(indentation) + "\"renderPass\": " + cuboid.getRenderPass() + ",");

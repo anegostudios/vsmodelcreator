@@ -13,7 +13,9 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
@@ -152,7 +154,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		currentProject = new Project(null);
 		changeHistory.addHistoryState(currentProject);
 		
-		setDropTarget(getCustomDropTarget());		
+		setDropTarget(getCustomDropTarget());
 		setPreferredSize(new Dimension(1200, 715));
 		setMinimumSize(new Dimension(800, 500));
 		setLayout(new BorderLayout(10, 0));
@@ -911,6 +913,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			
 			@Override
 		    public synchronized void drop(DropTargetDropEvent evt) {
+				modelrenderer.renderDropTagets = false;
+				
 				DataFlavor flavor = evt.getCurrentDataFlavors()[0];
 				
 				try {
@@ -944,19 +948,18 @@ public class ModelCreator extends JFrame implements ITextureCallback
 								code = code.substring(0, code.indexOf("."));
 								PendingTexture pendingTexture = new PendingTexture(code, file, ModelCreator.Instance, 0);
 								
+								
+								
 								int x = evt.getLocation().x;
-								if (x >= leftSidebarWidth()) {
-									String textureCode = null;
-									Element curelem = currentProject.SelectedElement;
-									for (int i = 0; curelem != null && i < curelem.getAllFaces().length; i++) {
-										Face face = curelem.getAllFaces()[i];
-										if (face.isEnabled() && face.getTextureCode() != null) {
-											textureCode = face.getTextureCode();
-											break;
-										}
-									}
+								int y = evt.getLocation().y;
+								
+								if (y >= canvHeight / 3) {
 									
-									pendingTexture.SetReplacesTexture(textureCode);
+									if (y >= 2 * canvHeight / 3) {
+										pendingTexture.SetReplacesAllTextures();	
+									} else {
+										pendingTexture.SetReplacesSelectElementTextures();
+									}
 								}
 								
 								AddPendingTexture(pendingTexture);
@@ -993,6 +996,85 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		        		        
 		        evt.dropComplete(true);
 		    }
+		 
+			@Override
+			public synchronized void dragEnter(DropTargetDragEvent evt)
+			{
+				DataFlavor flavor = evt.getCurrentDataFlavors()[0];
+				
+				try {
+					Object obj = evt.getTransferable().getTransferData(flavor);
+					
+					if (obj instanceof DefaultMutableTreeNode[]) {
+						return;
+					}
+				
+					@SuppressWarnings("rawtypes")
+					List data = (List)obj;
+					
+					for (Object elem : data) {
+						if (elem instanceof File) {
+							File file = (File)elem;							
+							if (file.getName().endsWith(".png")) {
+								modelrenderer.renderDropTagets = true;
+								modelrenderer.dropLocation = evt.getLocation();
+							}
+							return;
+						}
+							
+					}
+					
+				} catch (Exception e) {
+					
+				}
+				
+				
+				super.dragEnter(evt);
+			}
+			
+			@Override
+			public synchronized void dragOver(DropTargetDragEvent evt)
+			{
+				DataFlavor flavor = evt.getCurrentDataFlavors()[0];
+				
+				try {
+					Object obj = evt.getTransferable().getTransferData(flavor);
+					
+					if (obj instanceof DefaultMutableTreeNode[]) {
+						return;
+					}
+				
+					@SuppressWarnings("rawtypes")
+					List data = (List)obj;
+					
+					for (Object elem : data) {
+						if (elem instanceof File) {
+							File file = (File)elem;							
+							if (file.getName().endsWith(".png")) {
+								modelrenderer.renderDropTagets = true;
+								modelrenderer.dropLocation = evt.getLocation();
+							}
+							return;
+						}
+							
+					}
+					
+				} catch (Exception e) {
+					
+				}
+				
+				
+				super.dragOver(evt);
+			}
+		
+			
+			@Override
+			public synchronized void dragExit(DropTargetEvent dte)
+			{
+				modelrenderer.renderDropTagets = false;
+				super.dragExit(dte);
+			}
+		 
 		 };
 	}
 

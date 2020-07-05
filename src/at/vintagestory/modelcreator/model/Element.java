@@ -81,6 +81,7 @@ public class Element implements IDrawable
 	protected int renderPass = -1;
 	protected int unwrapMode;
 	protected int unwrapRotation;
+	protected int ZOffset = 0;
 	
 	
 	// Rotation Point Indicator
@@ -1312,6 +1313,14 @@ public class Element implements IDrawable
 	
 	public String getName() {
 		return name;
+	}
+	
+	public int getZOffset() {
+		return ZOffset;
+	}
+	
+	public void setZOffset(int value) {
+		this.ZOffset = value;
 	}
 	
 	public void setName(String name) {
