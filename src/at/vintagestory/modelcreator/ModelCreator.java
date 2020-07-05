@@ -820,6 +820,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			GLU.gluPickMatrix(x, y, 1, 1, IntBuffer.wrap(viewport));
 			GLU.gluPerspective(60F, (float) (canvWidth) / (float) canvHeight, 0.3F, 1000F);
 
+			modelrenderer.prepareDraw();
 			modelrenderer.drawGridAndElements();
 		}
 		GL11.glPopMatrix();

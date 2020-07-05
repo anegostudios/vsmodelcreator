@@ -44,13 +44,7 @@ public class ModelRenderer
 		glLoadIdentity();
 		GLU.gluPerspective(60F, (float) (width - leftSidebarWidth) / (float) height, 0.3F, 1000F);
 
-		glMatrixMode(GL_MODELVIEW);
-		glEnable(GL_DEPTH_TEST);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		camera.useView();
-		glClearColor(0.92F, 0.92F, 0.93F, 1.0F);
-		
-		
+		prepareDraw();
 		drawGridAndElements();
 		
 		glDisable(GL_DEPTH_TEST);
@@ -69,70 +63,83 @@ public class ModelRenderer
 		drawCompass();
 		
 		if (renderDropTagets) {
-			GL11.glPushMatrix();			
-			int mouseX = -10;
-			int mouseY = -10;
-			
-			if (dropLocation != null) {
-				mouseX = dropLocation.x;
-				mouseY = dropLocation.y - 40;
-			}
-			
-			String texts[] = new String[] {
-				"Only Load Texture",
-				"Load Texture and Apply to Selected Element",
-				"Load Texture and Apply to all Elements",
-			};
-			
-			float[][] colors = new float[][] {
-				new float[] { 0.8f, 0.8f, 1f,   0.6f, 0.6f, 0.9f },
-				new float[] { 0.8f, 1.0f, 1f,   0.6f, 0.9f, 0.9f },
-				new float[] { 1.0f, 0.8f, 1f,   0.9f, 0.6f, 0.9f },
-			};
-			
-			for (int i = 0; i < 3; i++) {
-				GL11.glEnable(GL11.GL_BLEND);
-				
-				float[] color = colors[i]; 
-				
-				if (mouseX < width && mouseY > 0 && mouseY >= 0 && mouseY < height / 3) {
-					glColor4f(color[0], color[1], color[2], 0.85f);
-				} else {
-					glColor4f(color[3], color[4], color[5], 0.5f);	
-				}
-				
-				glBegin(GL_QUADS);
-				{
-					glVertex2i(0, 0);
-					glVertex2i(width, 0);
-					glVertex2i(width, height/3);
-					glVertex2i(0, height/3);
-				}
-				glEnd();
-				
-				
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-				
-				String text = texts[i];
-				float strwdt = EnumFonts.BEBAS_NEUE_50.getWidth(text);
-				float strhgt = EnumFonts.BEBAS_NEUE_50.getHeight(text);
-				EnumFonts.BEBAS_NEUE_50.drawString((int)(width/2 - strwdt/2), (int)(height/3/2 - strhgt/2), text, new Color(0.3F, 0.3F, 0.3F));
-				
-				GL11.glDisable(GL11.GL_BLEND);
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
-				
-				GL11.glTranslated(0, height/3, 0);
-				mouseY -= height/3;
-				
-			}
-			
-			
-			GL11.glPopMatrix();
+			renderDropTargets(width, height);
 		}
 	}
 	
 	
+	public void prepareDraw()
+	{
+		glMatrixMode(GL_MODELVIEW);
+		glEnable(GL_DEPTH_TEST);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		camera.useView();
+		glClearColor(0.92F, 0.92F, 0.93F, 1.0F);
+	}
+
+	private void renderDropTargets(int width, int height)
+	{
+		GL11.glPushMatrix();			
+		int mouseX = -10;
+		int mouseY = -10;
+		
+		if (dropLocation != null) {
+			mouseX = dropLocation.x;
+			mouseY = dropLocation.y - 40;
+		}
+		
+		String texts[] = new String[] {
+			"Only Load Texture",
+			"Load Texture and Apply to Selected Element",
+			"Load Texture and Apply to all Elements",
+		};
+		
+		float[][] colors = new float[][] {
+			new float[] { 0.8f, 0.8f, 1f,   0.6f, 0.6f, 0.9f },
+			new float[] { 0.8f, 1.0f, 1f,   0.6f, 0.9f, 0.9f },
+			new float[] { 1.0f, 0.8f, 1f,   0.9f, 0.6f, 0.9f },
+		};
+		
+		for (int i = 0; i < 3; i++) {
+			GL11.glEnable(GL11.GL_BLEND);
+			
+			float[] color = colors[i]; 
+			
+			if (mouseX < width && mouseY > 0 && mouseY >= 0 && mouseY < height / 3) {
+				glColor4f(color[0], color[1], color[2], 0.85f);
+			} else {
+				glColor4f(color[3], color[4], color[5], 0.5f);	
+			}
+			
+			glBegin(GL_QUADS);
+			{
+				glVertex2i(0, 0);
+				glVertex2i(width, 0);
+				glVertex2i(width, height/3);
+				glVertex2i(0, height/3);
+			}
+			glEnd();
+			
+			
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
+			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			
+			String text = texts[i];
+			float strwdt = EnumFonts.BEBAS_NEUE_50.getWidth(text);
+			float strhgt = EnumFonts.BEBAS_NEUE_50.getHeight(text);
+			EnumFonts.BEBAS_NEUE_50.drawString((int)(width/2 - strwdt/2), (int)(height/3/2 - strhgt/2), text, new Color(0.3F, 0.3F, 0.3F));
+			
+			GL11.glDisable(GL11.GL_BLEND);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			
+			GL11.glTranslated(0, height/3, 0);
+			mouseY -= height/3;
+			
+		}
+				
+		GL11.glPopMatrix();
+	}
+
 	public void drawGridAndElements()
 	{
 		drawPerspectiveGrid();
@@ -293,8 +300,9 @@ public class ModelRenderer
 		}
 		glPopMatrix();
 
-		if (renderedLeftSidebar != null)
+		if (renderedLeftSidebar != null) {
 			renderedLeftSidebar.draw(sidebarWidth, width, height, frameHeight);
+		}
 	}
 	
 	
@@ -349,7 +357,9 @@ public class ModelRenderer
 			
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 		}
+		
 		glPopMatrix();
+		
 	}
 
 	
