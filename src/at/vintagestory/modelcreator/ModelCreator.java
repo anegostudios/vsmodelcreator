@@ -238,7 +238,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			loop();
 
 			Display.destroy();
-			dispose();
+			//dispose();
 			System.exit(0);
 		}
 		catch (Exception e1)
