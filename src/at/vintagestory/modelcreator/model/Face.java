@@ -645,8 +645,10 @@ public class Face
 		
 		if (textureCode != null) {
 			TextureEntry entry = getTextureEntry();
-			texWidth = entry.Width  / scale.W;
-			texHeight = entry.Height / scale.H;
+			if (entry != null) {
+				texWidth = entry.Width  / scale.W;
+				texHeight = entry.Height / scale.H;
+			}
 		}
 		
 		double facewidth = Math.abs(textureUEnd - textureU);

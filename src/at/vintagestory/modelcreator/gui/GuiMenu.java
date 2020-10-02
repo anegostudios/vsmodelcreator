@@ -315,7 +315,7 @@ public class GuiMenu extends JMenuBar
 		    }
 		};
 		
-		String rkey = "Randomize";
+		String rkey = "Randomize texture";
 		itemRandomizeTexture.setAction(buttonActionRandomize);
 		itemRandomizeTexture.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/cube.png")));
 		buttonAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_B);
