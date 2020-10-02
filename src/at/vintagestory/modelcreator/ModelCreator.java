@@ -92,7 +92,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static boolean renderTexture = true;
 	public static boolean autoreloadTexture = true;
 	public static boolean repositionWhenReparented = true;
-	
+	public static boolean darkMode = false;
+
 	public static float noTexScale = 2;
 
 	// Canvas Variables
@@ -145,6 +146,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		queue.push(new EventQueueProxy());
 		
 		showGrid = prefs.getBoolean("showGrid", true);
+		darkMode = prefs.getBoolean("darkMode", false);
 		noTexScale = prefs.getFloat("noTexScale", 2);
 		autoreloadTexture = prefs.getBoolean("autoreloadTexture", true);
 		repositionWhenReparented = prefs.getBoolean("repositionWhenReparented", true);

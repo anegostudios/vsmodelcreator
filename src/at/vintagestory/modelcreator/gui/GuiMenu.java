@@ -77,6 +77,7 @@ public class GuiMenu extends JMenuBar
 	private JCheckBoxMenuItem itemGrid;
 	private JCheckBoxMenuItem itemTransparency;
 	private JCheckBoxMenuItem itemTexture;
+	private JCheckBoxMenuItem itemDarkMode;
 	/*private JMenuItem modelFromBelow;
 	private JMenuItem modelFromAbove;
 	private JMenuItem modelFromSide;
@@ -164,6 +165,9 @@ public class GuiMenu extends JMenuBar
 			
 			itemTexture = createCheckboxItem("Texture", "Toggles textured rendering", KeyEvent.VK_T, Icons.transparent);
 			itemTexture.setSelected(ModelCreator.transparent);
+
+			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D,Icons.transparent);
+			itemDarkMode.setSelected(ModelCreator.darkMode);
 		}
 
 		
@@ -189,7 +193,8 @@ public class GuiMenu extends JMenuBar
 		menuView.add(itemGrid);
 		menuView.add(itemTransparency);
 		menuView.add(itemTexture);
-		
+		menuView.add(itemDarkMode);
+
 		menuProject.add(itemUnlockAngles);
 		menuProject.add(itemSingleTexture);
 		menuProject.add(itemNoTextureSize);
@@ -475,6 +480,11 @@ public class GuiMenu extends JMenuBar
 		{
 			ModelCreator.renderTexture = itemTexture.isSelected();
 			itemTexture.setSelected(ModelCreator.renderTexture);
+		});
+
+		itemDarkMode.addActionListener(a -> {
+			ModelCreator.darkMode = itemDarkMode.isSelected();
+			ModelCreator.prefs.putBoolean("darkMode", ModelCreator.darkMode);
 		});
 		
 		itemUnlockAngles.addActionListener(a ->
