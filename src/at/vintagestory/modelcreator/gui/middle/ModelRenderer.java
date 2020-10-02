@@ -31,15 +31,15 @@ public class ModelRenderer
 	
 	public boolean renderDropTagets = false;
 	public Point dropLocation;
-	
+
 	public ModelRenderer(IElementManager manager) {
 		this.manager = manager;
 	}
-	
+
 	public void Render(int leftSidebarWidth, int width, int height, int frameHeight) {
 		this.width = width;
 		this.height = height;
-		
+
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		GLU.gluPerspective(60F, (float) (width - leftSidebarWidth) / (float) height, 0.3F, 1000F);
@@ -74,7 +74,12 @@ public class ModelRenderer
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		camera.useView();
-		glClearColor(0.92F, 0.92F, 0.93F, 1.0F);
+
+		if(ModelCreator.darkMode){
+			glClearColor(0.22F, 0.22F, 0.22F, 1.0F);
+		} else {
+			glClearColor(0.92F, 0.92F, 0.93F, 1.0F);
+		}
 	}
 
 	private void renderDropTargets(int width, int height)
