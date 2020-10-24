@@ -84,7 +84,7 @@ public class ControlsDialog
 
 		JDialog dialog = new JDialog(parent, "Quick Controls", false);
 		dialog.setResizable(false);
-		dialog.setPreferredSize(new Dimension(500, 610));
+		dialog.setPreferredSize(new Dimension(700, 800));
 		dialog.add(container);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);

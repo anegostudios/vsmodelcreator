@@ -250,9 +250,18 @@ public class Face
 	
 	public static Sized getVoxel2PixelScale(Project project, TextureEntry entry) {
 		if (entry != null) {
+			double textureVoxelWidth = project.TextureWidth;
+			double textureVoxelHeight = project.TextureHeight;
+			
+			int[] size = project.TextureSizes.get(entry.code);
+			if (size != null) {
+				textureVoxelWidth = size[0];
+				textureVoxelHeight = size[1];
+			}
+			
 			return new Sized(
-				(double)entry.Width / project.TextureWidth,
-				(double)entry.Height / project.TextureHeight
+				(double)entry.Width / textureVoxelWidth,
+				(double)entry.Height / textureVoxelHeight
 			);
 		}
 		
