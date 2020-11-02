@@ -1142,8 +1142,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			setTitle(new File(currentProject.filePath).getName() + " - " + windowTitle);
 		}
 		
-		ignoreDidModify = false;
-		
+		ignoreDidModify = true;
 		changeHistory.clear();
 		changeHistory.addHistoryState(currentProject);
 		
@@ -1153,6 +1152,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		}
 		currentProject.reloadStepparentRelationShips();
 		
+		ignoreDidModify = false;
+
 		
 		ModelCreator.updateValues(null);
 		currentProject.tree.jtree.updateUI();		

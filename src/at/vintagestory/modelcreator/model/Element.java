@@ -201,6 +201,13 @@ public class Element implements IDrawable
 		if (autoUnwrap == enabled) return;
 		
 		this.autoUnwrap = enabled;
+		
+		if (enabled) {		
+			for (int i = 0; i < faces.length; i++) {
+				faces[i].setAutoUVEnabled(enabled);
+			}
+		}
+		
 		ModelCreator.DidModify();
 	}
 	
