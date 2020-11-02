@@ -167,6 +167,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			ModelCreator.prefs.put("texturePath", args[0]);			
 		}
 		
+		if (args.length > 1) {
+			ModelCreator.prefs.put("shapePath", args[1]);
+		}
+		
 		
 		canvas = new Canvas();
 		
@@ -458,7 +462,15 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				canvHeight = newDim.height;
 			}
 
+			// glViewPort view must not go negative 
 			int leftSidebarWidth = leftSidebarWidth();
+			if (canvWidth - leftSidebarWidth < 0)  {
+				if (modelrenderer.renderedLeftSidebar != null) {
+				 	modelrenderer.renderedLeftSidebar.nowSidebarWidth = canvWidth - 10;
+				 	leftSidebarWidth = leftSidebarWidth();
+				}
+			}
+			
 			glViewport(leftSidebarWidth, 0, canvWidth - leftSidebarWidth, canvHeight);
 			handleInput(leftSidebarWidth);
 			
