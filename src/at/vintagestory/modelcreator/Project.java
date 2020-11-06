@@ -710,7 +710,7 @@ public class Project
 
 
 	private void TryGenSnowLayer(Element elem)
-	{		
+	{
 		for (Element celem : elem.ChildElements) {
 			if (celem.getName().contains("-snow")) return;
 			

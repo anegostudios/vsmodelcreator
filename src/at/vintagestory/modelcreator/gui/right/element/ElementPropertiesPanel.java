@@ -143,7 +143,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 		
 		JLabel label = new JLabel("Stepparent element");
 		stepparentButton = new JButton();
-		stepparentButton.setText("Select...");
+		stepparentButton.setText("Not set");
 		stepparentButton.addActionListener(e ->
 		{
 			StepparentSelectionDialog.show(manager, ModelCreator.Instance, ModelCreator.currentProject.SelectedElement);
@@ -169,6 +169,8 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 			seasonColorMapField.setText(cube.getSeasonColorMap() == null ? "" : cube.getSeasonColorMap());
 			renderPassList.setSelectedIndex(cube.getRenderPass() + 1);
 			stepparentButton.setEnabled(true);
+			String stp = cube.getStepParent();
+			stepparentButton.setText(stp == null ? "Not set" : stp);
 		}
 		else
 		{
@@ -178,6 +180,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 			
 			climateColorMapField.setEnabled(false);
 			climateColorMapField.setText("");
+			stepparentButton.setText("Not set");
 			stepparentButton.setEnabled(false);
 		}
 	}

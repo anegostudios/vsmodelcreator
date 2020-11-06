@@ -1351,6 +1351,12 @@ public class Element implements IDrawable
 			stepParentElement = null;
 		}
 		
+		if (elemName == null && stepparentName != null) {
+			stepparentName = null;
+			ModelCreator.DidModify();
+			return;
+		}
+		
 		stepparentName = elemName;
 		
 		if (elemName != null) {		

@@ -1110,6 +1110,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	public void LoadFile(String filePath)
 	{
+		ModelCreator.currentBackdropProject = null;
+		
 		if (ModelCreator.currentProject.rootElements.size() > 0 && currentProject.needsSaving)
 		{
 			int returnVal = JOptionPane.showConfirmDialog(null, "Your current unsaved project will be cleared, are you sure you want to continue?", "Warning", JOptionPane.YES_NO_OPTION);		

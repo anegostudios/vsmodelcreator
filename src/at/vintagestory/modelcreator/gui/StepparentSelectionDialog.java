@@ -23,7 +23,7 @@ public class StepparentSelectionDialog
 {
 	public static void show(IElementManager manager, JFrame parent, Element forElement)
 	{
-		StepparentSelectionDialog.rebuildElementList();
+		StepparentSelectionDialog.rebuildElementList(forElement.getStepParent());
 		
 		JDialog dialog = new JDialog(parent, "Select step parent element", false);
 		
@@ -50,9 +50,18 @@ public class StepparentSelectionDialog
 		
 		container.add(panelRow1, BorderLayout.CENTER);
 		
+		JButton btnDelete = new JButton("Remove step parent");
+		btnDelete.setIcon(Icons.bin);
+		btnDelete.addActionListener(a ->
+		{
+			forElement.setStepParent(null);			
+			dialog.dispose();
+			ModelCreator.updateValues(btnDelete);
+		});
 		
-		JPanel panelRow2 = new JPanel(new GridLayout(1, 2, 15, 0));
 		
+		
+		JPanel panelRow2 = new JPanel(new GridLayout(2, 2, 15, 15));
 		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setIcon(Icons.clear);
@@ -70,15 +79,17 @@ public class StepparentSelectionDialog
 		{
 			ParentElemEntry entry = (ParentElemEntry)stepParentList.getSelectedItem();
 			forElement.setStepParent(entry.ElemName);			
-			
 			dialog.dispose();
+			
+			ModelCreator.updateValues(btnDuplicate);
 		});
 		
 		
 		panelRow2.add(btnDuplicate);
+		panelRow2.add(btnDelete);
 			
 		container.add(panelRow2, BorderLayout.SOUTH);
-			
+		
 		
 		dialog.setResizable(false);
 		dialog.add(container);
@@ -91,16 +102,16 @@ public class StepparentSelectionDialog
 	
 	static DefaultComboBoxModel<ParentElemEntry> elementList;
 
+	static ArrayList<ParentElemEntry> elements = new ArrayList<ParentElemEntry>();
 	
 	
-	
-	
-	public static void rebuildElementList()
+	public static void rebuildElementList(String selectedElement)
 	{
 		if (elementList == null) {
 			elementList = new DefaultComboBoxModel<ParentElemEntry>();
 		} else {
 			elementList.removeAllElements();
+			elements.clear();
 		}
 		
 		addElementsToModel(elementList, ModelCreator.currentProject.rootElements, "");
@@ -108,12 +119,21 @@ public class StepparentSelectionDialog
 		if (ModelCreator.currentBackdropProject != null) {
 			addElementsToModel(elementList, ModelCreator.currentBackdropProject.rootElements, "");
 		}
+		
+		for (ParentElemEntry elem : elements) {
+			if (elem.ElemName.equals(selectedElement)) {
+				elementList.setSelectedItem(elem);
+				break;
+			}
+		}
 	}
 
 	private static void addElementsToModel(DefaultComboBoxModel<ParentElemEntry> model, ArrayList<Element> elems, String prefix)
 	{
 		for (Element elem : elems) {
-			model.addElement(new ParentElemEntry(prefix + elem.getName(), elem.getName()));
+			ParentElemEntry entry = new ParentElemEntry(prefix + elem.getName(), elem.getName());
+			elements.add(entry);
+			model.addElement(entry);
 			
 			prefix += "  ";
 			addElementsToModel(model, elem.ChildElements, prefix);
