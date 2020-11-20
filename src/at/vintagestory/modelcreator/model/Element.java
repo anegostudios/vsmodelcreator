@@ -1404,7 +1404,7 @@ public class Element implements IDrawable
 
 	public void RandomizeTexture()
 	{
-		if (autoUnwrap) {
+		if (ModelCreator.currentProject.EntityTextureMode && autoUnwrap) {
 			double uMin = 9999, vMin = 9999, uMax = -9999, vMax = -9999;
 			
 			Sized scale=null;

@@ -21,9 +21,11 @@ public class Icons
 	public static Icon coin;
 	public static Icon load;
 	public static Icon disk;
+	public static Icon disk_multiple;
 	public static Icon exit;
 	public static Icon cube;
 	public static Icon inout;
+	public static Icon rainbow;
 	public static Icon smallcube;
 	public static Icon smallcubegray;
 	public static Icon point;
@@ -31,6 +33,7 @@ public class Icons
 	public static Icon light_off;
 	public static Icon arrow_up;
 	public static Icon arrow_down;
+	public static Icon arrow_join;
 	public static Icon reload;
 	public static Icon keyboard;
 	public static Icon drink;
@@ -61,6 +64,8 @@ public class Icons
 	public static Icon addremove;
 	public static Icon left;
 	public static Icon right;
+	
+	public static Icon weather_snow;
 
 	
 	public static void init(Class<?> clazz)
@@ -69,6 +74,7 @@ public class Icons
 		
 		cube = new ImageIcon(loader.getResource("icons/cube.png"));
 		inout = new ImageIcon(loader.getResource("icons/arrow_inout.png"));
+		rainbow = new ImageIcon(loader.getResource("icons/rainbow.png"));
 		smallcube = new ImageIcon(loader.getResource("icons/smallcube.png"));
 		smallcubegray = new ImageIcon(loader.getResource("icons/smallcube-gray.png"));
 		point = new ImageIcon(loader.getResource("icons/point.png"));
@@ -87,6 +93,7 @@ public class Icons
 		coin = new ImageIcon(loader.getResource("icons/coin.png"));
 		load = new ImageIcon(loader.getResource("icons/load.png"));
 		disk = new ImageIcon(loader.getResource("icons/disk.png"));
+		disk_multiple = new ImageIcon(loader.getResource("icons/disk_multiple.png"));
 		exit = new ImageIcon(loader.getResource("icons/exit.png"));
 		reload = new ImageIcon(loader.getResource("icons/reload.png"));
 		keyboard = new ImageIcon(loader.getResource("icons/keyboard.png"));
@@ -97,6 +104,7 @@ public class Icons
 		
 		arrow_up = new ImageIcon(loader.getResource("icons/arrow_up.png"));
 		arrow_down = new ImageIcon(loader.getResource("icons/arrow_down.png"));
+		arrow_join = new ImageIcon(loader.getResource("icons/arrow_join.png"));
 		
 		arrow_up_x = new ImageIcon(loader.getResource("icons/arrow_up_x.png"));
 		arrow_down_x = new ImageIcon(loader.getResource("icons/arrow_down_x.png"));
@@ -127,5 +135,7 @@ public class Icons
 		
 		model_cauldron = new ImageIcon(loader.getResource("icons/model_cauldron.png"));
 		model_chair = new ImageIcon(loader.getResource("icons/model_chair.png"));
+		
+		weather_snow = new ImageIcon(loader.getResource("icons/weather_snow.png"));
 	}
 }

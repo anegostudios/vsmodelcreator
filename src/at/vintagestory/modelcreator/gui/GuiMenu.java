@@ -9,6 +9,7 @@ import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
@@ -57,9 +58,6 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemRedo;
 	private JMenuItem itemAddCube;
 	private JMenuItem itemAddFace;
-	private JMenuItem itemResize;
-	private JMenuItem itemRandomizeTexture;
-	private JMenuItem itemGenSnowLayer;
 	
 	private JCheckBoxMenuItem itemRepositionWhenReparented;
 	
@@ -84,6 +82,14 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem modelFromFront;*/
 	
 
+	/* Edit */
+	private JMenu menuTools;
+	private JMenuItem itemResize;
+	private JMenuItem itemRandomizeTexture;
+	private JMenuItem itemRandomizeTextureAll;
+	private JMenuItem itemGenSnowLayer;
+
+	
 
 	/* Export */
 	private JMenu exportMenu;
@@ -112,10 +118,10 @@ public class GuiMenu extends JMenuBar
 		{
 			itemNew = createItem("New", "New Model", KeyEvent.VK_N, new ImageIcon(getClass().getClassLoader().getResource("icons/new.png")));
 			itemLoad = createItem("Open...", "Open JSON", KeyEvent.VK_O, new ImageIcon(getClass().getClassLoader().getResource("icons/load.png")));
-			itemImport = createItem("Import...", "Import JSON into existing file", KeyEvent.VK_I, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
+			itemImport = createItem("Import...", "Import JSON into existing file", KeyEvent.VK_I, new ImageIcon(getClass().getClassLoader().getResource("icons/arrow_join.png")));
 			
 			itemSave = createItem("Save...", "Save JSON", KeyEvent.VK_S, new ImageIcon(getClass().getClassLoader().getResource("icons/disk.png")));
-			itemSaveAs = createItem("Save as...", "Save JSON", KeyEvent.VK_E, new ImageIcon(getClass().getClassLoader().getResource("icons/export.png")));
+			itemSaveAs = createItem("Save as...", "Save JSON", KeyEvent.VK_E, new ImageIcon(getClass().getClassLoader().getResource("icons/disk_multiple.png")));
 			itemTexturePath = createItem("Set Texture base path...", "Set the base path to look for textures", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
 			itemShapePath = createItem("Set Shape base path...", "Set the base path to look for backdrop models", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/cube.png")));
 			itemExit = createItem("Exit", "Exit Application", KeyEvent.VK_Q, new ImageIcon(getClass().getClassLoader().getResource("icons/exit.png")));
@@ -128,10 +134,6 @@ public class GuiMenu extends JMenuBar
 			
 			itemAddCube = createItem("Add cube", "Add new cube", KeyEvent.VK_C, Icons.cube);
 			itemAddFace = createItem("Add face", "Add single face", KeyEvent.VK_F, Icons.cube);
-			
-			itemResize = createItem("Resize Element", "Resize a cube, including child elements", KeyEvent.VK_R, Icons.inout);
-			itemRandomizeTexture = createItem("Randomize Element Texture", "Randomizes an element texture, including child elements", KeyEvent.VK_B, Icons.inout);
-			itemGenSnowLayer = createItem("Generate Snow Layer", "Attempts to generate a snow layer on all horizontal faces", KeyEvent.VK_B, Icons.inout);
 			
 			itemRepositionWhenReparented = createCheckboxItem("Keep reparented Elements in place", "When performing a drag&drop operation, the editor will attempt to keep the element in place by changing its position and rotation, but its currently not very successfull at that. This setting lets you disable this feature", 0, null);
 		}
@@ -169,6 +171,17 @@ public class GuiMenu extends JMenuBar
 			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D,Icons.transparent);
 			itemDarkMode.setSelected(ModelCreator.darkMode);
 		}
+		
+		
+
+		menuTools = new JMenu("Tools");
+		{
+			itemResize = createItem("Resize Element", "Resize a cube, including child elements", KeyEvent.VK_R, Icons.inout);
+			itemRandomizeTexture = createItem("Randomize Selected Element UVs", "Randomizes an element texture, including child elements", KeyEvent.VK_B, Icons.rainbow);
+			itemRandomizeTextureAll = createItem("Randomize All UVs", "Randomizes all element textures", KeyEvent.VK_B, Icons.rainbow);
+			
+			itemGenSnowLayer = createItem("Generate Snow Layer", "Attempts to generate a snow layer on all horizontal faces", KeyEvent.VK_B, Icons.weather_snow);
+		}
 
 		
 		exportMenu = new JMenu("Export");
@@ -181,9 +194,9 @@ public class GuiMenu extends JMenuBar
 		}
 
 		
-		helpMenu = new JMenu("Help");
+		helpMenu = new JMenu("Controls & Credits");
 		{
-			itemControls = createItem("Quick Controls", "Some useful controls", 0, Icons.keyboard);
+			itemControls = createItem("Controls", "Some useful controls", 0, Icons.keyboard);
 			itemCredits = createItem("Credits", "Who made this tool", 0, Icons.drink);
 		}
 		
@@ -212,11 +225,14 @@ public class GuiMenu extends JMenuBar
 		menuEdit.add(itemAddCube);
 		menuEdit.add(itemAddFace);
 		menuEdit.addSeparator();
-		menuEdit.add(itemResize);
-		menuEdit.add(itemRandomizeTexture);
-		menuEdit.add(itemGenSnowLayer);
-		menuEdit.addSeparator();
 		menuEdit.add(itemRepositionWhenReparented);
+		
+		
+		menuTools.add(itemRandomizeTexture);
+		menuTools.add(itemRandomizeTextureAll);
+		menuTools.add(itemGenSnowLayer);
+		menuTools.add(itemResize);
+		
 		
 		exportMenu.add(itemExportUvMap);
 		exportMenu.add(itemSaveScreenshot);
@@ -227,6 +243,7 @@ public class GuiMenu extends JMenuBar
 
 		helpMenu.add(itemControls);
 		helpMenu.add(itemCredits);
+
 
 		menuFile.add(itemNew);
 		menuFile.addSeparator();
@@ -244,6 +261,8 @@ public class GuiMenu extends JMenuBar
 		add(menuEdit);
 		add(menuView);
 		add(menuProject);
+		add(menuTools);
+		add(Box.createHorizontalGlue());
 		add(exportMenu);
 		add(helpMenu);
 	}
@@ -306,7 +325,7 @@ public class GuiMenu extends JMenuBar
 		
 		
 		
-		Action buttonActionRandomize = new AbstractAction("Randomize") {		 
+		Action buttonActionRandomize = new AbstractAction("Randomize UV Textures") {		 
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -322,7 +341,7 @@ public class GuiMenu extends JMenuBar
 		
 		String rkey = "Randomize texture";
 		itemRandomizeTexture.setAction(buttonActionRandomize);
-		itemRandomizeTexture.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/cube.png")));
+		itemRandomizeTexture.setIcon(Icons.rainbow);
 		buttonAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_B);
 		itemRandomizeTexture.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(strokes[7], key);
 		itemRandomizeTexture.getActionMap().put(rkey, buttonAction);
@@ -331,7 +350,18 @@ public class GuiMenu extends JMenuBar
 
 		ActionListener glistener = a -> { ModelCreator.currentProject.TryGenSnowLayer(); }; 
 		itemGenSnowLayer.addActionListener(glistener);
+
+
 		
+		itemRandomizeTextureAll.addActionListener(a ->
+		{
+			ModelCreator.changeHistory.beginMultichangeHistoryState();
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.RandomizeTexture();	
+			}
+			
+			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
+		});
 		
 		itemRepositionWhenReparented.addActionListener(a ->
 		{
@@ -791,6 +821,7 @@ public class GuiMenu extends JMenuBar
 		
 		itemResize.setEnabled(ModelCreator.currentProject.SelectedElement != null);
 		itemRandomizeTexture.setEnabled(ModelCreator.currentProject.SelectedElement != null);
+		itemGenSnowLayer.setEnabled(ModelCreator.currentProject.SelectedElement != null);
 	}
 	
 	public void updateFrame() {
