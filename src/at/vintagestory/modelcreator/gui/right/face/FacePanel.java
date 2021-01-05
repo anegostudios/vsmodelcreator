@@ -45,6 +45,8 @@ public class FacePanel extends JPanel implements IValueUpdater
 	{
 		this.manager = manager;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setAlignmentX(LEFT_ALIGNMENT);
+		
 		initMenu();
 		initComponents();
 		addComponents();
@@ -139,7 +141,7 @@ public class FacePanel extends JPanel implements IValueUpdater
 
 	@Override
 	public void updateValues(JComponent byGuiElem)
-	{
+	{		
 		Element cube = manager.getCurrentElement();
 		if (cube != null)
 		{

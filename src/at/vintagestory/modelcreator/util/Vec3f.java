@@ -91,7 +91,17 @@ public class Vec3f
         );
     }
 
-  
+
+    public Vec3f Copy()
+    {
+        return new Vec3f(
+              X,
+              Y,
+              Z
+        );
+    }
+
+    
     public void Set(float x, float y, float z)
     {
         this.X = x;

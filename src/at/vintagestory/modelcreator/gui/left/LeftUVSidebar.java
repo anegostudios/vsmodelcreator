@@ -234,6 +234,7 @@ public class LeftUVSidebar extends LeftSidebar
 		for (Element elem : elems) {
 			Face[] faces = elem.getAllFaces();
 			
+			
 			for (int i = 0; i < 6; i++) {
 				Face face = faces[i];
 				if (!face.isEnabled() || (textureCode != null && !textureCode.equals(face.getTextureCode()))) continue;
@@ -242,6 +243,7 @@ public class LeftUVSidebar extends LeftSidebar
 				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);
 				
 				Color color = Face.getFaceColour(i);
+				
 				
 				GL11.glColor4f(color.r * elem.brightnessByFace[i], color.g * elem.brightnessByFace[i], color.b * elem.brightnessByFace[i], 0.3f);
 	
@@ -275,7 +277,6 @@ public class LeftUVSidebar extends LeftSidebar
 					glColor3f(0f, 1f, 0.75f);
 				}
 				
-
 	
 				glBegin(GL_LINES);
 				{
@@ -293,6 +294,26 @@ public class LeftUVSidebar extends LeftSidebar
 				}
 				
 				glEnd();
+				
+				
+
+				boolean renderName = ModelCreator.uvShowNames && (!elem.isAutoUnwrapEnabled() || (elem.getUnwrapMode() <= 0 && i ==0) || i == elem.getUnwrapMode() - 1);
+				
+				if (renderName) {
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					GL11.glEnable(GL11.GL_BLEND);
+					
+					float width = EnumFonts.BEBAS_NEUE_12.getWidth(elem.getName());
+					float height = EnumFonts.BEBAS_NEUE_12.getHeight(elem.getName());
+					
+					int x = (int)((uv.W + (uvend.W - uv.W) / 2) * texBoxWidth - width/2);
+					int y = (int)((uv.H + (uvend.H - uv.H) / 2) * texBoxHeight - height/2);
+					
+					EnumFonts.BEBAS_NEUE_12.drawString(x, y, elem.getName(), BLACK_ALPHA);
+					
+					TextureImpl.bindNone();
+				}
+				
 			}
 			
 			drawElementList(textureCode, elem.ChildElements, texBoxWidth, texBoxHeight, canvasHeight);

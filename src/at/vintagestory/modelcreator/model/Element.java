@@ -4,18 +4,25 @@ import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
+import org.lwjgl.util.vector.Matrix;
+import org.lwjgl.util.vector.Matrix4f;
+
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.util.GameMath;
 import at.vintagestory.modelcreator.util.Mat4f;
+import at.vintagestory.modelcreator.util.Vec3f;
+
 import org.newdawn.slick.Color;
 
 public class Element implements IDrawable
@@ -86,6 +93,9 @@ public class Element implements IDrawable
 	
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();
+	
+	
+	public BlockFacing[] rotatedfaces = new BlockFacing[] { BlockFacing.NORTH, BlockFacing.EAST, BlockFacing.SOUTH, BlockFacing.WEST, BlockFacing.UP, BlockFacing.DOWN };
 	
 	
 	public float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 };
@@ -331,10 +341,16 @@ public class Element implements IDrawable
 
 	public void draw(IDrawable selectedElem)
 	{
-		draw(selectedElem, false);
+		draw(selectedElem, false, Mat4f.Identity_(new float[16]));
+	}
+
+	
+	public void draw(IDrawable selectedElem, float[] mat)
+	{
+		draw(selectedElem, false, mat);
 	}
 	
-	public void draw(IDrawable selectedElem, boolean drawCallFromStepParent) {
+	public void draw(IDrawable selectedElem, boolean drawCallFromStepParent, float[] mat) {
 		if (!renderInEditor || (stepParentElement != null && !drawCallFromStepParent)) return;
 		
 		float b;
@@ -343,15 +359,23 @@ public class Element implements IDrawable
 		{
 			GL11.glEnable(GL_BLEND);
 			GL11.glDisable(GL_CULL_FACE);
+			
+			ApplyTransform(mat);
+			
 			GL11.glTranslated(originX, originY, originZ);
 			rotateAxis();
 			GL11.glTranslated(-originX, -originY, -originZ);
-			
 			GL11.glTranslated(startX, startY, startZ);
 			
+			
 			for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
+				Vec3f bface = BlockFacing.ALLFACES[i].GetFacingVector();
+
+				float[] out = Mat4f.MulWithVec4(mat, new float[] { bface.X, bface.Y, bface.Z, 0 });
+				rotatedfaces[i] = BlockFacing.FromNormal(new Vec3f(out[0], out[1], out[2]));
+
 				if (!faces[i].isEnabled()) continue;
-				
+
 				b = brightnessByFace[BlockFacing.ALLFACES[i].GetIndex()];
 				Color c = Face.ColorsByFace[i];
 				GL11.glColor3f(c.r * b, c.g * b, c.b * b);
@@ -360,11 +384,11 @@ public class Element implements IDrawable
 			}
 						
 			for (int i = 0; i < ChildElements.size(); i++) {
-				ChildElements.get(i).draw(selectedElem);
+				ChildElements.get(i).draw(selectedElem, Mat4f.CloneIt(mat));
 			}
 			
 			for (int i = 0; i < StepChildElements.size(); i++) {
-				StepChildElements.get(i).draw(selectedElem, true);
+				StepChildElements.get(i).draw(selectedElem, true, Mat4f.CloneIt(mat));
 			}
 			
 		}
@@ -595,7 +619,7 @@ public class Element implements IDrawable
 
 
 	void setUnwrappedCubeUV() {
-		if (unwrapMode == 0) {
+		if (unwrapMode <= 0) {
 			performDefaultUVUnwrapping();
 			return;
 		}
@@ -1453,5 +1477,37 @@ public class Element implements IDrawable
 		
 		ModelCreator.DidModify();
 	}
+
+	
+	
+	
+	public void reduceDecimals()
+	{
+		startX = ((int)(startX * 10)) / 10.0; 
+		startY = ((int)(startY * 10)) / 10.0; 
+		startZ = ((int)(startZ * 10)) / 10.0;
+		width = ((int)(width * 10)) / 10.0;
+		height = ((int)(height * 10)) / 10.0;
+		depth = ((int)(depth * 10)) / 10.0;;
+
+		originX = ((int)(originX * 10)) / 10.0;
+		originY = ((int)(originY * 10)) / 10.0;
+		originZ = ((int)(originZ * 10)) / 10.0;
+		rotationX = ((int)(rotationX * 10)) / 10.0;
+		rotationY = ((int)(rotationY * 10)) / 10.0;
+		rotationZ = ((int)(rotationZ * 10)) / 10.0;
+		
+		for (Element elem : ChildElements) { 
+			elem.reduceDecimals();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 }
 

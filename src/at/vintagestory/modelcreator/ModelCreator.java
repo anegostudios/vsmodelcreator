@@ -7,6 +7,7 @@ import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Image;
@@ -60,7 +61,6 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Element;
-import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.PendingTexture;
 import at.vintagestory.modelcreator.model.TextureEntry;
 import at.vintagestory.modelcreator.util.screenshot.AnimationCapture;
@@ -93,12 +93,14 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static boolean autoreloadTexture = true;
 	public static boolean repositionWhenReparented = true;
 	public static boolean darkMode = false;
+	public static boolean saratyMode = false;
+	public static boolean uvShowNames = false;
 
 	public static float noTexScale = 2;
 
 	// Canvas Variables
 	private final static AtomicReference<Dimension> newCanvasSize = new AtomicReference<Dimension>();
-	public final Canvas canvas;
+	public static Canvas canvas;
 	public int canvWidth = 990, canvHeight = 700;
 
 	// Swing Components
@@ -120,6 +122,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	private boolean grabbing = false;
 	private boolean closeRequested = false;
+	
 
 	
 	public LeftSidebar uvSidebar;
@@ -146,6 +149,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		queue.push(new EventQueueProxy());
 		
 		showGrid = prefs.getBoolean("showGrid", true);
+		saratyMode = prefs.getBoolean("uvRotateRename", true);
+		uvShowNames = prefs.getBoolean("uvShowNames", true);
 		darkMode = prefs.getBoolean("darkMode", false);
 		noTexScale = prefs.getFloat("noTexScale", 2);
 		autoreloadTexture = prefs.getBoolean("autoreloadTexture", true);
@@ -220,7 +225,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		// Seriously man, fuck java. Mouse listeners on a canvas are just plain not working. 
 		// canvas.addMouseListener(ml);
-				
 		
 		
 		pack();
@@ -228,7 +232,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		setLocationRelativeTo(null);
 
 		initDisplay();
-
 		
 		
 		currentProject.LoadIntoEditor(getElementManager());
@@ -299,7 +302,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		canvas.setFocusable(true);
 		canvas.setVisible(true);
 		canvas.requestFocus();
-
+		
 		modelrenderer = new ModelRenderer(manager);
 		
 		scroll = new JScrollPane((JPanel) manager);
@@ -964,8 +967,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 								PendingTexture pendingTexture = new PendingTexture(code, file, ModelCreator.Instance, 0);
 								
 								
-								
-								int x = evt.getLocation().x;
+								//int x = evt.getLocation().x;
 								int y = evt.getLocation().y;
 								
 								if (y >= canvHeight / 3) {

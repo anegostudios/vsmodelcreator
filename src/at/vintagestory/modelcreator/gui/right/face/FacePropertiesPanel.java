@@ -85,7 +85,6 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 				manager.getCurrentElement().getSelectedFace().updateUV();
 
 			}
-
 			
 			ModelCreator.updateValues(boxAutoUV);
 			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);

@@ -678,6 +678,18 @@ public class Project
 		}
 	}
 
+	public void ReduceDecimals() {
+		ModelCreator.changeHistory.beginMultichangeHistoryState();
+		
+		for (Element elem : rootElements) {
+			elem.reduceDecimals();
+		}
+		
+		ModelCreator.DidModify();
+		ModelCreator.updateValues(null);
+		ModelCreator.changeHistory.endMultichangeHistoryState(this);
+	}
+	
 
 	public void TryGenSnowLayer()
 	{
@@ -708,6 +720,7 @@ public class Project
 		ModelCreator.changeHistory.endMultichangeHistoryState(this);
 	}
 
+	
 
 	private void TryGenSnowLayer(Element elem)
 	{

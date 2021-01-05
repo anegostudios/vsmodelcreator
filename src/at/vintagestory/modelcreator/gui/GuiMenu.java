@@ -1,5 +1,6 @@
 package at.vintagestory.modelcreator.gui;
 
+import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -70,25 +71,26 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemLoadAsBackdrop;
 	private JMenuItem itemClearBackdrop;
 	
+	
 	/* View */
 	private JMenu menuView;
 	private JCheckBoxMenuItem itemGrid;
 	private JCheckBoxMenuItem itemTransparency;
 	private JCheckBoxMenuItem itemTexture;
-	private JCheckBoxMenuItem itemDarkMode;
-	/*private JMenuItem modelFromBelow;
-	private JMenuItem modelFromAbove;
-	private JMenuItem modelFromSide;
-	private JMenuItem modelFromFront;*/
+	private JCheckBoxMenuItem itemDarkMode;	
+	private JCheckBoxMenuItem itemSaratyMode;
+	private JCheckBoxMenuItem itemuvShowNames;
+	
 	
 
-	/* Edit */
+	/* Tools */
 	private JMenu menuTools;
 	private JMenuItem itemResize;
 	private JMenuItem itemRandomizeTexture;
 	private JMenuItem itemRandomizeTextureAll;
 	private JMenuItem itemGenSnowLayer;
-
+	private JMenuItem itemuvUnrwapEverything;
+	private JMenuItem itemReduceDecimals;
 	
 
 	/* Export */
@@ -170,6 +172,12 @@ public class GuiMenu extends JMenuBar
 
 			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D,Icons.transparent);
 			itemDarkMode.setSelected(ModelCreator.darkMode);
+			
+			itemSaratyMode = createCheckboxItem("Saraty Mode", "When enabled, changes the auto-uv-unwrap feature to be more Saraty-compatible", KeyEvent.VK_D,Icons.transparent);
+			itemSaratyMode.setSelected(ModelCreator.saratyMode);
+			
+			itemuvShowNames = createCheckboxItem("Show element names in UV editor", "When enabled, will display the name of the element in the UV editor", KeyEvent.VK_D,Icons.transparent);
+			itemuvShowNames.setSelected(ModelCreator.uvShowNames);
 		}
 		
 		
@@ -178,9 +186,12 @@ public class GuiMenu extends JMenuBar
 		{
 			itemResize = createItem("Resize Element", "Resize a cube, including child elements", KeyEvent.VK_R, Icons.inout);
 			itemRandomizeTexture = createItem("Randomize Selected Element UVs", "Randomizes an element texture, including child elements", KeyEvent.VK_B, Icons.rainbow);
-			itemRandomizeTextureAll = createItem("Randomize All UVs", "Randomizes all element textures", KeyEvent.VK_B, Icons.rainbow);
+			itemRandomizeTextureAll = createItem("Randomize All Element UVs", "Randomizes all element textures", KeyEvent.VK_B, Icons.rainbow);
 			
 			itemGenSnowLayer = createItem("Generate Snow Layer", "Attempts to generate a snow layer on all horizontal faces", KeyEvent.VK_B, Icons.weather_snow);
+			
+			itemuvUnrwapEverything = createItem("Unwrap all UVs", "Attempts to unwrap all uvs onto a texture without overlap", KeyEvent.VK_B, Icons.rainbow);
+			itemReduceDecimals = createItem("Reduce decimals", "Reduce all element positions and sizes to one decimal point", KeyEvent.VK_B, Icons.rainbow);
 		}
 
 		
@@ -207,6 +218,8 @@ public class GuiMenu extends JMenuBar
 		menuView.add(itemTransparency);
 		menuView.add(itemTexture);
 		menuView.add(itemDarkMode);
+		menuView.add(itemSaratyMode);
+		menuView.add(itemuvShowNames);
 
 		menuProject.add(itemUnlockAngles);
 		menuProject.add(itemSingleTexture);
@@ -232,6 +245,8 @@ public class GuiMenu extends JMenuBar
 		menuTools.add(itemRandomizeTextureAll);
 		menuTools.add(itemGenSnowLayer);
 		menuTools.add(itemResize);
+		menuTools.add(itemuvUnrwapEverything);
+		menuTools.add(itemReduceDecimals);
 		
 		
 		exportMenu.add(itemExportUvMap);
@@ -325,7 +340,7 @@ public class GuiMenu extends JMenuBar
 		
 		
 		
-		Action buttonActionRandomize = new AbstractAction("Randomize UV Textures") {		 
+		Action buttonActionRandomize = new AbstractAction("Randomize Selected Element UVs") {		 
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -339,7 +354,7 @@ public class GuiMenu extends JMenuBar
 		    }
 		};
 		
-		String rkey = "Randomize texture";
+		String rkey = "Randomize Selected Element UVs";
 		itemRandomizeTexture.setAction(buttonActionRandomize);
 		itemRandomizeTexture.setIcon(Icons.rainbow);
 		buttonAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_B);
@@ -350,6 +365,10 @@ public class GuiMenu extends JMenuBar
 
 		ActionListener glistener = a -> { ModelCreator.currentProject.TryGenSnowLayer(); }; 
 		itemGenSnowLayer.addActionListener(glistener);
+		
+		
+		ActionListener redulistener = a -> { ModelCreator.currentProject.ReduceDecimals(); }; 
+		itemReduceDecimals.addActionListener(redulistener);
 
 
 		
@@ -515,6 +534,16 @@ public class GuiMenu extends JMenuBar
 		itemDarkMode.addActionListener(a -> {
 			ModelCreator.darkMode = itemDarkMode.isSelected();
 			ModelCreator.prefs.putBoolean("darkMode", ModelCreator.darkMode);
+		});
+		
+		itemSaratyMode.addActionListener(a -> {
+			ModelCreator.saratyMode = itemSaratyMode.isSelected();
+			ModelCreator.prefs.putBoolean("uvRotateRename", ModelCreator.saratyMode);
+		});
+		
+		itemuvShowNames.addActionListener(a -> {
+			ModelCreator.uvShowNames = itemuvShowNames.isSelected();
+			ModelCreator.prefs.putBoolean("uvShowNames", ModelCreator.uvShowNames);
 		});
 		
 		itemUnlockAngles.addActionListener(a ->

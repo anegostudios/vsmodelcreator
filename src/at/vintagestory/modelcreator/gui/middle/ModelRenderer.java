@@ -45,6 +45,7 @@ public class ModelRenderer
 		GLU.gluPerspective(60F, (float) (width - leftSidebarWidth) / (float) height, 0.3F, 1000F);
 
 		prepareDraw();
+		
 		drawGridAndElements();
 		
 		glDisable(GL_DEPTH_TEST);
@@ -75,7 +76,7 @@ public class ModelRenderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		camera.useView();
 
-		if(ModelCreator.darkMode){
+		if (ModelCreator.darkMode){
 			glClearColor(0.22F, 0.22F, 0.22F, 1.0F);
 		} else {
 			glClearColor(0.92F, 0.92F, 0.93F, 1.0F);
@@ -184,10 +185,10 @@ public class ModelRenderer
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-			GL11.glTranslated(0, 0, 16);
+			/*GL11.glTranslated(8, 0, 16);
 			GL11.glScaled(0.018, 0.018, 0.018);
 			GL11.glRotated(90, 1, 0, 0);
-			EnumFonts.BEBAS_NEUE_50.drawString(8, 0, "VS Model Creator", new Color(0.5F, 0.5F, 0.6F));
+			EnumFonts.BEBAS_NEUE_50.drawString(8, 0, "S", new Color(0.5F, 0.5F, 0.6F));*/
 
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glShadeModel(GL11.GL_SMOOTH);
@@ -207,6 +208,7 @@ public class ModelRenderer
 		{
 			glColor3f(0.55F, 0.55F, 0.60F);
 			glTranslatef(-8, 0, -8);
+			
 
 			// Bold outside lines
 			glLineWidth(2F);
@@ -286,9 +288,15 @@ public class ModelRenderer
 
 	public void renderLeftPane(int sidebarWidth, int frameHeight)
 	{
+		
 		glPushMatrix();
 		{
-			glColor3f(0.58F, 0.58F, 0.58F);
+			if (ModelCreator.darkMode) {
+				glColor3f(0.08F, 0.08F, 0.08F);	
+			} else {
+				glColor3f(0.58F, 0.58F, 0.58F);
+			}
+			
 			glLineWidth(2F);
 			glBegin(GL_LINES);
 			{
@@ -316,9 +324,10 @@ public class ModelRenderer
 		
 		glPushMatrix();
 		{
-			glTranslatef(width - 80, height - 80, 0);
+			glTranslatef(width - 70, height - 70, 0);
 			glLineWidth(2F);
 			glRotated(-camera.getRY(), 0, 0, 1);
+			GL11.glScaled(0.85, 0.85, 0.85);
 
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_BLEND);
@@ -340,23 +349,24 @@ public class ModelRenderer
 			glEnd();
 
 			glColor3d(0.3, 0.3, 0.6);
+			
 			glBegin(GL_TRIANGLES);
 			{
-				glVertex2i(-5, -45);
-				glVertex2i(0, -50);
-				glVertex2i(5, -45);
+				glVertex2i(-5, -40);
+				glVertex2i(0, -53);
+				glVertex2i(5, -40);
 
-				glVertex2i(-5, 45);
-				glVertex2i(0, 50);
-				glVertex2i(5, 45);
+				glVertex2i(-5, 40);
+				glVertex2i(0, 53);
+				glVertex2i(5, 40);
 
-				glVertex2i(-45, -5);
-				glVertex2i(-50, 0);
-				glVertex2i(-45, 5);
+				glVertex2i(-40, -5);
+				glVertex2i(-53, 0);
+				glVertex2i(-40, 5);
 
-				glVertex2i(45, -5);
-				glVertex2i(50, 0);
-				glVertex2i(45, 5);
+				glVertex2i(40, -5);
+				glVertex2i(53, 0);
+				glVertex2i(40, 5);
 			}
 			glEnd();
 			

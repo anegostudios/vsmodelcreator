@@ -10,7 +10,10 @@ import at.vintagestory.modelcreator.ModelCreator;
 
 public enum EnumFonts
 {
-	BEBAS_NEUE_20("bebas_neue.otf", 20), BEBAS_NEUE_50("bebas_neue.otf", 50);
+	BEBAS_NEUE_12("bebas_neue.otf", 12),
+	BEBAS_NEUE_20("bebas_neue.otf", 20), 
+	BEBAS_NEUE_50("bebas_neue.otf", 50),
+	BEBAS_NEUE_75("bebas_neue.otf", 75);
 
 	private TrueTypeFont font;
 
@@ -25,7 +28,7 @@ public enum EnumFonts
 		{
 			InputStream is = ModelCreator.class.getClassLoader().getResourceAsStream(name);
 			Font font = Font.createFont(Font.TRUETYPE_FONT, is);
-			this.font = new TrueTypeFont(font.deriveFont(size), false);
+			this.font = new TrueTypeFont(font.deriveFont(size), true);
 
 		}
 		catch (Exception e)

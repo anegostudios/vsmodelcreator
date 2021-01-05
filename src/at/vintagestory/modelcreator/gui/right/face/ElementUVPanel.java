@@ -22,6 +22,7 @@ import javax.swing.JTextField;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
+import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
@@ -332,6 +333,34 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			xStartField.setText("");
 			yStartField.setText("");
 		}
+		
+		
+		
+		if (cube != null) {
+			int index = menuList.getSelectedIndex();
+			model.removeAllElements();
+			model.addElement("Compact");
+			
+			
+			if (ModelCreator.saratyMode) {
+				
+				for (int i = 0; i < 6; i++) {
+					model.addElement(cube.rotatedfaces[i].Name + " is front");
+				}
+				model.addElement(cube.rotatedfaces[4].Name + " is front (Saratymode)");
+			} else {
+				model.addElement("North is front");
+				model.addElement("East is front");
+				model.addElement("South is front");
+				model.addElement("West is front");
+				model.addElement("Up is front");
+				model.addElement("Down is front");
+			}
+				
+			
+			menuList.setSelectedIndex(index);
+		}
+		
 	}
 	
 	
