@@ -297,7 +297,7 @@ public class LeftUVSidebar extends LeftSidebar
 				
 				
 
-				boolean renderName = ModelCreator.uvShowNames && (!elem.isAutoUnwrapEnabled() || (elem.getUnwrapMode() <= 0 && i ==0) || i == elem.getUnwrapMode() - 1);
+				boolean renderName = (ModelCreator.uvShowNames && (!elem.isAutoUnwrapEnabled() || (elem.getUnwrapMode() <= 0 && i ==0) || i == elem.getUnwrapMode() - 1));
 				
 				if (renderName) {
 					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

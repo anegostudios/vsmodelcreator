@@ -208,6 +208,7 @@ public class ElementTree
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode)enumer.nextElement();
 			if (node.getUserObject().equals(elem)) {
 				jtree.setSelectionPath(new TreePath(node.getPath()));
+				jtree.scrollPathToVisible(new TreePath(node.getPath()));
 				break;
 			}
 		}

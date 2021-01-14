@@ -4,6 +4,9 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
+
+import org.lwjgl.input.Mouse;
+
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.gui.CuboidTabbedPane;
 import at.vintagestory.modelcreator.gui.Icons;
@@ -34,13 +37,14 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 
 	public ElementTree tree = new ElementTree();
 	
+	int dy = 60;
+	
 	public RightTopPanel(ModelCreator creator)
 	{
 		this.creator = creator;
-		setLayout(layout = new SpringLayout());
 		setPreferredSize(new Dimension(215, 1150));
 		initComponents();
-		setLayoutConstaints();
+		setLayout(dy);
 	}
 
 	public void initComponents()
@@ -107,7 +111,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		add(tree.jtree);
 
 		scrollPane = new JScrollPane(tree.jtree);
-		scrollPane.setPreferredSize(new Dimension(205, 240));
+		scrollPane.setPreferredSize(new Dimension(205, 240 + dy));
 		add(scrollPane);
 
 		tabbedPane.add("Cube", new ElementPanel(this));
@@ -141,11 +145,13 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		add(tabbedPane);
 	}
 
-	public void setLayoutConstaints()
+	public void setLayout(int dy)
 	{
-		layout.putConstraint(SpringLayout.NORTH, nameField, 212 + 70, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.NORTH, btnContainer, 176 + 70, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.NORTH, tabbedPane, 250 + 70, SpringLayout.NORTH, this);
+		layout = new SpringLayout();
+		layout.putConstraint(SpringLayout.NORTH, nameField, 212 + 70 + dy, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, btnContainer, 176 + 70 + dy, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, tabbedPane, 250 + 70 + dy, SpringLayout.NORTH, this);
+		setLayout(layout);
 	}
 
 	@Override
@@ -183,10 +189,76 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		
 		ModelCreator.guiMain.itemSaveGifAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
 		ModelCreator.guiMain.itemSavePngAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
+		
 	}
-
+	
 	
 	public void updateFrame(JComponent byGuiElem) {
 		rightKeyFramesPanel.updateFrame(byGuiElem);
+	}
+	
+	
+	
+
+	boolean nowResizingSidebar;
+	int lastGrabMouseX;
+	boolean overSidebar;
+
+	public void onMouseDownOnRightPanel()
+	{
+		int width = getSize().width;
+		int nowMouseX = MouseInfo.getPointerInfo().getLocation().x - ModelCreator.Instance.getX();
+		int edgeX = ModelCreator.Instance.leftSidebarWidth() + 2 + ModelCreator.canvas.getWidth();
+		
+		if (Math.abs(edgeX - nowMouseX) < 8) {
+			if (Mouse.isButtonDown(0)) {
+				if (!nowResizingSidebar) {
+					lastGrabMouseX = nowMouseX; 
+				}
+				
+				nowResizingSidebar = true;
+			}
+			
+			overSidebar = true;
+		}
+		
+		if (nowResizingSidebar) {
+			final int newwidth = Math.min(600, Math.max(215, width + (lastGrabMouseX - nowMouseX)));
+			final int prevheight = getSize().height;
+			
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					setPreferredSize(new Dimension(newwidth, prevheight));
+					scrollPane.setPreferredSize(new Dimension(newwidth - 10, 240 + dy));
+					
+					invalidate();
+					ModelCreator.Instance.revalidate();					
+				}
+			});
+			
+			lastGrabMouseX = nowMouseX;
+			
+		}		
+	}
+
+	public void Draw()
+	{
+		int nowMouseX = MouseInfo.getPointerInfo().getLocation().x - ModelCreator.Instance.getX();
+		int edgeX = ModelCreator.Instance.leftSidebarWidth() + 2 + ModelCreator.canvas.getWidth();
+		
+		
+		if (Math.abs(edgeX - nowMouseX) < 8) {
+			ModelCreator.Instance.isOnRightPanel=true;
+			ModelCreator.canvas.setCursor(new java.awt.Cursor(Cursor.E_RESIZE_CURSOR));
+			overSidebar = true;
+		} else {
+			ModelCreator.Instance.isOnRightPanel=false;
+			if (overSidebar) {
+				ModelCreator.canvas.setCursor(java.awt.Cursor.getDefaultCursor());				
+				overSidebar = false;
+			}
+		}
+		
 	}
 }

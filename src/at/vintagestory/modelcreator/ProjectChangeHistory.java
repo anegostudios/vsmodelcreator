@@ -63,7 +63,7 @@ public class ProjectChangeHistory
 			ModelCreator.currentProject.SelectedElement = ModelCreator.currentProject.findElement(oldProject.SelectedElement.getName());	
 		}
 		
-		ModelCreator.currentProject.LoadIntoEditor(ModelCreator.manager);
+		ModelCreator.currentProject.LoadIntoEditor(ModelCreator.rightTopPanel);
 
 		if (oldProject.SelectedAnimation != null) {
 			ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.findAnimation(oldProject.SelectedAnimation.getName());	

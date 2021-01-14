@@ -53,8 +53,8 @@ public class Project
 	public Project(String filePath) {
 		this.filePath = filePath;
 		
-		if (ModelCreator.manager != null) {
-			tree = ((RightTopPanel)ModelCreator.manager).tree;	
+		if (ModelCreator.rightTopPanel != null) {
+			tree = ((RightTopPanel)ModelCreator.rightTopPanel).tree;	
 		}	
 	}
 	

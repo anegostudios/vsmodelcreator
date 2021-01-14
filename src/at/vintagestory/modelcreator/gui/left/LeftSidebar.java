@@ -74,11 +74,11 @@ public abstract class LeftSidebar
 		int width = GetSidebarWidth();
 		int nowMouseX = Mouse.getX();
 		if (width - nowMouseX > 0 && width - nowMouseX < 7) {
-			ModelCreator.Instance.canvas.setCursor(new java.awt.Cursor(Cursor.E_RESIZE_CURSOR));
+			ModelCreator.canvas.setCursor(new java.awt.Cursor(Cursor.E_RESIZE_CURSOR));
 			overSidebar = true;
 		} else {
 			if (overSidebar) {
-				ModelCreator.Instance.canvas.setCursor(java.awt.Cursor.getDefaultCursor());				
+				ModelCreator.canvas.setCursor(java.awt.Cursor.getDefaultCursor());				
 				overSidebar = false;
 			}
 		}

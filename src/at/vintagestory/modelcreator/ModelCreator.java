@@ -7,7 +7,6 @@ import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Image;
@@ -104,8 +103,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public int canvWidth = 990, canvHeight = 700;
 
 	// Swing Components
-	private JScrollPane scroll;
-	public static IElementManager manager;
+	public JScrollPane scroll;
+	public static RightTopPanel rightTopPanel;
 	private Element grabbedElem = null;
 
 	// Texture Loading Cache
@@ -119,6 +118,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	private int lastMouseX, lastMouseY;
 	boolean mouseDownOnLeftPanel;
 	boolean mouseDownOnCenterPanel;
+	boolean mouseDownOnRightPanel;
 	
 	private boolean grabbing = false;
 	private boolean closeRequested = false;
@@ -290,9 +290,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	{
 		Icons.init(getClass());
 		
-		manager = new RightTopPanel(this);
+		rightTopPanel = new RightTopPanel(this);
 
-		leftKeyframesPanel = new LeftKeyFramesPanel(manager);
+		leftKeyframesPanel = new LeftKeyFramesPanel(rightTopPanel);
 		leftKeyframesPanel.setVisible(false);
 		add(leftKeyframesPanel, BorderLayout.WEST);
 
@@ -303,9 +303,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		canvas.setVisible(true);
 		canvas.requestFocus();
 		
-		modelrenderer = new ModelRenderer(manager);
+		modelrenderer = new ModelRenderer(rightTopPanel);
 		
-		scroll = new JScrollPane((JPanel) manager);
+		scroll = new JScrollPane((JPanel) rightTopPanel);
 		scroll.setBorder(BorderFactory.createEmptyBorder());
 		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -313,7 +313,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 		add(scroll, BorderLayout.EAST);
 		
-		uvSidebar = new LeftUVSidebar("UV Editor", manager);
+		uvSidebar = new LeftUVSidebar("UV Editor", rightTopPanel);
 		
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		setJMenuBar(guiMain = new GuiMenu(this));
@@ -346,7 +346,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				}
 								
 				guiMain.updateValues(byGuiElem);
-			 	((RightTopPanel)manager).updateValues(byGuiElem);
+			 	((RightTopPanel)rightTopPanel).updateValues(byGuiElem);
 			 	leftKeyframesPanel.updateValues(byGuiElem);
 			 	updateFrame(false);
 			 	updateTitle();
@@ -380,7 +380,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 					ignoreFrameUpdates = true;
 					
 					leftKeyframesPanel.updateFrame();
-					((RightTopPanel)manager).updateFrame(null);
+					((RightTopPanel)rightTopPanel).updateFrame(null);
 					updateTitle();
 					guiMain.updateFrame();
 					
@@ -391,7 +391,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			ignoreFrameUpdates = true;
 			
 			leftKeyframesPanel.updateFrame();
-			((RightTopPanel)manager).updateFrame(null);
+			((RightTopPanel)rightTopPanel).updateFrame(null);
 			updateTitle();
 			guiMain.updateFrame();
 			
@@ -417,7 +417,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	
 	ArrayList<PendingTexture> notLoadedPendingTexs = new ArrayList<PendingTexture>();
-	
+	int frameCounter;
 	
 	private void loop() throws Exception
 	{
@@ -433,6 +433,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				Thread.sleep(5);
 				continue;
 			}
+			
+			frameCounter++;
 			
 			synchronized (pendingTextures)
 			{
@@ -489,7 +491,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 
 			modelrenderer.Render(leftSidebarWidth, canvWidth, canvHeight, getHeight());
-			
+			rightTopPanel.Draw();
 
 			if (ModelCreator.transparent) {
 				GL11.glDisable(GL11.GL_BLEND);
@@ -524,14 +526,15 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			} else {
 				
 				if (project != null && project.SelectedAnimation != null && project.PlayAnimation) {
-					project.SelectedAnimation.NextFrame();
-					updateFrame(true);
+					if (frameCounter % 2 == 0) {
+						project.SelectedAnimation.NextFrame();
+						updateFrame(true);
+					}
 				}
-				
 
-				// Don't run faster than ~30 FPS (1000 / 30 = 33ms)
+				// Don't run faster than ~60 FPS (1000 / 60 = 16.67ms)
 				long duration = System.currentTimeMillis() - prevFrameMillisec; 
-				Thread.sleep(Math.max(33 - duration, 0));
+				Thread.sleep(Math.max(16 - duration, 0));
 				prevFrameMillisec = System.currentTimeMillis();
 				
 			}
@@ -557,13 +560,14 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	boolean rKeyDown;
 	boolean tKeyDown;
 	boolean bKeyDown;
-	
+	public boolean isOnRightPanel;
 	
 	public void handleInput(int leftSidebarWidth)
 	{
 		final float cameraMod = Math.abs(modelrenderer.camera.getZ());
 		
 		boolean isOnLeftPanel = Mouse.getX() < leftSidebarWidth;
+		
 		
 		if (Mouse.isButtonDown(0) || Mouse.isButtonDown(1))
 		{
@@ -574,9 +578,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				grabbing = true;
 			}
 			
-			if (!mouseDownOnCenterPanel && !mouseDownOnLeftPanel) {
+			if (!mouseDownOnCenterPanel && !mouseDownOnLeftPanel && !mouseDownOnRightPanel) {
 				mouseDownOnLeftPanel = isOnLeftPanel;
-				mouseDownOnCenterPanel = !isOnLeftPanel;
+				mouseDownOnCenterPanel = !isOnLeftPanel && !isOnRightPanel;
+				mouseDownOnRightPanel = isOnRightPanel;
 			}
 		}
 		else
@@ -590,9 +595,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			if (!mouseDownOnLeftPanel && grabbing) {
 				ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 			}
+			
 			grabbing = false;
 			mouseDownOnLeftPanel = false;
 			mouseDownOnCenterPanel = false;
+			mouseDownOnRightPanel = false;
 		}
 
 		
@@ -600,7 +607,12 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		{
 			modelrenderer.renderedLeftSidebar.onMouseDownOnPanel();
 			return;
-		}		
+		}
+		
+		if (mouseDownOnRightPanel) {
+			rightTopPanel.onMouseDownOnRightPanel();
+			return;
+		}
 
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
@@ -702,7 +714,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				if (openGlName >= 0)
 				{
 					currentProject.selectElementAndFaceByOpenGLName(openGlName);
-					grabbedElem = manager.getCurrentElement();
+					grabbedElem = rightTopPanel.getCurrentElement();
 					currentProject.selectElement(grabbedElem);
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
@@ -812,7 +824,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	
 	
-	
 
 	public int getElementGLNameAtPos(int x, int y)
 	{
@@ -835,7 +846,15 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GLU.gluPickMatrix(x, y, 1, 1, IntBuffer.wrap(viewport));
-			GLU.gluPerspective(60F, (float) (canvWidth) / (float) canvHeight, 0.3F, 1000F);
+			//glViewPort view must not go negative 
+			int leftSidebarWidth = leftSidebarWidth();
+			if (canvWidth - leftSidebarWidth < 0)  {
+				if (modelrenderer.renderedLeftSidebar != null) {
+				 	modelrenderer.renderedLeftSidebar.nowSidebarWidth = canvWidth - 10;
+				 	leftSidebarWidth = leftSidebarWidth();
+				}
+			}
+			GLU.gluPerspective(60F, (float) (canvWidth - leftSidebarWidth) / (float) canvHeight, 0.3F, 1000F);
 
 			modelrenderer.prepareDraw();
 			modelrenderer.drawGridAndElements();
@@ -906,7 +925,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	public IElementManager getElementManager()
 	{
-		return manager;
+		return rightTopPanel;
 	}
 	
 	public void close()
@@ -1125,7 +1144,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		if (filePath == null) {
 			setTitle("(untitled) - " + windowTitle);
 			currentProject = new Project(null);
-			currentProject.LoadIntoEditor(ModelCreator.manager);
+			currentProject.LoadIntoEditor(ModelCreator.rightTopPanel);
 			
 		} else {
 			prefs.put("filePath", filePath);
@@ -1141,7 +1160,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 			
 			ignoreValueUpdates = false;
-			currentProject.LoadIntoEditor(ModelCreator.manager);
+			currentProject.LoadIntoEditor(ModelCreator.rightTopPanel);
 			
 			setTitle(new File(currentProject.filePath).getName() + " - " + windowTitle);
 		}
@@ -1188,7 +1207,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 		ignoreValueUpdates = false;
 		
-		currentProject.LoadIntoEditor(ModelCreator.manager);
+		currentProject.LoadIntoEditor(ModelCreator.rightTopPanel);
 		
 		ignoreDidModify = false;
 		

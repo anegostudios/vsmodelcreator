@@ -57,7 +57,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		{
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
 			
-			Element elem = ModelCreator.manager.getCurrentElement();
+			Element elem = ModelCreator.rightTopPanel.getCurrentElement();
 			KeyFrameElement keyFrameElem = ModelCreator.currentProject.SelectedAnimation.ToggleRotation(elem, btnRot.isSelected());
 			
 			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) == 1) {
@@ -83,8 +83,8 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		{
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
 			
-			Element elem = ModelCreator.manager.getCurrentElement();
-			KeyFrameElement keyFrameElem = ModelCreator.currentProject.SelectedAnimation.TogglePosition(ModelCreator.manager.getCurrentElement(), btnPos.isSelected());
+			Element elem = ModelCreator.rightTopPanel.getCurrentElement();
+			KeyFrameElement keyFrameElem = ModelCreator.currentProject.SelectedAnimation.TogglePosition(ModelCreator.rightTopPanel.getCurrentElement(), btnPos.isSelected());
 			
 			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) == 1) {
 				Animation anim = ModelCreator.currentProject.SelectedAnimation;
@@ -111,8 +111,8 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		{
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
 			
-			Element elem = ModelCreator.manager.getCurrentElement();
-			KeyFrameElement keyFrameElem = ModelCreator.currentProject.SelectedAnimation.ToggleStretch(ModelCreator.manager.getCurrentElement(), btnStretch.isSelected());
+			Element elem = ModelCreator.rightTopPanel.getCurrentElement();
+			KeyFrameElement keyFrameElem = ModelCreator.currentProject.SelectedAnimation.ToggleStretch(ModelCreator.rightTopPanel.getCurrentElement(), btnStretch.isSelected());
 			
 			
 			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) == 1) {
@@ -152,8 +152,8 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 	}
 	
 	public void updateFrame(JComponent byGuiElem) {
-		if (ModelCreator.manager == null) return;
-		Element elem = ModelCreator.manager.getCurrentElement();
+		if (ModelCreator.rightTopPanel == null) return;
+		Element elem = ModelCreator.rightTopPanel.getCurrentElement();
 		
 		boolean enabled = ModelCreator.currentProject.SelectedAnimation != null && elem != null && ModelCreator.currentProject.GetFrameCount() > 0;
 		if (ModelCreator.currentProject.PlayAnimation) return;
@@ -181,9 +181,9 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 
 	public KeyFrameElement getCurrentElement()
 	{
-		if (ModelCreator.manager == null) return null;
+		if (ModelCreator.rightTopPanel == null) return null;
 		
-		Element elem = ModelCreator.manager.getCurrentElement();
+		Element elem = ModelCreator.rightTopPanel.getCurrentElement();
 		if (elem == null || ModelCreator.currentProject.SelectedAnimation == null) return null;
 		
 		return ModelCreator.currentProject.SelectedAnimation.GetKeyFrameElement(elem, ModelCreator.currentProject.SelectedAnimation.currentFrame);
