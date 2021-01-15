@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project modelcreator with libraries in sub-folder">
+<project default="create_run_jar" name="Create Runnable Jar for Project ModelCreator with libraries in sub-folder">
     <!--this file was created by Eclipse Runnable JAR Export Wizard-->
     <!--ANT 1.7 is required                                        -->
     <!--define folder properties-->
     <property name="dir.buildfile" value="."/>
-    <property name="dir.workspace" value="${dir.buildfile}/.."/>
+    <property name="dir.workspace" value="C:/Users/Tyron/eclipse"/>
     <property name="dir.jarfile" value="${dir.buildfile}/output-jar"/>
     <target name="create_run_jar">
         <jar destfile="${dir.jarfile}/vsmodelcreator.jar">
             <manifest>
                 <attribute name="Main-Class" value="at.vintagestory.modelcreator.Start"/>
-                <attribute name="Class-Path" value=". vsmodelcreator_lib/gson-2.3.1.jar vsmodelcreator_lib/JTattoo-1.6.11.jar vsmodelcreator_lib/lwjgl_util.jar vsmodelcreator_lib/slick-util.jar vsmodelcreator_lib/lwjgl.jar"/>
+                <attribute name="Class-Path" value=". vsmodelcreator_lib/gson-2.3.1.jar vsmodelcreator_lib/JTattoo-1.6.11.jar vsmodelcreator_lib/lwjgl_util.jar vsmodelcreator_lib/lwjgl.jar vsmodelcreator_lib/slick-util.jar"/>
             </manifest>
             <fileset dir="${dir.buildfile}/bin"/>
         </jar>
@@ -19,7 +19,7 @@
         <copy file="${dir.buildfile}/libs/gson-2.3.1.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
         <copy file="${dir.buildfile}/libs/JTattoo-1.6.11.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
         <copy file="${dir.buildfile}/libs/lwjgl_util.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
-        <copy file="${dir.buildfile}/libs/slick-util.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
         <copy file="${dir.buildfile}/libs/lwjgl.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/slick-util.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
     </target>
 </project>
