@@ -5,6 +5,9 @@ import org.lwjgl.util.vector.Quaternion;
 
 public class QUtil
 {
+    /**
+     * Converts yaw, pitch, roll to a quaternion
+     */
 	public static Quaternion ToQuaternion(double yaw, double pitch, double roll) // yaw (Z), pitch (Y), roll (X)
 	{
 	    // Abbreviations for the various angular functions
@@ -25,10 +28,43 @@ public class QUtil
 	    
 	    return q;
 	}
-	
-	
 
+    /**
+     * Converts intrinsic x/y/z euler angles as used by the game to a hamilton quaternion.
+     */
+	public static Quaternion IntrinsicXYZToQuaternion(double alpha, double beta, double gamma)
+    {
+        double ca = Math.cos(alpha * 0.5);
+        double sa = Math.sin(alpha * 0.5);
+        double cb = Math.cos(beta * 0.5);
+        double sb = Math.sin(beta * 0.5);
+        double cy = Math.cos(gamma * 0.5);
+        double sy = Math.sin(gamma * 0.5);
 
+        double w = ca * cb * cy + sa * sb * sy;
+        double x = sa * cb * cy - ca * sb * sy;
+        double y = ca * sb * cy + sa * cb * sy;
+        double z = ca * cb * sy - sa * sb * cy;
+
+        return new Quaternion((float)x, (float)y, (float)z, (float)w);
+    }
+
+    /**
+     * Converts to x/y/z rotation euler output, as used by the game
+     */
+    public static double[] ToIntrinsicXYZEuler(Quaternion q)
+    {
+        double[] angles = ToEulerAngles(q);
+        double temp = angles[0];
+        angles[0] = angles[2];
+        angles[2] = temp;
+
+        return angles;
+    }
+
+    /**
+     * Converts to yaw, pitch, roll euler angles.
+     */
     public static double[] ToEulerAngles(Quaternion q)
     {
     	double[] angles = new double[3];
@@ -76,6 +112,6 @@ public class QUtil
         Quaternion.setFromMatrix(mat, q);
 
         
-        return QUtil.ToEulerAngles(q);
+        return QUtil.ToIntrinsicXYZEuler(q);
     }
 }
