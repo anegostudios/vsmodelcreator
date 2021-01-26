@@ -217,6 +217,8 @@ class TreeTransferHandler extends TransferHandler {
   
     private void applyReparentTransform(Element ownElem, List<Element> oldParentPath, List<Element> newParentPath)
 	{
+        ModelCreator.ignoreValueUpdates = true;
+
         float[] matrix = Mat4f.Create();
         
         for (int j = 0; j < newParentPath.size(); j++) {
@@ -232,25 +234,28 @@ class TreeTransferHandler extends TransferHandler {
 
         
         float[] originpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getOriginX(), (float)ownElem.getOriginY(), (float)ownElem.getOriginZ(), 1 });
-        float[] startpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getStartX(), (float)ownElem.getStartY(), (float)ownElem.getStartZ(), 1 });
         
-        ownElem.ApplyTransform(matrix);        
+        ownElem.ApplyTransform(matrix);
         double[] angles = QUtil.MatrixToEuler(matrix);
-        
-        
-        
-        ModelCreator.ignoreValueUpdates = true;
+
+        ownElem.setOriginX(originpos[0]);
+        ownElem.setOriginY(originpos[1]);
+        ownElem.setOriginZ(originpos[2]);
+
+        ownElem.setRotationX(-angles[0] * GameMath.RAD2DEG);
+        ownElem.setRotationY(-angles[1] * GameMath.RAD2DEG);
+        ownElem.setRotationZ(-angles[2] * GameMath.RAD2DEG);
+
+        Mat4f.Invert(matrix, matrix);
+        ownElem.ApplyTransform(matrix);
+        Mat4f.Invert(matrix, matrix);
+
+        float[] startpos = Mat4f.MulWithVec4(matrix, new float[] { (float)ownElem.getStartX(), (float)ownElem.getStartY(), (float)ownElem.getStartZ(), 1 });
+
     	ownElem.setStartX(startpos[0]);
     	ownElem.setStartY(startpos[1]);
     	ownElem.setStartZ(startpos[2]);
 
-    	ownElem.setOriginX(originpos[0]);
-    	ownElem.setOriginY(originpos[1]);
-    	ownElem.setOriginZ(originpos[2]);
-    	
-    	ownElem.setRotationX(-angles[0] * GameMath.RAD2DEG);
-    	ownElem.setRotationY(-angles[1] * GameMath.RAD2DEG);
-    	ownElem.setRotationZ(-angles[2] * GameMath.RAD2DEG);
     	ModelCreator.ignoreValueUpdates = false;
 	}
     
