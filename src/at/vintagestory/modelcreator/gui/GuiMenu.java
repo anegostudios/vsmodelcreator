@@ -1,6 +1,5 @@
 package at.vintagestory.modelcreator.gui;
 
-import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -91,6 +90,9 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemGenSnowLayer;
 	private JMenuItem itemuvUnrwapEverything;
 	private JMenuItem itemReduceDecimals;
+	private JMenuItem itemRotateModel90Deg;
+	private JMenuItem itemRotateModel90DegClockwise;
+	private JMenuItem itemRotateModel90DegAntiClockwise;
 	
 
 	/* Export */
@@ -192,6 +194,14 @@ public class GuiMenu extends JMenuBar
 			
 			itemuvUnrwapEverything = createItem("Unwrap all UVs", "Attempts to unwrap all uvs onto a texture without overlap", KeyEvent.VK_B, Icons.rainbow);
 			itemReduceDecimals = createItem("Reduce decimals", "Reduce all element positions and sizes to one decimal point", KeyEvent.VK_B, Icons.rainbow);
+
+			itemRotateModel90Deg = new JMenu("Rotate 90 degrees");
+			itemRotateModel90Deg.setIcon(Icons.arrow_rotate_clockwise);
+			itemRotateModel90Deg.setToolTipText("Rotates the selected elements by 90 degrees");
+			{
+				itemRotateModel90DegClockwise = createItem("Clockwise", null, KeyEvent.VK_B, Icons.arrow_rotate_clockwise);
+				itemRotateModel90DegAntiClockwise = createItem("Anti-clockwise", null, KeyEvent.VK_B, Icons.arrow_rotate_anticlockwise);
+			}
 		}
 
 		
@@ -247,6 +257,9 @@ public class GuiMenu extends JMenuBar
 		menuTools.add(itemResize);
 		menuTools.add(itemuvUnrwapEverything);
 		menuTools.add(itemReduceDecimals);
+		menuTools.add(itemRotateModel90Deg);
+		itemRotateModel90Deg.add(itemRotateModel90DegClockwise);
+		itemRotateModel90Deg.add(itemRotateModel90DegAntiClockwise);
 		
 		
 		exportMenu.add(itemExportUvMap);
@@ -569,6 +582,30 @@ public class GuiMenu extends JMenuBar
 		itemResize.addActionListener(a -> {
 			ResizeDialog.show(creator);
 		});
+
+		itemRotateModel90DegClockwise.addActionListener(a -> {
+			Element elem = ModelCreator.currentProject.SelectedElement;
+
+			ModelCreator.ignoreDidModify = true;
+			elem.rotate90DegAroundCenter(0, -1, 0);
+
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(itemRotateModel90DegClockwise);
+		});
+
+		itemRotateModel90DegAntiClockwise.addActionListener(a -> {
+			Element elem = ModelCreator.currentProject.SelectedElement;
+
+			ModelCreator.ignoreDidModify = true;
+			elem.rotate90DegAroundCenter(0, 1, 0);
+
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(itemRotateModel90DegAntiClockwise);
+		});
 		
 		itemRandomizeTexture.addActionListener(a -> {
 			Element elem = ModelCreator.currentProject.SelectedElement;			
@@ -851,6 +888,8 @@ public class GuiMenu extends JMenuBar
 		itemResize.setEnabled(ModelCreator.currentProject.SelectedElement != null);
 		itemRandomizeTexture.setEnabled(ModelCreator.currentProject.SelectedElement != null);
 		itemGenSnowLayer.setEnabled(ModelCreator.currentProject.SelectedElement != null);
+
+		itemRotateModel90Deg.setEnabled(ModelCreator.currentProject.SelectedElement != null);
 	}
 	
 	public void updateFrame() {

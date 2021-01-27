@@ -34,6 +34,8 @@ public class Icons
 	public static Icon arrow_up;
 	public static Icon arrow_down;
 	public static Icon arrow_join;
+	public static Icon arrow_rotate_clockwise;
+	public static Icon arrow_rotate_anticlockwise;
 	public static Icon reload;
 	public static Icon keyboard;
 	public static Icon drink;
@@ -105,6 +107,9 @@ public class Icons
 		arrow_up = new ImageIcon(loader.getResource("icons/arrow_up.png"));
 		arrow_down = new ImageIcon(loader.getResource("icons/arrow_down.png"));
 		arrow_join = new ImageIcon(loader.getResource("icons/arrow_join.png"));
+
+		arrow_rotate_clockwise = new ImageIcon(loader.getResource("icons/arrow_rotate_clockwise.png"));
+		arrow_rotate_anticlockwise = new ImageIcon(loader.getResource("icons/arrow_rotate_anticlockwise.png"));
 		
 		arrow_up_x = new ImageIcon(loader.getResource("icons/arrow_up_x.png"));
 		arrow_down_x = new ImageIcon(loader.getResource("icons/arrow_down_x.png"));
