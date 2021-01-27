@@ -4,25 +4,21 @@ import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.lwjgl.BufferUtils;
+import at.vintagestory.modelcreator.util.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
-import org.lwjgl.util.vector.Matrix;
-import org.lwjgl.util.vector.Matrix4f;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
-import at.vintagestory.modelcreator.util.GameMath;
-import at.vintagestory.modelcreator.util.Mat4f;
-import at.vintagestory.modelcreator.util.Vec3f;
 
+import org.lwjgl.util.vector.Quaternion;
 import org.newdawn.slick.Color;
 
 public class Element implements IDrawable
@@ -74,7 +70,9 @@ public class Element implements IDrawable
 
 	// Rotation Variables
 	protected double originX = 0, originY = 0, originZ = 0;
-	protected double rotationX = 0, rotationY = 0, rotationZ = 0;
+	protected double rotationX = 0;
+	protected double rotationY = 0;
+	protected double rotationZ = 0;
 	
 	protected boolean rescale = false;
 
@@ -533,6 +531,177 @@ public class Element implements IDrawable
 	public String toString()
 	{
 		return name;
+	}
+
+	public void rotate90DegAroundCenter(int xSteps, int ySteps, int zSteps)
+	{
+		// center offset
+		double co = 8;
+		originX -= co; originY -= co; originZ -= co;
+		startX -= co; startY -= co; startZ -= co;
+
+		rotate90Deg(xSteps, ySteps, zSteps);
+
+		// move back
+		originX += co; originY += co; originZ += co;
+		startX += co; startY += co; startZ += co;
+	}
+
+	public void rotate90Deg(int xSteps, int ySteps, int zSteps)
+	{
+		Quaternion q = QUtil.IntrinsicXYZToQuaternion(
+				xSteps * GameMath.PIHALF,
+				ySteps * GameMath.PIHALF,
+				zSteps * GameMath.PIHALF);
+
+		float[] translation = new float[3];
+		rotate90DegRecurse(q, translation);
+	}
+
+	private void rotate90DegRecurse(Quaternion q, float[] translation)
+	{
+		float[] newTranslation = rotate90DegImpl(q, translation);
+
+		for (Element child : ChildElements) {
+			child.rotate90DegRecurse(q, newTranslation);
+		}
+	}
+
+	private float[] rotate90DegImpl(Quaternion q, float[] translation)
+	{
+		float[] matrix = Mat4f.Create();
+		Mat4f.FromRotationTranslation(matrix,
+				new float[] { q.x, q.y, q.z, q.w },
+				translation);
+
+		float[] vFrom = new float[] { (float) startX, (float) startY, (float) startZ, 1 };
+		float[] vSize = new float[] { (float) width, (float) height, (float) depth, 0 };
+		float[] vOrigin = new float[] { (float) originX, (float) originY, (float) originZ, 1 };
+
+		float[] vRotationAxis = new float[] { 0, 0, 0, 0 };
+		double theta = QUtil.IntrinsicXYZToAxisAngle(
+				GameMath.DEG2RAD * rotationX,
+				GameMath.DEG2RAD * rotationY,
+				GameMath.DEG2RAD * rotationZ,
+				vRotationAxis);
+
+		vFrom = Mat4f.MulWithVec4(matrix, vFrom);
+		vSize = Mat4f.MulWithVec4(matrix, vSize);
+		vOrigin = Mat4f.MulWithVec4(matrix, vOrigin);
+		vRotationAxis = Mat4f.MulWithVec4(matrix, vRotationAxis);
+
+		double[] xyzRotation =
+				Arrays.stream(QUtil.AxisAngleToIntrinsicXYZEuler(vRotationAxis, theta))
+						.map(x -> GameMath.RAD2DEG * x)
+						.map(x -> GameMath.round(x, 6))
+						.toArray();
+
+		VecUtil.Round(vFrom, 6);
+		VecUtil.Round(vSize, 6);
+		VecUtil.Round(vOrigin, 6);
+
+		float[] newTranslation = fixSign(vFrom, vSize);
+
+		startX = vFrom[0]; startY = vFrom[1]; startZ = vFrom[2];
+		width = vSize[0]; height = vSize[1]; depth = vSize[2];
+		originX = vOrigin[0]; originY = vOrigin[1]; originZ = vOrigin[2];
+		rotationX = xyzRotation[0]; rotationY = xyzRotation[1]; rotationZ = xyzRotation[2];
+
+		rotateFaces(matrix);
+		rotateAnimationElements(matrix);
+
+		ModelCreator.DidModify();
+		return newTranslation;
+	}
+
+	// this has to be implemented here because we need the translation info from fixSign
+	private void rotateAnimationElements(float[] matrix) {
+    	float[] vOrigin = new float[] { 0, 0, 0, 1 };
+    	float[] vOffset = new float[] { 0, 0, 0, 0 };
+    	float[] vStretch = new float[] { 0, 0, 0, 0 };
+    	float[] vRotationAxis = new float[] { 0, 0, 0, 0 };
+
+    	for (Animation anim : ModelCreator.currentProject.Animations) {
+    		for (Keyframe keyframe : anim.keyframes) {
+    			if (keyframe == null) continue;
+
+    			KeyFrameElement e = keyframe.GetKeyFrameElement(this);
+    			if (e == null) continue;
+
+    			vOrigin[0] = (float) e.getOriginX();
+    			vOrigin[1] = (float) e.getOriginY();
+    			vOrigin[2] = (float) e.getOriginZ();
+
+    			vOffset[0] = (float) e.getOffsetX();
+    			vOffset[1] = (float) e.getOffsetY();
+    			vOffset[2] = (float) e.getOffsetZ();
+
+    			vStretch[0] = (float) e.getStretchX();
+    			vStretch[1] = (float) e.getStretchY();
+    			vStretch[2] = (float) e.getStretchZ();
+
+    			double theta = QUtil.IntrinsicXYZToAxisAngle(
+						GameMath.DEG2RAD * e.getRotationX(),
+						GameMath.DEG2RAD * e.getRotationY(),
+						GameMath.DEG2RAD * e.getRotationZ(),
+						vRotationAxis
+				);
+
+    			vOrigin = Mat4f.MulWithVec4(matrix, vOrigin);
+    			vOffset = Mat4f.MulWithVec4(matrix, vOffset);
+    			vStretch = Mat4f.MulWithVec4(matrix, vStretch);
+    			vRotationAxis = Mat4f.MulWithVec4(matrix, vRotationAxis);
+
+    			double[] xyzRotation =
+						Arrays.stream(QUtil.AxisAngleToIntrinsicXYZEuler(vRotationAxis, theta))
+								.map(x -> GameMath.RAD2DEG * x)
+								.map(x -> GameMath.round(x, 6))
+								.toArray();
+
+				VecUtil.Round(vOrigin, 6);
+				VecUtil.Round(vOffset, 6);
+				VecUtil.Round(vStretch, 6);
+
+				e.setOriginX(vOrigin[0]); e.setOriginY(vOrigin[1]); e.setOriginZ(vOrigin[2]);
+				e.setOffsetX(vOffset[0]); e.setOffsetY(vOffset[1]); e.setOffsetZ(vOffset[2]);
+				e.setStretchX(vStretch[0]); e.setStretchY(vStretch[1]); e.setStretchZ(vStretch[2]);
+				e.setRotationX(xyzRotation[0]); e.setRotationY(xyzRotation[1]); e.setRotationZ(xyzRotation[2]);
+			}
+
+    		anim.framesDirty = true;
+		}
+	}
+
+	private void rotateFaces(float[] matrix) {
+		Face[] newFaces = new Face[faces.length];
+		float[] normal = new float[] { 0, 0, 0, 0 };
+		for (int i = 0; i < faces.length; ++i) {
+
+			BlockFacing.ALLFACES[i].GetFacingVector().ToArray(normal);
+
+			normal = Mat4f.MulWithVec4(matrix, normal);
+
+			int face = BlockFacing.FromNormal(new Vec3f(normal)).GetIndex();
+			newFaces[face] = faces[i];
+		}
+
+		System.arraycopy(newFaces, 0, faces, 0, faces.length);
+	}
+
+	private float[] fixSign(float[] vFrom, float[] vSize)
+	{
+		float[] translation = new float[3];
+
+		for (int i = 0; i < 3; ++i) {
+			if (vSize[i] >= 0) continue;
+
+			float diff = -vSize[i];
+			vFrom[i] -= diff;
+			vSize[i] = diff;
+			translation[i] = diff;
+		}
+
+		return translation;
 	}
 
 	public void updateUV()

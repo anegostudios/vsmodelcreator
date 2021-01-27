@@ -5,6 +5,9 @@ import org.lwjgl.util.vector.Quaternion;
 
 public class QUtil
 {
+
+    public static final double EPSILON = 0.000001;
+
     /**
      * Converts yaw, pitch, roll to a quaternion
      */
@@ -113,5 +116,73 @@ public class QUtil
 
         
         return QUtil.ToIntrinsicXYZEuler(q);
+    }
+
+    /**
+     * Converts a quaternion to an axis and an angle theta
+     * @param axis the rotation axis of q, set by this function
+     * @param q the quaternion to convert
+     * @return theta, or NaN if not applicable
+     */
+    public static double ToAxisAngle(float[] axis, Quaternion q) {
+        double x = q.x, y = q.y, z = q.z, w = q.w;
+
+        double Nq = w * w + x * x + y * y + z * z;
+        if (!Double.isFinite(Nq)) {
+            axis[0] = 1; axis[1] = 0; axis[2] = 0;
+            return Float.NaN;
+        }
+
+        if (Nq < EPSILON) {
+            // results are probably unreliable after normalization
+            axis[0] = 1; axis[1] = 0; axis[2] = 0;
+            return 0;
+        }
+
+        if (Nq != 1) {
+            // need to normalize
+            double s = Math.sqrt(Nq);
+            w = w / s; x = x / s; y = y / s; z = z / s;
+        }
+
+        double len2 = x * x + y * y + z * z;
+        if (len2 < EPSILON) {
+            // nearly 0, 0, 0 => this is an identity rotation
+            axis[0] = 1; axis[1] = 0; axis[2] = 0;
+            return 0;
+        }
+
+        double len = Math.sqrt(len2);
+        axis[0] = (float) (x / len);
+        axis[1] = (float) (y / len);
+        axis[2] = (float) (z / len);
+
+        // clamp w to prevent floating point errors
+        w = Math.max(Math.min(w, 1), -1);
+        return 2 * Math.acos(w);
+    }
+
+    public static Quaternion AxisAngleToQuat(float[] axis, double theta)
+    {
+        Quaternion q = new Quaternion();
+
+        double s = Math.sin(theta/2);
+        q.x = (float) (axis[0] * s);
+        q.y = (float) (axis[1] * s);
+        q.z = (float) (axis[2] * s);
+        q.w = (float) Math.cos(theta/2);
+
+        return q;
+    }
+
+    public static double[] AxisAngleToIntrinsicXYZEuler(float[] axis, double theta)
+    {
+        Quaternion q = AxisAngleToQuat(axis, theta);
+        return ToIntrinsicXYZEuler(q);
+    }
+
+    public static double IntrinsicXYZToAxisAngle(double alpha, double beta, double gamma, float[] axis) {
+        Quaternion q = IntrinsicXYZToQuaternion(alpha, beta, gamma);
+        return ToAxisAngle(axis, q);
     }
 }

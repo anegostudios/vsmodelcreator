@@ -18,6 +18,13 @@ public class Vec3f
         this.Z = z;
     }
 
+    public Vec3f(float[] vector)
+    {
+        this.X = vector[0];
+        this.Y = vector[1];
+        this.Z = vector[2];
+    }
+
     public float Length()
     {
         return (float)Math.sqrt(X * X + Y * Y + Z * Z);
@@ -109,5 +116,17 @@ public class Vec3f
         this.Z = z;
     }
 
+    public float[] ToArray()
+    {
+        float[] data = new float[3];
+        ToArray(data);
+        return data;
+    }
 
+    public void ToArray(float[] out)
+    {
+        out[0] = X;
+        out[1] = Y;
+        out[2] = Z;
+    }
 }
