@@ -42,7 +42,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 	public RightTopPanel(ModelCreator creator)
 	{
 		this.creator = creator;
-		setPreferredSize(new Dimension(215, 1150));
+		setPreferredSize(new Dimension(215, 1250));
 		initComponents();
 		setLayout(dy);
 	}
