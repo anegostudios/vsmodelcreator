@@ -17,6 +17,7 @@ import static org.lwjgl.opengl.GL11.glVertex2d;
 import static org.lwjgl.opengl.GL11.glVertex2i;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -28,6 +29,7 @@ import at.vintagestory.modelcreator.enums.EnumFonts;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.model.RenderFaceTask;
 import at.vintagestory.modelcreator.model.Sized;
 import at.vintagestory.modelcreator.model.TextureEntry;
 
@@ -48,6 +50,9 @@ public class LeftUVSidebar extends LeftSidebar
 	float[] brightnessByFace = new float[] { 1, 1, 1, 1, 1, 1 }; 
 	
 	int canvasHeight;
+	
+	Stack<RenderFaceTask> renderLastStack = new Stack<RenderFaceTask>();
+	
 	
 	public LeftUVSidebar(String title, IElementManager manager)
 	{
@@ -234,89 +239,119 @@ public class LeftUVSidebar extends LeftSidebar
 		for (Element elem : elems) {
 			Face[] faces = elem.getAllFaces();
 			
-			
 			for (int i = 0; i < 6; i++) {
 				Face face = faces[i];
 				if (!face.isEnabled() || (textureCode != null && !textureCode.equals(face.getTextureCode()))) continue;
 				
-				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
-				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);
 				
-				Color color = Face.getFaceColour(i);
-				
-				
-				GL11.glColor4f(color.r * elem.brightnessByFace[i], color.g * elem.brightnessByFace[i], color.b * elem.brightnessByFace[i], 0.3f);
-	
-				glBegin(GL_QUADS);
-				{
-					glTexCoord2f(0, 1);
-					glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
-					
-					glTexCoord2f(1, 1);
-					glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
-					
-					glTexCoord2f(1, 0);
-					glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
-	
-					glTexCoord2f(0, 0);
-					glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
-				}
-				glEnd();
-	
-				
-				glColor3f(0.5f, 0.5f, 0.5f);
 				if (elem == selectedElem) {
-					glColor3f(0f, 0f, 1f);
+					renderLastStack.push(new RenderFaceTask(face, elem));
+					continue;
 				}
 				
 				if (elem == grabbedElement && face.isAutoUVEnabled()) {
-					glColor3f(0f, 0.75f, 1f);
+					renderLastStack.push(new RenderFaceTask(face, elem));
+					continue;
 				}
 				
 				if (elem == grabbedElement && !face.isAutoUVEnabled() && i == grabbedFaceIndex) {
-					glColor3f(0f, 1f, 0.75f);
+					renderLastStack.push(new RenderFaceTask(face, elem));
+					continue;
 				}
 				
-	
-				glBegin(GL_LINES);
-				{
-					glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
-					glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
-	
-					glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
-					glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
-	
-					glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
-					glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
-	
-					glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
-					glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
-				}
 				
-				glEnd();
-				
-				
-
-				boolean renderName = (ModelCreator.uvShowNames && (!elem.isAutoUnwrapEnabled() || (elem.getUnwrapMode() <= 0 && i ==0) || i == elem.getUnwrapMode() - 1));
-				
-				if (renderName) {
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					GL11.glEnable(GL11.GL_BLEND);
-					
-					float width = EnumFonts.BEBAS_NEUE_12.getWidth(elem.getName());
-					float height = EnumFonts.BEBAS_NEUE_12.getHeight(elem.getName());
-					
-					int x = (int)((uv.W + (uvend.W - uv.W) / 2) * texBoxWidth - width/2);
-					int y = (int)((uv.H + (uvend.H - uv.H) / 2) * texBoxHeight - height/2);
-					
-					EnumFonts.BEBAS_NEUE_12.drawString(x, y, elem.getName(), BLACK_ALPHA);
-					
-					TextureImpl.bindNone();
-				}
-				
+				drawFace(elem, face);
+								
 			}
 			
 			drawElementList(textureCode, elem.ChildElements, texBoxWidth, texBoxHeight, canvasHeight);
+		}
+		
+		// Needs to be drawn at the end so the selected highlight is always visible
+		while (renderLastStack.size() > 0) {
+			RenderFaceTask rft = renderLastStack.pop();
+			drawFace(rft.elem, rft.face);
+		}
+	}
+	
+	private void drawFace(Element elem, Face face) {
+		Element selectedElem = ModelCreator.currentProject.SelectedElement;
+		
+		Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
+		Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);
+		
+		int sidei = face.getSide();
+		
+		Color color = Face.getFaceColour(sidei);
+		
+		
+		GL11.glColor4f(color.r * elem.brightnessByFace[sidei], color.g * elem.brightnessByFace[sidei], color.b * elem.brightnessByFace[sidei], 0.3f);
+
+		glBegin(GL_QUADS);
+		{
+			glTexCoord2f(0, 1);
+			glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
+			
+			glTexCoord2f(1, 1);
+			glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
+			
+			glTexCoord2f(1, 0);
+			glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
+
+			glTexCoord2f(0, 0);
+			glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
+		}
+		glEnd();
+
+		
+		glColor3f(0.5f, 0.5f, 0.5f);
+
+		
+		if (elem == selectedElem) {
+			glColor3f(0f, 0f, 1f);
+		}
+		
+		if (elem == grabbedElement && face.isAutoUVEnabled()) {
+			glColor3f(0f, 0.75f, 1f);
+		}
+		
+		if (elem == grabbedElement && !face.isAutoUVEnabled() && sidei == grabbedFaceIndex) {
+			glColor3f(0f, 1f, 0.75f);
+		}
+		
+		glBegin(GL_LINES);
+		{
+			glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
+			glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
+
+			glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
+			glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
+
+			glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
+			glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
+
+			glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
+			glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
+		}
+		
+		glEnd();
+				
+
+		boolean renderName = (ModelCreator.uvShowNames && (!elem.isAutoUnwrapEnabled() || (elem.getUnwrapMode() <= 0 && sidei ==0) || sidei == elem.getUnwrapMode() - 1));
+		
+		if (renderName) {
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			GL11.glEnable(GL11.GL_BLEND);
+			
+			float width = EnumFonts.BEBAS_NEUE_12.getWidth(elem.getName());
+			float height = EnumFonts.BEBAS_NEUE_12.getHeight(elem.getName());
+			
+			int x = (int)((uv.W + (uvend.W - uv.W) / 2) * texBoxWidth - width/2);
+			int y = (int)((uv.H + (uvend.H - uv.H) / 2) * texBoxHeight - height/2);
+			
+			EnumFonts.BEBAS_NEUE_12.drawString(x, y, elem.getName(), BLACK_ALPHA);
+			
+			TextureImpl.bindNone();
 		}
 	}
 	
@@ -661,8 +696,8 @@ public class LeftUVSidebar extends LeftSidebar
 				{
 					face.setAutoUVEnabled(false);
 
-					face.addTextureXEnd(xMovement / scale.W);
-					face.addTextureYEnd(-yMovement / scale.H);
+					face.addTextureUEnd(xMovement / scale.W);
+					face.addTextureVEnd(-yMovement / scale.H);
 
 					face.setAutoUVEnabled(false);
 				}

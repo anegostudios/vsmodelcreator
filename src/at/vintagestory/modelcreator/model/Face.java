@@ -320,7 +320,7 @@ public class Face
 		if (amt != 0) ModelCreator.DidModify();
 	}
 
-	public void addTextureX(double amt)
+	public void addTextureU(double amt)
 	{
 		this.textureU += amt;
 		cuboid.updateUV();
@@ -328,7 +328,7 @@ public class Face
 		if (amt != 0) ModelCreator.DidModify();
 	}
 
-	public void addTextureY(double amt)
+	public void addTextureV(double amt)
 	{
 		this.textureV += amt;
 		cuboid.updateUV();
@@ -336,7 +336,7 @@ public class Face
 		if (amt != 0) ModelCreator.DidModify();
 	}
 
-	public void addTextureXEnd(double amt)
+	public void addTextureUEnd(double amt)
 	{
 		if (this.autoUV) {
 			this.textureV += amt;
@@ -348,7 +348,7 @@ public class Face
 		if (amt != 0) ModelCreator.DidModify();
 	}
 
-	public void addTextureYEnd(double amt)
+	public void addTextureVEnd(double amt)
 	{
 		if (this.autoUV) {
 			this.textureV += amt;

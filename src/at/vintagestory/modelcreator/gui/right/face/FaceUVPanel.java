@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
@@ -14,6 +16,7 @@ import javax.swing.JTextField;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
+import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
@@ -28,19 +31,22 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 	private static final long serialVersionUID = 1L;
 
 	private IElementManager manager;
-	private JButton btnPlusX;
-	private JButton btnPlusY;
-	private JTextField xStartField;
-	private JTextField yStartField;
-	private JButton btnNegX;
-	private JButton btnNegY;
+	private JButton btnPlusUStart;
+	private JButton btnPlusVStart;
+	private JTextField uStartField;
+	private JTextField vStartField;
+	private JButton btnNegUStart;
+	private JButton btnNegVStart;
 
-	private JButton btnPlusXEnd;
-	private JButton btnPlusYEnd;
-	private JTextField xEndField;
-	private JTextField yEndField;
-	private JButton btnNegXEnd;
-	private JButton btnNegYEnd;
+	private JButton btnPlusUEnd;
+	private JButton btnPlusVEnd;
+	private JTextField uEndField;
+	private JTextField vEndField;
+	private JButton btnNegUEnd;
+	private JButton btnNegVEnd;
+	
+	JTextField[] fields;
+	JButton[] buttons;
 
 	private DecimalFormat df = new DecimalFormat("#.##");
 
@@ -57,64 +63,74 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 
 	public void initComponents()
 	{
-		btnPlusX = new JButton(Icons.arrow_up);
-		btnPlusY = new JButton(Icons.arrow_up);
-		xStartField = new JTextField();
-		yStartField = new JTextField();
-		btnNegX = new JButton(Icons.arrow_down);
-		btnNegY = new JButton(Icons.arrow_down);
+		btnPlusUStart = new JButton(Icons.arrow_up);
+		btnPlusVStart = new JButton(Icons.arrow_up);
+		uStartField = new JTextField();
+		vStartField = new JTextField();
+		btnNegUStart = new JButton(Icons.arrow_down);
+		btnNegVStart = new JButton(Icons.arrow_down);
+		
+		btnPlusUEnd = new JButton(Icons.arrow_up);
+		btnPlusVEnd = new JButton(Icons.arrow_up);
+		uEndField = new JTextField();
+		vEndField = new JTextField();
+		btnNegUEnd = new JButton(Icons.arrow_down);
+		btnNegVEnd = new JButton(Icons.arrow_down);
 
-		btnPlusXEnd = new JButton(Icons.arrow_up);
-		btnPlusYEnd = new JButton(Icons.arrow_up);
-		xEndField = new JTextField();
-		yEndField = new JTextField();
-		btnNegXEnd = new JButton(Icons.arrow_down);
-		btnNegYEnd = new JButton(Icons.arrow_down);
+		fields = new JTextField[] { uStartField, vStartField, uEndField, vEndField };
+		buttons = new JButton[] { btnPlusUStart, btnPlusVStart, btnNegUStart, btnNegVStart, btnPlusUEnd, btnPlusVEnd, btnNegUEnd, btnNegVEnd };
+		
+		Font defaultFont = new Font("SansSerif", Font.BOLD, 20);
+		for (JButton btn : buttons) {
+			btn.setSize(new Dimension(62, 30));
+			btn.setFont(defaultFont);
+		}
 	}
 
 	public void initProperties()
 	{
 		Font defaultFont = new Font("SansSerif", Font.BOLD, 20);
-		xStartField.setSize(new Dimension(62, 30));
-		xStartField.setFont(defaultFont);
-		xStartField.setHorizontalAlignment(JTextField.CENTER);
+		uStartField.setSize(new Dimension(62, 30));
+		uStartField.setFont(defaultFont);
+		uStartField.setHorizontalAlignment(JTextField.CENTER);
 		
 		
-		AwtUtil.addChangeListener(xStartField, e -> {
+		AwtUtil.addChangeListener(uStartField, e -> {
 			Element element = manager.getCurrentElement();
 			if (element == null) return;			
 			Face face = element.getSelectedFace();
-			face.setStartU(Parser.parseDouble(xStartField.getText(), face.getStartU()));
+			face.setStartU(Parser.parseDouble(uStartField.getText(), face.getStartU()));
 			face.updateUV();
-			ModelCreator.updateValues(xStartField);			
+			ModelCreator.updateValues(uStartField);			
 		});
+		
 
-		yStartField.setSize(new Dimension(62, 30));
-		yStartField.setFont(defaultFont);
-		yStartField.setHorizontalAlignment(JTextField.CENTER);
+		vStartField.setSize(new Dimension(62, 30));
+		vStartField.setFont(defaultFont);
+		vStartField.setHorizontalAlignment(JTextField.CENTER);
 		
 		
-		AwtUtil.addChangeListener(yStartField, e -> {
+		AwtUtil.addChangeListener(vStartField, e -> {
 			Element element = manager.getCurrentElement();
 			if (element == null) return;			
 			Face face = element.getSelectedFace();
 			
-			face.setStartV(Parser.parseDouble(yStartField.getText(), face.getStartV()));
+			face.setStartV(Parser.parseDouble(vStartField.getText(), face.getStartV()));
 			face.updateUV();
-			ModelCreator.updateValues(yStartField);			
+			ModelCreator.updateValues(vStartField);			
 		});
 
 
-		xEndField.setSize(new Dimension(62, 30));
-		xEndField.setFont(defaultFont);
-		xEndField.setHorizontalAlignment(JTextField.CENTER);
+		uEndField.setSize(new Dimension(62, 30));
+		uEndField.setFont(defaultFont);
+		uEndField.setHorizontalAlignment(JTextField.CENTER);
 		
-		AwtUtil.addChangeListener(xEndField, e -> {
+		AwtUtil.addChangeListener(uEndField, e -> {
 			Element element = manager.getCurrentElement();
 			if (element == null) return;			
 			Face face = element.getSelectedFace();
 			
-			double nowEndU = Parser.parseDouble(xEndField.getText(), face.getEndU());
+			double nowEndU = Parser.parseDouble(uEndField.getText(), face.getEndU());
 			// Disable auto-uv if user changed End U
 			if (nowEndU != face.getEndU()) {
 				face.setAutoUVEnabled(false);
@@ -123,19 +139,19 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			
 			face.setEndU(nowEndU);
 			face.updateUV();
-			ModelCreator.updateValues(xEndField);			
+			ModelCreator.updateValues(uEndField);			
 		});
 
-		yEndField.setSize(new Dimension(62, 30));
-		yEndField.setFont(defaultFont);
-		yEndField.setHorizontalAlignment(JTextField.CENTER);
+		vEndField.setSize(new Dimension(62, 30));
+		vEndField.setFont(defaultFont);
+		vEndField.setHorizontalAlignment(JTextField.CENTER);
 				
-		AwtUtil.addChangeListener(yEndField, e -> {
+		AwtUtil.addChangeListener(vEndField, e -> {
 			Element element = manager.getCurrentElement();
 			if (element == null) return;			
 			Face face = element.getSelectedFace();
 			
-			double nowEndV = Parser.parseDouble(yEndField.getText(), face.getEndV());
+			double nowEndV = Parser.parseDouble(vEndField.getText(), face.getEndV());
 			// Disable auto-uv if user changed End V
 			if (nowEndV != face.getEndV()) {
 				face.setAutoUVEnabled(false);
@@ -143,218 +159,100 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 			
 			face.setEndV(nowEndV);
 			face.updateUV();
-			ModelCreator.updateValues(yEndField);			
+			ModelCreator.updateValues(vEndField);			
 		});
 
-
-		btnPlusX.addActionListener(e ->
+		
+		for (int i = 0; i < fields.length; i++)
 		{
-			if (manager.getCurrentElement() != null)
+			JTextField field = fields[i];
+			
+			final int index = i;
+			
+			field.addMouseWheelListener(new MouseWheelListener()
 			{
-				Element cube = manager.getCurrentElement();
-				Face face = cube.getSelectedFace();
-				Sized scale = face.getVoxel2PixelScale();
 				
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
+				@Override
+				public void mouseWheelMoved(MouseWheelEvent e)
 				{
-					face.addTextureX(face.isSnapUvEnabled() ? 1/scale.W : 0.1);
+					int notches = e.getWheelRotation();
+					modifyPosition(index, (notches > 0 ? 1 : -1), e.getModifiers(), field);
 				}
-				else
-				{
-					face.addTextureX(1.0);
-				}
-				cube.updateUV();
-				ModelCreator.updateValues(btnPlusX);
-			}
-		});
+			});	
+		}
+		
 
-		btnPlusX.setSize(new Dimension(62, 30));
-		btnPlusX.setFont(defaultFont);
-		btnPlusX.setToolTipText("<html>Increases the start U.<br><b>Hold shift for decimals</b></html>");
-
-		btnPlusY.addActionListener(e ->
+		btnPlusUStart.addActionListener(e ->
 		{
-			if (manager.getCurrentElement() != null)
-			{
-				Element cube = manager.getCurrentElement();
-				Face face = cube.getSelectedFace();
-				Sized scale = face.getVoxel2PixelScale();
-				
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					face.addTextureY(face.isSnapUvEnabled() ? 1/scale.H : 0.1);
-				}
-				else
-				{
-					face.addTextureY(1.0);
-				}
-				cube.updateUV();
-				ModelCreator.updateValues(btnPlusY);
-			}
+			modifyPosition(0, 1, e.getModifiers(), btnPlusUStart);
 		});
-		btnPlusY.setPreferredSize(new Dimension(62, 30));
-		btnPlusY.setFont(defaultFont);
-		btnPlusY.setToolTipText("<html>Increases the start V.<br><b>Hold shift for decimals</b></html>");
 
-		btnNegX.addActionListener(e ->
-		{
-			if (manager.getCurrentElement() != null)
-			{
-				Element cube = manager.getCurrentElement();
-				Face face = cube.getSelectedFace();
-				Sized scale = face.getVoxel2PixelScale();
-				
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					face.addTextureX(face.isSnapUvEnabled() ? -1/scale.W : -0.1);
-				}
-				else
-				{
-					face.addTextureX(-1.0);
-				}
-				cube.updateUV();
-				ModelCreator.updateValues(btnNegX);
-			}
-		});
-		btnNegX.setSize(new Dimension(62, 30));
-		btnNegX.setFont(defaultFont);
-		btnNegX.setToolTipText("<html>Decreases the start U.<br><b>Hold shift for decimals</b></html>");
+		btnPlusUStart.setToolTipText("<html>Increases the start U.<br><b>Hold shift for decimals</b></html>");
 
-		btnNegY.addActionListener(e ->
+		btnPlusVStart.addActionListener(e ->
 		{
-			if (manager.getCurrentElement() != null)
-			{
-				Element cube = manager.getCurrentElement();
-				Face face = cube.getSelectedFace();
-				Sized scale = face.getVoxel2PixelScale();
-				
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					face.addTextureY(face.isSnapUvEnabled() ? -1/scale.H : -0.1);
-				}
-				else
-				{
-					face.addTextureY(-1.0);
-				}
-				cube.updateUV();
-				ModelCreator.updateValues(btnNegY);
-			}
+			modifyPosition(1, 1, e.getModifiers(), btnPlusUStart);
 		});
-		btnNegY.setSize(new Dimension(62, 30));
-		btnNegY.setFont(defaultFont);
-		btnNegY.setToolTipText("<html>Decreases the start V.<br><b>Hold shift for decimals</b></html>");
+		
+		btnPlusVStart.setToolTipText("<html>Increases the start V.<br><b>Hold shift for decimals</b></html>");
 
-		btnPlusXEnd.addActionListener(e ->
+		btnNegUStart.addActionListener(e ->
 		{
-			if (manager.getCurrentElement() != null)
-			{
-				Element cube = manager.getCurrentElement();
-				Face face = cube.getSelectedFace();
-				Sized scale = face.getVoxel2PixelScale();
-				
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					face.addTextureXEnd(face.isSnapUvEnabled() ? 1/scale.W : 0.1);
-				}
-				else
-				{
-					face.addTextureXEnd(1.0);
-				}
-				
-				ModelCreator.updateValues(btnPlusXEnd);
-			}
+			modifyPosition(0, -1, e.getModifiers(), btnPlusVStart);
 		});
-		btnPlusXEnd.setSize(new Dimension(62, 30));
-		btnPlusXEnd.setFont(defaultFont);
-		btnPlusXEnd.setToolTipText("<html>Increases the end U.<br><b>Hold shift for decimals</b></html>");
+		
+		btnNegUStart.setToolTipText("<html>Decreases the start U.<br><b>Hold shift for decimals</b></html>");
 
-		btnPlusYEnd.addActionListener(e ->
+		btnNegVStart.addActionListener(e ->
 		{
-			if (manager.getCurrentElement() != null)
-			{
-				Element cube = manager.getCurrentElement();
-				Face face = cube.getSelectedFace();
-				Sized scale = face.getVoxel2PixelScale();
-				
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					face.addTextureYEnd(face.isSnapUvEnabled() ? 1/scale.H : 0.1);
-				}
-				else
-				{
-					face.addTextureYEnd(1.0);
-				}
-				
-				ModelCreator.updateValues(btnPlusYEnd);
-			}
+			modifyPosition(1, -1, e.getModifiers(), btnNegUStart);
 		});
-		btnPlusYEnd.setPreferredSize(new Dimension(62, 30));
-		btnPlusYEnd.setFont(defaultFont);
-		btnPlusYEnd.setToolTipText("<html>Increases the end V.<br><b>Hold shift for decimals</b></html>");
+		
+		btnNegVStart.setToolTipText("<html>Decreases the start V.<br><b>Hold shift for decimals</b></html>");
 
-		btnNegXEnd.addActionListener(e ->
+		btnPlusUEnd.addActionListener(e ->
 		{
-			if (manager.getCurrentElement() != null)
-			{
-				Element cube = manager.getCurrentElement();
-				Face face = cube.getSelectedFace();
-				Sized scale = face.getVoxel2PixelScale();
-				
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					face.addTextureXEnd(face.isSnapUvEnabled() ? -1/scale.W : -0.1);
-				}
-				else
-				{
-					face.addTextureXEnd(-1.0);
-				}
-				
-				ModelCreator.updateValues(btnNegXEnd);
-			}
+			modifyPosition(2, 1, e.getModifiers(), btnPlusUEnd);
 		});
-		btnNegXEnd.setSize(new Dimension(62, 30));
-		btnNegXEnd.setFont(defaultFont);
-		btnNegXEnd.setToolTipText("<html>Decreases the end U.<br><b>Hold shift for decimals</b></html>");
+		btnPlusUEnd.setToolTipText("<html>Increases the end U.<br><b>Hold shift for decimals</b></html>");
 
-		btnNegYEnd.addActionListener(e ->
+		btnPlusVEnd.addActionListener(e ->
 		{
-			if (manager.getCurrentElement() != null)
-			{
-				Element cube = manager.getCurrentElement();
-				Face face = cube.getSelectedFace();
-				Sized scale = face.getVoxel2PixelScale();
-				
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1)
-				{
-					face.addTextureYEnd(face.isSnapUvEnabled() ? -1/scale.H : -0.1);
-				}
-				else
-				{
-					face.addTextureYEnd(-1.0);
-				}
-				
-				ModelCreator.updateValues(btnNegYEnd);
-			}
+			modifyPosition(3, 1, e.getModifiers(), btnPlusVEnd);
 		});
-		btnNegYEnd.setSize(new Dimension(62, 30));
-		btnNegYEnd.setFont(defaultFont);
-		btnNegYEnd.setToolTipText("<html>Decreases the end V.<br><b>Hold shift for decimals</b></html>");
+		
+		btnPlusVEnd.setToolTipText("<html>Increases the end V.<br><b>Hold shift for decimals</b></html>");
+
+		btnNegUEnd.addActionListener(e ->
+		{
+			modifyPosition(2, -1, e.getModifiers(), btnNegUEnd);
+		});
+		
+		btnNegUEnd.setToolTipText("<html>Decreases the end U.<br><b>Hold shift for decimals</b></html>");
+
+		btnNegVEnd.addActionListener(e ->
+		{
+			modifyPosition(3, -1, e.getModifiers(), btnNegVEnd);
+		});
+		
+		
+		btnNegVEnd.setToolTipText("<html>Decreases the end V.<br><b>Hold shift for decimals</b></html>");
 	}
 
 	public void addComponents()
 	{
-		add(btnPlusX);
-		add(btnPlusY);
-		add(btnPlusXEnd);
-		add(btnPlusYEnd);
-		add(xStartField);
-		add(yStartField);
-		add(xEndField);
-		add(yEndField);
-		add(btnNegX);
-		add(btnNegY);
-		add(btnNegXEnd);
-		add(btnNegYEnd);
+		add(btnPlusUStart);
+		add(btnPlusVStart);
+		add(btnPlusUEnd);
+		add(btnPlusVEnd);
+		add(uStartField);
+		add(vStartField);
+		add(uEndField);
+		add(vEndField);
+		add(btnNegUStart);
+		add(btnNegVStart);
+		add(btnNegUEnd);
+		add(btnNegVEnd);
 	}
 
 	@Override
@@ -364,28 +262,96 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 		
 		if (cube != null)
 		{
-			xStartField.setEnabled(true);
-			yStartField.setEnabled(true);
-			xEndField.setEnabled(true);
-			yEndField.setEnabled(true);
-			if (byGuiElem != xStartField) xStartField.setText(df.format(cube.getSelectedFace().getStartU()));
-			if (byGuiElem != yStartField) yStartField.setText(df.format(cube.getSelectedFace().getStartV()));
-			if (byGuiElem != xEndField) xEndField.setText(df.format(cube.getSelectedFace().getEndU()));
-			if (byGuiElem != yEndField) yEndField.setText(df.format(cube.getSelectedFace().getEndV()));
+			uStartField.setEnabled(true);
+			vStartField.setEnabled(true);
+			uEndField.setEnabled(true);
+			vEndField.setEnabled(true);
+			if (byGuiElem != uStartField) uStartField.setText(df.format(cube.getSelectedFace().getStartU()));
+			if (byGuiElem != vStartField) vStartField.setText(df.format(cube.getSelectedFace().getStartV()));
+			if (byGuiElem != uEndField) uEndField.setText(df.format(cube.getSelectedFace().getEndU()));
+			if (byGuiElem != vEndField) vEndField.setText(df.format(cube.getSelectedFace().getEndV()));
 			
 			
 
 		}
 		else
 		{
-			xStartField.setEnabled(false);
-			yStartField.setEnabled(false);
-			xEndField.setEnabled(false);
-			yEndField.setEnabled(false);
-			xStartField.setText("");
-			yStartField.setText("");
-			xEndField.setText("");
-			yEndField.setText("");
+			uStartField.setEnabled(false);
+			vStartField.setEnabled(false);
+			uEndField.setEnabled(false);
+			vEndField.setEnabled(false);
+			uStartField.setText("");
+			vStartField.setText("");
+			uEndField.setText("");
+			vEndField.setText("");
 		}
 	}
+	
+	
+	
+	public void modifyPosition(int type, int direction, int modifiers, JComponent sourceField) {
+		Element cube = manager.getCurrentElement();
+		if (cube == null) return;
+		Face face = cube.getSelectedFace();
+		
+		double size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
+		
+		Sized scale = face.getVoxel2PixelScale();
+		
+		boolean ctrl = (modifiers & ActionEvent.CTRL_MASK) > 0;
+		boolean shift = (modifiers & ActionEvent.SHIFT_MASK) == 1;
+		
+		if (shift) {
+			size = direction * 0.1;
+		}
+		else if (ctrl)
+		{
+			double step = 1 / scale.H;
+			if (type == 0 || type == 2) step = 1 / scale.W;
+			
+			size = direction * (face.isSnapUvEnabled() ? -step : -0.1);
+		}
+		else
+		{
+			size = direction * 1;
+		}
+		
+		
+		ModelCreator.changeHistory.beginMultichangeHistoryState();
+		
+		JTextField targetField;
+		double targetValue;
+		
+		switch (type) {
+		case 0:
+			targetField = uStartField;
+			targetValue = Parser.parseDouble(targetField.getText(), face.getStartU()) + size;
+			face.setStartU(targetValue);			
+			break;
+		case 1:
+			targetField = vStartField;
+			targetValue = Parser.parseDouble(targetField.getText(), face.getStartV()) + size;
+			face.setStartV(targetValue);
+			break;
+		case 2:
+			targetField = uEndField;
+			targetValue = Parser.parseDouble(targetField.getText(), face.getEndU()) + size;
+			face.setEndU(targetValue);
+			break;
+		case 3:
+			targetField = vEndField;
+			targetValue = Parser.parseDouble(targetField.getText(), face.getEndV()) + size;
+			face.setEndV(targetValue);
+			break;
+		default:
+			return;
+		}
+		
+		
+		ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
+		targetField.setText(df.format(targetValue));
+		face.updateUV();
+		ModelCreator.updateValues(sourceField);
+	}
 }
+

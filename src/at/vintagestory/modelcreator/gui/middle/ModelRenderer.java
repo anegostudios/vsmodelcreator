@@ -57,6 +57,7 @@ public class ModelRenderer
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		GLU.gluOrtho2D(0, width, height, 0);
+		
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
@@ -185,10 +186,10 @@ public class ModelRenderer
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-			/*GL11.glTranslated(8, 0, 16);
+			GL11.glTranslated(0, 0, 16);
 			GL11.glScaled(0.018, 0.018, 0.018);
 			GL11.glRotated(90, 1, 0, 0);
-			EnumFonts.BEBAS_NEUE_50.drawString(8, 0, "S", new Color(0.5F, 0.5F, 0.6F));*/
+			EnumFonts.BEBAS_NEUE_50.drawString(8, 0, "VS Model Creator", new Color(0.5F, 0.5F, 0.6F));
 
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glShadeModel(GL11.GL_SMOOTH);

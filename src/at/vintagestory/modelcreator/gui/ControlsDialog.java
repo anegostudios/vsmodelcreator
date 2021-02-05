@@ -55,10 +55,15 @@ public class ControlsDialog
 				+ "<li>Hold CTRL and click on any up/down arrows of the cubes position to not move the origin</li>"
 				+ "<li>Focus any of the position/origin/size text fields and use mouse wheel to modify increase/decrease the size in -1/+1 (also works in conjunction with the CTRL and Shift modifiers)</li>"				
 				+ "</ul>"		
-				+ "<p><b>Face Pane (Right)<b></p>"
+				+ "<p><b>Face Pane, UVs (Right)<b></p>"
+				+ "<ul>"
+				+ "<li>Hold SHIFT and mousewheel or click on any of the up/down arrows to modify in increments of 0.1</li>"
+				+ "<li>Hold CTRL and mousewheel or click on any of the up/down arrows to modify in increments of single texture pixels</li>"
+				+ "</ul>"
+				+ "<p><b>Face Pane, Textures (Right)<b></p>"
 				+ "<ul>"
 				+ "<li>Press Copy Button and then hold SHIFT + Left Mousue Click the Paste Button to quickly assign a texture to all the faces of a cube</li>"
-				+ "<li>Press Copy Button and then hold CTRL + SHIFT + Left Mousue Click the Paste Button to quickly assign a texture to all the faces of a cube and all its child elements</li>"
+				+ "<li>Press Copy Button and then hold CTRL + SHIFT + Left Mouse Click the Paste Button to quickly assign a texture to all the faces of a cube and all its child elements</li>"
 				+ "<li>Hold SHIFT and toggle 'Enabled', 'Auto Resolution' or 'Snap UV' to toggle it for all faces</li>"
 				+ "</ul>"
 				+ "<p><b>Keyframe Pane (Right)<b></p>"
@@ -84,7 +89,7 @@ public class ControlsDialog
 
 		JDialog dialog = new JDialog(parent, "Quick Controls", false);
 		dialog.setResizable(false);
-		dialog.setPreferredSize(new Dimension(700, 800));
+		dialog.setPreferredSize(new Dimension(800, 800));
 		dialog.add(container);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);

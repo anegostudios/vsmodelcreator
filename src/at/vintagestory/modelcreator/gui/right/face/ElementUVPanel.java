@@ -22,12 +22,13 @@ import javax.swing.JTextField;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
-import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.model.Sized;
 import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
@@ -53,6 +54,10 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 	private DecimalFormat df = new DecimalFormat("#.##");
 	
 	private DefaultComboBoxModel<String> model;
+	
+	JTextField[] fields;
+	JButton[] buttons;
+	
 
 	public ElementUVPanel(IElementManager manager)
 	{
@@ -72,6 +77,10 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		yStartField = new JTextField();
 		btnNegX = new JButton(Icons.arrow_down);
 		btnNegY = new JButton(Icons.arrow_down);
+		
+		
+		fields = new JTextField[] { xStartField, yStartField };
+		buttons = new JButton[] { btnPlusX, btnPlusY, btnNegX, btnNegY };
 		
 		model = new DefaultComboBoxModel<String>();
 		model.addElement("Compact");
@@ -102,11 +111,6 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		});
 
 		
-		
-		
-		
-		
-		
 		autoUnwrap = new Checkbox("Auto-Unwrap");
 		autoUnwrap.addItemListener(new ItemListener()
 		{
@@ -122,6 +126,13 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 				ModelCreator.DidModify();
 			}
 		});
+		
+		
+		Font defaultFont = new Font("SansSerif", Font.BOLD, 20);
+		for (JButton btn : buttons) {
+			btn.setSize(new Dimension(62, 30));
+			btn.setFont(defaultFont);
+		}
 	}
 
 	public void initProperties()
@@ -152,7 +163,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			public void mouseWheelMoved(MouseWheelEvent e)
 			{
 				int notches = e.getWheelRotation();
-				modifyPosition(EnumAxis.X, (notches > 0 ? 1 : -1));
+				modifyPosition(EnumAxis.X, (notches > 0 ? 1 : -1), e.getModifiers(), xStartField);
 			}
 		});
 
@@ -182,62 +193,39 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			public void mouseWheelMoved(MouseWheelEvent e)
 			{
 				int notches = e.getWheelRotation();
-				modifyPosition(EnumAxis.Y, (notches > 0 ? 1 : -1));
+				modifyPosition(EnumAxis.Y, (notches > 0 ? 1 : -1), e.getModifiers(), yStartField);
 			}
 		});
-
 		
-
-
+		
 		btnPlusX.addActionListener(e ->
 		{
-			Element elem = manager.getCurrentElement();
-			if (elem == null) return;
-			double diff = ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1) ? 0.1 : 1;
-			elem.setTexUStart(elem.getTexUStart() + diff);
-			ModelCreator.updateValues(btnPlusX);
+			modifyPosition(EnumAxis.X, 1, e.getModifiers(), btnPlusX);
 		});
 
-		btnPlusX.setSize(new Dimension(62, 30));
-		btnPlusX.setFont(defaultFont);
 		btnPlusX.setToolTipText("<html>Increases the start U.<br><b>Hold shift for decimals</b></html>");
 
 		btnPlusY.addActionListener(e ->
 		{
-			Element elem = manager.getCurrentElement();
-			if (elem == null) return;
-			double diff = ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1) ? 0.1 : 1;
-			elem.setTexVStart(elem.getTexVStart() + diff);
-			ModelCreator.updateValues(btnPlusX);
+			modifyPosition(EnumAxis.Y, 1, e.getModifiers(), btnPlusY);
 		});
-		btnPlusY.setPreferredSize(new Dimension(62, 30));
-		btnPlusY.setFont(defaultFont);
 		btnPlusY.setToolTipText("<html>Increases the start V.<br><b>Hold shift for decimals</b></html>");
 
 		btnNegX.addActionListener(e ->
 		{
-			Element elem = manager.getCurrentElement();
-			if (elem == null) return;
-			double diff = ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1) ? -0.1 : -1;
-			elem.setTexUStart(elem.getTexUStart() + diff);
-			ModelCreator.updateValues(btnNegX);
+			modifyPosition(EnumAxis.X, -1, e.getModifiers(), btnNegX);
 		});
-		btnNegX.setSize(new Dimension(62, 30));
-		btnNegX.setFont(defaultFont);
 		btnNegX.setToolTipText("<html>Decreases the start U.<br><b>Hold shift for decimals</b></html>");
 
 		btnNegY.addActionListener(e ->
 		{
-			Element elem = manager.getCurrentElement();
-			if (elem == null) return;
-			double diff = ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 1) ? -0.1 : -1;
-			elem.setTexVStart(elem.getTexVStart() + diff);
-			ModelCreator.updateValues(btnNegY);
+			modifyPosition(EnumAxis.Y, -1, e.getModifiers(), btnNegY);
 
 		});
-		btnNegY.setSize(new Dimension(62, 30));
-		btnNegY.setFont(defaultFont);
 		btnNegY.setToolTipText("<html>Decreases the start V.<br><b>Hold shift for decimals</b></html>");
+		
+		
+		
 		
 		
 		unwrapPanel = new JPanel(new GridLayout(1, 1));
@@ -365,12 +353,32 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 	
 	
 
-	public void modifyPosition(EnumAxis axis, int direction) {
+	public void modifyPosition(EnumAxis axis, int direction, int modifiers, JComponent sourceField) {
 		Element cube = manager.getCurrentElement();
 		if (cube == null) return;
 		
-		float size = direction * 1f;
+		double size = direction * 1f;
 		
+		boolean ctrl = (modifiers & ActionEvent.CTRL_MASK) > 0;
+		boolean shift = (modifiers & ActionEvent.SHIFT_MASK) == 1;
+		
+		Face face = cube.getSelectedFace();
+		Sized scale = face.getVoxel2PixelScale();
+		
+		if (shift) {
+			size = direction * 0.1;
+		}
+		else if (ctrl)
+		{
+			double step = 1 / scale.H;
+			if (axis == EnumAxis.X) step = 1 / scale.W;
+			
+			size = direction * (face.isSnapUvEnabled() ? -step : -0.1);
+		}
+		else
+		{
+			size = direction * 1;
+		}
 		
 		
 		switch (axis) {
@@ -386,7 +394,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 				break;
 		}
 		
-		ModelCreator.updateValues(null);
+		ModelCreator.updateValues(sourceField);
 		
 	}
 
