@@ -89,6 +89,10 @@ public class Element implements IDrawable
 	protected int ZOffset = 0;
 	
 	
+	public int FoliageWaveSpecial = 0;
+	public boolean DisableRandomDrawOffset = false;
+	
+	
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();
 	

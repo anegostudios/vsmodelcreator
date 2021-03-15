@@ -327,7 +327,7 @@ public class Exporter
 		int i = 0;
 		for (String texturename : project.TextureSizes.keySet())
 		{
-			writer.write(space(2) + "\"" + texturename + "\": [" + project.TextureSizes.get(texturename)[0] + "," + project.TextureSizes.get(texturename)[0] + "]");
+			writer.write(space(2) + "\"" + texturename + "\": [" + project.TextureSizes.get(texturename)[0] + "," + project.TextureSizes.get(texturename)[1] + "]");
 			if (i < project.TextureSizes.size() - 1)
 			{
 				writer.write(",");
@@ -372,6 +372,7 @@ public class Exporter
 			writeGradientShade(writer, cuboid, indentation);
 			writer.newLine();
 		}
+		
 		if (cuboid.getClimateColorMap() != null)
 		{
 			writer.write(space(indentation) + "\"climateColorMap\": \"" + cuboid.getClimateColorMap() + "\",");
@@ -394,6 +395,20 @@ public class Exporter
 			writer.write(space(indentation) + "\"renderPass\": " + cuboid.getRenderPass() + ",");
 			writer.newLine();
 		}
+		
+		if (cuboid.FoliageWaveSpecial != 0)
+		{
+			writer.write(space(indentation) + "\"foliageWaveSpecial\": " + cuboid.FoliageWaveSpecial + ",");
+			writer.newLine();
+		}
+
+		if (cuboid.DisableRandomDrawOffset)
+		{
+			writer.write(space(indentation) + "\"disableRandomDrawOffset\": " + cuboid.DisableRandomDrawOffset + ",");
+			writer.newLine();
+		}
+
+		
 		
 		if (project.EntityTextureMode) {
 			if (cuboid.getUnwrapMode() > 0)

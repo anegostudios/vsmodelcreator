@@ -57,7 +57,7 @@ public class TextureSizeDialog
 
 		
 		
-		JPanel panelRow2 = new JPanel(new GridLayout(3 + 2*count, 10, 5, 0));
+		JPanel panelRow2 = new JPanel(new GridLayout(4 + 2*count, 2, 5, 5));
 		
 		label = new JLabel("Texture Width");
 		label.setPreferredSize(new Dimension(30, 20));
@@ -115,6 +115,7 @@ public class TextureSizeDialog
 			heightTextField.setPreferredSize(new Dimension(50, 20));
 			heightTextField.setText(""+ModelCreator.currentProject.TextureHeight);
 			panelRow2.add(heightTextField);
+			
 			
 			textureSizes.put("__generic", new JTextField[] { widthTextField, heightTextField });
 		}

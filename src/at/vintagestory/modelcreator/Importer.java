@@ -475,6 +475,17 @@ public class Importer
 				element.setRenderPass(obj.get("renderPass").getAsInt());
 			}
 			
+			if (obj.has("foliageWaveSpecial") && obj.get("foliageWaveSpecial").isJsonPrimitive())
+			{
+				element.FoliageWaveSpecial = obj.get("foliageWaveSpecial").getAsInt();
+			}
+
+			if (obj.has("disableRandomDrawOffset") && obj.get("disableRandomDrawOffset").isJsonPrimitive())
+			{
+				element.DisableRandomDrawOffset = obj.get("disableRandomDrawOffset").getAsBoolean();
+			}
+
+			
 			if (obj.has("renderInEditor") && obj.get("renderInEditor").isJsonPrimitive())
 			{
 				element.setRenderInEditor(obj.get("renderInEditor").getAsBoolean());
