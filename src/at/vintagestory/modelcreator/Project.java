@@ -588,6 +588,7 @@ public class Project
 						String altimgName = textureCode + i;
 						if (!TexturesByCode.containsKey(altimgName)) {
 							TexturesByCode.put(altimgName, new TextureEntry(altimgName, texture, icon, image.getAbsolutePath(), fromBackdrop));
+							textureCode = altimgName;
 							break;
 						}					
 						i++;
@@ -608,7 +609,7 @@ public class Project
 			}			
 		}
 		
-		if (doReplaceAll || doReplacedForSelectedElement && SelectedElement != null) {
+		if (doReplaceAll || (doReplacedForSelectedElement && SelectedElement != null)) {
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
 		
 			if (doReplaceAll) {
