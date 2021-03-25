@@ -75,7 +75,7 @@ public class TextureSizeDialog
 		entries.addAll(ModelCreator.currentProject.TexturesByCode.keySet());
 		entries.addAll(ModelCreator.currentProject.MissingTexturesByCode.keySet());
 		
-		if (count > 1) {
+		if (count > 0) {
 			for (String keycode : entries) {
 				
 				label = new JLabel(keycode);
