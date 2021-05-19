@@ -5,12 +5,7 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glViewport;
 
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDragEvent;
@@ -295,13 +290,28 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		leftKeyframesPanel = new LeftKeyFramesPanel(rightTopPanel);
 		leftKeyframesPanel.setVisible(false);
 		add(leftKeyframesPanel, BorderLayout.WEST);
-
-		canvas.setPreferredSize(new Dimension(1000, 850));
-		add(canvas, BorderLayout.CENTER);
-
+		
+		// Canvas stuff
 		canvas.setFocusable(true);
 		canvas.setVisible(true);
 		canvas.requestFocus();
+		
+		
+		//but works
+		final double viewScale = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getDefaultTransform().getScaleX();
+		
+		JPanel panel = new JPanel(null);
+		panel.add(canvas);
+		add(panel, BorderLayout.CENTER);
+		
+		panel.addComponentListener(new ComponentAdapter()
+		{
+			@Override
+			public void componentResized(ComponentEvent e)
+			{
+				canvas.setSize((int)(panel.getWidth()*viewScale), (int)(panel.getHeight()*viewScale));
+			}
+		});
 		
 		modelrenderer = new ModelRenderer(rightTopPanel);
 		
