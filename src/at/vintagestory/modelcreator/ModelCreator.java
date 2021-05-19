@@ -172,21 +172,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		}
 		
 		
-		canvas = new Canvas();
-		
 		initComponents();
 		
-		
-
-
-		canvas.addComponentListener(new ComponentAdapter()
-		{
-			@Override
-			public void componentResized(ComponentEvent e)
-			{
-				newCanvasSize.set(canvas.getSize());
-			}
-		});
 
 		addWindowListener(new WindowAdapter()
 		{
@@ -292,18 +279,31 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		add(leftKeyframesPanel, BorderLayout.WEST);
 		
 		// Canvas stuff
+		canvas = new Canvas();
 		canvas.setFocusable(true);
 		canvas.setVisible(true);
 		canvas.requestFocus();
 		
+		canvas.addComponentListener(new ComponentAdapter()
+		{
+			@Override
+			public void componentResized(ComponentEvent e)
+			{
+				newCanvasSize.set(canvas.getSize());
+			}
+		});
 		
-		//but works
+		//== Canvas trickery for larger uiScales ==//
+		// kinda messy, but works
 		final double viewScale = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getDefaultTransform().getScaleX();
 		
+		// Create a container for our canvas (a simple JPanel) without a layout
+		// so that our canvas would not get affected by the base component's layout.
 		JPanel panel = new JPanel(null);
 		panel.add(canvas);
 		add(panel, BorderLayout.CENTER);
 		
+		// Inherit size from JPanel, apply the ui scale factor
 		panel.addComponentListener(new ComponentAdapter()
 		{
 			@Override
@@ -312,6 +312,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				canvas.setSize((int)(panel.getWidth()*viewScale), (int)(panel.getHeight()*viewScale));
 			}
 		});
+		
+		//== end Canvas trickery ==//
 		
 		modelrenderer = new ModelRenderer(rightTopPanel);
 		
