@@ -5,12 +5,7 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glViewport;
 
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDragEvent;
@@ -177,21 +172,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		}
 		
 		
-		canvas = new Canvas();
-		
 		initComponents();
 		
-		
-
-
-		canvas.addComponentListener(new ComponentAdapter()
-		{
-			@Override
-			public void componentResized(ComponentEvent e)
-			{
-				newCanvasSize.set(canvas.getSize());
-			}
-		});
 
 		addWindowListener(new WindowAdapter()
 		{
@@ -295,13 +277,43 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		leftKeyframesPanel = new LeftKeyFramesPanel(rightTopPanel);
 		leftKeyframesPanel.setVisible(false);
 		add(leftKeyframesPanel, BorderLayout.WEST);
-
-		canvas.setPreferredSize(new Dimension(1000, 850));
-		add(canvas, BorderLayout.CENTER);
-
+		
+		// Canvas stuff
+		canvas = new Canvas();
 		canvas.setFocusable(true);
 		canvas.setVisible(true);
 		canvas.requestFocus();
+		
+		canvas.addComponentListener(new ComponentAdapter()
+		{
+			@Override
+			public void componentResized(ComponentEvent e)
+			{
+				newCanvasSize.set(canvas.getSize());
+			}
+		});
+		
+		//== Canvas trickery for larger uiScales ==//
+		// kinda messy, but works
+		final double viewScale = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getDefaultTransform().getScaleX();
+		
+		// Create a container for our canvas (a simple JPanel) without a layout
+		// so that our canvas would not get affected by the base component's layout.
+		JPanel panel = new JPanel(null);
+		panel.add(canvas);
+		add(panel, BorderLayout.CENTER);
+		
+		// Inherit size from JPanel, apply the ui scale factor
+		panel.addComponentListener(new ComponentAdapter()
+		{
+			@Override
+			public void componentResized(ComponentEvent e)
+			{
+				canvas.setSize((int)(panel.getWidth()*viewScale), (int)(panel.getHeight()*viewScale));
+			}
+		});
+		
+		//== end Canvas trickery ==//
 		
 		modelrenderer = new ModelRenderer(rightTopPanel);
 		
