@@ -791,6 +791,11 @@ public class LeftUVSidebar extends LeftSidebar
 			TextureEntry texEntry = null;
 			if (textureCode != null) {
 				texEntry = ModelCreator.currentProject.TexturesByCode.get(textureCode);
+				int[] size = ModelCreator.currentProject.TextureSizes.get(textureCode);
+				if (size != null) {
+					texWidth = size[0];
+					texHeight = size[1];
+				}
 			}
 			
 			scale = Face.getVoxel2PixelScale(ModelCreator.currentProject, texEntry);

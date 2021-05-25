@@ -244,21 +244,25 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 
 	public void Draw()
 	{
-		int nowMouseX = MouseInfo.getPointerInfo().getLocation().x - ModelCreator.Instance.getX();
-		int edgeX = ModelCreator.Instance.leftSidebarWidth() + 2 + ModelCreator.canvas.getWidth();
+		PointerInfo pinfo = MouseInfo.getPointerInfo(); 
+	
+		if (pinfo != null) {
 		
-		
-		if (Math.abs(edgeX - nowMouseX) < 8) {
-			ModelCreator.Instance.isOnRightPanel=true;
-			ModelCreator.canvas.setCursor(new java.awt.Cursor(Cursor.E_RESIZE_CURSOR));
-			overSidebar = true;
-		} else {
-			ModelCreator.Instance.isOnRightPanel=false;
-			if (overSidebar) {
-				ModelCreator.canvas.setCursor(java.awt.Cursor.getDefaultCursor());				
-				overSidebar = false;
+			int nowMouseX = pinfo.getLocation().x - ModelCreator.Instance.getX();
+			int edgeX = ModelCreator.Instance.leftSidebarWidth() + 2 + ModelCreator.canvas.getWidth();
+			
+			
+			if (Math.abs(edgeX - nowMouseX) < 8) {
+				ModelCreator.Instance.isOnRightPanel=true;
+				ModelCreator.canvas.setCursor(new java.awt.Cursor(Cursor.E_RESIZE_CURSOR));
+				overSidebar = true;
+			} else {
+				ModelCreator.Instance.isOnRightPanel=false;
+				if (overSidebar) {
+					ModelCreator.canvas.setCursor(java.awt.Cursor.getDefaultCursor());				
+					overSidebar = false;
+				}
 			}
 		}
-		
 	}
 }
