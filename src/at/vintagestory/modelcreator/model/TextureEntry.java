@@ -3,6 +3,8 @@ package at.vintagestory.modelcreator.model;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
+
 import org.newdawn.slick.opengl.Texture;
 
 import at.vintagestory.modelcreator.ModelCreator;
@@ -39,42 +41,52 @@ public class TextureEntry
 		
 		File f = new File(textureLocation);
 
-        try {
-            watchService = new SimpleDirectoryWatchService(); // May throw
-            watchService.register( // May throw
-                    new DirectoryWatchService.OnFileChangeListener() {
-                        @Override
-                        public void onFileModify(String filePath) {
-                            if (!ModelCreator.autoreloadTexture) return;
-                            
-                        	if (isFromBackdrop) {
-                        		if (ModelCreator.currentBackdropProject != null) {
-                        			PendingTexture ptex = new PendingTexture(self, 3);
-                        			ptex.SetIsBackDrop();
-                        			ModelCreator.Instance.AddPendingTexture(ptex);
-                            	}
-                        	} else {
-                        		if (ModelCreator.currentProject != null) {
-                        			ModelCreator.Instance.AddPendingTexture(new PendingTexture(self, 3));
-                            	}	
-                        	}
-                        	
-                        	
-                        	
-                        }
-                    },
-                    f.getParent(),
-                    f.getName()
-            );
-            
-            watchService.start();
-        } catch (IOException e) {
-            System.out.println("Unable to register file change listener for " + textureLocation);
-        }
+		SwingUtilities.invokeLater(new Runnable() 
+	    {
+	      public void run() {
+		        try {
+		            watchService = new SimpleDirectoryWatchService(); // May throw
+		            watchService.register( // May throw
+		                    new DirectoryWatchService.OnFileChangeListener() {
+		                        @Override
+		                        public void onFileModify(String filePath) {
+		                            if (!ModelCreator.autoreloadTexture) return;
+		                            
+		                        	if (isFromBackdrop) {
+		                        		if (ModelCreator.currentBackdropProject != null) {
+		                        			PendingTexture ptex = new PendingTexture(self, 3);
+		                        			ptex.SetIsBackDrop();
+		                        			ModelCreator.Instance.AddPendingTexture(ptex);
+		                            	}
+		                        	} else {
+		                        		if (ModelCreator.currentProject != null) {
+		                        			ModelCreator.Instance.AddPendingTexture(new PendingTexture(self, 3));
+		                            	}	
+		                        	}
+		                        	
+		                        	
+		                        	
+		                        }
+		                    },
+		                    f.getParent(),
+		                    f.getName()
+		            );
+		            
+		            watchService.start();
+		        } catch (IOException e) {
+		            System.out.println("Unable to register file change listener for " + textureLocation);
+		        }
+	      }
+	    });
 	}
 	
 	public void Dispose() {
-		watchService.stop();
+		SwingUtilities.invokeLater(new Runnable() 
+	    {
+	      public void run() {
+	    	  watchService.stop();
+	      }
+	    });
 	}
 
 	public String getCode()
