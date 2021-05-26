@@ -869,6 +869,9 @@ public class Element implements IDrawable
 		
 		if (leftFace.isEnabled()) { 
 			x += leftFace.uvWidth();
+			// Fix any float imprecision first
+			x = Math.round(x * 1000.0) / 1000.0;
+			// Now round to the next closest pixel
 			x = Math.ceil(x * scale.W) / scale.W;
 		}
 		
@@ -878,6 +881,10 @@ public class Element implements IDrawable
 		
 		// Row 2
 		if (aboveFace.isEnabled()) y += aboveFace.uvHeight();
+		
+		// Fix any float imprecision first
+		y = Math.round(y * 1000.0) / 1000.0;
+		// Now round to the next closest pixel
 		y = Math.ceil(y * scale.H) / scale.H;
 		
 		x = getTexUStart();
@@ -888,6 +895,9 @@ public class Element implements IDrawable
 		
 		if (leftFace.isEnabled()) {
 			x += leftFace.uvWidth();
+			// Fix any float imprecision first
+			x = Math.round(x * 1000.0) / 1000.0;
+			// Now round to the next closest pixel
 			x = Math.ceil(x * scale.W) / scale.W;
 		}
 		
@@ -897,6 +907,9 @@ public class Element implements IDrawable
 		
 		if (centerFace.isEnabled()) {
 			x += centerFace.uvWidth();
+			// Fix any float imprecision first
+			x = Math.round(x * 1000.0) / 1000.0;
+			// Now round to the next closest pixel
 			x = Math.ceil(x * scale.W) / scale.W;
 		}
 		
@@ -906,6 +919,9 @@ public class Element implements IDrawable
 		
 		if (rightFace.isEnabled()) {
 			x += rightFace.uvWidth();
+			// Fix any float imprecision first
+			x = Math.round(x * 1000.0) / 1000.0;
+			// Now round to the next closest pixel
 			x = Math.ceil(x * scale.W) / scale.W;
 		}
 		
@@ -918,10 +934,16 @@ public class Element implements IDrawable
 		x = getTexUStart();
 		if (leftFace.isEnabled()) {
 			x+= leftFace.uvWidth();
+			// Fix any float imprecision first
+			x = Math.round(x * 1000.0) / 1000.0;
+			// Now round to the next closest pixel			
 			x = Math.ceil(x * scale.W) / scale.W;
 		}
 		
 		y += Math.max(leftFace.uvHeight(), Math.max(centerFace.uvHeight(), Math.max(rightFace.uvHeight(), veryRightFace.uvHeight())));
+		// Fix any float imprecision first
+		y = Math.round(y * 1000.0) / 1000.0;
+		// Now round to the next closest pixel
 		y = Math.ceil(y * scale.H) / scale.H;
 		
 		belowFace.textureU = x;
