@@ -59,8 +59,12 @@ public class UVMapExporter
 		int minX = (int)Math.min(startX, endX);
 		int minY = (int)Math.min(startY, endY);
 		
-		int maxX = (int)Math.ceil(Math.max(startX, endX));
-		int maxY = (int)Math.ceil(Math.max(startY, endY));
+		// Fix any imprecision first
+		double mx = Math.round(Math.max(startX, endX) * 1000.0) / 1000.0;
+		double my = Math.round(Math.max(startY, endY) * 1000.0) / 1000.0;
+
+		int maxX = (int)Math.ceil(mx);
+		int maxY = (int)Math.ceil(my);
 		
 		for (int x = minX; x < maxX; x++) {
 			for (int y = minY; y < maxY; y++) {
