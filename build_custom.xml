@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="default" name="build-common">
+   
+	<property name="dir.buildfile" value="."/>
+	<property name="dir.workspace" value="C:/Users/User/eclipse"/>
+    <property name="dir.jarfile" value="${dir.buildfile}/output-jar"/>
+	
+	<target name="default" depends="dist" />
+	
+	<target name="clean">
+        <delete dir="${dir.jarfile}/prepare/" />
+		<delete dir="${dir.jarfile}/vsmodelcreator_lib/" />
+		
+		<mkdir dir="${dir.jarfile}/prepare/" />
+		<mkdir dir="${dir.jarfile}/vsmodelcreator_lib/"/>
+    </target>
+	
+	<target name="copy_lib_prepare" depends="clean">
+		<copy todir="${dir.jarfile}/vsmodelcreator_lib/">
+			<fileset dir="${dir.buildfile}/libs/" />
+		</copy>
+	</target>
+
+    <target name="compile" depends="copy_lib_prepare">
+        <javac srcdir="${dir.buildfile}/src/" destdir="${dir.jarfile}/prepare/">
+    		<classpath>
+    			<pathelement path="${dir.jarfile}/vsmodelcreator_lib/gson-2.3.1.jar" />
+    			<pathelement path="${dir.jarfile}/vsmodelcreator_lib/JTattoo-1.6.11.jar" />
+    			<pathelement path="${dir.jarfile}/vsmodelcreator_lib/lwjgl.jar" />
+    			<pathelement path="${dir.jarfile}/vsmodelcreator_lib/lwjgl_util.jar" />
+    			<pathelement path="${dir.jarfile}/vsmodelcreator_lib/slick-util.jar" />
+    		</classpath>
+    	</javac>
+    </target>
+	
+	<target name="copy_assets" depends="compile">
+		<copy todir="${dir.jarfile}/prepare/assets/">
+			<fileset dir="${dir.buildfile}/assets/"/>
+		</copy>
+	</target>
+	
+	<target name="copy_icons" depends="copy_assets">
+		<copy todir="${dir.jarfile}/prepare/icons/">
+			<fileset dir="${dir.buildfile}/assets/icons/"/>
+		</copy>
+	</target>
+	
+	<target name="copy_app_resource" depends="copy_icons">
+		<copy todir="${dir.jarfile}/prepare/">
+  			<fileset dir="${dir.buildfile}/assets/" />
+		</copy>
+	</target>
+	
+	<target name="create_run_jar" depends="copy_app_resource">
+        <jar destfile="${dir.jarfile}/vsmodelcreator.jar" basedir="${dir.jarfile}/prepare/">
+            <manifest>
+                <attribute name="Main-Class" value="at.vintagestory.modelcreator.Start"/>
+                <attribute name="Class-Path" value=". vsmodelcreator_lib/gson-2.3.1.jar vsmodelcreator_lib/JTattoo-1.6.11.jar vsmodelcreator_lib/lwjgl_util.jar vsmodelcreator_lib/lwjgl.jar vsmodelcreator_lib/slick-util.jar"/>
+            </manifest>
+        </jar>
+    </target>
+	
+	<target name="delete_prepare" depends="create_run_jar">
+        <delete dir="${dir.jarfile}/prepare/" />
+    </target>
+	
+	<target name="dist" depends="delete_prepare">
+		
+	</target>
+</project>
