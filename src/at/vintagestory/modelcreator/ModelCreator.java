@@ -245,7 +245,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		manager.subscribe(new ListenerKeyPressInterval(elementLeft, Keyboard.KEY_LEFT));
 		manager.subscribe(new ListenerKeyPressInterval(elementDown, Keyboard.KEY_NEXT));
 		
-		// Enable repeat events, grants more control of input behaviour
+		// Enable repeat events, grants more fine-grained control over keyboard input
 		Keyboard.enableRepeatEvents(true);
 		
 		// Seriously man, fuck java. Mouse listeners on a canvas are just plain not working. 

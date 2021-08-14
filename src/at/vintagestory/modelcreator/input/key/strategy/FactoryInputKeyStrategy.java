@@ -5,14 +5,14 @@ import at.vintagestory.modelcreator.input.command.ProjectCommand;
 public class FactoryInputKeyStrategy
 {
 	
-	public static StrategyInputKey CreateKeyInterval50(int keyCode, ProjectCommand command)
+	public static StrategyInputKey CreateKeyInterval25(int keyCode, ProjectCommand command)
 	{
-		return CreateKeyInterval50(null, keyCode, command);
+		return CreateKeyInterval25(null, keyCode, command);
 	}
 	
-	public static StrategyInputKey CreateKeyInterval50(Integer controlKeyCode, int keyCode, ProjectCommand command) {
+	public static StrategyInputKey CreateKeyInterval25(Integer controlKeyCode, int keyCode, ProjectCommand command) {
 		if (controlKeyCode == null)
-			return new InputKeyInterval(keyCode, 50, CreateKeyRepeat(keyCode, command));
+			return new InputKeyInterval(keyCode, 25, CreateKeyRepeat(keyCode, command));
 		return new InputKeyControl(controlKeyCode.intValue(), new InputKeyInterval(keyCode, 100, CreateKeyRepeat(keyCode, command)));
 	}
 	

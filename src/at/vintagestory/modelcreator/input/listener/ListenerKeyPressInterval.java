@@ -19,7 +19,7 @@ public class ListenerKeyPressInterval implements InputListener
 	}
 	
 	private ListenerKeyPressInterval(ProjectCommand command, Integer controlKey, int key) {
-		this.strategy = FactoryInputKeyStrategy.CreateKeyInterval50(controlKey, key, command);
+		this.strategy = FactoryInputKeyStrategy.CreateKeyInterval25(controlKey, key, command);
 	}
 	
 	@Override
