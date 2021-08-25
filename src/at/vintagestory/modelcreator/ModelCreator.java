@@ -50,6 +50,7 @@ import at.vintagestory.modelcreator.gui.left.LeftSidebar;
 import at.vintagestory.modelcreator.gui.left.LeftUVSidebar;
 import at.vintagestory.modelcreator.gui.middle.ModelRenderer;
 import at.vintagestory.modelcreator.gui.right.RightTopPanel;
+import at.vintagestory.modelcreator.gui.right.face.FaceTexturePanel;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
@@ -1132,13 +1133,26 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	{										
 		if (errormessage != null)
 		{
-			JOptionPane error = new JOptionPane();
-			error.setMessage(errormessage);
-			JDialog dialog = error.createDialog(canvas, "Texture Error");
-			dialog.setLocationRelativeTo(null);
-			dialog.setModal(false);
-			dialog.setVisible(true);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					JOptionPane error = new JOptionPane();
+					error.setMessage(errormessage);
+					JDialog dialog = error.createDialog(canvas, "Texture Error");
+					dialog.setLocationRelativeTo(null);
+					dialog.setModal(true);
+					dialog.setAlwaysOnTop(true);
+					dialog.setVisible(true);
+			}});
+		} else {
+			
+			if (FaceTexturePanel.dlg.IsOpened()) {
+				FaceTexturePanel.dlg.onTextureLoaded(isNew, errormessage, texture);
+			}
+			
 		}
+		
+
 	}
 
 	public void LoadFile(String filePath)

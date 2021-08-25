@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -23,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.util.UVMapExporter;
@@ -31,6 +34,9 @@ import at.vintagestory.modelcreator.util.screenshot.AnimationPngCapture;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCallback;
 import at.vintagestory.modelcreator.util.screenshot.Uploader;
+
+import org.eclipse.swt.*;
+import org.eclipse.swt.widgets.*;
 
 public class GuiMenu extends JMenuBar
 {
@@ -686,70 +692,74 @@ public class GuiMenu extends JMenuBar
 		itemAddFace.addActionListener(a ->
 		{
 			ModelCreator.currentProject.addElementAsChild(new Element(1, 1));
-		});
-		
-		
-		
+		});	
 	}
 	
+
+	
+	static Map<String, String> lastOpenLocations = new HashMap<String, String>();
+	
+	public static String getJsonFilePathFromFileOpenDialog(String dialogtitle) {
+		return getFilePathFromFileOpenDialog(dialogtitle, ModelCreator.prefs.get("filePath", "."), "JSON (.json)", "*.json");
+	}
+	
+	public static String getFilePathFromFileOpenDialog(String dialogtitle, String filterPath, String filterName, String filterExt) {
+		String lastLoc = lastOpenLocations.get(filterName);
+		if (lastLoc != null) filterPath = lastLoc;
+		
+		Display display = new Display ();
+        Shell shell = new Shell (display);
+		FileDialog dialog = new FileDialog (shell, SWT.OPEN);
+		String [] filterNames = new String [] {filterName};
+        String [] filterExtensions = new String [] {filterExt};
+        dialog.setText(dialogtitle);
+        dialog.setFilterNames (filterNames);
+        dialog.setFilterExtensions (filterExtensions);
+        dialog.setFilterPath (filterPath);
+        dialog.open();
+        
+        String result = null;
+        
+        String[] selectedFileNames = dialog.getFileNames();
+        String filePath = dialog.getFilterPath();
+        for(String fileName : selectedFileNames) {
+        	result = filePath + File.separator + fileName;
+			break;
+        }
+        shell.close();
+        while (!shell.isDisposed ()) {
+            if (!display.readAndDispatch ()) display.sleep ();
+        }
+        display.dispose();
+        
+        if (result != null) {
+        	lastOpenLocations.put(filterName, filePath);
+        }
+        
+        return result;
+	}
 	
 
 	private void OnLoadFile()
 	{
-		JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
-		chooser.setDialogTitle("File to open");
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setApproveButtonText("Open");
-
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON (.json)", "json");
-		chooser.setFileFilter(filter);
-
-		int returnVal = chooser.showOpenDialog(null);
-		if (returnVal == JFileChooser.APPROVE_OPTION)
-		{
-			String filePath = chooser.getSelectedFile().getAbsolutePath();
-			creator.LoadFile(filePath);
-		}
+		String filepath = getJsonFilePathFromFileOpenDialog("Select file to open");
+		if (filepath != null) creator.LoadFile(filepath);
 	}
 	
 	private void OnImportFile()
 	{
-		JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
-		chooser.setDialogTitle("File to import");
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setApproveButtonText("Import");
-
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON (.json)", "json");
-		chooser.setFileFilter(filter);
-
-		int returnVal = chooser.showOpenDialog(null);
-		if (returnVal == JFileChooser.APPROVE_OPTION)
-		{
-			String filePath = chooser.getSelectedFile().getAbsolutePath();
-			creator.ImportFile(filePath);
-		}
+		String filepath = getJsonFilePathFromFileOpenDialog("Select file to import");
+		if (filepath != null) creator.ImportFile(filepath);
 	}
 	
 	
 	private void OnLoadBackdropFile()
 	{
-		JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
-		chooser.setDialogTitle("File to import as backdrop");
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setApproveButtonText("Import backdrop");
-
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON (.json)", "json");
-		chooser.setFileFilter(filter);
-
-		int returnVal = chooser.showOpenDialog(null);
-		if (returnVal == JFileChooser.APPROVE_OPTION)
-		{
-			String filePath = chooser.getSelectedFile().getAbsolutePath();
-			creator.LoadBackdropFile(filePath);
-			
-			if (ModelCreator.currentBackdropProject != null) {
-				itemClearBackdrop.setEnabled(true);
-			}
+		String filepath = getJsonFilePathFromFileOpenDialog("Select file to import as backdrop");
+		if (filepath != null) creator.LoadBackdropFile(filepath);
+		
+		if (ModelCreator.currentBackdropProject != null) {
+			itemClearBackdrop.setEnabled(true);
 		}
 	}
 	

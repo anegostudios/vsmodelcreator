@@ -205,26 +205,14 @@ public class ModelRenderer
 	{
 		if (!ModelCreator.showGrid) return;
 		
+		float d1 = 0.8f;
+		float d2 = 0.6f;
+		if (ModelCreator.darkMode) { d1 = 1.2f; d2 = 1.4f; }
+		
 		glPushMatrix();
 		{
 			glColor3f(0.55F, 0.55F, 0.60F);
 			glTranslatef(-8, 0, -8);
-			
-
-			// Bold outside lines
-			glLineWidth(2F);
-			glBegin(GL_LINES);
-			{
-				glVertex3i(0, 0, 0);
-				glVertex3i(0, 0, 16);
-				glVertex3i(16, 0, 0);
-				glVertex3i(16, 0, 16);
-				glVertex3i(0, 0, 16);
-				glVertex3i(16, 0, 16);
-				glVertex3i(0, 0, 0);
-				glVertex3i(16, 0, 0);
-			}
-			glEnd();
 
 			// Thin inside lines
 			glLineWidth(1F);
@@ -242,13 +230,44 @@ public class ModelRenderer
 					glVertex3i(16, 0, i);
 				}
 			}
-						
 			glEnd();
 			
 			
+			glColor3f(0.55F * d2, 0.55F * d2, 0.60F * d2);
+			
+			// Bold outside lines
+			glLineWidth(2F);
+			glBegin(GL_LINES);
+			{
+				glVertex3i(0, 0, 0);
+				glVertex3i(0, 0, 16);
+				glVertex3i(16, 0, 0);
+				glVertex3i(16, 0, 16);
+				glVertex3i(0, 0, 16);
+				glVertex3i(16, 0, 16);
+				glVertex3i(0, 0, 0);
+				glVertex3i(16, 0, 0);
+			}
+			glEnd();
+
+			glColor3f(0.55F * d1, 0.55F * d1, 0.60F * d1);
+			
+			// Bold center cross
+			glLineWidth(2F);
+			glBegin(GL_LINES);
+			{
+				glVertex3i(8, 0, 0);
+				glVertex3i(8, 0, 16);
+				glVertex3i(0, 0, 8);
+				glVertex3i(16, 0, 8);
+			}
+			glEnd();
+
+			glColor3f(0.55F, 0.55F, 0.60F);
+			
 			// Thin half transparent line to show block size
 			glLineWidth(1F);
-			glColor3f(0.8F, 0.8F, 0.8F);
+			glColor3f(0.55F / d1, 0.55F / d1, 0.55F / d1);
 			
 			
 			glBegin(GL_LINES);

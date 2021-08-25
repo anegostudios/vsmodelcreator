@@ -28,6 +28,8 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 	private JButton btnClear;
 	private JButton btnCopy;
 	private JButton btnPaste;
+	
+	public static TextureDialog dlg;
 
 	public FaceTexturePanel(IElementManager manager)
 	{
@@ -49,7 +51,7 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		{
 			if (manager.getCurrentElement() != null)
 			{
-				TextureDialog dlg = new TextureDialog();
+				dlg = new TextureDialog();
 				String texture = dlg.display(manager);
 				if (texture != null)
 				{
