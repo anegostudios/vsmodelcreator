@@ -186,10 +186,22 @@ public class ModelRenderer
 			GL11.glDisable(GL11.GL_CULL_FACE);
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-			GL11.glTranslated(0, 0, 16);
-			GL11.glScaled(0.018, 0.018, 0.018);
-			GL11.glRotated(90, 1, 0, 0);
-			EnumFonts.BEBAS_NEUE_50.drawString(8, 0, "VS Model Creator", new Color(0.5F, 0.5F, 0.6F));
+			GL11.glPushMatrix();
+			{
+				GL11.glTranslated(0, 0, 16);
+				GL11.glScaled(0.018, 0.018, 0.018);
+				GL11.glRotated(90, 1, 0, 0);
+				EnumFonts.BEBAS_NEUE_50.drawString(8, 0, "VS Model Creator", new Color(0.5F, 0.5F, 0.6F));
+			}
+			GL11.glPopMatrix();
+			
+			if (ModelCreator.currentProject.EntityTextureMode) {
+				GL11.glTranslated(-1, 0, 8 + 2);
+				GL11.glScaled(0.018, 0.018, 0.018);
+				GL11.glRotated(90, 0, 1, 0);
+				GL11.glRotated(90, 1, 0, 0);
+				EnumFonts.BEBAS_NEUE_50.drawString(8, 0, "Entity front", new Color(0.5F, 0.5F, 0.6F));
+			}
 
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glShadeModel(GL11.GL_SMOOTH);

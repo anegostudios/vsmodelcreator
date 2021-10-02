@@ -1146,7 +1146,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}});
 		} else {
 			
-			if (FaceTexturePanel.dlg.IsOpened()) {
+			if (FaceTexturePanel.dlg != null && FaceTexturePanel.dlg.IsOpened()) {
 				FaceTexturePanel.dlg.onTextureLoaded(isNew, errormessage, texture);
 			}
 			
