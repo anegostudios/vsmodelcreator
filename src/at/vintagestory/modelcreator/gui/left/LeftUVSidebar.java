@@ -636,8 +636,11 @@ public class LeftUVSidebar extends LeftSidebar
 			int yMovement = 0;
 			TextureEntry texEntry = null;
 			
-			if (!ModelCreator.currentProject.EntityTextureMode && grabbedFaceIndex >= 0) {
+			if (grabbedFaceIndex >= 0) {
 				texEntry = grabbedElement.getAllFaces()[grabbedFaceIndex].getTextureEntry();
+			}
+			
+			if (!ModelCreator.currentProject.EntityTextureMode && grabbedFaceIndex >= 0) {
 				Sized texSize = GetBlockTextureModeTextureSize(texEntry == null ? null : texEntry.code);
 				texBoxWidth = (int)texSize.W;
 				texBoxHeight = (int)texSize.H;
@@ -707,12 +710,10 @@ public class LeftUVSidebar extends LeftSidebar
 
 			
 			if (xMovement != 0) {
-				//this.lastMouseX += (int)((int)(mousedx / sectionWidth) * sectionWidth);
 				this.lastMouseX += xMovement * sectionWidth;   // Add *sectionWidth because otherwise the rect moves too quickly
 			}
 			
 			if (yMovement != 0) {
-				//this.lastMouseY += (int)((int)(mousedy / sectionHeight) * sectionHeight); - why so weird? this causes weird continous sliding effects on a 48x144 texture
 				this.lastMouseY += yMovement * sectionHeight;
 			}
 
