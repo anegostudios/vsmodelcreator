@@ -199,6 +199,21 @@ public class ElementTree
         return null;
 	}
 	
+	public Element getNextSelectedElement() {
+		TreePath currentSelection = jtree.getSelectionPath();
+		if (currentSelection != null) {
+        	DefaultMutableTreeNode node = ((DefaultMutableTreeNode)currentSelection.getLastPathComponent());
+        	if (node.getNextSibling() != null) { 
+        		return (Element)node.getNextSibling().getUserObject();
+        	}
+        	if (node.getPreviousSibling() != null) { 
+        		return (Element)node.getPreviousSibling().getUserObject();
+        	}
+        }
+		
+		return null;
+	}
+	
 	
 	public void selectElement(Element elem) {
 		jtree.clearSelection();

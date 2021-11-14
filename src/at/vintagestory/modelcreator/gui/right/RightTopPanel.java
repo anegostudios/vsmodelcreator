@@ -42,7 +42,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 	public RightTopPanel(ModelCreator creator)
 	{
 		this.creator = creator;
-		setPreferredSize(new Dimension(215, 1250));
+		setPreferredSize(new Dimension(215, 1450));
 		initComponents();
 		setLayout(dy);
 	}
@@ -119,7 +119,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 		tabbedPane.add("Keyframe", rightKeyFramesPanel = new RightKeyFramesPanel());
 		tabbedPane.add("P", new AttachmentPointsPanel());
 		
-		tabbedPane.setPreferredSize(new Dimension(205, 850));
+		tabbedPane.setPreferredSize(new Dimension(205, 1150));
 		tabbedPane.setTabPlacement(JTabbedPane.TOP);
 		
 		tabbedPane.addChangeListener(c ->

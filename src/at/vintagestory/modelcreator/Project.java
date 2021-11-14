@@ -245,6 +245,7 @@ public class Project
 		ModelCreator.ignoreDidModify = true;
 		
 		Element curElem = SelectedElement;
+		Element nextElem = tree.getNextSelectedElement();
 		
 		tree.removeCurrentElement();
 		
@@ -263,6 +264,10 @@ public class Project
 		curElem.onRemoved();
 		
 		ModelCreator.ignoreDidModify = false;
+		
+		if (nextElem != null) {
+			tree.selectElement(nextElem);
+		}
 		
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.DidModify();

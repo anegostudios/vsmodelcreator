@@ -86,6 +86,11 @@ public class GuiMenu extends JMenuBar
 	private JCheckBoxMenuItem itemSaratyMode;
 	private JCheckBoxMenuItem itemuvShowNames;
 	
+	private JMenuItem itemPreviewWind;
+	private JMenuItem itemPreviewWindOff;
+	private JMenuItem itemPreviewWindSelected;
+	private JMenuItem itemPreviewWindAll;
+	
 	
 
 	/* Tools */
@@ -186,6 +191,15 @@ public class GuiMenu extends JMenuBar
 			
 			itemuvShowNames = createCheckboxItem("Show element names in UV editor", "When enabled, will display the name of the element in the UV editor", KeyEvent.VK_D,Icons.transparent);
 			itemuvShowNames.setSelected(ModelCreator.uvShowNames);
+			
+			itemPreviewWind = new JMenu("Wind preview");
+			itemPreviewWind.setIcon(Icons.wind);
+			itemPreviewWind.setToolTipText("Makes elements sway if configured so, please not that the sway is not the same as in game");
+			{
+				itemPreviewWindOff = createItem("Off", null, KeyEvent.VK_B, Icons.clear);
+				itemPreviewWindSelected = createItem("Only selected element", null, KeyEvent.VK_B, Icons.wind);
+				itemPreviewWindAll = createItem("All elements", null, KeyEvent.VK_B, Icons.wind);
+			}
 		}
 		
 		
@@ -236,6 +250,12 @@ public class GuiMenu extends JMenuBar
 		menuView.add(itemDarkMode);
 		menuView.add(itemSaratyMode);
 		menuView.add(itemuvShowNames);
+		
+		menuView.add(itemPreviewWind);
+		itemPreviewWind.add(itemPreviewWindOff);
+		itemPreviewWind.add(itemPreviewWindSelected);
+		itemPreviewWind.add(itemPreviewWindAll);
+		
 
 		menuProject.add(itemUnlockAngles);
 		menuProject.add(itemSingleTexture);
@@ -564,6 +584,20 @@ public class GuiMenu extends JMenuBar
 			ModelCreator.uvShowNames = itemuvShowNames.isSelected();
 			ModelCreator.prefs.putBoolean("uvShowNames", ModelCreator.uvShowNames);
 		});
+		
+		itemPreviewWindAll.addActionListener(a ->
+		{
+			ModelCreator.WindPreview = 2;
+		});
+		itemPreviewWindOff.addActionListener(a ->
+		{
+			ModelCreator.WindPreview = 0;
+		});
+		itemPreviewWindSelected.addActionListener(a ->
+		{
+			ModelCreator.WindPreview = 1;
+		});
+		
 		
 		itemUnlockAngles.addActionListener(a ->
 		{

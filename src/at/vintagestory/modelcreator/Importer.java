@@ -475,11 +475,16 @@ public class Importer
 				element.setRenderPass(obj.get("renderPass").getAsInt());
 			}
 			
-			if (obj.has("foliageWaveSpecial") && obj.get("foliageWaveSpecial").isJsonPrimitive())
+			/*if (obj.has("windMode") && obj.get("windMode").isJsonPrimitive())
 			{
-				element.FoliageWaveSpecial = obj.get("foliageWaveSpecial").getAsInt();
+				element.windMode = obj.get("windMode").getAsInt();
 			}
 
+			if (obj.has("windData") && obj.get("windData").isJsonPrimitive())
+			{
+				element.windData = obj.get("windData").getAsInt();
+			}*/
+			
 			if (obj.has("disableRandomDrawOffset") && obj.get("disableRandomDrawOffset").isJsonPrimitive())
 			{
 				element.DisableRandomDrawOffset = obj.get("disableRandomDrawOffset").getAsBoolean();
@@ -646,6 +651,15 @@ public class Importer
 			if (obj.has("enabled")) {
 				boolean enabled = obj.get("enabled").getAsBoolean();
 				face.setEnabled(enabled);
+			}
+			
+			if (obj.has("windMode") && obj.get("windMode").isJsonArray()) {
+				JsonArray modes = obj.get("windMode").getAsJsonArray();
+				face.WindModes = new int[] { modes.get(0).getAsInt(), modes.get(1).getAsInt(), modes.get(2).getAsInt(), modes.get(3).getAsInt() };				
+			}
+			if (obj.has("windData") && obj.get("windData").isJsonArray()) {
+				JsonArray modes = obj.get("windData").getAsJsonArray();
+				face.WindData = new int[] { modes.get(0).getAsInt(), modes.get(1).getAsInt(), modes.get(2).getAsInt(), modes.get(3).getAsInt() };				
 			}
 		}
 	}

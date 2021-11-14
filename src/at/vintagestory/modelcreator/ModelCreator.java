@@ -132,6 +132,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public long prevFrameMillisec;
 	
 	
+	public static double WindWaveCounter;
+	public static int WindPreview;
+	
 	static {
 		prefs = Preferences.userRoot().node("ModelCreator");
 	}
@@ -448,6 +451,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 			
 			frameCounter++;
+			
+			WindWaveCounter = (frameCounter / 60.0) % 2000;
 			
 			synchronized (pendingTextures)
 			{

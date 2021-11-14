@@ -14,6 +14,7 @@ import org.newdawn.slick.Color;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
+import at.vintagestory.modelcreator.util.Mat4f;
 
 public class KeyFrameElement implements IDrawable
 {
@@ -112,6 +113,7 @@ public class KeyFrameElement implements IDrawable
 		double startY = AnimatedElement.startY + getOffsetY();
 		double startZ = AnimatedElement.startZ + getOffsetZ();
 		
+		float[] matrix = Mat4f.Create();
 		
 		GL11.glPushMatrix();
 		{
@@ -134,7 +136,7 @@ public class KeyFrameElement implements IDrawable
 				Color c = Face.ColorsByFace[i];
 				GL11.glColor3f(c.r * b, c.g * b, c.b * b);
 								
-				AnimatedElement.faces[i].renderFace(BlockFacing.ALLFACES[i], b);
+				AnimatedElement.faces[i].renderFace(BlockFacing.ALLFACES[i], b, false, matrix);
 			}
 			GL11.glLoadName(0);
 			

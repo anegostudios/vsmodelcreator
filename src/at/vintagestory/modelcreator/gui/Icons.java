@@ -39,6 +39,7 @@ public class Icons
 	public static Icon reload;
 	public static Icon keyboard;
 	public static Icon drink;
+	public static Icon wind;
 
 	
 	public static Icon arrow_up_x;
@@ -74,6 +75,7 @@ public class Icons
 	{	
 		ClassLoader loader = clazz.getClassLoader();
 		
+		wind = new ImageIcon(loader.getResource("icons/wind.png"));
 		cube = new ImageIcon(loader.getResource("icons/cube.png"));
 		inout = new ImageIcon(loader.getResource("icons/arrow_inout.png"));
 		rainbow = new ImageIcon(loader.getResource("icons/rainbow.png"));

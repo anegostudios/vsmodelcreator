@@ -396,11 +396,17 @@ public class Exporter
 			writer.newLine();
 		}
 		
-		if (cuboid.FoliageWaveSpecial != 0)
+		/*(if (cuboid.windMode > -1)
 		{
-			writer.write(space(indentation) + "\"foliageWaveSpecial\": " + cuboid.FoliageWaveSpecial + ",");
+			writer.write(space(indentation) + "\"windMode\": " + cuboid.windMode + ",");
 			writer.newLine();
 		}
+
+		if (cuboid.windData != 0)
+		{
+			writer.write(space(indentation) + "\"windData\": " + cuboid.windData + ",");
+			writer.newLine();
+		}*/
 
 		if (cuboid.DisableRandomDrawOffset)
 		{
@@ -562,6 +568,12 @@ public class Exporter
 			if (!face.isSnapUvEnabled()) {
 				writer.write(", \"snapUv\": false");
 			}
+			if (face.WindModes != null) {
+				writer.write(", \"windMode\": ["+face.WindModes[0]+","+face.WindModes[1]+","+face.WindModes[2]+","+face.WindModes[3]+"]");
+			}
+			if (face.WindData != null) {
+				writer.write(", \"windData\": ["+face.WindData[0]+","+face.WindData[1]+","+face.WindData[2]+","+face.WindData[3]+"]");
+			}			
 			
 			writer.write(" }");
 			if (face.getSide() != cuboid.getLastValidFace())
