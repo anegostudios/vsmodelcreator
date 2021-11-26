@@ -264,6 +264,10 @@ public class Exporter
 			collapseKeyFrameElements(kElem.ChildElements, kfList);
 		}		
 	}
+	
+	double rndVal(double value) {
+		return (double)Math.round(value * 1000d) / 1000d;
+	}
 
 
 	private void writeKeyFrameElement(BufferedWriter writer, KeyFrameElement kElem, int indent) throws IOException
@@ -283,9 +287,9 @@ public class Exporter
 			if (bla) {
 				writer.write(", ");
 			}
-			writer.write("\"rotationX\": " + kElem.getRotationX());
-			writer.write(", \"rotationY\": " + kElem.getRotationY());
-			writer.write(", \"rotationZ\": " + kElem.getRotationZ());
+			writer.write("\"rotationX\": " + rndVal(kElem.getRotationX()));
+			writer.write(", \"rotationY\": " + rndVal(kElem.getRotationY()));
+			writer.write(", \"rotationZ\": " + rndVal(kElem.getRotationZ()));
 			bla = true;
 		}
 		
@@ -503,9 +507,9 @@ public class Exporter
 		writer.write("\"posZ\": \"" + point.getPosZ() + "\",");
 		
 		writer.newLine();
-		writer.write(space(indentation) + "\"rotationX\": \"" + point.getRotationX() + "\",");
-		writer.write("\"rotationY\": \"" + point.getRotationY() + "\",");
-		writer.write("\"rotationZ\": \"" + point.getRotationZ() + "\"");
+		writer.write(space(indentation) + "\"rotationX\": \"" + rndVal(point.getRotationX()) + "\",");
+		writer.write("\"rotationY\": \"" + rndVal(point.getRotationY()) + "\",");
+		writer.write("\"rotationZ\": \"" + rndVal(point.getRotationZ()) + "\"");
 		
 		indentation--;
 		
@@ -539,9 +543,9 @@ public class Exporter
 	{
 		writer.write(space(indentation) + "\"rotationOrigin\": [ " + d2s(cuboid.getOriginX()) + ", " + d2s(cuboid.getOriginY()) + ", " + d2s(cuboid.getOriginZ()) + " ],");
 		writer.newLine();
-		if (cuboid.getRotationX() != 0) { writer.write(space(indentation) + "\"rotationX\": " + cuboid.getRotationX() + ","); writer.newLine(); }
-		if (cuboid.getRotationY() != 0) { writer.write(space(indentation) + "\"rotationY\": " + cuboid.getRotationY() + ","); writer.newLine(); }
-		if (cuboid.getRotationZ() != 0) { writer.write(space(indentation) + "\"rotationZ\": " + cuboid.getRotationZ() + ","); writer.newLine(); }
+		if (cuboid.getRotationX() != 0) { writer.write(space(indentation) + "\"rotationX\": " + rndVal(cuboid.getRotationX()) + ","); writer.newLine(); }
+		if (cuboid.getRotationY() != 0) { writer.write(space(indentation) + "\"rotationY\": " + rndVal(cuboid.getRotationY()) + ","); writer.newLine(); }
+		if (cuboid.getRotationZ() != 0) { writer.write(space(indentation) + "\"rotationZ\": " + rndVal(cuboid.getRotationZ()) + ","); writer.newLine(); }
 	}
 
 	private void writeFaces(BufferedWriter writer, Element cuboid, int indentation) throws IOException

@@ -58,6 +58,9 @@ public class ElementTree
 				
 				if (!ModelCreator.ignoreValueUpdates) {
 					ModelCreator.currentProject.SelectedElement = getSelectedElement();
+					if (ModelCreator.currentProject.SelectedElement != null) {
+						ModelCreator.currentProject.SelectedElement.elementWasSelected();
+					}
 					ModelCreator.updateValues(jtree);	
 				}
 			}	

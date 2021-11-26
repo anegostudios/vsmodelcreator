@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.lwjgl.BufferUtils;
@@ -78,12 +79,18 @@ public class Face
             -1, -1,  1
     };
 	
+	
 	public static int[] cubeUVCoords = {
-            // North
-            1, 0,
+			// North ... this is has flipped V -.-
+            /*1, 0,
             1, 1,
             0, 1,
+            0, 0,*/
+			
+			1, 1,
+            1, 0,
             0, 0,
+            0, 1,
 
             // East 
             1, 1,
@@ -91,17 +98,27 @@ public class Face
             0, 0,
             0, 1,
 
-            // South
-            0, 0,
+            // South ... this is has flipped u and v -.-
+            /*0, 0,
             1, 0,
             1, 1,
-            0, 1,
+            0, 1,*/
             
-            // West
+            0, 1,
+            1, 1,
+            1, 0,
             0, 0,
+            
+            // West ... flipped V
+           /* 0, 0,
             1, 0,
             1, 1,
+            0, 1,*/
+            
             0, 1,
+            1, 1,
+            1, 0,
+            0, 0,
 
             // Top face
             0, 0,
@@ -115,11 +132,11 @@ public class Face
             1, 1,
             1, 1,*/
 
-            // Bottom face
-            1, 1,
-            0, 1,
-            0, 0,
+            // Bottom face - flipped V
             1, 0,
+            0, 0,
+            0, 1,
+            1, 1
 	};
 
 	
@@ -185,9 +202,9 @@ public class Face
 	public void renderFace(BlockFacing blockFacing, float brightness, boolean windAnimate, float[] matrix)
 	{	
 		Project project = getProject();
-		TextureEntry entry = project == null ? null : project.getTextureEntryByCode(textureCode);
+		TextureEntry entry = project == null ? null : project.getTextureEntryByCode(textureCode);	
 		
-
+		
 		GL11.glPushMatrix();
 		{
 			if (!isInBackdropProject) GL11.glLoadName(openGlName);
@@ -248,36 +265,31 @@ public class Face
 					
 					double offX = 0;
 					double heightBend = 0;
-					if (windAnimate && WindModes != null && WindModes[c] > 0) {
+					if (WindModes != null && WindModes[c] > 0) {
 						
 						float[] facematrix = Mat4f.Translate(new float[16], matrix, new float[] {0,0,0});
 						float[] sdf = Mat4f.MulWithVec4(facematrix, new float[] { x, y, z, 1 });
 						float ypos = sdf[1] / 16f;
 						float yfract = Math.abs(ypos - (int)ypos);
 						
-						if (WindData != null || (WindData == null && (int)ypos > 0)) {
-							if (WindData == null) WindData = new int[4];
-							int prev = WindData[c];
-							int now = (int)ypos;
-							if (prev != now) {
-								WindData[c] = now;
-								ModelCreator.updateValues(null);
-								ModelCreator.DidModify();
-							}
-							
-							heightBend = WindData[c];
-						}
-						
+						heightBend = 0;
+						if (WindData != null) heightBend = WindData[c];
 						heightBend += yfract;
 						
-						offX = heightBend * 16 / 7.0 * (0.8 + Math.sin(ModelCreator.WindWaveCounter * 2)) / 2.0;
-						
-						if (WindModes[c] != 4) {
-							double div = 8.0;
-							if (WindModes[c] == 1) div = 30.0;
+						if (windAnimate) {
+							offX = heightBend * 16 / 7.0 * (0.8 + Math.sin(ModelCreator.WindWaveCounter * 1.5)) / 2.0;
+
+							if (WindModes[c]==9) { heightBend=0; offX = 0;}
 							
-							offX += heightBend + Math.sin(ModelCreator.WindWaveCounter * 30) / div;
+							if (WindModes[c] != 4 && WindModes[c] != 5) {
+								double div = 3.0;
+								if (WindModes[c] == 1) div = 10.0;
+								if (WindModes[c] == 7) div = 20.0;
+								
+								offX += heightBend + Math.sin(ModelCreator.WindWaveCounter * 10) / div;
+							}
 						}
+						
 					}
 					
 					float[] invmat = Mat4f.Invert(new float[16], matrix);
@@ -763,6 +775,60 @@ public class Face
 		
 		setEndU(ustart + facewidth); 
 		setEndV(vstart + faceheight);
+		
+	}
+
+	public void AutoguessWindMode(int windMode, int facesEnabled, float[] modelMat)
+	{
+		if (windMode == 0) {
+			this.WindModes = null;
+			return;
+		}
+		
+		if (WindModes == null) {
+			WindModes = new int[4];
+		}
+		
+		Vec3f sizeXyz = new Vec3f(
+            (float)(cuboid.getWidth()) / 1f,
+            (float)(cuboid.getHeight()) / 1f,
+            (float)(cuboid.getDepth()) / 1f
+        );
+		Vec3f centerVec = new Vec3f(sizeXyz.X / 2, sizeXyz.Y / 2, sizeXyz.Z / 2);
+		
+		WindData = new int[4];
+
+		int hereMode = windMode;
+		if (windMode == -1) {
+			hereMode = facesEnabled == 1 || cuboid.name.contains("leaves") ? 7 : 5;
+		}
+		
+		if (windMode == 1 && (cuboid.name.contains("trunk") || cuboid.name.contains("stem"))) hereMode=4;
+		
+		int coordIndex = side * 12;
+		
+		for (int i = 0; i < 4; i++) {
+			
+			float x = centerVec.X + sizeXyz.X * Face.CubeVertices[coordIndex + i*3] / 2;
+			float y = centerVec.Y + sizeXyz.Y * Face.CubeVertices[coordIndex + i*3 + 1] / 2;
+			float z = centerVec.Z + sizeXyz.Z * Face.CubeVertices[coordIndex + i*3 + 2] / 2;
+			
+			float[] facematrix = Mat4f.Translate(new float[16], modelMat, new float[] {0,0,0});
+			float[] sdf = Mat4f.MulWithVec4(facematrix, new float[] { x, y, z, 1 });
+			float ypos = sdf[1] / 16f;
+			
+			WindData[i] = (int)ypos;
+			
+			int mode = 0;
+			if (sdf[1] > 4f) mode = hereMode;
+			
+			
+			WindModes[i] = mode;
+			
+			//if (mode == 1 && (i == 0 || i == 3)) WindModes[i] = 4;
+		}
+		
+		if (WindData[0] == 0 && WindData[1] == 0 && WindData[2] == 0 && WindData[3] == 0) WindData = null;
 		
 	}
 

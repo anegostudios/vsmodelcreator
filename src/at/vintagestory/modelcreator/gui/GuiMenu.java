@@ -28,6 +28,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.util.Mat4f;
 import at.vintagestory.modelcreator.util.UVMapExporter;
 import at.vintagestory.modelcreator.util.screenshot.AnimatedGifCapture;
 import at.vintagestory.modelcreator.util.screenshot.AnimationPngCapture;
@@ -101,6 +102,16 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemGenSnowLayer;
 	private JMenuItem itemuvUnrwapEverything;
 	private JMenuItem itemReduceDecimals;
+	
+	private JMenu itemAutoWind;
+	private JMenuItem itemAutoWindNormal;
+	private JMenuItem itemAutoWindWeak;
+	private JMenuItem itemAutoWindBend;
+	private JMenuItem itemAutoWindTallBend;
+	private JMenuItem itemAutoWindWeakNoBend;
+	private JMenuItem itemAutoWindWeakBend;
+	private JMenuItem itemAutoWindAllOff;
+	
 	private JMenuItem itemRotateModel90Deg;
 	private JMenuItem itemRotateModel90DegClockwise;
 	private JMenuItem itemRotateModel90DegAntiClockwise;
@@ -215,6 +226,23 @@ public class GuiMenu extends JMenuBar
 			itemuvUnrwapEverything = createItem("Unwrap all UVs", "Attempts to unwrap all uvs onto a texture without overlap", KeyEvent.VK_B, Icons.rainbow);
 			itemReduceDecimals = createItem("Reduce decimals", "Reduce all element positions and sizes to one decimal point", KeyEvent.VK_B, Icons.rainbow);
 
+			
+			itemAutoWind = new JMenu("Auto-Guess Wind mode");
+			itemAutoWind.setIcon(Icons.wind);
+			itemAutoWind.setToolTipText("Tries to guess the correct wind mode and wind data on all elements");
+			{
+				itemAutoWindNormal = createItem("Normal wind", "Set to normal wind mode", 0, Icons.wind);
+				itemAutoWindWeak = createItem("Weak wind", "Set to weak wind mode", 0, Icons.wind);
+				itemAutoWindBend = createItem("Bend", "Set to bend wind mode", 0, Icons.wind);
+				itemAutoWindTallBend = createItem("Tall Bend", "Set to bend wind mode", 0, Icons.wind);
+				
+				itemAutoWindWeakBend = createItem("Bend + Weak wind on single faces", "Set to weak wind mode", 0, Icons.wind);
+				
+				itemAutoWindAllOff = createItem("Disable all wind modes", "", 0, Icons.wind);
+				
+				itemAutoWindWeakNoBend= createItem("Weakwind No Bend", "", 0, Icons.wind);
+			}
+			
 			itemRotateModel90Deg = new JMenu("Rotate 90 degrees");
 			itemRotateModel90Deg.setIcon(Icons.arrow_rotate_clockwise);
 			itemRotateModel90Deg.setToolTipText("Rotates the selected elements by 90 degrees");
@@ -283,6 +311,16 @@ public class GuiMenu extends JMenuBar
 		menuTools.add(itemResize);
 		menuTools.add(itemuvUnrwapEverything);
 		menuTools.add(itemReduceDecimals);
+		
+		menuTools.add(itemAutoWind);
+		itemAutoWind.add(itemAutoWindNormal);
+		itemAutoWind.add(itemAutoWindWeak);
+		itemAutoWind.add(itemAutoWindBend);
+		itemAutoWind.add(itemAutoWindTallBend);
+		itemAutoWind.add(itemAutoWindWeakNoBend);
+		itemAutoWind.add(itemAutoWindWeakBend);
+		itemAutoWind.add(itemAutoWindAllOff);
+		
 		menuTools.add(itemRotateModel90Deg);
 		itemRotateModel90Deg.add(itemRotateModel90DegClockwise);
 		itemRotateModel90Deg.add(itemRotateModel90DegAntiClockwise);
@@ -610,7 +648,6 @@ public class GuiMenu extends JMenuBar
 		itemSingleTexture.addActionListener(a ->
 		{
 			ModelCreator.currentProject.EntityTextureMode = itemSingleTexture.isSelected();
-			//if (ModelCreator.currentProject.EntityTextureMode) ModelCreator.currentProject.applySingleTextureMode();
 			ModelCreator.DidModify();
 			ModelCreator.updateValues(itemSingleTexture);
 		});
@@ -622,6 +659,102 @@ public class GuiMenu extends JMenuBar
 		itemResize.addActionListener(a -> {
 			ResizeDialog.show(creator);
 		});
+		
+		
+		
+		itemAutoWindNormal.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(2, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindWeak.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(1, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindBend.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(4, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindTallBend.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(5, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindAllOff.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(0, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindWeakNoBend.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(9, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindWeakBend.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(-1, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+
+		
+		
 
 		itemRotateModel90DegClockwise.addActionListener(a -> {
 			Element elem = ModelCreator.currentProject.SelectedElement;

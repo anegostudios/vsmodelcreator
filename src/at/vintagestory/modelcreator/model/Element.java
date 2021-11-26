@@ -58,7 +58,7 @@ public class Element implements IDrawable
 	protected boolean renderInEditor = true;
 	
 	// Face Variables
-	protected int selectedFace = 0;
+	protected int selectedFace = -1;
 	protected Face[] faces = new Face[6];
 	private double texUStart;
 	private double texVStart;
@@ -1746,6 +1746,44 @@ public class Element implements IDrawable
 		for (Element elem : ChildElements) { 
 			elem.reduceDecimals();
 		}
+	}
+
+	public void AutoguessWindMode(int windMode, float[] modelMat)
+	{
+		float[] childModelMat = modelMat.clone();
+		ApplyTransform(childModelMat);
+		
+		int facesEnabled = 0;
+		for (Face face : faces) {
+			if (!face.isEnabled()) continue;
+			facesEnabled++;
+		}
+		
+		for (Face face : faces) {
+			if (!face.isEnabled()) continue;
+			
+			face.AutoguessWindMode(windMode, facesEnabled, childModelMat);
+		}
+		
+		for (Element elem : ChildElements) { 
+			elem.AutoguessWindMode(windMode, childModelMat);
+		}
+		
+	}
+
+	public void elementWasSelected()
+	{
+		if (selectedFace >= 0) return;
+		
+		for (Face face : faces) {
+			if (!face.isEnabled()) continue;
+			
+			selectedFace = face.getSide();
+			return;
+		}
+		
+		selectedFace = 0;
+		
 	}
 	
 	

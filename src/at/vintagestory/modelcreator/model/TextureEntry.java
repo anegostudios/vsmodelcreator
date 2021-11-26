@@ -110,9 +110,17 @@ public class TextureEntry
 		return filePath;
 	}
 	
+	// LwJgl upsizes all textures to 2^n
+	public float LwJglFuckeryScaleW() {
+		return (float)Width / texture.getTextureWidth();
+	}
+	
+	public float LwJglFuckeryScaleH() {
+		return (float)Height / texture.getTextureHeight();
+	}
 	
 	public float VoxelWidthWithLwJglFuckery(Project project) {
-		float scale = (float)Width / texture.getTextureWidth(); 
+		float scale = LwJglFuckeryScaleW(); 
 		
 		int[] size = project.TextureSizes.get(code);
 		if (size != null) {
@@ -123,7 +131,7 @@ public class TextureEntry
 	}
 	
 	public float VoxelHeighthWithLwJglFuckery(Project project) {
-		float scale = (float)Height / texture.getTextureHeight();
+		float scale = LwJglFuckeryScaleH();
 		
 		int[] size = project.TextureSizes.get(code);
 		if (size != null) {
