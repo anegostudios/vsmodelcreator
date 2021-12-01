@@ -110,6 +110,7 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemAutoWindTallBend;
 	private JMenuItem itemAutoWindWeakNoBend;
 	private JMenuItem itemAutoWindWeakBend;
+	private JMenuItem itemAutoWindExtraWeak;
 	private JMenuItem itemAutoWindAllOff;
 	
 	private JMenuItem itemRotateModel90Deg;
@@ -239,7 +240,7 @@ public class GuiMenu extends JMenuBar
 				itemAutoWindWeakBend = createItem("Bend + Weak wind on single faces", "Set to weak wind mode", 0, Icons.wind);
 				
 				itemAutoWindAllOff = createItem("Disable all wind modes", "", 0, Icons.wind);
-				
+				itemAutoWindExtraWeak= createItem("Extra Weak wind", "", 0, Icons.wind);
 				itemAutoWindWeakNoBend= createItem("Weakwind No Bend", "", 0, Icons.wind);
 			}
 			
@@ -320,6 +321,7 @@ public class GuiMenu extends JMenuBar
 		itemAutoWind.add(itemAutoWindWeakNoBend);
 		itemAutoWind.add(itemAutoWindWeakBend);
 		itemAutoWind.add(itemAutoWindAllOff);
+		itemAutoWind.add(itemAutoWindExtraWeak);
 		
 		menuTools.add(itemRotateModel90Deg);
 		itemRotateModel90Deg.add(itemRotateModel90DegClockwise);
@@ -706,6 +708,20 @@ public class GuiMenu extends JMenuBar
 			
 			for (Element elem : ModelCreator.currentProject.rootElements) {
 				elem.AutoguessWindMode(5, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+
+		
+		itemAutoWindExtraWeak.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(7, Mat4f.Create());
 			}
 			
 			ModelCreator.ignoreDidModify = false;

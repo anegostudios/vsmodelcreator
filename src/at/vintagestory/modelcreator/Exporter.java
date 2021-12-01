@@ -390,7 +390,7 @@ public class Exporter
 		}
 		
 		if (cuboid.getZOffset() != 0) {
-			writer.write(space(indentation) + "\"zOffset\": \"" + cuboid.getZOffset() + "\",");
+			writer.write(space(indentation) + "\"zOffset\": " + cuboid.getZOffset() + ",");
 			writer.newLine();
 		}
 		
@@ -527,6 +527,9 @@ public class Exporter
 	private void writeShade(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
 		writer.write(space(indentation) + "\"shade\": " + cuboid.isShaded() + ",");
+		if (cuboid.isGradientShaded()) {
+			writer.write(space(indentation) + "\"gradientShade\": " + cuboid.isGradientShaded() + ",");	
+		}
 	}
 
 	private void writeReflective(BufferedWriter writer, Element cuboid, int indentation) throws IOException

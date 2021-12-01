@@ -432,8 +432,13 @@ public class LeftUVSidebar extends LeftSidebar
 					// Texture
 					face.bindTexture();
 					
-					float u = face.getTextureEntry().LwJglFuckeryScaleW();
-					float v = face.getTextureEntry().LwJglFuckeryScaleH();
+					float u=1, v=1;
+					
+					TextureEntry entry = face.getTextureEntry();
+					if (entry != null) {
+						u = entry.LwJglFuckeryScaleW();
+						v = entry.LwJglFuckeryScaleH();
+					}
 
 					glBegin(GL_QUADS);
 					{

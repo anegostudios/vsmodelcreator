@@ -800,7 +800,7 @@ public class Face
 
 		int hereMode = windMode;
 		if (windMode == -1) {
-			hereMode = facesEnabled == 1 || cuboid.name.contains("leaves") ? 7 : 5;
+			hereMode = facesEnabled == 1 || cuboid.name.contains("leaves") ? 1 : 4;
 		}
 		
 		if (windMode == 1 && (cuboid.name.contains("trunk") || cuboid.name.contains("stem"))) hereMode=4;
@@ -820,7 +820,7 @@ public class Face
 			WindData[i] = (int)ypos;
 			
 			int mode = 0;
-			if (sdf[1] > 4f) mode = hereMode;
+			if (sdf[1] > 3f) mode = hereMode;
 			
 			
 			WindModes[i] = mode;
