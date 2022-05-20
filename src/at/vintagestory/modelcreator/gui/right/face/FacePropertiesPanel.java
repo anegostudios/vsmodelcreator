@@ -48,6 +48,8 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 	@SuppressWarnings("unchecked")
 	private JComboBox<String>[] windModeList = (JComboBox<String>[]) Array.newInstance(bla.getClass(), 4);
 
+	private JComboBox<String> reflectiveMode;
+	
 	public FacePropertiesPanel(IElementManager manager)
 	{
 		this.manager = manager;
@@ -144,6 +146,29 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 		horizontalBox.add(boxSnapUv);
 		horizontalBox.add(new JLabel("Glow Level (0..255)"));
 		horizontalBox.add(glowValue);
+		
+		horizontalBox.add(new JLabel("Reflective Mode"));
+		
+		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
+		model.addElement("Not reflective");
+		model.addElement("Weakly random reflective");
+		model.addElement("Weakly reflective");
+		model.addElement("Strongly reflective");
+		
+		reflectiveMode = new JComboBox<String>();
+		reflectiveMode.setModel(model);
+		reflectiveMode.setToolTipText("Sets the reflectivity of the face.");
+		reflectiveMode.addActionListener(e ->
+		{
+			if (ModelCreator.ignoreValueUpdates) return;
+			if (manager.getCurrentElement() != null)
+			{
+				manager.getCurrentElement().getSelectedFace().setReflectiveMode(reflectiveMode.getSelectedIndex());
+				updateValues(reflectiveMode);
+			}
+		});
+		
+		horizontalBox.add(reflectiveMode);
 		
 		for (int i = 0; i < 4; i++) {
 			int index=i;
@@ -404,6 +429,7 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 		model.addElement("<html><b>ExtraWeakWind</b></html>"); // 7
 		model.addElement("<html><b>Fruit</b></html>");         // 8
 		model.addElement("<html><b>WeakWindNoBend</b></html>");         // 9
+		model.addElement("<html><b>Inverse Bend (Vines)</b></html>");         // 10
 		
 		return model;
 	}

@@ -361,6 +361,11 @@ public class Importer
 			kelem.setStretchZ(obj.get("stretchZ").getAsDouble());
 		}
 		
+		if (obj.has("rotShortestDistance")) {
+			kelem.RotShortestDistance = obj.get("rotShortestDistance").getAsBoolean();
+		}
+	
+		
 		return kelem;
 	}
 
@@ -444,11 +449,6 @@ public class Importer
 				element.setShade(obj.get("shade").getAsBoolean());
 			}
 			
-			element.setReflective(false);
-			if (obj.has("reflective") && obj.get("reflective").isJsonPrimitive())
-			{
-				element.setReflective(obj.get("reflective").getAsBoolean());
-			}
 			
 			if (obj.has("gradientShade") && obj.get("gradientShade").isJsonPrimitive())
 			{
@@ -475,15 +475,6 @@ public class Importer
 				element.setRenderPass(obj.get("renderPass").getAsInt());
 			}
 			
-			/*if (obj.has("windMode") && obj.get("windMode").isJsonPrimitive())
-			{
-				element.windMode = obj.get("windMode").getAsInt();
-			}
-
-			if (obj.has("windData") && obj.get("windData").isJsonPrimitive())
-			{
-				element.windData = obj.get("windData").getAsInt();
-			}*/
 			
 			if (obj.has("disableRandomDrawOffset") && obj.get("disableRandomDrawOffset").isJsonPrimitive())
 			{
@@ -646,6 +637,12 @@ public class Importer
 			if (obj.has("glow") && obj.get("glow").isJsonPrimitive())
 			{
 				face.setGlow(((int) obj.get("glow").getAsInt()));
+			}
+
+			face.setReflectiveMode(0);
+			if (obj.has("reflective") && obj.get("reflective").isJsonPrimitive())
+			{
+				face.setReflectiveMode(obj.get("reflective").getAsInt());
 			}
 
 			if (obj.has("enabled")) {

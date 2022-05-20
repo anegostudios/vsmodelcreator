@@ -162,6 +162,8 @@ public class Face
 	
 	public int HoveredVertex=-1;
 	
+	public int reflectiveMode;
+	
 	
 	public boolean isInBackdropProject;
 	
@@ -822,14 +824,17 @@ public class Face
 			int mode = 0;
 			if (sdf[1] > 3f) mode = hereMode;
 			
-			
 			WindModes[i] = mode;
-			
-			//if (mode == 1 && (i == 0 || i == 3)) WindModes[i] = 4;
 		}
 		
 		if (WindData[0] == 0 && WindData[1] == 0 && WindData[2] == 0 && WindData[3] == 0) WindData = null;
 		
+	}
+
+	public void setReflectiveMode(int selectedIndex)
+	{
+		this.reflectiveMode = selectedIndex;
+		ModelCreator.DidModify();
 	}
 
 }

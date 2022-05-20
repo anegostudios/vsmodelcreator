@@ -124,8 +124,6 @@ public class AnimationSelector
 		buttonPanel.setPreferredSize(new Dimension(233, 30));
 		
 		
-		
-		
 		JButton btnSelect = new JButton("New");
 		btnSelect.addActionListener(a ->
 		{
@@ -246,7 +244,6 @@ public class AnimationSelector
 				if (anim == null) return;
 				
 				if (anim.getCode() != null && anim.getCode().equals(codeField.getText())) return;
-				
 				
 				anim.setCode(codeField.getText());
 				ModelCreator.updateValues(codeField);

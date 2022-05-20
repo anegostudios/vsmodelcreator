@@ -136,7 +136,12 @@ public class TextureSizeDialog
 					if (((scale * width) % 8) != 0 || ((scale * height) % 8) != 0) {
 						JOptionPane.showMessageDialog(null, "Width and Height, multiplied with the scale, must be a multiple of 8!", "Invalid values", JOptionPane.ERROR_MESSAGE, null);
 						return;
-					}					
+					}
+					
+					if (textureSizes.size() == 1) {
+						ModelCreator.currentProject.TextureWidth = width;
+						ModelCreator.currentProject.TextureHeight = height;
+					}
 				}
 				
 				boolean didChange = false;

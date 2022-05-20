@@ -83,6 +83,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	
 	public static boolean showGrid = true;
+	public static boolean showShade = true;
 	public static boolean transparent = true;
 	public static boolean renderTexture = true;
 	public static boolean autoreloadTexture = true;
