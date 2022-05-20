@@ -6,7 +6,7 @@
     <property name="dir.buildfile" value="."/>
     <property name="dir.workspace" value="C:/Users/Tyron/eclipse-workspace"/>
     <property name="dir.jarfile" value="${dir.buildfile}/output-jar"/>
-    <target name="create_run_jar">
+    <target name="create_run_jar_win32">
         <jar destfile="${dir.jarfile}/vsmodelcreator.jar">
             <manifest>
                 <attribute name="Main-Class" value="at.vintagestory.modelcreator.Start"/>
@@ -21,6 +21,24 @@
         <copy file="${dir.buildfile}/libs/lwjgl_util.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
         <copy file="${dir.buildfile}/libs/lwjgl.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
         <copy file="${dir.buildfile}/libs/slick-util.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
-        <copy file="${dir.buildfile}/libs/swt.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/native/windows/swt.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
     </target>
+    <target name="create_run_jar_linux">
+        <jar destfile="${dir.jarfile}/vsmodelcreator.jar">
+            <manifest>
+                <attribute name="Main-Class" value="at.vintagestory.modelcreator.Start"/>
+                <attribute name="Class-Path" value=". vsmodelcreator_lib/gson-2.3.1.jar vsmodelcreator_lib/JTattoo-1.6.11.jar vsmodelcreator_lib/lwjgl_util.jar vsmodelcreator_lib/lwjgl.jar vsmodelcreator_lib/slick-util.jar vsmodelcreator_lib/swt.jar"/>
+            </manifest>
+            <fileset dir="${dir.buildfile}/bin"/>
+        </jar>
+        <delete dir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <mkdir dir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/gson-2.3.1.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/JTattoo-1.6.11.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/lwjgl_util.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/lwjgl.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/slick-util.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/native/linux/swt-gtk4.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+    </target>
+    
 </project>
