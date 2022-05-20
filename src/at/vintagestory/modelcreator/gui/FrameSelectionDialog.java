@@ -41,20 +41,11 @@ public class FrameSelectionDialog
 		}
 			
 		
-		
 		panelRow1.add(frameTextFiel);
-		
 		
 		container.add(panelRow1, BorderLayout.CENTER);
 		
-		
-		
-		
-		
-		
 		JPanel panelRow2 = new JPanel(new GridLayout(1, 2, 15, 0));
-		
-
 		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setIcon(Icons.clear);
@@ -71,6 +62,11 @@ public class FrameSelectionDialog
 		btnDuplicate.addActionListener(a ->
 		{
 			int forFrame = Integer.parseInt(frameTextFiel.getText());
+			
+			if (forFrame < 0) {
+				JOptionPane.showMessageDialog(null, "Must be a positive frame number");
+				return;
+			}
 			
 			for (int i = 0; i < ModelCreator.currentProject.SelectedAnimation.keyframes.length; i++) {
 				Keyframe keyframe = ModelCreator.currentProject.SelectedAnimation.keyframes[i];

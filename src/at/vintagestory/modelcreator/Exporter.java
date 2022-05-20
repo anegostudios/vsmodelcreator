@@ -300,7 +300,16 @@ public class Exporter
 			writer.write("\"stretchX\": " + kElem.getStretchX());
 			writer.write(", \"stretchY\": " + kElem.getStretchY());
 			writer.write(", \"stretchZ\": " + kElem.getStretchZ());
+			bla=true;
 		}
+		
+		if (kElem.RotShortestDistance) {
+			if (bla) {
+				writer.write(", ");
+			}
+			writer.write("\"rotShortestDistance\": true");
+		}
+		
 		
 		writer.write(" }");
 	}
@@ -366,11 +375,6 @@ public class Exporter
 			writeShade(writer, cuboid, indentation);
 			writer.newLine();
 		}
-		if (cuboid.isReflective())
-		{
-			writeReflective(writer, cuboid, indentation);
-			writer.newLine();
-		}
 		if (cuboid.isGradientShaded())
 		{
 			writeGradientShade(writer, cuboid, indentation);
@@ -399,18 +403,6 @@ public class Exporter
 			writer.write(space(indentation) + "\"renderPass\": " + cuboid.getRenderPass() + ",");
 			writer.newLine();
 		}
-		
-		/*(if (cuboid.windMode > -1)
-		{
-			writer.write(space(indentation) + "\"windMode\": " + cuboid.windMode + ",");
-			writer.newLine();
-		}
-
-		if (cuboid.windData != 0)
-		{
-			writer.write(space(indentation) + "\"windData\": " + cuboid.windData + ",");
-			writer.newLine();
-		}*/
 
 		if (cuboid.DisableRandomDrawOffset)
 		{
@@ -532,10 +524,6 @@ public class Exporter
 		}
 	}
 
-	private void writeReflective(BufferedWriter writer, Element cuboid, int indentation) throws IOException
-	{
-		writer.write(space(indentation) + "\"reflective\": " + cuboid.isReflective() + ",");
-	}
 
 	private void writeGradientShade(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
@@ -581,6 +569,9 @@ public class Exporter
 			if (face.WindData != null) {
 				writer.write(", \"windData\": ["+face.WindData[0]+","+face.WindData[1]+","+face.WindData[2]+","+face.WindData[3]+"]");
 			}			
+			if (face.reflectiveMode > 0) {
+				writer.write(", \"reflectiveMode\": " + face.reflectiveMode);
+			}
 			
 			writer.write(" }");
 			if (face.getSide() != cuboid.getLastValidFace())

@@ -73,12 +73,11 @@ public class Element implements IDrawable
 	protected double rotationX = 0;
 	protected double rotationY = 0;
 	protected double rotationZ = 0;
-	
 	protected boolean rescale = false;
 
 	// Extra Variables
 	protected boolean shade = true;
-	protected boolean reflective = false;
+	
 	protected boolean gradientShade = false;
 	protected String climateColorMap = null;
 	protected String seasonColorMap = null;
@@ -381,7 +380,7 @@ public class Element implements IDrawable
 
 				if (!faces[i].isEnabled()) continue;
 
-				b = brightnessByFace[BlockFacing.ALLFACES[i].GetIndex()];
+				b = ModelCreator.showShade ? brightnessByFace[BlockFacing.ALLFACES[i].GetIndex()] : 1;
 				Color c = Face.ColorsByFace[i];
 				GL11.glColor3f(c.r * b, c.g * b, c.b * b);
 								
@@ -1275,11 +1274,6 @@ public class Element implements IDrawable
 		return shade;
 	}
 	
-	public boolean isReflective()
-	{
-		return reflective;
-	}
-	
 	public boolean isGradientShaded()
 	{
 		return gradientShade;
@@ -1293,15 +1287,7 @@ public class Element implements IDrawable
 		recalculateBrightnessValues();
 		ModelCreator.DidModify();
 	}
-	
-	
-	public void setReflective(boolean reflective)
-	{
-		if (this.reflective == reflective) return;
-		
-		this.reflective = reflective;
-		ModelCreator.DidModify();
-	}
+
 	
 	public void setGradientShade(boolean shade)
 	{
@@ -1357,19 +1343,6 @@ public class Element implements IDrawable
 		
 		this.renderPass = pass;
 	}
-	
-	public int getWindMode()
-	{
-		return windMode;
-	}
-
-	public void setWindMode(int mode)
-	{
-		if (this.windMode == mode) return;
-		
-		this.windMode = mode;
-	}
-
 	
 	public Element clone() {
 		Element cloned = new Element();

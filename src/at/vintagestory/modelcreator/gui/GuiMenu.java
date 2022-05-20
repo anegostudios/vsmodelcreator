@@ -86,6 +86,7 @@ public class GuiMenu extends JMenuBar
 	private JCheckBoxMenuItem itemDarkMode;	
 	private JCheckBoxMenuItem itemSaratyMode;
 	private JCheckBoxMenuItem itemuvShowNames;
+	private JCheckBoxMenuItem itemShowShade;
 	
 	private JMenuItem itemPreviewWind;
 	private JMenuItem itemPreviewWindOff;
@@ -178,6 +179,10 @@ public class GuiMenu extends JMenuBar
 			itemSingleTexture = createCheckboxItem("Entity Texturing Mode", "When creating entities, it is often more useful to use only a single texture and have the uv boxes unwrap side by side.", 0, Icons.transparent);
 			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);
 			
+			itemSaratyMode = createCheckboxItem("Saraty Mode", "When enabled, changes the auto-uv-unwrap feature to be more Saraty-compatible", KeyEvent.VK_D,Icons.transparent);
+			itemSaratyMode.setSelected(ModelCreator.saratyMode);
+			
+
 			itemLoadAsBackdrop = createItem("Set backdrop...", "Set a model as a backdrop", KeyEvent.VK_K, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
 			
 			itemClearBackdrop = createItem("Clear backdrop", "Remove the backdrop again", KeyEvent.VK_L, new ImageIcon(getClass().getClassLoader().getResource("icons/clear.png")));
@@ -186,25 +191,26 @@ public class GuiMenu extends JMenuBar
 		
 		menuView = new JMenu("View");
 		{
-			itemGrid = createCheckboxItem("Grid + Compass", "Toggles the voxel grid and compass overlay", KeyEvent.VK_G, Icons.transparent);
+			itemGrid = createCheckboxItem("Show Grid + Compass", "Toggles the voxel grid and compass overlay", KeyEvent.VK_G, Icons.transparent);
 			itemGrid.setSelected(ModelCreator.showGrid);
-			
-			itemTransparency = createCheckboxItem("Transparency", "Toggles transparent rendering", KeyEvent.VK_Y, Icons.transparent);
-			itemTransparency.setSelected(ModelCreator.transparent);
-			
-			itemTexture = createCheckboxItem("Texture", "Toggles textured rendering", KeyEvent.VK_T, Icons.transparent);
-			itemTexture.setSelected(ModelCreator.transparent);
-
-			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D,Icons.transparent);
-			itemDarkMode.setSelected(ModelCreator.darkMode);
-			
-			itemSaratyMode = createCheckboxItem("Saraty Mode", "When enabled, changes the auto-uv-unwrap feature to be more Saraty-compatible", KeyEvent.VK_D,Icons.transparent);
-			itemSaratyMode.setSelected(ModelCreator.saratyMode);
 			
 			itemuvShowNames = createCheckboxItem("Show element names in UV editor", "When enabled, will display the name of the element in the UV editor", KeyEvent.VK_D,Icons.transparent);
 			itemuvShowNames.setSelected(ModelCreator.uvShowNames);
 			
-			itemPreviewWind = new JMenu("Wind preview");
+			itemShowShade = createCheckboxItem("Show element shade", "When disabled, element shade is disabled", KeyEvent.VK_D,Icons.transparent);
+			itemShowShade.setSelected(ModelCreator.showShade);
+
+			itemTexture = createCheckboxItem("Render Textures", "Toggles textured rendering", KeyEvent.VK_T, Icons.transparent);
+			itemTexture.setSelected(ModelCreator.transparent);
+
+			itemTransparency = createCheckboxItem("Render Texture Transparency", "Toggles transparent rendering", KeyEvent.VK_Y, Icons.transparent);
+			itemTransparency.setSelected(ModelCreator.transparent);
+			
+			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D,Icons.transparent);
+			itemDarkMode.setSelected(ModelCreator.darkMode);
+			
+
+			itemPreviewWind = new JMenu("Wind preview mode");
 			itemPreviewWind.setIcon(Icons.wind);
 			itemPreviewWind.setToolTipText("Makes elements sway if configured so, please not that the sway is not the same as in game");
 			{
@@ -274,12 +280,12 @@ public class GuiMenu extends JMenuBar
 
 	
 		menuView.add(itemGrid);
-		menuView.add(itemTransparency);
-		menuView.add(itemTexture);
-		menuView.add(itemDarkMode);
-		menuView.add(itemSaratyMode);
 		menuView.add(itemuvShowNames);
-		
+		menuView.add(itemShowShade);
+		menuView.add(itemTexture);
+		menuView.add(itemTransparency);
+		menuView.addSeparator();
+		menuView.add(itemDarkMode);
 		menuView.add(itemPreviewWind);
 		itemPreviewWind.add(itemPreviewWindOff);
 		itemPreviewWind.add(itemPreviewWindSelected);
@@ -289,6 +295,7 @@ public class GuiMenu extends JMenuBar
 		menuProject.add(itemUnlockAngles);
 		menuProject.add(itemSingleTexture);
 		menuProject.add(itemNoTextureSize);
+		menuProject.add(itemSaratyMode);
 		menuProject.addSeparator();
 		menuProject.add(itemAutoReloadTextures);
 		menuProject.add(itemReloadTextures);
@@ -588,7 +595,7 @@ public class GuiMenu extends JMenuBar
 
 		
 		
-		Action buttonAction3 = new AbstractAction("Show Texture") {
+		Action buttonAction3 = new AbstractAction("Show Textures") {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -623,6 +630,11 @@ public class GuiMenu extends JMenuBar
 		itemuvShowNames.addActionListener(a -> {
 			ModelCreator.uvShowNames = itemuvShowNames.isSelected();
 			ModelCreator.prefs.putBoolean("uvShowNames", ModelCreator.uvShowNames);
+		});
+		
+		itemShowShade.addActionListener(a -> {
+			ModelCreator.showShade = itemShowShade.isSelected();
+			ModelCreator.prefs.putBoolean("showShade", ModelCreator.showShade);
 		});
 		
 		itemPreviewWindAll.addActionListener(a ->
