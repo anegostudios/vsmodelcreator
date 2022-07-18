@@ -8,6 +8,7 @@ public class InputKeyInterval implements StrategyInputKey
 	private long nanoseconds;
 	private StrategyInputKey strategy;
 	
+	private boolean hasPreviousNanoseconds;
 	private long previousNanoseconds;
 	
 	public InputKeyInterval(int keyCode, int milliseconds, StrategyInputKey strategy) {
@@ -15,16 +16,17 @@ public class InputKeyInterval implements StrategyInputKey
 		this.nanoseconds = milliseconds * 1000000;
 		this.strategy = strategy;
 		this.previousNanoseconds = 0L;
+		this.hasPreviousNanoseconds = false;
 	}
 	
 	@Override
 	public void execute(InputKeyEvent event)
 	{
 		long currentNanoseconds = event.getNanoSeconds();
-		if(event.keyCode() == this.keyCode && (currentNanoseconds - previousNanoseconds) > nanoseconds) {
+		if(event.keyCode() == this.keyCode && ((currentNanoseconds - previousNanoseconds) > nanoseconds) || !hasPreviousNanoseconds) {
 			this.previousNanoseconds = currentNanoseconds;
+			this.hasPreviousNanoseconds = true;
 			strategy.execute(event);
 		}
-		
 	}
 }

@@ -30,7 +30,6 @@ public class CommandMoveSelectedElement implements ProjectCommand
 			// Apply cardinal translation
 			elementCard.cardinalTranslate(alpha, matrix);
 		}
-		
 	}
 
 }

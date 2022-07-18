@@ -8,14 +8,22 @@
 	<target name="default" depends="dist" />
 	
 	<target name="clean">
-        <delete dir="${dir.jarfile}/prepare/" />
+		<delete dir="${dir.jarfile}/natives/" />
+		<delete dir="${dir.jarfile}/prepare/" />
 		<delete dir="${dir.jarfile}/vsmodelcreator_lib/" />
 		
+		<mkdir dir="${dir.jarfile}/natives" />
 		<mkdir dir="${dir.jarfile}/prepare/" />
 		<mkdir dir="${dir.jarfile}/vsmodelcreator_lib/"/>
     </target>
 	
-	<target name="copy_lib_prepare" depends="clean">
+	<target name="copy_lib_natives" depends="clean">
+			<copy todir="${dir.jarfile}/natives/">
+				<fileset dir="${dir.buildfile}/natives/" />
+			</copy>
+		</target>
+	
+	<target name="copy_lib_prepare" depends="copy_lib_natives">
 		<copy todir="${dir.jarfile}/vsmodelcreator_lib/">
 			<fileset dir="${dir.buildfile}/libs/" />
 		</copy>
@@ -29,6 +37,7 @@
     			<pathelement path="${dir.jarfile}/vsmodelcreator_lib/lwjgl.jar" />
     			<pathelement path="${dir.jarfile}/vsmodelcreator_lib/lwjgl_util.jar" />
     			<pathelement path="${dir.jarfile}/vsmodelcreator_lib/slick-util.jar" />
+    			<pathelement path="${dir.jarfile}/vsmodelcreator_lib/swt.jar" />
     		</classpath>
     	</javac>
     </target>
@@ -55,7 +64,7 @@
         <jar destfile="${dir.jarfile}/vsmodelcreator.jar" basedir="${dir.jarfile}/prepare/">
             <manifest>
                 <attribute name="Main-Class" value="at.vintagestory.modelcreator.Start"/>
-                <attribute name="Class-Path" value=". vsmodelcreator_lib/gson-2.3.1.jar vsmodelcreator_lib/JTattoo-1.6.11.jar vsmodelcreator_lib/lwjgl_util.jar vsmodelcreator_lib/lwjgl.jar vsmodelcreator_lib/slick-util.jar"/>
+                <attribute name="Class-Path" value=". vsmodelcreator_lib/gson-2.3.1.jar vsmodelcreator_lib/JTattoo-1.6.11.jar vsmodelcreator_lib/lwjgl_util.jar vsmodelcreator_lib/lwjgl.jar vsmodelcreator_lib/slick-util.jar vsmodelcreator_lib/swt.jar"/>            
             </manifest>
         </jar>
     </target>
