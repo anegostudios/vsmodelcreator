@@ -22,6 +22,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.gui.GuiMenu;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.PendingTexture;
@@ -37,6 +38,12 @@ public class TextureDialog implements ITextureCallback
 	JTextField textureCodeField;
 	
 	boolean ignoreSelects = false;
+	
+	JDialog dialog;
+	
+	public boolean IsOpened() {
+		return dialog.isVisible();
+	}
 	
 	public String display(IElementManager manager)
 	{
@@ -128,23 +135,16 @@ public class TextureDialog implements ITextureCallback
 		JButton btnImport = new JButton("Import");
 		btnImport.addActionListener(a ->
 		{
-			JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("texturePath",""));
-			if (lastLocation != null)
-				chooser.setCurrentDirectory(lastLocation);
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Images", "png");
-			chooser.setFileFilter(filter);
-			int returnVal = chooser.showOpenDialog(null);
-			if (returnVal == JFileChooser.APPROVE_OPTION)
-			{
-				lastLocation = chooser.getSelectedFile().getParentFile();
+			String filepath = GuiMenu.getFilePathFromFileOpenDialog("Select PNG image to load", ModelCreator.prefs.get("texturePath",""), "PNG Images", "*.png");
+			if (filepath != null) {
 				try
 				{
-					ModelCreator.Instance.AddPendingTexture(new PendingTexture(null, chooser.getSelectedFile(), ModelCreator.Instance, 0));
+					ModelCreator.Instance.AddPendingTexture(new PendingTexture(null, new File(filepath), ModelCreator.Instance, 0));
 				}
 				catch (Exception e1)
 				{
 					e1.printStackTrace();
-				}
+				}	
 			}
 		});
 		btnImport.setFont(defaultFont);
@@ -159,7 +159,7 @@ public class TextureDialog implements ITextureCallback
 		btnClose.setFont(defaultFont);
 		buttonRow.add(btnClose);
 
-		JDialog dialog = new JDialog(manager.getCreator(), "Texture Manager", false);
+		dialog = new JDialog(manager.getCreator(), "Texture Manager", false);
 		dialog.setLayout(new BorderLayout());
 		dialog.setResizable(false);
 		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);

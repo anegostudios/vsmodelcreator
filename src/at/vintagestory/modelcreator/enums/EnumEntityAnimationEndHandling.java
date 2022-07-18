@@ -4,7 +4,9 @@ public enum EnumEntityAnimationEndHandling
 {
     Repeat,
     Hold,
-    Stop;
+    Stop,
+	EaseOut
+	;
 	
 	
 	public int index()

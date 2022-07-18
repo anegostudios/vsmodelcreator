@@ -26,9 +26,7 @@ public class ControlsDialog
 				+ "<p><b>Drag&Drop of files</b></p>"
 				+ "<ul>"
 				+ "<li>Drop in model json files to open them</li>"
-				+ "<li>Drop in a png file to the center pane to replace all textures</li>"
-				+ "<li>Select an element, then drop in a png file to the center pane to replace one texture</li>"
-				+ "<li>Drop in a png file to the left UV pane to add one texture</li>"
+				+ "<li>Drop in a png file to the center pane to import a texture. Drop it in one of the three appearing colored rectangles to determine import behavior.</li>"
 				+ "</ul>"
 				+ "<p><b>UV Panel (Left)</b></p>"
 				+ "<ul>"
@@ -62,9 +60,13 @@ public class ControlsDialog
 				+ "</ul>"
 				+ "<p><b>Face Pane, Textures (Right)<b></p>"
 				+ "<ul>"
-				+ "<li>Press Copy Button and then hold SHIFT + Left Mousue Click the Paste Button to quickly assign a texture to all the faces of a cube</li>"
+				+ "<li>Press Copy Button and then hold SHIFT + Left Mouse Click the Paste Button to quickly assign a texture to all the faces of a cube</li>"
 				+ "<li>Press Copy Button and then hold CTRL + SHIFT + Left Mouse Click the Paste Button to quickly assign a texture to all the faces of a cube and all its child elements</li>"
 				+ "<li>Hold SHIFT and toggle 'Enabled', 'Auto Resolution' or 'Snap UV' to toggle it for all faces</li>"
+				+ "</ul>"
+				+ "<p><b>Face Pane, Properties<b></p>"
+				+ "<ul>"
+				+ "<li>Hold CTRL+SHIFT and select a windmode to apply that windmode to the entire element</li>"
 				+ "</ul>"
 				+ "<p><b>Keyframe Pane (Right)<b></p>"
 				+ "<ul>"
@@ -89,7 +91,7 @@ public class ControlsDialog
 
 		JDialog dialog = new JDialog(parent, "Quick Controls", false);
 		dialog.setResizable(false);
-		dialog.setPreferredSize(new Dimension(800, 800));
+		dialog.setPreferredSize(new Dimension(800, 850));
 		dialog.add(container);
 		dialog.pack();
 		dialog.setLocationRelativeTo(null);

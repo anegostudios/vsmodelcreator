@@ -75,14 +75,11 @@ public class Animation
 				lerpKeyFrameElement(i, prevkelem);
 			}
 		}
-		
-		//System.out.println("calc all frames done");
 	}
 	
 
 	
 	void lerpKeyFrameElement(int keyFrameIndex, KeyFrameElement curKelem) {
-		//System.out.println("lerp key frame element " + prevkelem.AnimatedElement.name + " for frame " + prevkelem.FrameNumber);
 		
 		for (int flag = 0; flag < 3; flag++) {
 			if (!curKelem.IsSet(flag)) continue;

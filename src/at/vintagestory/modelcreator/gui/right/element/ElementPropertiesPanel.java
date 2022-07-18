@@ -35,6 +35,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 	JTextField climateColorMapField;
 	JTextField seasonColorMapField;
 	private JComboBox<String> renderPassList;
+	//private JComboBox<String> windModeList;
 	JButton stepparentButton;
 
 
@@ -123,8 +124,10 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 				
 				ModelCreator.updateValues(renderPassList);
 			}
-			
 		});
+		
+		
+
 	}
 
 	public void addComponents()
@@ -140,6 +143,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 		
 		add(new JLabel("Render pass"));
 		add(renderPassList);
+
 		
 		JLabel label = new JLabel("Stepparent element");
 		stepparentButton = new JButton();
@@ -168,6 +172,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 			climateColorMapField.setText(cube.getClimateColorMap() == null ? "" : cube.getClimateColorMap());
 			seasonColorMapField.setText(cube.getSeasonColorMap() == null ? "" : cube.getSeasonColorMap());
 			renderPassList.setSelectedIndex(cube.getRenderPass() + 1);
+			
 			stepparentButton.setEnabled(true);
 			String stp = cube.getStepParent();
 			stepparentButton.setText(stp == null ? "Not set" : stp);
@@ -201,5 +206,6 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 		
 		return model;
 	}
+	
 
 }

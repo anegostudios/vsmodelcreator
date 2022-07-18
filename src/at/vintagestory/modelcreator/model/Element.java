@@ -58,7 +58,7 @@ public class Element implements IDrawable
 	protected boolean renderInEditor = true;
 	
 	// Face Variables
-	protected int selectedFace = 0;
+	protected int selectedFace = -1;
 	protected Face[] faces = new Face[6];
 	private double texUStart;
 	private double texVStart;
@@ -73,12 +73,11 @@ public class Element implements IDrawable
 	protected double rotationX = 0;
 	protected double rotationY = 0;
 	protected double rotationZ = 0;
-	
 	protected boolean rescale = false;
 
 	// Extra Variables
 	protected boolean shade = true;
-	protected boolean reflective = false;
+	
 	protected boolean gradientShade = false;
 	protected String climateColorMap = null;
 	protected String seasonColorMap = null;
@@ -89,7 +88,8 @@ public class Element implements IDrawable
 	protected int ZOffset = 0;
 	
 	
-	public int FoliageWaveSpecial = 0;
+	public int windMode = -1;
+	public int windData = 0;
 	public boolean DisableRandomDrawOffset = false;
 	
 	
@@ -148,6 +148,8 @@ public class Element implements IDrawable
 		this.rotationY = cuboid.rotationY;
 		this.rotationZ = cuboid.rotationZ;
 		this.renderPass = cuboid.renderPass;
+		this.windMode = cuboid.windMode;
+		this.windData = cuboid.windData;
 		this.climateColorMap = cuboid.climateColorMap;
 		this.seasonColorMap = cuboid.climateColorMap;
 		this.unwrapMode = cuboid.unwrapMode;
@@ -378,11 +380,11 @@ public class Element implements IDrawable
 
 				if (!faces[i].isEnabled()) continue;
 
-				b = brightnessByFace[BlockFacing.ALLFACES[i].GetIndex()];
+				b = ModelCreator.showShade ? brightnessByFace[BlockFacing.ALLFACES[i].GetIndex()] : 1;
 				Color c = Face.ColorsByFace[i];
 				GL11.glColor3f(c.r * b, c.g * b, c.b * b);
 								
-				faces[i].renderFace(BlockFacing.ALLFACES[i], b);
+				faces[i].renderFace(BlockFacing.ALLFACES[i], b, ModelCreator.WindPreview == 2 || (ModelCreator.WindPreview == 1 && selectedElem == this), mat);
 			}
 						
 			for (int i = 0; i < ChildElements.size(); i++) {
@@ -418,6 +420,7 @@ public class Element implements IDrawable
 	{
 		GL11.glLineWidth(1f);
 		
+
 		if (!ModelCreator.renderAttachmentPoints) {
 			GL11.glPushMatrix();
 			{
@@ -478,9 +481,15 @@ public class Element implements IDrawable
 			GL11.glTranslated(startX, startY, startZ);
 			
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
+			GL11.glLineWidth(1f);
 			GL11.glBegin(GL11.GL_LINES);
 			{
-				GL11.glColor4f(0F, 0F, 0F, 0.5f);
+				if (ModelCreator.darkMode) {
+					GL11.glColor4f(1f,1f,0.5f,1f);
+				}
+				else {
+					GL11.glColor4f(0F, 0F, 0F, 0.5f);
+				}
 				
 				float w = (float)width;
 				float h = (float)height;
@@ -528,7 +537,34 @@ public class Element implements IDrawable
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 		
 		}
-		GL11.glPopMatrix();		
+		GL11.glPopMatrix();
+		
+		
+		GL11.glPushMatrix();
+		{
+		Face face = getSelectedFace();
+			if (face != null && face.HoveredVertex >= 0) {
+				int coordIndex = selectedFace * 12;
+				
+				GL11.glTranslated(originX, originY, originZ);
+				rotateAxis();
+				GL11.glTranslated(-originX, -originY, -originZ);
+				GL11.glTranslated(startX, startY, startZ);
+
+				
+				GL11.glDisable(GL11.GL_DEPTH_TEST);
+				GL11.glTranslated(
+					0 + face.centerVec.X + face.sizeXyz.X * Face.CubeVertices[coordIndex + face.HoveredVertex*3] / 2, 
+					face.centerVec.Y + face.sizeXyz.Y * Face.CubeVertices[coordIndex + face.HoveredVertex*3 + 1] / 2, 
+					face.centerVec.Z + face.sizeXyz.Z * Face.CubeVertices[coordIndex + face.HoveredVertex*3 + 2] / 2
+				);
+				GL11.glColor3f(0.25F, 1f, 0.25F);
+				sphere.draw(0.2F, 16, 16);
+				GL11.glEnable(GL11.GL_DEPTH_TEST);
+			}
+		}
+		GL11.glPopMatrix();
+		
 	}
 
 	@Override
@@ -869,6 +905,9 @@ public class Element implements IDrawable
 		
 		if (leftFace.isEnabled()) { 
 			x += leftFace.uvWidth();
+			// Fix any float imprecision first
+			x = Math.round(x * 1000.0) / 1000.0;
+			// Now round to the next closest pixel
 			x = Math.ceil(x * scale.W) / scale.W;
 		}
 		
@@ -878,6 +917,10 @@ public class Element implements IDrawable
 		
 		// Row 2
 		if (aboveFace.isEnabled()) y += aboveFace.uvHeight();
+		
+		// Fix any float imprecision first
+		y = Math.round(y * 1000.0) / 1000.0;
+		// Now round to the next closest pixel
 		y = Math.ceil(y * scale.H) / scale.H;
 		
 		x = getTexUStart();
@@ -888,6 +931,9 @@ public class Element implements IDrawable
 		
 		if (leftFace.isEnabled()) {
 			x += leftFace.uvWidth();
+			// Fix any float imprecision first
+			x = Math.round(x * 1000.0) / 1000.0;
+			// Now round to the next closest pixel
 			x = Math.ceil(x * scale.W) / scale.W;
 		}
 		
@@ -897,6 +943,9 @@ public class Element implements IDrawable
 		
 		if (centerFace.isEnabled()) {
 			x += centerFace.uvWidth();
+			// Fix any float imprecision first
+			x = Math.round(x * 1000.0) / 1000.0;
+			// Now round to the next closest pixel
 			x = Math.ceil(x * scale.W) / scale.W;
 		}
 		
@@ -906,6 +955,9 @@ public class Element implements IDrawable
 		
 		if (rightFace.isEnabled()) {
 			x += rightFace.uvWidth();
+			// Fix any float imprecision first
+			x = Math.round(x * 1000.0) / 1000.0;
+			// Now round to the next closest pixel
 			x = Math.ceil(x * scale.W) / scale.W;
 		}
 		
@@ -918,10 +970,16 @@ public class Element implements IDrawable
 		x = getTexUStart();
 		if (leftFace.isEnabled()) {
 			x+= leftFace.uvWidth();
+			// Fix any float imprecision first
+			x = Math.round(x * 1000.0) / 1000.0;
+			// Now round to the next closest pixel			
 			x = Math.ceil(x * scale.W) / scale.W;
 		}
 		
 		y += Math.max(leftFace.uvHeight(), Math.max(centerFace.uvHeight(), Math.max(rightFace.uvHeight(), veryRightFace.uvHeight())));
+		// Fix any float imprecision first
+		y = Math.round(y * 1000.0) / 1000.0;
+		// Now round to the next closest pixel
 		y = Math.ceil(y * scale.H) / scale.H;
 		
 		belowFace.textureU = x;
@@ -1216,11 +1274,6 @@ public class Element implements IDrawable
 		return shade;
 	}
 	
-	public boolean isReflective()
-	{
-		return reflective;
-	}
-	
 	public boolean isGradientShaded()
 	{
 		return gradientShade;
@@ -1234,15 +1287,7 @@ public class Element implements IDrawable
 		recalculateBrightnessValues();
 		ModelCreator.DidModify();
 	}
-	
-	
-	public void setReflective(boolean reflective)
-	{
-		if (this.reflective == reflective) return;
-		
-		this.reflective = reflective;
-		ModelCreator.DidModify();
-	}
+
 	
 	public void setGradientShade(boolean shade)
 	{
@@ -1298,7 +1343,6 @@ public class Element implements IDrawable
 		
 		this.renderPass = pass;
 	}
-
 	
 	public Element clone() {
 		Element cloned = new Element();
@@ -1345,6 +1389,8 @@ public class Element implements IDrawable
 		cloned.unwrapRotation = unwrapRotation;
 		cloned.stepparentName = stepparentName;
 		cloned.renderInEditor = renderInEditor;
+		cloned.windData = windData;
+		cloned.windMode = windMode;
 		
 		for (int i = 0; i < brightnessByFace.length; i++) {
 			cloned.brightnessByFace[i] = brightnessByFace[i];			
@@ -1673,6 +1719,44 @@ public class Element implements IDrawable
 		for (Element elem : ChildElements) { 
 			elem.reduceDecimals();
 		}
+	}
+
+	public void AutoguessWindMode(int windMode, float[] modelMat)
+	{
+		float[] childModelMat = modelMat.clone();
+		ApplyTransform(childModelMat);
+		
+		int facesEnabled = 0;
+		for (Face face : faces) {
+			if (!face.isEnabled()) continue;
+			facesEnabled++;
+		}
+		
+		for (Face face : faces) {
+			if (!face.isEnabled()) continue;
+			
+			face.AutoguessWindMode(windMode, facesEnabled, childModelMat);
+		}
+		
+		for (Element elem : ChildElements) { 
+			elem.AutoguessWindMode(windMode, childModelMat);
+		}
+		
+	}
+
+	public void elementWasSelected()
+	{
+		if (selectedFace >= 0) return;
+		
+		for (Face face : faces) {
+			if (!face.isEnabled()) continue;
+			
+			selectedFace = face.getSide();
+			return;
+		}
+		
+		selectedFace = 0;
+		
 	}
 	
 	

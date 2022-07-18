@@ -361,6 +361,11 @@ public class Importer
 			kelem.setStretchZ(obj.get("stretchZ").getAsDouble());
 		}
 		
+		if (obj.has("rotShortestDistance")) {
+			kelem.RotShortestDistance = obj.get("rotShortestDistance").getAsBoolean();
+		}
+	
+		
 		return kelem;
 	}
 
@@ -444,11 +449,6 @@ public class Importer
 				element.setShade(obj.get("shade").getAsBoolean());
 			}
 			
-			element.setReflective(false);
-			if (obj.has("reflective") && obj.get("reflective").isJsonPrimitive())
-			{
-				element.setReflective(obj.get("reflective").getAsBoolean());
-			}
 			
 			if (obj.has("gradientShade") && obj.get("gradientShade").isJsonPrimitive())
 			{
@@ -475,11 +475,7 @@ public class Importer
 				element.setRenderPass(obj.get("renderPass").getAsInt());
 			}
 			
-			if (obj.has("foliageWaveSpecial") && obj.get("foliageWaveSpecial").isJsonPrimitive())
-			{
-				element.FoliageWaveSpecial = obj.get("foliageWaveSpecial").getAsInt();
-			}
-
+			
 			if (obj.has("disableRandomDrawOffset") && obj.get("disableRandomDrawOffset").isJsonPrimitive())
 			{
 				element.DisableRandomDrawOffset = obj.get("disableRandomDrawOffset").getAsBoolean();
@@ -643,9 +639,24 @@ public class Importer
 				face.setGlow(((int) obj.get("glow").getAsInt()));
 			}
 
+			face.setReflectiveMode(0);
+			if (obj.has("reflective") && obj.get("reflective").isJsonPrimitive())
+			{
+				face.setReflectiveMode(obj.get("reflective").getAsInt());
+			}
+
 			if (obj.has("enabled")) {
 				boolean enabled = obj.get("enabled").getAsBoolean();
 				face.setEnabled(enabled);
+			}
+			
+			if (obj.has("windMode") && obj.get("windMode").isJsonArray()) {
+				JsonArray modes = obj.get("windMode").getAsJsonArray();
+				face.WindModes = new int[] { modes.get(0).getAsInt(), modes.get(1).getAsInt(), modes.get(2).getAsInt(), modes.get(3).getAsInt() };				
+			}
+			if (obj.has("windData") && obj.get("windData").isJsonArray()) {
+				JsonArray modes = obj.get("windData").getAsJsonArray();
+				face.WindData = new int[] { modes.get(0).getAsInt(), modes.get(1).getAsInt(), modes.get(2).getAsInt(), modes.get(3).getAsInt() };				
 			}
 		}
 	}

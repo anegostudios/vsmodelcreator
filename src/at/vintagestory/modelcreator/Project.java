@@ -245,6 +245,7 @@ public class Project
 		ModelCreator.ignoreDidModify = true;
 		
 		Element curElem = SelectedElement;
+		Element nextElem = tree.getNextSelectedElement();
 		
 		tree.removeCurrentElement();
 		
@@ -263,6 +264,10 @@ public class Project
 		curElem.onRemoved();
 		
 		ModelCreator.ignoreDidModify = false;
+		
+		if (nextElem != null) {
+			tree.selectElement(nextElem);
+		}
 		
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.DidModify();
@@ -542,7 +547,13 @@ public class Project
 	public String loadTexture(String textureCode, File image, BooleanParam isNew, boolean fromBackdrop, boolean doReplaceAll, boolean doReplacedForSelectedElement) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
-		Texture texture = TextureLoader.getTexture("PNG", is);
+		Texture texture;
+		try {
+			texture = TextureLoader.getTexture("PNG", is);
+		} catch (Throwable e) {
+			return "Unabled to load this texture, is this a valid png file?";
+		}
+		
 		texture.setTextureFilter(SGL.GL_NEAREST);
 		is.close();
 
@@ -556,9 +567,8 @@ public class Project
 		ImageIcon icon = upscaleIcon(new ImageIcon(image.getAbsolutePath()), 256);
 		
 		if (textureCode == null) {
-			textureCode = image.getName().replace(".png", "");	
+			textureCode = image.getName().replace(".png", "");
 		}
-		
 		
 		ArrayList<String> nowFoundTextures = new ArrayList<String>(); 
 		

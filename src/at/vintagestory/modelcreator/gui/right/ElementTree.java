@@ -58,6 +58,9 @@ public class ElementTree
 				
 				if (!ModelCreator.ignoreValueUpdates) {
 					ModelCreator.currentProject.SelectedElement = getSelectedElement();
+					if (ModelCreator.currentProject.SelectedElement != null) {
+						ModelCreator.currentProject.SelectedElement.elementWasSelected();
+					}
 					ModelCreator.updateValues(jtree);	
 				}
 			}	
@@ -197,6 +200,21 @@ public class ElementTree
         	}
         }
         return null;
+	}
+	
+	public Element getNextSelectedElement() {
+		TreePath currentSelection = jtree.getSelectionPath();
+		if (currentSelection != null) {
+        	DefaultMutableTreeNode node = ((DefaultMutableTreeNode)currentSelection.getLastPathComponent());
+        	if (node.getNextSibling() != null) { 
+        		return (Element)node.getNextSibling().getUserObject();
+        	}
+        	if (node.getPreviousSibling() != null) { 
+        		return (Element)node.getPreviousSibling().getUserObject();
+        	}
+        }
+		
+		return null;
 	}
 	
 	

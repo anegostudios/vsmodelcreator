@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -23,14 +25,19 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.util.Mat4f;
 import at.vintagestory.modelcreator.util.UVMapExporter;
 import at.vintagestory.modelcreator.util.screenshot.AnimatedGifCapture;
 import at.vintagestory.modelcreator.util.screenshot.AnimationPngCapture;
 import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCallback;
 import at.vintagestory.modelcreator.util.screenshot.Uploader;
+
+import org.eclipse.swt.*;
+import org.eclipse.swt.widgets.*;
 
 public class GuiMenu extends JMenuBar
 {
@@ -79,6 +86,12 @@ public class GuiMenu extends JMenuBar
 	private JCheckBoxMenuItem itemDarkMode;	
 	private JCheckBoxMenuItem itemSaratyMode;
 	private JCheckBoxMenuItem itemuvShowNames;
+	private JCheckBoxMenuItem itemShowShade;
+	
+	private JMenuItem itemPreviewWind;
+	private JMenuItem itemPreviewWindOff;
+	private JMenuItem itemPreviewWindSelected;
+	private JMenuItem itemPreviewWindAll;
 	
 	
 
@@ -90,6 +103,17 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemGenSnowLayer;
 	private JMenuItem itemuvUnrwapEverything;
 	private JMenuItem itemReduceDecimals;
+	
+	private JMenu itemAutoWind;
+	private JMenuItem itemAutoWindNormal;
+	private JMenuItem itemAutoWindWeak;
+	private JMenuItem itemAutoWindBend;
+	private JMenuItem itemAutoWindTallBend;
+	private JMenuItem itemAutoWindWeakNoBend;
+	private JMenuItem itemAutoWindWeakBend;
+	private JMenuItem itemAutoWindExtraWeak;
+	private JMenuItem itemAutoWindAllOff;
+	
 	private JMenuItem itemRotateModel90Deg;
 	private JMenuItem itemRotateModel90DegClockwise;
 	private JMenuItem itemRotateModel90DegAntiClockwise;
@@ -155,6 +179,10 @@ public class GuiMenu extends JMenuBar
 			itemSingleTexture = createCheckboxItem("Entity Texturing Mode", "When creating entities, it is often more useful to use only a single texture and have the uv boxes unwrap side by side.", 0, Icons.transparent);
 			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);
 			
+			itemSaratyMode = createCheckboxItem("Saraty Mode", "When enabled, changes the auto-uv-unwrap feature to be more Saraty-compatible", KeyEvent.VK_D,Icons.transparent);
+			itemSaratyMode.setSelected(ModelCreator.saratyMode);
+			
+
 			itemLoadAsBackdrop = createItem("Set backdrop...", "Set a model as a backdrop", KeyEvent.VK_K, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
 			
 			itemClearBackdrop = createItem("Clear backdrop", "Remove the backdrop again", KeyEvent.VK_L, new ImageIcon(getClass().getClassLoader().getResource("icons/clear.png")));
@@ -163,23 +191,33 @@ public class GuiMenu extends JMenuBar
 		
 		menuView = new JMenu("View");
 		{
-			itemGrid = createCheckboxItem("Grid + Compass", "Toggles the voxel grid and compass overlay", KeyEvent.VK_G, Icons.transparent);
+			itemGrid = createCheckboxItem("Show Grid + Compass", "Toggles the voxel grid and compass overlay", KeyEvent.VK_G, Icons.transparent);
 			itemGrid.setSelected(ModelCreator.showGrid);
-			
-			itemTransparency = createCheckboxItem("Transparency", "Toggles transparent rendering", KeyEvent.VK_Y, Icons.transparent);
-			itemTransparency.setSelected(ModelCreator.transparent);
-			
-			itemTexture = createCheckboxItem("Texture", "Toggles textured rendering", KeyEvent.VK_T, Icons.transparent);
-			itemTexture.setSelected(ModelCreator.transparent);
-
-			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D,Icons.transparent);
-			itemDarkMode.setSelected(ModelCreator.darkMode);
-			
-			itemSaratyMode = createCheckboxItem("Saraty Mode", "When enabled, changes the auto-uv-unwrap feature to be more Saraty-compatible", KeyEvent.VK_D,Icons.transparent);
-			itemSaratyMode.setSelected(ModelCreator.saratyMode);
 			
 			itemuvShowNames = createCheckboxItem("Show element names in UV editor", "When enabled, will display the name of the element in the UV editor", KeyEvent.VK_D,Icons.transparent);
 			itemuvShowNames.setSelected(ModelCreator.uvShowNames);
+			
+			itemShowShade = createCheckboxItem("Show element shade", "When disabled, element shade is disabled", KeyEvent.VK_D,Icons.transparent);
+			itemShowShade.setSelected(ModelCreator.showShade);
+
+			itemTexture = createCheckboxItem("Render Textures", "Toggles textured rendering", KeyEvent.VK_T, Icons.transparent);
+			itemTexture.setSelected(ModelCreator.transparent);
+
+			itemTransparency = createCheckboxItem("Render Texture Transparency", "Toggles transparent rendering", KeyEvent.VK_Y, Icons.transparent);
+			itemTransparency.setSelected(ModelCreator.transparent);
+			
+			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D,Icons.transparent);
+			itemDarkMode.setSelected(ModelCreator.darkMode);
+			
+
+			itemPreviewWind = new JMenu("Wind preview mode");
+			itemPreviewWind.setIcon(Icons.wind);
+			itemPreviewWind.setToolTipText("Makes elements sway if configured so, please not that the sway is not the same as in game");
+			{
+				itemPreviewWindOff = createItem("Off", null, KeyEvent.VK_B, Icons.clear);
+				itemPreviewWindSelected = createItem("Only selected element", null, KeyEvent.VK_B, Icons.wind);
+				itemPreviewWindAll = createItem("All elements", null, KeyEvent.VK_B, Icons.wind);
+			}
 		}
 		
 		
@@ -195,6 +233,23 @@ public class GuiMenu extends JMenuBar
 			itemuvUnrwapEverything = createItem("Unwrap all UVs", "Attempts to unwrap all uvs onto a texture without overlap", KeyEvent.VK_B, Icons.rainbow);
 			itemReduceDecimals = createItem("Reduce decimals", "Reduce all element positions and sizes to one decimal point", KeyEvent.VK_B, Icons.rainbow);
 
+			
+			itemAutoWind = new JMenu("Auto-Guess Wind mode");
+			itemAutoWind.setIcon(Icons.wind);
+			itemAutoWind.setToolTipText("Tries to guess the correct wind mode and wind data on all elements");
+			{
+				itemAutoWindNormal = createItem("Normal wind", "Set to normal wind mode", 0, Icons.wind);
+				itemAutoWindWeak = createItem("Weak wind", "Set to weak wind mode", 0, Icons.wind);
+				itemAutoWindBend = createItem("Bend", "Set to bend wind mode", 0, Icons.wind);
+				itemAutoWindTallBend = createItem("Tall Bend", "Set to bend wind mode", 0, Icons.wind);
+				
+				itemAutoWindWeakBend = createItem("Bend + Weak wind on single faces", "Set to weak wind mode", 0, Icons.wind);
+				
+				itemAutoWindAllOff = createItem("Disable all wind modes", "", 0, Icons.wind);
+				itemAutoWindExtraWeak= createItem("Extra Weak wind", "", 0, Icons.wind);
+				itemAutoWindWeakNoBend= createItem("Weakwind No Bend", "", 0, Icons.wind);
+			}
+			
 			itemRotateModel90Deg = new JMenu("Rotate 90 degrees");
 			itemRotateModel90Deg.setIcon(Icons.arrow_rotate_clockwise);
 			itemRotateModel90Deg.setToolTipText("Rotates the selected elements by 90 degrees");
@@ -225,15 +280,22 @@ public class GuiMenu extends JMenuBar
 
 	
 		menuView.add(itemGrid);
-		menuView.add(itemTransparency);
-		menuView.add(itemTexture);
-		menuView.add(itemDarkMode);
-		menuView.add(itemSaratyMode);
 		menuView.add(itemuvShowNames);
+		menuView.add(itemShowShade);
+		menuView.add(itemTexture);
+		menuView.add(itemTransparency);
+		menuView.addSeparator();
+		menuView.add(itemDarkMode);
+		menuView.add(itemPreviewWind);
+		itemPreviewWind.add(itemPreviewWindOff);
+		itemPreviewWind.add(itemPreviewWindSelected);
+		itemPreviewWind.add(itemPreviewWindAll);
+		
 
 		menuProject.add(itemUnlockAngles);
 		menuProject.add(itemSingleTexture);
 		menuProject.add(itemNoTextureSize);
+		menuProject.add(itemSaratyMode);
 		menuProject.addSeparator();
 		menuProject.add(itemAutoReloadTextures);
 		menuProject.add(itemReloadTextures);
@@ -257,6 +319,17 @@ public class GuiMenu extends JMenuBar
 		menuTools.add(itemResize);
 		menuTools.add(itemuvUnrwapEverything);
 		menuTools.add(itemReduceDecimals);
+		
+		menuTools.add(itemAutoWind);
+		itemAutoWind.add(itemAutoWindNormal);
+		itemAutoWind.add(itemAutoWindWeak);
+		itemAutoWind.add(itemAutoWindBend);
+		itemAutoWind.add(itemAutoWindTallBend);
+		itemAutoWind.add(itemAutoWindWeakNoBend);
+		itemAutoWind.add(itemAutoWindWeakBend);
+		itemAutoWind.add(itemAutoWindAllOff);
+		itemAutoWind.add(itemAutoWindExtraWeak);
+		
 		menuTools.add(itemRotateModel90Deg);
 		itemRotateModel90Deg.add(itemRotateModel90DegClockwise);
 		itemRotateModel90Deg.add(itemRotateModel90DegAntiClockwise);
@@ -522,7 +595,7 @@ public class GuiMenu extends JMenuBar
 
 		
 		
-		Action buttonAction3 = new AbstractAction("Show Texture") {
+		Action buttonAction3 = new AbstractAction("Show Textures") {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -559,6 +632,25 @@ public class GuiMenu extends JMenuBar
 			ModelCreator.prefs.putBoolean("uvShowNames", ModelCreator.uvShowNames);
 		});
 		
+		itemShowShade.addActionListener(a -> {
+			ModelCreator.showShade = itemShowShade.isSelected();
+			ModelCreator.prefs.putBoolean("showShade", ModelCreator.showShade);
+		});
+		
+		itemPreviewWindAll.addActionListener(a ->
+		{
+			ModelCreator.WindPreview = 2;
+		});
+		itemPreviewWindOff.addActionListener(a ->
+		{
+			ModelCreator.WindPreview = 0;
+		});
+		itemPreviewWindSelected.addActionListener(a ->
+		{
+			ModelCreator.WindPreview = 1;
+		});
+		
+		
 		itemUnlockAngles.addActionListener(a ->
 		{
 			ModelCreator.currentProject.AllAngles = itemUnlockAngles.isSelected();
@@ -570,7 +662,6 @@ public class GuiMenu extends JMenuBar
 		itemSingleTexture.addActionListener(a ->
 		{
 			ModelCreator.currentProject.EntityTextureMode = itemSingleTexture.isSelected();
-			//if (ModelCreator.currentProject.EntityTextureMode) ModelCreator.currentProject.applySingleTextureMode();
 			ModelCreator.DidModify();
 			ModelCreator.updateValues(itemSingleTexture);
 		});
@@ -582,6 +673,116 @@ public class GuiMenu extends JMenuBar
 		itemResize.addActionListener(a -> {
 			ResizeDialog.show(creator);
 		});
+		
+		
+		
+		itemAutoWindNormal.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(2, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindWeak.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(1, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindBend.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(4, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindTallBend.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(5, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+
+		
+		itemAutoWindExtraWeak.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(7, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindAllOff.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(0, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindWeakNoBend.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(9, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+		
+		itemAutoWindWeakBend.addActionListener(a -> {
+			ModelCreator.ignoreDidModify = true;
+			
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(-1, Mat4f.Create());
+			}
+			
+			ModelCreator.ignoreDidModify = false;
+			ModelCreator.DidModify();
+
+			ModelCreator.updateValues(this);
+		});
+
+		
+		
 
 		itemRotateModel90DegClockwise.addActionListener(a -> {
 			Element elem = ModelCreator.currentProject.SelectedElement;
@@ -686,70 +887,74 @@ public class GuiMenu extends JMenuBar
 		itemAddFace.addActionListener(a ->
 		{
 			ModelCreator.currentProject.addElementAsChild(new Element(1, 1));
-		});
-		
-		
-		
+		});	
 	}
 	
+
+	
+	static Map<String, String> lastOpenLocations = new HashMap<String, String>();
+	
+	public static String getJsonFilePathFromFileOpenDialog(String dialogtitle) {
+		return getFilePathFromFileOpenDialog(dialogtitle, ModelCreator.prefs.get("filePath", "."), "JSON (.json)", "*.json");
+	}
+	
+	public static String getFilePathFromFileOpenDialog(String dialogtitle, String filterPath, String filterName, String filterExt) {
+		String lastLoc = lastOpenLocations.get(filterName);
+		if (lastLoc != null) filterPath = lastLoc;
+		
+		Display display = new Display ();
+        Shell shell = new Shell (display);
+		FileDialog dialog = new FileDialog (shell, SWT.OPEN);
+		String [] filterNames = new String [] {filterName};
+        String [] filterExtensions = new String [] {filterExt};
+        dialog.setText(dialogtitle);
+        dialog.setFilterNames (filterNames);
+        dialog.setFilterExtensions (filterExtensions);
+        dialog.setFilterPath (filterPath);
+        dialog.open();
+        
+        String result = null;
+        
+        String[] selectedFileNames = dialog.getFileNames();
+        String filePath = dialog.getFilterPath();
+        for(String fileName : selectedFileNames) {
+        	result = filePath + File.separator + fileName;
+			break;
+        }
+        shell.close();
+        while (!shell.isDisposed ()) {
+            if (!display.readAndDispatch ()) display.sleep ();
+        }
+        display.dispose();
+        
+        if (result != null) {
+        	lastOpenLocations.put(filterName, filePath);
+        }
+        
+        return result;
+	}
 	
 
 	private void OnLoadFile()
 	{
-		JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
-		chooser.setDialogTitle("File to open");
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setApproveButtonText("Open");
-
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON (.json)", "json");
-		chooser.setFileFilter(filter);
-
-		int returnVal = chooser.showOpenDialog(null);
-		if (returnVal == JFileChooser.APPROVE_OPTION)
-		{
-			String filePath = chooser.getSelectedFile().getAbsolutePath();
-			creator.LoadFile(filePath);
-		}
+		String filepath = getJsonFilePathFromFileOpenDialog("Select file to open");
+		if (filepath != null) creator.LoadFile(filepath);
 	}
 	
 	private void OnImportFile()
 	{
-		JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
-		chooser.setDialogTitle("File to import");
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setApproveButtonText("Import");
-
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON (.json)", "json");
-		chooser.setFileFilter(filter);
-
-		int returnVal = chooser.showOpenDialog(null);
-		if (returnVal == JFileChooser.APPROVE_OPTION)
-		{
-			String filePath = chooser.getSelectedFile().getAbsolutePath();
-			creator.ImportFile(filePath);
-		}
+		String filepath = getJsonFilePathFromFileOpenDialog("Select file to import");
+		if (filepath != null) creator.ImportFile(filepath);
 	}
 	
 	
 	private void OnLoadBackdropFile()
 	{
-		JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("filePath", "."));
-		chooser.setDialogTitle("File to import as backdrop");
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setApproveButtonText("Import backdrop");
-
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON (.json)", "json");
-		chooser.setFileFilter(filter);
-
-		int returnVal = chooser.showOpenDialog(null);
-		if (returnVal == JFileChooser.APPROVE_OPTION)
-		{
-			String filePath = chooser.getSelectedFile().getAbsolutePath();
-			creator.LoadBackdropFile(filePath);
-			
-			if (ModelCreator.currentBackdropProject != null) {
-				itemClearBackdrop.setEnabled(true);
-			}
+		String filepath = getJsonFilePathFromFileOpenDialog("Select file to import as backdrop");
+		if (filepath != null) creator.LoadBackdropFile(filepath);
+		
+		if (ModelCreator.currentBackdropProject != null) {
+			itemClearBackdrop.setEnabled(true);
 		}
 	}
 	

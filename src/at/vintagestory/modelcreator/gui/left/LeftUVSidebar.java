@@ -431,16 +431,24 @@ public class LeftUVSidebar extends LeftSidebar
 
 					// Texture
 					face.bindTexture();
+					
+					float u=1, v=1;
+					
+					TextureEntry entry = face.getTextureEntry();
+					if (entry != null) {
+						u = entry.LwJglFuckeryScaleW();
+						v = entry.LwJglFuckeryScaleH();
+					}
 
 					glBegin(GL_QUADS);
 					{
-						glTexCoord2f(0, 1);
+						glTexCoord2f(0, v);
 						glVertex2d(0, texSize.H);
 						
-						glTexCoord2f(1, 1);
+						glTexCoord2f(u, v);
 						glVertex2d(texSize.W, texSize.H);
 						
-						glTexCoord2f(1, 0);
+						glTexCoord2f(u, 0);
 						glVertex2d(texSize.W, 0);
 		
 						glTexCoord2f(0, 0);
@@ -636,8 +644,11 @@ public class LeftUVSidebar extends LeftSidebar
 			int yMovement = 0;
 			TextureEntry texEntry = null;
 			
-			if (!ModelCreator.currentProject.EntityTextureMode && grabbedFaceIndex >= 0) {
+			if (grabbedFaceIndex >= 0) {
 				texEntry = grabbedElement.getAllFaces()[grabbedFaceIndex].getTextureEntry();
+			}
+			
+			if (!ModelCreator.currentProject.EntityTextureMode && grabbedFaceIndex >= 0) {
 				Sized texSize = GetBlockTextureModeTextureSize(texEntry == null ? null : texEntry.code);
 				texBoxWidth = (int)texSize.W;
 				texBoxHeight = (int)texSize.H;
@@ -707,12 +718,10 @@ public class LeftUVSidebar extends LeftSidebar
 
 			
 			if (xMovement != 0) {
-				//this.lastMouseX += (int)((int)(mousedx / sectionWidth) * sectionWidth);
 				this.lastMouseX += xMovement * sectionWidth;   // Add *sectionWidth because otherwise the rect moves too quickly
 			}
 			
 			if (yMovement != 0) {
-				//this.lastMouseY += (int)((int)(mousedy / sectionHeight) * sectionHeight); - why so weird? this causes weird continous sliding effects on a 48x144 texture
 				this.lastMouseY += yMovement * sectionHeight;
 			}
 

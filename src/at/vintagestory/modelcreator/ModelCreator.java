@@ -50,6 +50,7 @@ import at.vintagestory.modelcreator.gui.left.LeftSidebar;
 import at.vintagestory.modelcreator.gui.left.LeftUVSidebar;
 import at.vintagestory.modelcreator.gui.middle.ModelRenderer;
 import at.vintagestory.modelcreator.gui.right.RightTopPanel;
+import at.vintagestory.modelcreator.gui.right.face.FaceTexturePanel;
 import at.vintagestory.modelcreator.input.InputManager;
 import at.vintagestory.modelcreator.input.command.FactoryProjectCommand;
 import at.vintagestory.modelcreator.input.command.ProjectCommand;
@@ -88,6 +89,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	
 	public static boolean showGrid = true;
+	public static boolean showShade = true;
 	public static boolean transparent = true;
 	public static boolean renderTexture = true;
 	public static boolean autoreloadTexture = true;
@@ -136,6 +138,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	public long prevFrameMillisec;
 	
+	
+	public static double WindWaveCounter;
+	public static int WindPreview;
 	
 	static {
 		prefs = Preferences.userRoot().node("ModelCreator");
@@ -490,6 +495,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 			
 			frameCounter++;
+			
+			WindWaveCounter = (frameCounter / 60.0) % 2000;
 			
 			synchronized (pendingTextures)
 			{
@@ -1107,13 +1114,28 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	{										
 		if (errormessage != null)
 		{
-			JOptionPane error = new JOptionPane();
-			error.setMessage(errormessage);
-			JDialog dialog = error.createDialog(canvas, "Texture Error");
-			dialog.setLocationRelativeTo(null);
-			dialog.setModal(false);
-			dialog.setVisible(true);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					JOptionPane error = new JOptionPane();
+					error.setMessage(errormessage);
+					JDialog dialog = error.createDialog(canvas, "Texture Error");
+					dialog.setLocationRelativeTo(null);
+					dialog.setModal(true);
+					dialog.setAlwaysOnTop(true);
+					dialog.setVisible(true);
+			}});
+		} else {
+			
+			if (FaceTexturePanel.dlg != null) {
+				if (FaceTexturePanel.dlg.IsOpened()) {
+					FaceTexturePanel.dlg.onTextureLoaded(isNew, errormessage, texture);
+				}
+			}
+			
 		}
+		
+
 	}
 
 	public void LoadFile(String filePath)

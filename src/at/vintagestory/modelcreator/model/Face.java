@@ -5,17 +5,22 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.lwjgl.util.glu.Sphere;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.enums.BlockFacing;
+import at.vintagestory.modelcreator.util.GameMath;
+import at.vintagestory.modelcreator.util.Mat4f;
+import at.vintagestory.modelcreator.util.Vec3f;
 
 public class Face
 {
@@ -37,79 +42,101 @@ public class Face
 	};
 	
 	public static float[] CubeVertices = {
-        // North face
-        0, 0, 0,
-        0,  1, 0,
-        1,  1, 0,
-        1, 0, 0,
+            // North face
+            -1, -1, -1,
+            -1,  1, -1,
+            1,  1, -1,
+            1, -1, -1,
 
-        // East face
-        1, 0,  1,     // bot right
-        1, 0, 0,     // bot left
-        1,  1, 0,     // top left
-        1,  1,  1,     // top right
+            // East face
+            1, -1, -1,     // bot left
+            1,  1, -1,     // top left
+            1,  1,  1,     // top right
+            1, -1,  1,     // bot right
 
-        // South face
-        0, 0,  1,
-        1, 0,  1,
-        1,  1,  1,
-        0,  1,  1,
+            // South face
+            -1, -1,  1,
+            1, -1,  1,
+            1,  1,  1,
+            -1,  1,  1,
 
-        // West face
-        0, 0, 0,
-        0, 0,  1,
-        0,  1,  1,
-        0,  1, 0,
-        
-        // Top face
-        1,  1, 0,
-        0,  1, 0,
-        0,  1,  1,
-        1,  1,  1,
-                      
-        // Bottom face
-        0, 0, 0,
-        1, 0, 0,
-        1, 0,  1,
-        0, 0,  1
+            // West face
+            -1, -1, -1,
+            -1, -1,  1,
+            -1,  1,  1,
+            -1,  1, -1,
+            
+            // Top face
+            -1,  1, -1,
+            -1,  1,  1,
+            1,  1,  1,
+            1,  1, -1,
+                          
+            // Bottom face
+            -1, -1, -1,
+            1, -1, -1,
+            1, -1,  1,
+            -1, -1,  1
     };
 	
+	
 	public static int[] cubeUVCoords = {
-            // North
+			// North ... this is has flipped V -.-
+            /*1, 0,
             1, 1,
+            0, 1,
+            0, 0,*/
+			
+			1, 1,
             1, 0,
             0, 0,
             0, 1,
 
             // East 
+            1, 1,
+            1, 0,
+            0, 0,
+            0, 1,
+
+            // South ... this is has flipped u and v -.-
+            /*0, 0,
+            1, 0,
+            1, 1,
+            0, 1,*/
+            
             0, 1,
             1, 1,
             1, 0,
             0, 0,
             
-            // South
-            0, 1,
-            1, 1,
+            // West ... flipped V
+           /* 0, 0,
             1, 0,
-            0, 0,
+            1, 1,
+            0, 1,*/
             
-            // West
             0, 1,
             1, 1,
             1, 0,
             0, 0,
 
             // Top face
-            1, 0,
             0, 0,
             0, 1,
             1, 1,
+            1, 0,
 
-            // Bottom face
+            // Top face - 3 hours later, I have fkin no idea why this order differs from the one in VS....
+/*            0, 1,
+            0, 1,
+            1, 1,
+            1, 1,*/
+
+            // Bottom face - flipped V
             1, 0,
             0, 0,
             0, 1,
-            1, 1,
+            1, 1
 	};
 
 	
@@ -126,10 +153,16 @@ public class Face
 	private boolean snapUV = true;
 	public int rotation;
 	public int openGlName = 0;
+	public int[] WindModes = null;
+	public int[] WindData = null;
 	
 	private Element cuboid;
 	private int side;
 	private int glow;
+	
+	public int HoveredVertex=-1;
+	
+	public int reflectiveMode;
 	
 	
 	public boolean isInBackdropProject;
@@ -147,18 +180,9 @@ public class Face
 		openGlName = nextOpenGlName++;
 		this.cuboid = cuboid;
 		this.side = side;
-		//applyEntityTextureMode();
 	}
 	
-	/*public void applyEntityTextureMode() {
-		Project project = getProject();
-		if (project != null && project.EntityTextureMode && project.TexturesByCode != null && project.TexturesByCode.size() > 0) {
-			//this.textureName = ModelCreator.currentProject.Textures.get(0).name;
-			
-			this.textureCode = project.TexturesByCode.values().iterator().next().code;
-		}		
-	}*/
-	
+
 	static FloatBuffer color = BufferUtils.createFloatBuffer(4);
 	static {
 		color.rewind();
@@ -166,12 +190,23 @@ public class Face
 		color.rewind();
 	}
 	
+	static int[][] uvRotations = new int[][] {
+        new int[] { 0, 1, 2, 3 },
+        new int[] { 1, 2, 3, 0 },
+        new int[] { 2, 3, 0, 1 },
+        new int[] { 3, 0, 1, 2 }
+    };
+    
+    public Vec3f sizeXyz = new Vec3f();
+	public Vec3f centerVec = new Vec3f();
 	
-	public void renderFace(BlockFacing blockFacing, float brightness)
+    
+	public void renderFace(BlockFacing blockFacing, float brightness, boolean windAnimate, float[] matrix)
 	{	
 		Project project = getProject();
-		TextureEntry entry = project == null ? null : project.getTextureEntryByCode(textureCode);
-
+		TextureEntry entry = project == null ? null : project.getTextureEntryByCode(textureCode);	
+		
+		
 		GL11.glPushMatrix();
 		{
 			if (!isInBackdropProject) GL11.glLoadName(openGlName);
@@ -189,29 +224,98 @@ public class Face
 			if (textureBound) GL11.glColor3f(brightness, brightness, brightness);
 			
 			int coordIndex = blockFacing.GetIndex() * 12;
-			int uvBaseIndex = blockFacing.GetIndex() * 8;
+			int uvPos = blockFacing.GetIndex() * 8;
 			int uvIndex = 0;
 			
-			GL11.glBegin(GL11.GL_QUADS);
+			
+            int[] uvRotation = uvRotations[rotation % 4];
+            
+            
+            double sizeU = textureUEnd - textureU;
+            double sizeV = textureVEnd - textureV;
+            
+            
+            sizeXyz.Set(
+                (float)(cuboid.width) / 1f,
+                (float)(cuboid.height) / 1f,
+                (float)(cuboid.depth) / 1f
+            );
+            
+            // Relative center, because transformation matrix already translated to the from position
+            
+            centerVec.Set(sizeXyz.X / 2, sizeXyz.Y / 2, sizeXyz.Z / 2);
+            
+            
+            int[] tris = new int[] { 0, 1, 2, 0, 2, 3};
+
+            
+			GL11.glBegin(GL11.GL_TRIANGLES);
 			{
-				for (int j = 0; j < 4; j++) {
+				for (int j = 0; j < tris.length; j++) {
+					
+					int c = tris[j];
 					
 					Sized uv = translateVoxelPosToUvPos(project, entry,
-							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureU : textureUEnd),
-							(cubeUVCoords[uvBaseIndex + (2 * rotation + uvIndex++) % 8]==0 ? textureV : textureVEnd),
+							textureU + sizeU * cubeUVCoords[(2 * uvRotation[c] + uvPos)],
+							textureV + sizeV * cubeUVCoords[(2 * uvRotation[c] + uvPos + 1)],
 							false
 					);
 					
+					float x = centerVec.X + sizeXyz.X * CubeVertices[coordIndex + c*3] / 2;
+					float y = centerVec.Y + sizeXyz.Y * CubeVertices[coordIndex + c*3 + 1] / 2;
+					float z = centerVec.Z + sizeXyz.Z * CubeVertices[coordIndex + c*3 + 2] / 2;
+					
+					double offX = 0;
+					double heightBend = 0;
+					if (WindModes != null && WindModes[c] > 0) {
+						
+						float[] facematrix = Mat4f.Translate(new float[16], matrix, new float[] {0,0,0});
+						float[] sdf = Mat4f.MulWithVec4(facematrix, new float[] { x, y, z, 1 });
+						float ypos = sdf[1] / 16f;
+						float yfract = Math.abs(ypos - (int)ypos);
+						
+						heightBend = 0;
+						if (WindData != null) heightBend = WindData[c];
+						heightBend += yfract;
+						
+						if (windAnimate) {
+							offX = heightBend * 16 / 7.0 * (0.8 + Math.sin(ModelCreator.WindWaveCounter * 1.5)) / 2.0;
+
+							if (WindModes[c]==9) { heightBend=0; offX = 0;}
+							
+							if (WindModes[c] != 4 && WindModes[c] != 5) {
+								double div = 3.0;
+								if (WindModes[c] == 1) div = 10.0;
+								if (WindModes[c] == 7) div = 20.0;
+								
+								offX += heightBend + Math.sin(ModelCreator.WindWaveCounter * 10) / div;
+							}
+						}
+						
+					}
+					
+					float[] invmat = Mat4f.Invert(new float[16], matrix);
+					float[] out = Mat4f.MulWithVec4(invmat, new float[] { (float)offX, 0, 0, 0, 1 });
+					
+					
+					
+
 					GL11.glTexCoord2d(uv.W, uv.H);
-					GL11.glVertex3d(cuboid.getWidth() * CubeVertices[coordIndex++], cuboid.getHeight() * CubeVertices[coordIndex++], cuboid.getDepth() * CubeVertices[coordIndex++]);
+					
+					GL11.glVertex3d(
+							out[0] + x, 
+							out[1] + y, 
+							out[2] + z
+					);
 				}
 			}
 			GL11.glEnd();
-
+			
+			
 			GL11.glDisable(GL_TEXTURE_2D);
 			
 			if (!isInBackdropProject) GL11.glLoadName(0);
-			
+
 		}
 		GL11.glPopMatrix();
 	}
@@ -609,6 +713,8 @@ public class Face
 		cloned.side = side;
 		cloned.glow = glow;
 		cloned.snapUV = snapUV;
+		cloned.WindData = WindData == null ? null : WindData.clone();
+		cloned.WindModes = WindModes == null ? null : WindModes.clone();
 		return cloned;
 	}
 	
@@ -672,6 +778,63 @@ public class Face
 		setEndU(ustart + facewidth); 
 		setEndV(vstart + faceheight);
 		
+	}
+
+	public void AutoguessWindMode(int windMode, int facesEnabled, float[] modelMat)
+	{
+		if (windMode == 0) {
+			this.WindModes = null;
+			return;
+		}
+		
+		if (WindModes == null) {
+			WindModes = new int[4];
+		}
+		
+		Vec3f sizeXyz = new Vec3f(
+            (float)(cuboid.getWidth()) / 1f,
+            (float)(cuboid.getHeight()) / 1f,
+            (float)(cuboid.getDepth()) / 1f
+        );
+		Vec3f centerVec = new Vec3f(sizeXyz.X / 2, sizeXyz.Y / 2, sizeXyz.Z / 2);
+		
+		WindData = new int[4];
+
+		int hereMode = windMode;
+		if (windMode == -1) {
+			hereMode = facesEnabled == 1 || cuboid.name.contains("leaves") ? 1 : 4;
+		}
+		
+		if (windMode == 1 && (cuboid.name.contains("trunk") || cuboid.name.contains("stem"))) hereMode=4;
+		
+		int coordIndex = side * 12;
+		
+		for (int i = 0; i < 4; i++) {
+			
+			float x = centerVec.X + sizeXyz.X * Face.CubeVertices[coordIndex + i*3] / 2;
+			float y = centerVec.Y + sizeXyz.Y * Face.CubeVertices[coordIndex + i*3 + 1] / 2;
+			float z = centerVec.Z + sizeXyz.Z * Face.CubeVertices[coordIndex + i*3 + 2] / 2;
+			
+			float[] facematrix = Mat4f.Translate(new float[16], modelMat, new float[] {0,0,0});
+			float[] sdf = Mat4f.MulWithVec4(facematrix, new float[] { x, y, z, 1 });
+			float ypos = sdf[1] / 16f;
+			
+			WindData[i] = (int)ypos;
+			
+			int mode = 0;
+			if (sdf[1] > 3f) mode = hereMode;
+			
+			WindModes[i] = mode;
+		}
+		
+		if (WindData[0] == 0 && WindData[1] == 0 && WindData[2] == 0 && WindData[3] == 0) WindData = null;
+		
+	}
+
+	public void setReflectiveMode(int selectedIndex)
+	{
+		this.reflectiveMode = selectedIndex;
+		ModelCreator.DidModify();
 	}
 
 }
