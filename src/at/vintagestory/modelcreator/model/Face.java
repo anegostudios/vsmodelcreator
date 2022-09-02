@@ -380,7 +380,7 @@ public class Face
 	}
 	
 	public void bindTexture() {
-		TextureEntry entry = isInBackdropProject ? ModelCreator.currentBackdropProject.getTextureEntryByCode(textureCode) : ModelCreator.currentProject.getTextureEntryByCode(textureCode);
+		TextureEntry entry = isInBackdropProject && ModelCreator.currentBackdropProject != null ? ModelCreator.currentBackdropProject.getTextureEntryByCode(textureCode) : ModelCreator.currentProject.getTextureEntryByCode(textureCode);
 		textureBound = bindTexture(entry);
 	}
 	

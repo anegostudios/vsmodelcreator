@@ -814,6 +814,13 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			{
 				modelrenderer.camera.addZ(wheel * (cameraMod / 5000F));
 			}
+			
+			if (Keyboard.isKeyDown(Keyboard.KEY_MINUS) || Keyboard.isKeyDown(Keyboard.KEY_SUBTRACT)) {
+				modelrenderer.camera.addZ(-50 * (cameraMod / 5000F));
+			}
+			if (Keyboard.isKeyDown(Keyboard.KEY_ADD)) {
+				modelrenderer.camera.addZ(50 * (cameraMod / 5000F));
+			}
 		}
 		
 	}
