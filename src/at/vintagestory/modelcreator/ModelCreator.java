@@ -51,6 +51,12 @@ import at.vintagestory.modelcreator.gui.left.LeftUVSidebar;
 import at.vintagestory.modelcreator.gui.middle.ModelRenderer;
 import at.vintagestory.modelcreator.gui.right.RightTopPanel;
 import at.vintagestory.modelcreator.gui.right.face.FaceTexturePanel;
+import at.vintagestory.modelcreator.input.InputManager;
+import at.vintagestory.modelcreator.input.command.FactoryProjectCommand;
+import at.vintagestory.modelcreator.input.command.ProjectCommand;
+import at.vintagestory.modelcreator.input.key.InputKeyEvent;
+import at.vintagestory.modelcreator.input.listener.ListenerKeyPressInterval;
+import at.vintagestory.modelcreator.input.listener.ListenerKeyPressOnce;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
@@ -140,6 +146,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		prefs = Preferences.userRoot().node("ModelCreator");
 	}
 	
+	// Input listener class
+	private InputManager manager = new InputManager();
+	
 	
 	public ModelCreator(String title, String[] args) throws LWJGLException
 	{
@@ -209,6 +218,40 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 		});
 		
+		// Commands
+		FactoryProjectCommand factoryCommand = new FactoryProjectCommand();
+		ProjectCommand undo = factoryCommand.CreateUndoCommand();
+		ProjectCommand redo = factoryCommand.CreateRedoCommand();
+		ProjectCommand save = factoryCommand.CreateSaveCommand(this);
+		
+		ProjectCommand texReload = factoryCommand.CreateReloadTextureCommand();
+		ProjectCommand texToggle = factoryCommand.CreateToggleTextureCommand();
+		ProjectCommand texRandom = factoryCommand.CreateRandomizeTextureCommand();
+		
+		ProjectCommand elementUp = factoryCommand.CreateMoveSelectedElementCommandUp(this);
+		ProjectCommand elementForward = factoryCommand.CreateMoveSelectedElementCommandForward(this);
+		ProjectCommand elementRight = factoryCommand.CreateMoveSelectedElementCommandRight(this);
+		ProjectCommand elementBackward = factoryCommand.CreateMoveSelectedElementCommandBackward(this);
+		ProjectCommand elementLeft = factoryCommand.CreateMoveSelectedElementCommandLeft(this);
+		ProjectCommand elementDown = factoryCommand.CreateMoveSelectedElementCommandDown(this);
+
+		// Add key input listeners
+		manager.subscribe(new ListenerKeyPressOnce(undo, Keyboard.KEY_LCONTROL, Keyboard.KEY_Z));
+		manager.subscribe(new ListenerKeyPressOnce(redo, Keyboard.KEY_LCONTROL, Keyboard.KEY_Y));
+		manager.subscribe(new ListenerKeyPressOnce(save, Keyboard.KEY_LCONTROL, Keyboard.KEY_S));
+		manager.subscribe(new ListenerKeyPressOnce(texReload, Keyboard.KEY_LCONTROL, Keyboard.KEY_R));
+		manager.subscribe(new ListenerKeyPressOnce(texToggle, Keyboard.KEY_LCONTROL, Keyboard.KEY_T));
+		manager.subscribe(new ListenerKeyPressOnce(texRandom, Keyboard.KEY_LCONTROL, Keyboard.KEY_B));
+		
+		manager.subscribe(new ListenerKeyPressInterval(elementUp, Keyboard.KEY_PRIOR));
+		manager.subscribe(new ListenerKeyPressInterval(elementForward, Keyboard.KEY_UP));
+		manager.subscribe(new ListenerKeyPressInterval(elementRight, Keyboard.KEY_RIGHT));
+		manager.subscribe(new ListenerKeyPressInterval(elementBackward, Keyboard.KEY_DOWN));
+		manager.subscribe(new ListenerKeyPressInterval(elementLeft, Keyboard.KEY_LEFT));
+		manager.subscribe(new ListenerKeyPressInterval(elementDown, Keyboard.KEY_NEXT));
+		
+		// Enable repeat events, grants more fine-grained control over keyboard input
+		Keyboard.enableRepeatEvents(true);
 		
 		// Seriously man, fuck java. Mouse listeners on a canvas are just plain not working. 
 		// canvas.addMouseListener(ml);
@@ -496,7 +539,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 			
 			glViewport(leftSidebarWidth, 0, canvWidth - leftSidebarWidth, canvHeight);
-			handleInput(leftSidebarWidth);
+			
+			handleInputKeyboard();
+			handleInputMouse(leftSidebarWidth);
 			
 			
 			if (animCapture != null && !animCapture.isComplete()) {
@@ -573,19 +618,43 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	}
 
 	
-	boolean zKeyDown;
-	boolean yKeyDown;
-	boolean sKeyDown;
-	boolean rKeyDown;
-	boolean tKeyDown;
-	boolean bKeyDown;
-	public boolean isOnRightPanel;
 	
-	public void handleInput(int leftSidebarWidth)
+	public void handleInputKeyboard()
 	{
+		// Poll the keyboard for input
+		Keyboard.poll();
+		
+		// Process keypresses
+		while (Keyboard.next()){
+			
+			// Read all events from keyboard
+			int keyCode = Keyboard.getEventKey();
+			char keyChar = Keyboard.getEventCharacter();
+			boolean pressed = Keyboard.getEventKeyState();
+			boolean down = Keyboard.isRepeatEvent();
+			long nano = Keyboard.getEventNanoseconds();
+			
+			// Create new KeyEvent
+			InputKeyEvent event = new InputKeyEvent(keyCode, keyChar, pressed, down, nano);
+			
+			// Notify all key listeners
+			manager.notifyListeners(event);
+			
+			// To retain compatability with existing code
+			if(event.keyCode() == Keyboard.KEY_LCONTROL)
+				leftControl = event.pressed();
+		}
+	}
+	
+	public boolean leftControl;
+	public boolean isOnRightPanel;
+	private void handleInputMouse(int leftSidebarWidth) {
+		
 		final float cameraMod = Math.abs(modelrenderer.camera.getZ());
 		
 		boolean isOnLeftPanel = Mouse.getX() < leftSidebarWidth;
+		
+		
 		
 		
 		if (Mouse.isButtonDown(0) || Mouse.isButtonDown(1))
@@ -632,101 +701,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			rightTopPanel.onMouseDownOnRightPanel();
 			return;
 		}
-
 		
-		if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
-		{
-			if (Keyboard.isKeyDown(Keyboard.KEY_Z)) zKeyDown = true;
-			else {
-				if (zKeyDown) {
-					zKeyDown = false;
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() { changeHistory.Undo(); } 
-					});
-				}
-			}
-			
-			
-			if (Keyboard.isKeyDown(Keyboard.KEY_Y)) yKeyDown = true;
-			else {
-				if (yKeyDown) {
-					yKeyDown = false;
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() { changeHistory.Redo(); } 
-					});
-					
-				}
-			}
-			if (Keyboard.isKeyDown(Keyboard.KEY_S)) sKeyDown = true;
-			else {
-				if (sKeyDown) {
-					sKeyDown = false;
-					
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							if (ModelCreator.currentProject.filePath == null) {
-								SaveProjectAs();
-							} else {
-								SaveProject(new File(ModelCreator.currentProject.filePath));
-							}								
-						}
-					});
-					
-				}
-			}
-			
-			if (Keyboard.isKeyDown(Keyboard.KEY_R)) rKeyDown = true;
-			else {
-				if (rKeyDown) {
-					rKeyDown = false;
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							ModelCreator.currentProject.reloadTextures(ModelCreator.Instance);						
-						}
-					});
-				}
-			}
-			
-			if (Keyboard.isKeyDown(Keyboard.KEY_T)) tKeyDown = true;
-			else {
-				if (tKeyDown) {
-					tKeyDown = false;
-					renderTexture = !renderTexture;
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() { updateValues(null); } 
-					});
-				}
-			}
-			
-			if (Keyboard.isKeyDown(Keyboard.KEY_B)) bKeyDown = true;
-			else {
-				if (bKeyDown) {
-					bKeyDown = false;
-					
-					Element elem = ModelCreator.currentProject.SelectedElement;
-			    	if (elem != null) {		
-						ModelCreator.changeHistory.beginMultichangeHistoryState();
-						elem.RandomizeTexture();
-						ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
-					}
-					
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() { updateValues(null); } 
-					});
-				}
-			}
-			
-			
+		if (leftControl)
+		{	
 			if (grabbedElem == null && (Mouse.isButtonDown(0) || Mouse.isButtonDown(1)))
 			{
 				int openGlName = getElementGLNameAtPos(Mouse.getX(), Mouse.getY());
@@ -838,10 +815,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				modelrenderer.camera.addZ(wheel * (cameraMod / 5000F));
 			}
 		}
-	
+		
 	}
-	
-	
 	
 
 	public int getElementGLNameAtPos(int x, int y)
@@ -1327,6 +1302,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				SaveProject(chooser.getSelectedFile());
 			}
 		}
+	}
+	
+	public Camera getCamera() {
+		return this.modelrenderer.camera;
 	}
 
 	public static void reloadStepparentRelationShips()
