@@ -10,3 +10,14 @@ Current featureset:
 - Attachment point editor
 - Auto UV Unwrap for individual boxes with several unwrap modes
 - Export screenshots and animated gifs
+
+<hr>
+
+First launch guide for developers:
+- Setup Eclipse and open it
+- Import VSMC via File -> Import -> Git
+- Click on project name and open Build Path -> Configure Build Path
+  - Check Java library is Java 8
+  - Add JARs from libs folder and natives/\<os\>/swt.jar
+- Mark assets folder as source folder (Build Path -> Use as Source folder)
+- Click on project name and Run As -> Java Application
