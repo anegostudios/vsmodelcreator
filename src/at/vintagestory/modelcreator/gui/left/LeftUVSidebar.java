@@ -59,7 +59,7 @@ public class LeftUVSidebar extends LeftSidebar
 		super(title);
 		this.manager = manager;
 		
-		blockFaceTextureWidth = DEFAULT_WIDTH;
+		blockFaceTextureSize = DEFAULT_WIDTH;
 	}
 	
 	@Override
@@ -356,7 +356,8 @@ public class LeftUVSidebar extends LeftSidebar
 	}
 	
 	
-	int blockFaceTextureWidth;
+	int blockFaceTextureSize;
+	int blockFaceTextureMaxWidth;
 
 	void drawRectsBlockTextureMode(int canvasHeight) {
 		Element elem = manager.getCurrentElement();
@@ -385,15 +386,37 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		boolean doDoubleColumn = horizontalSpace / (verticalSpace/6) >= 2;
 		
+		boolean onlyTallTextures = true;
+		
+		blockFaceTextureMaxWidth = 0;
+		
+		for (int i = 0; i < 6; i++) {
+			
+			Face face = faces[i];
+			if (!face.isEnabled()) continue;
+			
+			Sized texSize = GetBlockTextureModeTextureSize(face.getTextureCode(), blockFaceTextureSize);
+			
+			onlyTallTextures &=(texSize.H / texSize.W) >= 2;
+			doDoubleColumn |= (texSize.H / texSize.W) >= 2;
+			
+			blockFaceTextureMaxWidth = Math.max(blockFaceTextureMaxWidth, (int)texSize.W);
+		}
+		
+		
 		if (doDoubleColumn) {
 			horizontalSpace = GetSidebarWidth() - leftPadding - rightpadding - betweenpadding;
 			verticalSpace = canvasHeight - topPadding - bottompadding - 2*betweenpadding;
 			
-			blockFaceTextureWidth = (int)Math.min(horizontalSpace / 2, verticalSpace / 3);	
+			blockFaceTextureSize = (int)Math.min(horizontalSpace / 2, verticalSpace / 3);	
 		} else {
-			blockFaceTextureWidth = (int)Math.min(horizontalSpace, verticalSpace / 6);
+			blockFaceTextureSize = (int)Math.min(horizontalSpace, verticalSpace / 6);
 		}
 		
+		if (onlyTallTextures) {
+			blockFaceTextureSize *=2;
+			blockFaceTextureMaxWidth *= 2;
+		}
 		
 		
 		glPushMatrix();
@@ -409,20 +432,20 @@ public class LeftUVSidebar extends LeftSidebar
 				Face face = faces[i];
 				if (!face.isEnabled()) continue;
 				
-				Sized texSize = GetBlockTextureModeTextureSize(face.getTextureCode());
+				Sized texSize = GetBlockTextureModeTextureSize(face.getTextureCode(), blockFaceTextureSize);
 				
 				glPushMatrix(); {
 					if (i >= 3 && doDoubleColumn) {
-						glTranslatef(betweenpadding + blockFaceTextureWidth, countright * (blockFaceTextureWidth + betweenpadding), 0);
-						startX[i] = leftPadding + betweenpadding + blockFaceTextureWidth;
-						startY[i] = countright * (blockFaceTextureWidth + betweenpadding) + topPadding;
+						glTranslatef(betweenpadding + blockFaceTextureMaxWidth, countright * (blockFaceTextureSize + betweenpadding), 0);
+						startX[i] = leftPadding + betweenpadding + blockFaceTextureMaxWidth;
+						startY[i] = countright * (blockFaceTextureSize + betweenpadding) + topPadding;
 						countright++;
 					}
 					else
 					{
-						glTranslatef(0, countleft * (blockFaceTextureWidth + betweenpadding), 0);
+						glTranslatef(0, countleft * (blockFaceTextureSize + betweenpadding), 0);
 						startX[i] = leftPadding;
-						startY[i] = countleft * (blockFaceTextureWidth + betweenpadding) + topPadding;
+						startY[i] = countleft * (blockFaceTextureSize + betweenpadding) + topPadding;
 						countleft++;
 					}
 
@@ -468,10 +491,10 @@ public class LeftUVSidebar extends LeftSidebar
 							int pixelsW = (int)(ModelCreator.currentProject.TextureWidth * scale.W);
 							int pixelsH = (int)(ModelCreator.currentProject.TextureHeight * scale.H);
 							
-							double height = blockFaceTextureWidth * pixelsH/pixelsW;
+							double height = blockFaceTextureSize * pixelsH/pixelsW;
 							
 							if (pixelsW <= 64 && pixelsH <= 64) {
-								double sectionWidth = (double)blockFaceTextureWidth / pixelsW;
+								double sectionWidth = (double)blockFaceTextureSize / pixelsW;
 								for (double k= 0; k <= pixelsW; k++) {
 									glVertex2d(k * sectionWidth, 0);
 									glVertex2d(k * sectionWidth, height);	
@@ -480,7 +503,7 @@ public class LeftUVSidebar extends LeftSidebar
 								double sectionHeight = (double)height / pixelsH;
 								for (double k = 0; k <= pixelsH; k++) {
 									glVertex2d(0, k * sectionHeight);
-									glVertex2d(blockFaceTextureWidth, k * sectionHeight);	
+									glVertex2d(blockFaceTextureSize, k * sectionHeight);	
 								}
 							}
 							
@@ -507,20 +530,20 @@ public class LeftUVSidebar extends LeftSidebar
 				Face face = faces[i];
 				if (!face.isEnabled()) continue;
 				
-				Sized texSize = GetBlockTextureModeTextureSize(face.getTextureCode());
+				Sized texSize = GetBlockTextureModeTextureSize(face.getTextureCode(), blockFaceTextureSize);
 				
 				glPushMatrix(); {
 					if (i >= 3 && doDoubleColumn) {
-						glTranslatef(betweenpadding + blockFaceTextureWidth, countright * (blockFaceTextureWidth + betweenpadding), 0);
-						startX[i] = leftPadding + betweenpadding + blockFaceTextureWidth;
-						startY[i] = countright * (blockFaceTextureWidth + betweenpadding) + topPadding;
+						glTranslatef(betweenpadding + blockFaceTextureMaxWidth, countright * (blockFaceTextureSize + betweenpadding), 0);
+						startX[i] = leftPadding + betweenpadding + blockFaceTextureMaxWidth;
+						startY[i] = countright * (blockFaceTextureSize + betweenpadding) + topPadding;
 						countright++;
 					}
 					else
 					{
-						glTranslatef(0, countleft * (blockFaceTextureWidth + betweenpadding), 0);
+						glTranslatef(0, countleft * (blockFaceTextureSize + betweenpadding), 0);
 						startX[i] = leftPadding;
-						startY[i] = countleft * (blockFaceTextureWidth + betweenpadding) + topPadding;
+						startY[i] = countleft * (blockFaceTextureSize + betweenpadding) + topPadding;
 						countleft++;
 					}	
 
@@ -649,7 +672,7 @@ public class LeftUVSidebar extends LeftSidebar
 			}
 			
 			if (!ModelCreator.currentProject.EntityTextureMode && grabbedFaceIndex >= 0) {
-				Sized texSize = GetBlockTextureModeTextureSize(texEntry == null ? null : texEntry.code);
+				Sized texSize = GetBlockTextureModeTextureSize(texEntry == null ? null : texEntry.code, blockFaceTextureSize);
 				texBoxWidth = (int)texSize.W;
 				texBoxHeight = (int)texSize.H;
 			}
@@ -724,8 +747,6 @@ public class LeftUVSidebar extends LeftSidebar
 			if (yMovement != 0) {
 				this.lastMouseY += yMovement * sectionHeight;
 			}
-
-
 			
 			if (xMovement != 0 || yMovement != 0) {
 				ModelCreator.updateValues(null);	
@@ -736,7 +757,7 @@ public class LeftUVSidebar extends LeftSidebar
 	
 	
 	
-	public Sized GetBlockTextureModeTextureSize(String textureCode) {
+	public Sized GetBlockTextureModeTextureSize(String textureCode, float maxHeight) {
 		double texWidth = ModelCreator.currentProject.TextureWidth;
 		double texHeight = ModelCreator.currentProject.TextureHeight;
 		
@@ -748,8 +769,15 @@ public class LeftUVSidebar extends LeftSidebar
 			}
 		}
 		
-		int texBoxWidth = (int)(blockFaceTextureWidth);
+		int texBoxWidth = (int)(blockFaceTextureSize);
 		int texBoxHeight = (int)(texBoxWidth * texHeight / texWidth);
+		
+
+		if (texBoxHeight > blockFaceTextureSize) {
+			double div = texBoxHeight / blockFaceTextureSize;
+			texBoxWidth /= div;
+			texBoxHeight /= div;
+		}
 
 		return new Sized(texBoxWidth, texBoxHeight);
 	}
@@ -767,9 +795,9 @@ public class LeftUVSidebar extends LeftSidebar
 				continue;
 			}
 			
-			if (mouseX >= startX[i] && mouseX <= startX[i] + blockFaceTextureWidth)
+			if (mouseX >= startX[i] && mouseX <= startX[i] + blockFaceTextureMaxWidth)
 			{
-				if ((canvasHeight - mouseY + 10) >= startY[i] && (canvasHeight - mouseY + 10) <= startY[i] + blockFaceTextureWidth)
+				if ((canvasHeight - mouseY + 10) >= startY[i] && (canvasHeight - mouseY + 10) <= startY[i] + blockFaceTextureSize)
 				{
 					return i;
 				}
