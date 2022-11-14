@@ -397,6 +397,7 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			Sized texSize = GetBlockTextureModeTextureSize(face.getTextureCode(), blockFaceTextureSize);
 			
+			
 			onlyTallTextures &=(texSize.H / texSize.W) >= 2;
 			doDoubleColumn |= (texSize.H / texSize.W) >= 2;
 			
@@ -426,16 +427,17 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			int countleft = 0;
 			int countright = 0;
+			int faceCnt=0;
 
 			for (int i = 0; i < 6; i++) {
 				
 				Face face = faces[i];
 				if (!face.isEnabled()) continue;
-				
+				faceCnt++;
 				Sized texSize = GetBlockTextureModeTextureSize(face.getTextureCode(), blockFaceTextureSize);
 				
 				glPushMatrix(); {
-					if (i >= 3 && doDoubleColumn) {
+					if (faceCnt >= 3 && doDoubleColumn) {
 						glTranslatef(betweenpadding + blockFaceTextureMaxWidth, countright * (blockFaceTextureSize + betweenpadding), 0);
 						startX[i] = leftPadding + betweenpadding + blockFaceTextureMaxWidth;
 						startY[i] = countright * (blockFaceTextureSize + betweenpadding) + topPadding;
@@ -524,16 +526,17 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			countleft = 0;
 			countright = 0;
-			
+			faceCnt=0;
 			for (int i = 0; i < 6; i++) {
 				
 				Face face = faces[i];
 				if (!face.isEnabled()) continue;
+				faceCnt++;
 				
 				Sized texSize = GetBlockTextureModeTextureSize(face.getTextureCode(), blockFaceTextureSize);
 				
 				glPushMatrix(); {
-					if (i >= 3 && doDoubleColumn) {
+					if (faceCnt >= 3 && doDoubleColumn) {
 						glTranslatef(betweenpadding + blockFaceTextureMaxWidth, countright * (blockFaceTextureSize + betweenpadding), 0);
 						startX[i] = leftPadding + betweenpadding + blockFaceTextureMaxWidth;
 						startY[i] = countright * (blockFaceTextureSize + betweenpadding) + topPadding;
