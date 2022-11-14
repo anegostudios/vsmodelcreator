@@ -49,7 +49,7 @@ import at.vintagestory.modelcreator.gui.left.LeftKeyFramesPanel;
 import at.vintagestory.modelcreator.gui.left.LeftSidebar;
 import at.vintagestory.modelcreator.gui.left.LeftUVSidebar;
 import at.vintagestory.modelcreator.gui.middle.ModelRenderer;
-import at.vintagestory.modelcreator.gui.right.RightTopPanel;
+import at.vintagestory.modelcreator.gui.right.RightPanel;
 import at.vintagestory.modelcreator.gui.right.face.FaceTexturePanel;
 import at.vintagestory.modelcreator.input.InputManager;
 import at.vintagestory.modelcreator.input.command.FactoryProjectCommand;
@@ -107,7 +107,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	// Swing Components
 	public JScrollPane scroll;
-	public static RightTopPanel rightTopPanel;
+	public static RightPanel rightTopPanel;
 	private Element grabbedElem = null;
 
 	// Texture Loading Cache
@@ -320,7 +320,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	{
 		Icons.init(getClass());
 		
-		rightTopPanel = new RightTopPanel(this);
+		rightTopPanel = new RightPanel(this);
 
 		leftKeyframesPanel = new LeftKeyFramesPanel(rightTopPanel);
 		leftKeyframesPanel.setVisible(false);
@@ -406,7 +406,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				}
 								
 				guiMain.updateValues(byGuiElem);
-			 	((RightTopPanel)rightTopPanel).updateValues(byGuiElem);
+			 	((RightPanel)rightTopPanel).updateValues(byGuiElem);
 			 	leftKeyframesPanel.updateValues(byGuiElem);
 			 	updateFrame(false);
 			 	updateTitle();
@@ -440,7 +440,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 					ignoreFrameUpdates = true;
 					
 					leftKeyframesPanel.updateFrame();
-					((RightTopPanel)rightTopPanel).updateFrame(null);
+					((RightPanel)rightTopPanel).updateFrame(null);
 					updateTitle();
 					guiMain.updateFrame();
 					
@@ -451,7 +451,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			ignoreFrameUpdates = true;
 			
 			leftKeyframesPanel.updateFrame();
-			((RightTopPanel)rightTopPanel).updateFrame(null);
+			((RightPanel)rightTopPanel).updateFrame(null);
 			updateTitle();
 			guiMain.updateFrame();
 			

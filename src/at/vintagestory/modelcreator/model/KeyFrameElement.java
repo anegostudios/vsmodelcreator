@@ -122,6 +122,17 @@ public class KeyFrameElement implements IDrawable
 		{
 			GL11.glEnable(GL_BLEND);
 			GL11.glDisable(GL_CULL_FACE);
+			
+			// Correct (new)
+			/*GL11.glTranslated(originX, originY, originZ);
+			GL11.glTranslated(startX, startY, startZ);
+			GL11.glScaled(stretchX, stretchY, stretchZ);
+			
+			rotateAxis();
+			
+			GL11.glTranslated(-originX, -originY, -originZ);*/
+			
+			// Wrong (old)
 			GL11.glTranslated(originX, originY, originZ);
 			rotateAxis();
 			
@@ -130,6 +141,8 @@ public class KeyFrameElement implements IDrawable
 			GL11.glTranslated(-originX, -originY, -originZ);
 			
 			GL11.glTranslated(startX, startY, startZ);
+			
+
 			
 			
 			for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {

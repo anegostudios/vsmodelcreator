@@ -1517,6 +1517,11 @@ public class Element implements IDrawable
 				Face f = faces[i];
 				f.scaleSize(size);
 			}	
+		} else {
+			for (int i = 0; i < 6; i++) {
+				Face f = faces[i];
+				f.setAutoUVEnabled(false);
+			}
 		}
 		
 	}
