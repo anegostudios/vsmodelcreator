@@ -677,108 +677,36 @@ public class GuiMenu extends JMenuBar
 		
 		
 		itemAutoWindNormal.addActionListener(a -> {
-			ModelCreator.ignoreDidModify = true;
-			
-			for (Element elem : ModelCreator.currentProject.rootElements) {
-				elem.AutoguessWindMode(2, Mat4f.Create());
-			}
-			
-			ModelCreator.ignoreDidModify = false;
-			ModelCreator.DidModify();
-
-			ModelCreator.updateValues(this);
+			autoGuessWindMode(2);
 		});
 		
 		itemAutoWindWeak.addActionListener(a -> {
-			ModelCreator.ignoreDidModify = true;
-			
-			for (Element elem : ModelCreator.currentProject.rootElements) {
-				elem.AutoguessWindMode(1, Mat4f.Create());
-			}
-			
-			ModelCreator.ignoreDidModify = false;
-			ModelCreator.DidModify();
-
-			ModelCreator.updateValues(this);
+			autoGuessWindMode(1);
 		});
 		
 		itemAutoWindBend.addActionListener(a -> {
-			ModelCreator.ignoreDidModify = true;
-			
-			for (Element elem : ModelCreator.currentProject.rootElements) {
-				elem.AutoguessWindMode(4, Mat4f.Create());
-			}
-			
-			ModelCreator.ignoreDidModify = false;
-			ModelCreator.DidModify();
-
-			ModelCreator.updateValues(this);
+			autoGuessWindMode(4);
 		});
 		
 		itemAutoWindTallBend.addActionListener(a -> {
-			ModelCreator.ignoreDidModify = true;
-			
-			for (Element elem : ModelCreator.currentProject.rootElements) {
-				elem.AutoguessWindMode(5, Mat4f.Create());
-			}
-			
-			ModelCreator.ignoreDidModify = false;
-			ModelCreator.DidModify();
-
-			ModelCreator.updateValues(this);
+			autoGuessWindMode(5);
 		});
 
 		
 		itemAutoWindExtraWeak.addActionListener(a -> {
-			ModelCreator.ignoreDidModify = true;
-			
-			for (Element elem : ModelCreator.currentProject.rootElements) {
-				elem.AutoguessWindMode(7, Mat4f.Create());
-			}
-			
-			ModelCreator.ignoreDidModify = false;
-			ModelCreator.DidModify();
-
-			ModelCreator.updateValues(this);
+			autoGuessWindMode(7);
 		});
 		
 		itemAutoWindAllOff.addActionListener(a -> {
-			ModelCreator.ignoreDidModify = true;
-			
-			for (Element elem : ModelCreator.currentProject.rootElements) {
-				elem.AutoguessWindMode(0, Mat4f.Create());
-			}
-			
-			ModelCreator.ignoreDidModify = false;
-			ModelCreator.DidModify();
-
-			ModelCreator.updateValues(this);
+			autoGuessWindMode(0);
 		});
 		
 		itemAutoWindWeakNoBend.addActionListener(a -> {
-			ModelCreator.ignoreDidModify = true;
-			
-			for (Element elem : ModelCreator.currentProject.rootElements) {
-				elem.AutoguessWindMode(9, Mat4f.Create());
-			}
-			
-			ModelCreator.ignoreDidModify = false;
-			ModelCreator.DidModify();
-
-			ModelCreator.updateValues(this);
+			autoGuessWindMode(9);
 		});
 		
 		itemAutoWindWeakBend.addActionListener(a -> {
-			ModelCreator.ignoreDidModify = true;
-			
-			for (Element elem : ModelCreator.currentProject.rootElements) {
-				elem.AutoguessWindMode(-1, Mat4f.Create());
-			}
-			
-			ModelCreator.ignoreDidModify = false;
-			ModelCreator.DidModify();
-
-			ModelCreator.updateValues(this);
+			autoGuessWindMode(-1);
 		});
 
 		
@@ -888,6 +816,25 @@ public class GuiMenu extends JMenuBar
 		{
 			ModelCreator.currentProject.addElementAsChild(new Element(1, 1));
 		});	
+	}
+
+	private void autoGuessWindMode(int mode)
+	{
+		ModelCreator.ignoreDidModify = true;
+		
+		Element curelem = ModelCreator.currentProject.SelectedElement;
+		if (curelem != null) {
+			curelem.AutoguessWindMode(mode, Mat4f.Create());
+		} else {
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(mode, Mat4f.Create());		
+			}
+		}
+		
+		ModelCreator.ignoreDidModify = false;
+		ModelCreator.DidModify();
+
+		ModelCreator.updateValues(this);
 	}
 	
 

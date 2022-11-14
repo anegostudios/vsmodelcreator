@@ -204,8 +204,8 @@ public class Face
 	public void renderFace(BlockFacing blockFacing, float brightness, boolean windAnimate, float[] matrix)
 	{	
 		Project project = getProject();
-		TextureEntry entry = project == null ? null : project.getTextureEntryByCode(textureCode);	
-		
+		if (project == null) return;
+		TextureEntry entry = project.getTextureEntryByCode(textureCode);	
 		
 		GL11.glPushMatrix();
 		{
