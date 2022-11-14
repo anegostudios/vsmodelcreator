@@ -18,7 +18,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
 
-public class RightTopPanel extends JPanel implements IElementManager, IValueUpdater {
+public class RightPanel extends JPanel implements IElementManager, IValueUpdater {
 	private static final long serialVersionUID = 1L;
 
 	private ModelCreator creator;
@@ -39,7 +39,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 	
 	int dy = 60;
 	
-	public RightTopPanel(ModelCreator creator)
+	public RightPanel(ModelCreator creator)
 	{
 		this.creator = creator;
 		setPreferredSize(new Dimension(215, 1450));
@@ -238,8 +238,7 @@ public class RightTopPanel extends JPanel implements IElementManager, IValueUpda
 			});
 			
 			lastGrabMouseX = nowMouseX;
-			
-		}		
+		}	
 	}
 
 	public void Draw()

@@ -14,7 +14,7 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.opengl.renderer.SGL;
 
 import at.vintagestory.modelcreator.gui.right.ElementTree;
-import at.vintagestory.modelcreator.gui.right.RightTopPanel;
+import at.vintagestory.modelcreator.gui.right.RightPanel;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.*;
@@ -54,7 +54,7 @@ public class Project
 		this.filePath = filePath;
 		
 		if (ModelCreator.rightTopPanel != null) {
-			tree = ((RightTopPanel)ModelCreator.rightTopPanel).tree;	
+			tree = ((RightPanel)ModelCreator.rightTopPanel).tree;	
 		}	
 	}
 	

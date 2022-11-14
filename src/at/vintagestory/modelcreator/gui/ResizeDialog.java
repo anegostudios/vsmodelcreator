@@ -45,7 +45,7 @@ public class ResizeDialog
 
 		JCheckBox btnScaleUv = new JCheckBox("Scale UV");
 		btnScaleUv.setToolTipText("If off, it will not rescale the UV, but will cause wonky behavior if UVs are moved");
-		btnScaleUv.setSelected(true);
+		btnScaleUv.setSelected(false);
 		panelRow1.add(btnScaleUv);
 
 		label = new JLabel("");
@@ -70,7 +70,7 @@ public class ResizeDialog
 				float size = Float.parseFloat(scaleTextField.getText());
 				boolean scaleUV =  btnScaleUv.isSelected();
 				
-				Resize(elem, size, 0, scaleUV);
+				Resize(elem, size, 0, !scaleUV);
 				
 				ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 				
