@@ -89,6 +89,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	
 	public static boolean showGrid = true;
+	public static boolean showTreadmill = false;
 	public static boolean showShade = true;
 	public static boolean transparent = true;
 	public static boolean renderTexture = true;
@@ -98,6 +99,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static boolean saratyMode = false;
 	public static boolean uvShowNames = false;
 
+	
+	public static float TreadMillSpeed = 1f;
+	
 	public static float noTexScale = 2;
 
 	// Canvas Variables
@@ -171,7 +175,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		changeHistory.addHistoryState(currentProject);
 		
 		setDropTarget(getCustomDropTarget());
-		setPreferredSize(new Dimension(1200, 715));
+		setPreferredSize(new Dimension(1200, 780));
 		setMinimumSize(new Dimension(800, 500));
 		setLayout(new BorderLayout(10, 0));
 		setIconImages(getIcons());
@@ -640,7 +644,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			// Notify all key listeners
 			manager.notifyListeners(event);
 			
-			// To retain compatability with existing code
+			// To retain compatibility with existing code
 			if(event.keyCode() == Keyboard.KEY_LCONTROL)
 				leftControl = event.pressed();
 		}
@@ -1324,4 +1328,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		ModelCreator.currentProject.reloadStepparentRelationShips();
 		
 	}
+
+	
 }

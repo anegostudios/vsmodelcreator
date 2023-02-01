@@ -118,6 +118,8 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemRotateModel90DegClockwise;
 	private JMenuItem itemRotateModel90DegAntiClockwise;
 	
+	private JMenuItem triCount;
+	
 
 	/* Export */
 	private JMenu exportMenu;
@@ -257,6 +259,8 @@ public class GuiMenu extends JMenuBar
 				itemRotateModel90DegClockwise = createItem("Clockwise", null, KeyEvent.VK_B, Icons.arrow_rotate_clockwise);
 				itemRotateModel90DegAntiClockwise = createItem("Anti-clockwise", null, KeyEvent.VK_B, Icons.arrow_rotate_anticlockwise);
 			}
+			
+			triCount = createItem("Count triangles", "Count amount of triangles used in this model", 0, Icons.coin);
 		}
 
 		
@@ -319,8 +323,13 @@ public class GuiMenu extends JMenuBar
 		menuTools.add(itemResize);
 		menuTools.add(itemuvUnrwapEverything);
 		menuTools.add(itemReduceDecimals);
-		
+		menuTools.add(itemRotateModel90Deg);
+		itemRotateModel90Deg.add(itemRotateModel90DegClockwise);
+		itemRotateModel90Deg.add(itemRotateModel90DegAntiClockwise);
 		menuTools.add(itemAutoWind);
+
+		menuTools.add(triCount);
+		
 		itemAutoWind.add(itemAutoWindNormal);
 		itemAutoWind.add(itemAutoWindWeak);
 		itemAutoWind.add(itemAutoWindBend);
@@ -330,9 +339,6 @@ public class GuiMenu extends JMenuBar
 		itemAutoWind.add(itemAutoWindAllOff);
 		itemAutoWind.add(itemAutoWindExtraWeak);
 		
-		menuTools.add(itemRotateModel90Deg);
-		itemRotateModel90Deg.add(itemRotateModel90DegClockwise);
-		itemRotateModel90Deg.add(itemRotateModel90DegAntiClockwise);
 		
 		
 		exportMenu.add(itemExportUvMap);
@@ -792,7 +798,6 @@ public class GuiMenu extends JMenuBar
 		itemImgurLink.addActionListener(a ->
 		{
 			CreateImgurLink();
-			
 		});
 		
 		
@@ -816,6 +821,11 @@ public class GuiMenu extends JMenuBar
 		{
 			ModelCreator.currentProject.addElementAsChild(new Element(1, 1));
 		});	
+		
+		triCount.addActionListener(a -> {
+			int tris = ModelCreator.currentProject.countTriangles();
+			JOptionPane.showMessageDialog(null, "Amount of triangles: " + tris);
+		});
 	}
 
 	private void autoGuessWindMode(int mode)

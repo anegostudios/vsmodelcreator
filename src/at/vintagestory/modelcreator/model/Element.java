@@ -248,16 +248,6 @@ public class Element implements IDrawable
 		return faces;
 	}
 
-	public int getLastValidFace()
-	{
-		int id = 0;
-		for (Face face : faces)
-		{
-			id = face.getSide();
-		}
-		return id;
-	}
-
 	public FaceDimension getFaceDimension(int side)
 	{
 		switch (side)
@@ -1763,12 +1753,21 @@ public class Element implements IDrawable
 		selectedFace = 0;
 		
 	}
-	
-	
-	
-	
-	
-	
+
+	public int countTriangles()
+	{
+		int tris = 0;
+		
+		for (Face face : faces) {
+			if (face.isEnabled()) tris+=2;
+		}
+		
+		for (Element elem : ChildElements) { 
+			tris += elem.countTriangles();
+		}
+		
+		return tris;
+	}
 	
 	
 }

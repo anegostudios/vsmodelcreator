@@ -48,6 +48,8 @@ public class ModelRenderer
 		
 		drawGridAndElements();
 		
+		drawTreadmillGrid();
+		
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_TEXTURE_2D);
@@ -211,8 +213,7 @@ public class ModelRenderer
 	}
 	
 
-	
-	
+
 	public void drawPerspectiveGrid()
 	{
 		if (!ModelCreator.showGrid) return;
@@ -309,10 +310,6 @@ public class ModelRenderer
 				glVertex3i(0, 16, 0);
 			}
 			glEnd();
-			
-			
-
-			
 		}
 		glPopMatrix();
 	}
@@ -409,5 +406,95 @@ public class ModelRenderer
 		
 	}
 
+
+	
+	
+	
+	
+	
+	
+	
+
+	float accum = 0f;
+	
+	
+	public void drawTreadmillGrid()
+	{
+		if (!ModelCreator.showTreadmill) return;
+		
+		accum += 1/60f * ModelCreator.TreadMillSpeed;
+		if (accum > 1) accum -= 1;
+		
+		float d1 = 0.8f;
+		float d2 = 0.6f;
+		if (ModelCreator.darkMode) { d1 = 0.8f; d2 = 1.0f; }
+	
+		
+		for (int dx = -8; dx <= 8; dx++) {
+			for (int dz = -8; dz <= 8; dz++) {
+				glPushMatrix();
+				glTranslated(dx * 16 + accum * 16, 0, dz * 16);
+				
+				glColor3f(0.55F, 0.55F, 0.60F);
+				glTranslatef(-8, 0, -8);
+
+				// Thin inside lines
+				glLineWidth(1F);
+				glBegin(GL_LINES);
+				{
+					for (int i = 1; i <= 16; i++)
+					{
+						glVertex3i(i, 0, 0);
+						glVertex3i(i, 0, 16);
+					}
+
+					for (int i = 1; i <= 16; i++)
+					{
+						glVertex3i(0, 0, i);
+						glVertex3i(16, 0, i);
+					}
+				}
+				glEnd();
+				
+				glColor3f(0.55F * d2, 0.55F * d2, 0.60F * d2);
+				
+				// Bold outside lines
+				glLineWidth(2F);
+				glBegin(GL_LINES);
+				{
+					glVertex3i(0, 0, 0);
+					glVertex3i(0, 0, 16);
+					glVertex3i(16, 0, 0);
+					glVertex3i(16, 0, 16);
+					glVertex3i(0, 0, 16);
+					glVertex3i(16, 0, 16);
+					glVertex3i(0, 0, 0);
+					glVertex3i(16, 0, 0);
+				}
+				glEnd();
+
+				glColor3f(0.55F * d1, 0.55F * d1, 0.60F * d1);
+				
+				// Bold center cross
+				glLineWidth(2F);
+				glBegin(GL_LINES);
+				{
+					glVertex3i(8, 0, 0);
+					glVertex3i(8, 0, 16);
+					glVertex3i(0, 0, 8);
+					glVertex3i(16, 0, 8);
+				}
+				glEnd();
+
+				glColor3f(0.55F, 0.55F, 0.60F);
+				
+				glPopMatrix();
+				
+			}
+		}
+		
+	}
+	
+	
 	
 }

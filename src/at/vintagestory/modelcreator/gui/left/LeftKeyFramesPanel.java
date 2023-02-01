@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -37,6 +38,7 @@ import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Keyframe;
+import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.model.KeyFrameElement;
 
 public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
@@ -69,6 +71,9 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	JButton moveFrameRightButton;
 	JButton moveFrameLeftButton;
 	
+	JCheckBox treadMill;
+	JTextField treadMillSpeed;
+	
 	boolean ignoreSelectionChange = false;
 	
 	
@@ -95,6 +100,9 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		duplicateFrameButton = new JButton();
 		moveFrameLeftButton = new JButton();
 		moveFrameRightButton = new JButton();
+		
+		treadMill = new JCheckBox();
+		treadMillSpeed = new JTextField("1");
 		
 		
 		tableModel = new AbstractTableModel()
@@ -417,6 +425,36 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		btnContainerBottom.add(moveFrameLeftButton);
 		
 		add(btnContainerBottom);
+		
+		
+		// 7. Treadmill
+		
+		treadMill.addChangeListener(e -> {
+			ModelCreator.showTreadmill = treadMill.isSelected();
+		});
+		AwtUtil.addChangeListener(treadMillSpeed, e -> {
+			try {
+				float value= Float.valueOf(treadMillSpeed.getText());
+				
+				ModelCreator.TreadMillSpeed = value;
+		
+			} catch (Exception ex) {}
+		});
+
+		JPanel treadmillPanel = new JPanel(new GridLayout(1, 2));
+		
+		JPanel panel1 = new JPanel(new GridLayout(2, 1));
+		panel1.add(new JLabel("Treadmill"));
+		panel1.add(treadMill);
+		
+		JPanel panel2 = new JPanel(new GridLayout(2, 1));
+		panel2.add(new JLabel("Treadmill Speed"));
+		panel2.add(treadMillSpeed);
+
+		treadmillPanel.add(panel1);
+		treadmillPanel.add(panel2);
+		
+		add(treadmillPanel);
 		
 		
 		updateValues(null);

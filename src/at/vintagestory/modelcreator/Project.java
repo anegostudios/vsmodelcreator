@@ -221,14 +221,17 @@ public class Project
 		if (SelectedElement != null) {
 			Element newElem = new Element(SelectedElement);
 			newElem.ParentElement = SelectedElement.ParentElement;
+			newElem.ParentElement.ChildElements.add(newElem);
+
+			if (newElem.ParentElement == null) {
+				rootElements.add(newElem);
+			}
+			
 			EnsureUniqueElementName(newElem);
 			
 			tree.addElementAsSibling(newElem);
 			tree.selectElement(newElem);
 			
-			if (newElem.ParentElement == null) {
-				rootElements.add(newElem);
-			}
 		}
 		
 		ModelCreator.ignoreDidModify = false;
@@ -320,39 +323,30 @@ public class Project
 		ModelCreator.updateValues(null);
 	}
 	
-
+	
 	void EnsureUniqueElementName(Element elem) {
-		IntRef tq = new IntRef();
-		EnsureUniqueElementName(elem, tq);
-	}
-	
-	
-	void EnsureUniqueElementName(Element elem, IntRef totalQuantityElems) {
-		if (IsElementNameUsed(elem.getName(), elem)) {
-			
-			String numberStr = "";
-			int pos = elem.getName().length() - 1;
-			while (pos > 0) {
-				if (Character.isDigit(elem.getName().charAt(pos))) {
-					numberStr = elem.getName().charAt(pos) + numberStr;
-				} else break;
-				pos--;
-			}
-			
-			int nextNumber = TotalQuantityElements() + 1 + totalQuantityElems.value;
-			String baseName = elem.getName().substring(0, elem.getName().length() - numberStr.length());
-			
-			elem.setName(baseName + nextNumber);
-			while(IsElementNameUsed(elem.getName(), elem)) {
-				nextNumber++;
-				elem.setName(baseName + nextNumber);
-			}
-			
-			totalQuantityElems.value++;
+		String numberStr = "";
+		int pos = elem.getName().length() - 1;
+		while (pos > 0) {
+			if (Character.isDigit(elem.getName().charAt(pos))) {
+				numberStr = elem.getName().charAt(pos) + numberStr;
+			} else break;
+			pos--;
 		}
+		String baseName = elem.getName().substring(0, elem.getName().length() - numberStr.length());
+
+		if (numberStr.length() == 0) numberStr = "1";
+		int nextNumber = Integer.parseInt(numberStr) + 1;
+
+		String newName = baseName + nextNumber;
+		while (IsElementNameUsed(newName, elem)) {
+			newName = baseName + nextNumber;
+			nextNumber++;
+		}
+		elem.setName(newName);
 		
 		for (Element childElem : elem.ChildElements) {
-			EnsureUniqueElementName(childElem, totalQuantityElems);
+			EnsureUniqueElementName(childElem);
 		}
 	}
 
@@ -789,6 +783,17 @@ public class Project
 			}
 			return;
 		}
+	}
+
+
+	public int countTriangles()
+	{
+		int cnt = 0;
+		for (Element elem : rootElements) {
+			cnt += elem.countTriangles();
+		}
+		
+		return cnt;
 	}
 
 }

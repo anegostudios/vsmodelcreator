@@ -511,9 +511,9 @@ public class Exporter
 
 	private void writeBounds(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
-		writer.write(space(indentation) + "\"from\": [ " + d2s(cuboid.getStartX()) + ", " + d2s(cuboid.getStartY()) + ", " + d2s(cuboid.getStartZ()) + " ], ");
+		writer.write(space(indentation) + "\"from\": [ " + d2s(cuboid.getStartX()) + ", " + d2s(cuboid.getStartY()) + ", " + d2s(cuboid.getStartZ()) + " ],");
 		writer.newLine();
-		writer.write(space(indentation) + "\"to\": [ " + d2s(cuboid.getStartX() + cuboid.getWidth()) + ", " + d2s(cuboid.getStartY() + cuboid.getHeight()) + ", " + d2s(cuboid.getStartZ() + cuboid.getDepth()) + " ], ");
+		writer.write(space(indentation) + "\"to\": [ " + d2s(cuboid.getStartX() + cuboid.getWidth()) + ", " + d2s(cuboid.getStartY() + cuboid.getHeight()) + ", " + d2s(cuboid.getStartZ() + cuboid.getDepth()) + " ],");
 	}
 
 	private void writeShade(BufferedWriter writer, Element cuboid, int indentation) throws IOException
@@ -542,9 +542,17 @@ public class Exporter
 	private void writeFaces(BufferedWriter writer, Element cuboid, int indentation) throws IOException
 	{
 		writer.write(space(indentation) + "\"faces\": {");
+		int facesWritten=0;
 		writer.newLine();
 		for (Face face : cuboid.getAllFaces())
 		{
+			if (!face.isEnabled()) continue;
+			if (facesWritten > 0) {
+				writer.write(",");
+				writer.newLine();
+			}
+			
+			facesWritten++;	
 			writer.write(space(indentation + 1) + "\"" + Face.getFaceName(face.getSide()) + "\": { ");
 			writer.write("\"texture\": \"#" + face.getTextureCode() + "\"");
 			writer.write(", \"uv\": [ " + d2s(face.getStartU()) + ", " + d2s(face.getStartV()) + ", " + d2s(face.getEndU()) + ", " + d2s(face.getEndV()) + " ]");
@@ -553,9 +561,6 @@ public class Exporter
 			}
 			if (face.getGlow() > 0) {
 				writer.write(", \"glow\": " + face.getGlow());
-			}
-			if (!face.isEnabled()) {
-				writer.write(", \"enabled\": false");
 			}
 			if (!face.isAutoUVEnabled()) {
 				writer.write(", \"autoUv\": false");
@@ -574,14 +579,9 @@ public class Exporter
 			}
 			
 			writer.write(" }");
-			if (face.getSide() != cuboid.getLastValidFace())
-			{
-				writer.write(",");
-				writer.newLine();
-			}
 		}
-		
-		writer.newLine();
+				
+		if (facesWritten > 0) writer.newLine();
 		writer.write(space(indentation) + "}");
 	}
 

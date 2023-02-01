@@ -6,15 +6,14 @@ import at.vintagestory.modelcreator.model.Element;
 
 public class CommandRandomizeTexture implements ProjectCommand
 {
-	private static Element selectedElement = ModelCreator.currentProject.SelectedElement;
 	private static ProjectChangeHistory history = ModelCreator.changeHistory;
 	
 	@Override
 	public void execute()
 	{
-		if (selectedElement != null) {		
+		if (ModelCreator.currentProject.SelectedElement != null) {		
     		history.beginMultichangeHistoryState();
-    		selectedElement.RandomizeTexture();
+    		ModelCreator.currentProject.SelectedElement.RandomizeTexture();
 			history.endMultichangeHistoryState(ModelCreator.currentProject);
 		}
 		
