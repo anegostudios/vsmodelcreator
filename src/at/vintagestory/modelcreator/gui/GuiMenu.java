@@ -846,6 +846,25 @@ public class GuiMenu extends JMenuBar
 
 		ModelCreator.updateValues(this);
 	}
+
+	private void autoGuessWindMode(int mode)
+	{
+		ModelCreator.ignoreDidModify = true;
+		
+		Element curelem = ModelCreator.currentProject.SelectedElement;
+		if (curelem != null) {
+			curelem.AutoguessWindMode(mode, Mat4f.Create());
+		} else {
+			for (Element elem : ModelCreator.currentProject.rootElements) {
+				elem.AutoguessWindMode(mode, Mat4f.Create());		
+			}
+		}
+		
+		ModelCreator.ignoreDidModify = false;
+		ModelCreator.DidModify();
+
+		ModelCreator.updateValues(this);
+	}
 	
 
 	
