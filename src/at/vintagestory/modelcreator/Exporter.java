@@ -7,9 +7,18 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.model.Animation;
@@ -236,13 +245,18 @@ public class Exporter
 		
 		collapseKeyFrameElements(keyframe.Elements, keyframeElementsFlat);
 		
+		int k = 0;
 		for (int i = 0; i < keyframeElementsFlat.size(); i++) {
-			if (i > 0) {
+			KeyFrameElement kElem = keyframeElementsFlat.get(i);
+			if (!kElem.PositionSet && !kElem.RotationSet && !kElem.StretchSet) continue;
+
+			if (k > 0) {
 				writer.write(",");
 				writer.newLine();
 			}
+			k++;
 			
-			writeKeyFrameElement(writer, keyframeElementsFlat.get(i), 6);
+			writeKeyFrameElement(writer, kElem, 6);
 		}
 		
 		writer.newLine();
@@ -303,11 +317,23 @@ public class Exporter
 			bla=true;
 		}
 		
-		if (kElem.RotShortestDistance) {
+		if (kElem.RotShortestDistanceX) {
 			if (bla) {
 				writer.write(", ");
 			}
-			writer.write("\"rotShortestDistance\": true");
+			writer.write("\"rotShortestDistanceX\": true");
+		}
+		if (kElem.RotShortestDistanceY) {
+			if (bla) {
+				writer.write(", ");
+			}
+			writer.write("\"rotShortestDistanceY\": true");
+		}
+		if (kElem.RotShortestDistanceZ) {
+			if (bla) {
+				writer.write(", ");
+			}
+			writer.write("\"rotShortestDistanceZ\": true");
 		}
 		
 		
@@ -320,7 +346,10 @@ public class Exporter
 		writer.write(space(1) + "\"textures\": {");
 		writer.newLine();
 		int i = 0;
-		for (String texturename : textureMap.keySet())
+		
+		LinkedHashMap<String, String> map = sortByValue(textureMap);
+		
+		for (String texturename : map.keySet())
 		{
 			writer.write(space(2) + "\"" + texturename + "\": \"" + textureMap.get(texturename) + "\"");
 			if (i < textureMap.size() - 1)
@@ -331,6 +360,24 @@ public class Exporter
 			i++;
 		}
 		writer.write(space(1) + "},");
+	}
+	
+	private static <K, V> LinkedHashMap<K, V> sortByValue(Map<K, V> map) {
+	    List<Entry<K, V>> list = new LinkedList<>(map.entrySet());
+	    Collections.sort(list, new Comparator<Object>() {
+	        @SuppressWarnings("unchecked")
+	        public int compare(Object o1, Object o2) {
+	            return ((Comparable<V>) ((Map.Entry<K, V>) (o1)).getValue()).compareTo(((Map.Entry<K, V>) (o2)).getValue());
+	        }
+	    });
+
+	    LinkedHashMap<K, V> result = new LinkedHashMap<>();
+	    for (Iterator<Entry<K, V>> it = list.iterator(); it.hasNext();) {
+	        Map.Entry<K, V> entry = (Map.Entry<K, V>) it.next();
+	        result.put(entry.getKey(), entry.getValue());
+	    }
+
+	    return result;
 	}
 	
 	private void writeTextureSizes(BufferedWriter writer) throws IOException

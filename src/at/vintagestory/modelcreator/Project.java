@@ -221,7 +221,9 @@ public class Project
 		if (SelectedElement != null) {
 			Element newElem = new Element(SelectedElement);
 			newElem.ParentElement = SelectedElement.ParentElement;
-			newElem.ParentElement.ChildElements.add(newElem);
+			if (newElem.ParentElement != null) {
+				newElem.ParentElement.ChildElements.add(newElem);
+			}
 
 			if (newElem.ParentElement == null) {
 				rootElements.add(newElem);

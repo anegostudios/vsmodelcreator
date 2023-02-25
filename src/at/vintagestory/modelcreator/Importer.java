@@ -361,8 +361,14 @@ public class Importer
 			kelem.setStretchZ(obj.get("stretchZ").getAsDouble());
 		}
 		
-		if (obj.has("rotShortestDistance")) {
-			kelem.RotShortestDistance = obj.get("rotShortestDistance").getAsBoolean();
+		if (obj.has("rotShortestDistanceX")) {
+			kelem.RotShortestDistanceX = obj.get("rotShortestDistanceX").getAsBoolean();
+		}
+		if (obj.has("rotShortestDistanceY")) {
+			kelem.RotShortestDistanceY = obj.get("rotShortestDistanceY").getAsBoolean();
+		}
+		if (obj.has("rotShortestDistanceZ")) {
+			kelem.RotShortestDistanceZ = obj.get("rotShortestDistanceZ").getAsBoolean();
 		}
 	
 		

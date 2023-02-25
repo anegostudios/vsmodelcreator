@@ -24,7 +24,9 @@ public class KeyFrameElement implements IDrawable
 	public boolean PositionSet;
 	public boolean RotationSet;
 	public boolean StretchSet;
-	public boolean RotShortestDistance;
+	public boolean RotShortestDistanceX;
+	public boolean RotShortestDistanceY;
+	public boolean RotShortestDistanceZ;
 
 	private double offsetX = 0.0;
 	private double offsetY = 0.0;
@@ -457,7 +459,9 @@ public class KeyFrameElement implements IDrawable
 		cloned.originX = originX;
 		cloned.originY = originY;
 		cloned.originZ = originZ;
-		cloned.RotShortestDistance = RotShortestDistance;
+		cloned.RotShortestDistanceX = RotShortestDistanceX;
+		cloned.RotShortestDistanceY = RotShortestDistanceY;
+		cloned.RotShortestDistanceZ = RotShortestDistanceZ;
 		
 		for (IDrawable dw : ChildElements) {
 			cloned.ChildElements.add((IDrawable)((KeyFrameElement)dw).clone(iskeyframe, withElementReference));
@@ -485,7 +489,9 @@ public class KeyFrameElement implements IDrawable
 		rotationX = kelem.rotationX;
 		rotationY = kelem.rotationY;
 		rotationZ = kelem.rotationZ;
-		RotShortestDistance = kelem.RotShortestDistance;
+		RotShortestDistanceX = kelem.RotShortestDistanceX;
+		RotShortestDistanceY = kelem.RotShortestDistanceY;
+		RotShortestDistanceZ = kelem.RotShortestDistanceZ;
 	}
 
 
