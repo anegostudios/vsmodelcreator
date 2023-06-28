@@ -53,16 +53,8 @@ Temporary Items
 .project
 .classpath
 *.classpath
-.classpath
 
 # Outputs
 test.json
-/bin1/
-/bin1/
 /bin/
-output-bin/*
-output-jar/*
-/build-signed.bat
-/output-release
-/output-installer
-/launch-bat2exe.bat
+/output/

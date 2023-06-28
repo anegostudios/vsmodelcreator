@@ -5,22 +5,125 @@
     <!--define folder properties-->
     <property name="dir.buildfile" value="."/>
     <property name="dir.workspace" value="C:/Users/Tyron/eclipse-workspace"/>
-    <property name="dir.jarfile" value="${dir.buildfile}/output-jar"/>
-    <target name="create_run_jar">
-        <jar destfile="${dir.jarfile}/vsmodelcreator.jar">
+
+    <target name="clean_linux">
+        <delete dir="${dir.buildfile}/bin/linux" />
+        <delete dir="${dir.buildfile}/output/linux"/>
+
+        <mkdir dir="${dir.buildfile}/bin/" />
+        <mkdir dir="${dir.buildfile}/bin/linux/" />
+        <mkdir dir="${dir.buildfile}/output/" />
+        <mkdir dir="${dir.buildfile}/output/linux/" />
+    </target>
+
+    <target name="clean_win">
+        <delete dir="${dir.buildfile}/bin/windows" />
+        <delete dir="${dir.buildfile}/output/windows"/>
+
+        <mkdir dir="${dir.buildfile}/bin/" />
+        <mkdir dir="${dir.buildfile}/bin/windows/" />
+        <mkdir dir="${dir.buildfile}/output/" />
+        <mkdir dir="${dir.buildfile}/output/windows/" />
+    </target>
+
+    <target name="compile_windows" depends="clean_win">
+        <javac srcdir="${dir.buildfile}/src/" destdir="${dir.buildfile}/bin/windows/">
+            <classpath>
+                <pathelement path="${dir.buildfile}/libs/gson-2.3.1.jar" />
+                <pathelement path="${dir.buildfile}/libs/JTattoo-1.6.11.jar" />
+                <pathelement path="${dir.buildfile}/libs/lwjgl.jar" />
+                <pathelement path="${dir.buildfile}/libs/lwjgl_util.jar" />
+                <pathelement path="${dir.buildfile}/libs/slick-util.jar" />
+                <pathelement path="${dir.buildfile}/natives/windows/swt.jar" />
+            </classpath>
+        </javac>
+
+        <copy todir="${dir.buildfile}/bin/windows/">
+            <fileset dir="${dir.buildfile}/assets/"/>
+        </copy>
+    </target>
+
+    <target name="compile_linux" depends="clean_linux">
+        <javac srcdir="${dir.buildfile}/src/" destdir="${dir.buildfile}/bin/linux/">
+            <classpath>
+                <pathelement path="${dir.buildfile}/libs/gson-2.3.1.jar" />
+                <pathelement path="${dir.buildfile}/libs/JTattoo-1.6.11.jar" />
+                <pathelement path="${dir.buildfile}/libs/lwjgl.jar" />
+                <pathelement path="${dir.buildfile}/libs/lwjgl_util.jar" />
+                <pathelement path="${dir.buildfile}/libs/slick-util.jar" />
+                <pathelement path="${dir.buildfile}/natives/linux/swt.jar" />
+            </classpath>
+        </javac>
+
+        <copy todir="${dir.buildfile}/bin/linux/">
+            <fileset dir="${dir.buildfile}/assets/"/>
+        </copy>
+    </target>
+
+    <target name="create_run_jar" depends="compile_linux,compile_windows">
+        <property name="dir.jarfile_linux" value="${dir.buildfile}/output/linux"/>
+        <jar destfile="${dir.jarfile_linux}/vsmodelcreator.jar">
             <manifest>
                 <attribute name="Main-Class" value="at.vintagestory.modelcreator.Start"/>
                 <attribute name="Class-Path" value=". vsmodelcreator_lib/gson-2.3.1.jar vsmodelcreator_lib/JTattoo-1.6.11.jar vsmodelcreator_lib/lwjgl_util.jar vsmodelcreator_lib/lwjgl.jar vsmodelcreator_lib/slick-util.jar vsmodelcreator_lib/swt.jar"/>
             </manifest>
-            <fileset dir="${dir.buildfile}/bin"/>
+            <fileset dir="${dir.buildfile}/bin/linux"/>
         </jar>
-        <delete dir="${dir.jarfile}/vsmodelcreator_lib"/>
-        <mkdir dir="${dir.jarfile}/vsmodelcreator_lib"/>
-        <copy file="${dir.buildfile}/libs/gson-2.3.1.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
-        <copy file="${dir.buildfile}/libs/JTattoo-1.6.11.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
-        <copy file="${dir.buildfile}/libs/lwjgl_util.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
-        <copy file="${dir.buildfile}/libs/lwjgl.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
-        <copy file="${dir.buildfile}/libs/slick-util.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
-        <copy file="${dir.buildfile}/natives/windows/swt.jar" todir="${dir.jarfile}/vsmodelcreator_lib"/>
+        <delete dir="${dir.jarfile_linux}/vsmodelcreator_lib"/>
+        <mkdir dir="${dir.jarfile_linux}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/gson-2.3.1.jar" todir="${dir.jarfile_linux}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/JTattoo-1.6.11.jar" todir="${dir.jarfile_linux}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/lwjgl_util.jar" todir="${dir.jarfile_linux}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/lwjgl.jar" todir="${dir.jarfile_linux}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/slick-util.jar" todir="${dir.jarfile_linux}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/natives/linux/swt.jar" todir="${dir.jarfile_linux}/vsmodelcreator_lib"/>
+        <copy todir="${dir.jarfile_linux}/natives/linux">
+            <fileset dir="${dir.buildfile}/natives/linux/" includes="**/*" excludes="swt.jar"/>
+        </copy>
+
+        <property name="dir.jarfile_win" value="${dir.buildfile}/output/windows"/>
+        <jar destfile="${dir.jarfile_win}/vsmodelcreator.jar">
+            <manifest>
+                <attribute name="Main-Class" value="at.vintagestory.modelcreator.Start"/>
+                <attribute name="Class-Path" value=". vsmodelcreator_lib/gson-2.3.1.jar vsmodelcreator_lib/JTattoo-1.6.11.jar vsmodelcreator_lib/lwjgl_util.jar vsmodelcreator_lib/lwjgl.jar vsmodelcreator_lib/slick-util.jar vsmodelcreator_lib/swt.jar"/>
+            </manifest>
+            <fileset dir="${dir.buildfile}/bin/windows"/>
+        </jar>
+        <delete dir="${dir.jarfile_win}/vsmodelcreator_lib"/>
+        <mkdir dir="${dir.jarfile_win}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/gson-2.3.1.jar" todir="${dir.jarfile_win}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/JTattoo-1.6.11.jar" todir="${dir.jarfile_win}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/lwjgl_util.jar" todir="${dir.jarfile_win}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/lwjgl.jar" todir="${dir.jarfile_win}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/libs/slick-util.jar" todir="${dir.jarfile_win}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/natives/windows/swt.jar" todir="${dir.jarfile_win}/vsmodelcreator_lib"/>
+        <copy file="${dir.buildfile}/launch.exe" todir="${dir.jarfile_win}/"/>
+        <copy todir="${dir.jarfile_win}/natives/windows">
+            <fileset dir="${dir.buildfile}/natives/windows/" includes="**/*" excludes="swt.jar"/>
+        </copy>
     </target>
+
+    <target name="clean_out">
+        <delete dir="${dir.buildfile}/output" />
+        <mkdir dir="${dir.buildfile}/output" />
+    </target>
+
+    <target name="createRelease" depends="clean_out,create_run_jar">
+
+
+        <tar destfile="output/vsmodelcreator_linux-x64.tar.gz">
+            <fileset dir="output/linux" includes="**/*" />
+        </tar>
+
+        <exec executable="iscc">
+            <arg value="innosetup.iss" />
+        </exec>
+
+        <tstamp>
+            <format property="formattedDate" pattern="ddMMMyyyy" locale="en"/>
+        </tstamp>
+        <move file="output/vsmodelcreator_linux-x64.tar.gz" tofile="output/vsmodelcreator_linux-x64_${formattedDate}.tar.gz" />
+        <move file="output/vsmodelcreator_installer.exe" tofile="output/vsmodelcreator_installer_${formattedDate}.exe" />
+    </target>
+
 </project>
