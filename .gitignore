@@ -1,60 +1,30 @@
-# =========================
-# Operating System Files
-# =========================
+### IntelliJ IDEA ###
+out/
+output/
+!**/src/main/**/out/
+!**/src/test/**/out/
 
-# Windows
-# =========================
-
-# Image file caches
-Thumbs.db
-ehthumbs.db
-
-# Folder config file
-Desktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Shortcuts
-*.lnk
-
-# OSX
-# =========================
-
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Thumbnails
-._*
-
-# Files that might appear on external disk
-.Spotlight-V100
-.Trashes
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-# =========================
-# Other stuff
-# =========================
-
-# Eclipse
-.project
+### Eclipse ###
+.apt_generated
 .classpath
-*.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 
-# Outputs
-test.json
-/bin/
-/output/
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store

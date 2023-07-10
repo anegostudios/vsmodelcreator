@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="windows">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/natives/windows" />
+    </CLASSES>
+    <JAVADOC />
+    <NATIVE>
+      <root url="file://$PROJECT_DIR$/natives/windows" />
+    </NATIVE>
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/natives/windows" recursive="false" />
+  </library>
+</component>
