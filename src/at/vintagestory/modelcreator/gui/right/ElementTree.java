@@ -32,19 +32,19 @@ public class ElementTree
 	public DefaultTreeModel treeModel;
 	private Toolkit toolkit = Toolkit.getDefaultToolkit();
 	
-	public static HashSet<String> collapsedPaths = new HashSet<String>();
+	public HashSet<String> collapsedPaths = new HashSet<String>();
 	
 	boolean ignoreExpandCollapse;
 	
-	public static void loadCollapsedPaths(String values) {
+	public void loadCollapsedPaths(String values) {
 		String[] parts = values.split(",");
-		ElementTree.collapsedPaths.clear();
+		collapsedPaths.clear();
 		for (int i = 0; i < parts.length; i++) {
 			collapsedPaths.add(parts[i]);
 		}
 	}
 	
-	public static String saveCollapsedPaths() {
+	public String saveCollapsedPaths() {
 		String p = "";
 		int i=0;
 		for (String path : collapsedPaths) {

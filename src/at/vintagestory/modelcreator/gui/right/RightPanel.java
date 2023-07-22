@@ -260,7 +260,7 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 				scrollPane.setPreferredSize(new Dimension(newwidth - 10, my + dy));
 				
 				invalidate();
-				ModelCreator.Instance.revalidate();					
+				ModelCreator.Instance.revalidate();
 			}
 		});		
 	}

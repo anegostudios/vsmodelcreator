@@ -206,7 +206,7 @@ public class Importer
 		
 		if (obj.has("collapsedPaths") && obj.get("collapsedPaths").isJsonPrimitive())
 		{
-			ElementTree.loadCollapsedPaths(obj.get("collapsedPaths").getAsString());
+			ModelCreator.rightTopPanel.tree.loadCollapsedPaths(obj.get("collapsedPaths").getAsString());
 		}
 	}
 

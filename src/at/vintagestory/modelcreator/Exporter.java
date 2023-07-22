@@ -130,8 +130,8 @@ public class Exporter
 			writer.write(space(2) + "\"backDropShape\": \"" + project.backDropShape + "\",");
 			writer.newLine();
 		}
-		if (ElementTree.collapsedPaths.size() > 0) {
-			writer.write(space(2) + "\"collapsedPaths\": \"" + ElementTree.saveCollapsedPaths() + "\",");
+		if (ModelCreator.rightTopPanel.tree.collapsedPaths.size() > 0) {
+			writer.write(space(2) + "\"collapsedPaths\": \"" + ModelCreator.rightTopPanel.tree.saveCollapsedPaths() + "\",");
 			writer.newLine();			
 		}
 		writer.write(space(2) + "\"allAngles\": " + project.AllAngles + ",");
