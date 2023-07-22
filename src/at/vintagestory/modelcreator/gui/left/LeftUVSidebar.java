@@ -243,7 +243,6 @@ public class LeftUVSidebar extends LeftSidebar
 				Face face = faces[i];
 				if (!face.isEnabled() || (textureCode != null && !textureCode.equals(face.getTextureCode()))) continue;
 				
-				
 				if (elem == selectedElem) {
 					renderLastStack.push(new RenderFaceTask(face, elem));
 					continue;
@@ -259,10 +258,9 @@ public class LeftUVSidebar extends LeftSidebar
 					continue;
 				}
 				
-				
 				drawFace(elem, face);
-								
 			}
+			
 			
 			drawElementList(textureCode, elem.ChildElements, texBoxWidth, texBoxHeight, canvasHeight);
 		}
@@ -272,10 +270,37 @@ public class LeftUVSidebar extends LeftSidebar
 			RenderFaceTask rft = renderLastStack.pop();
 			drawFace(rft.elem, rft.face);
 		}
+		
+		if (selectedElem != null) {
+			Face selectedFace = selectedElem.getSelectedFace();
+			if (selectedFace != null) {
+				Sized uv = selectedFace.translateVoxelPosToUvPos(selectedFace.getStartU(), selectedFace.getStartV(), true);
+				Sized uvend = selectedFace.translateVoxelPosToUvPos(selectedFace.getEndU(), selectedFace.getEndV(), true);
+	
+				glColor3f(0f, 1f, 0.5f);
+				glBegin(GL_LINES);
+				{
+					glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
+					glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
+	
+					glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
+					glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
+	
+					glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
+					glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
+	
+					glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
+					glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
+				}
+				
+				glEnd();
+			}
+		}
 	}
 	
 	private void drawFace(Element elem, Face face) {
 		Element selectedElem = ModelCreator.currentProject.SelectedElement;
+		Face selectedFace = selectedElem == null ? null : selectedElem.getSelectedFace();
 		
 		Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
 		Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);
@@ -309,6 +334,10 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		if (elem == selectedElem) {
 			glColor3f(0f, 0f, 1f);
+			
+			if (face == selectedFace) {
+				glColor3f(0f, 1f, 0.5f);
+			}
 		}
 		
 		if (elem == grabbedElement && face.isAutoUVEnabled()) {
@@ -335,7 +364,7 @@ public class LeftUVSidebar extends LeftSidebar
 		}
 		
 		glEnd();
-				
+		
 
 		boolean renderName = (ModelCreator.uvShowNames && (!elem.isAutoUnwrapEnabled() || (elem.getUnwrapMode() <= 0 && sidei ==0) || sidei == elem.getUnwrapMode() - 1));
 		

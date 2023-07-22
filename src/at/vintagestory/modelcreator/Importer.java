@@ -20,6 +20,7 @@ import com.google.gson.JsonParser;
 
 import at.vintagestory.modelcreator.enums.EnumEntityActivityStoppedHandling;
 import at.vintagestory.modelcreator.enums.EnumEntityAnimationEndHandling;
+import at.vintagestory.modelcreator.gui.right.ElementTree;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
@@ -201,6 +202,11 @@ public class Importer
 		if (obj.has("backDropShape") && obj.get("backDropShape").isJsonPrimitive())
 		{
 			project.backDropShape = obj.get("backDropShape").getAsString();
+		}
+		
+		if (obj.has("collapsedPaths") && obj.get("collapsedPaths").isJsonPrimitive())
+		{
+			ElementTree.loadCollapsedPaths(obj.get("collapsedPaths").getAsString());
 		}
 	}
 

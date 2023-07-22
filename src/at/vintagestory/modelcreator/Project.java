@@ -529,7 +529,7 @@ public class Project
 		Texture texture = TextureLoader.getTexture("PNG", is);
 		is.close();
 		
-		if (texture.getImageHeight() % 16 != 0 | texture.getImageWidth() % 16 != 0)
+		if (texture.getImageHeight() % 8 != 0 | texture.getImageWidth() % 8 != 0)
 		{
 			texture.release();
 			return;

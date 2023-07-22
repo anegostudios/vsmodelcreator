@@ -113,7 +113,6 @@ public class Element implements IDrawable
 		this.depth = depth;
 		initFaces();
 		updateUV();
-		recalculateBrightnessValues();
 	}
 	
 	public Element(double width, double height) {
@@ -128,7 +127,6 @@ public class Element implements IDrawable
 		faces[2].setEnabled(true);
 
 		updateUV();
-		recalculateBrightnessValues();
 	}
 	
 
@@ -182,7 +180,6 @@ public class Element implements IDrawable
 		}
 		
 		updateUV();
-		recalculateBrightnessValues();
 	}
 	
 
@@ -297,10 +294,10 @@ public class Element implements IDrawable
 	
 	
 	
-	public void recalculateBrightnessValues() {
+	public void recalculateBrightnessValues(float[] mat) {
 		for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
 			if (shade) {
-				brightnessByFace[i] = getFaceBrightness(BlockFacing.ALLFACES[i]);	
+				brightnessByFace[i] = getFaceBrightness(mat, BlockFacing.ALLFACES[i]);	
 			} else {
 				brightnessByFace[i] = 1;
 			}
@@ -308,28 +305,17 @@ public class Element implements IDrawable
 		}
 	}
 	
-	public float getFaceBrightness(BlockFacing facing) {
-		float[] matrix = Mat4f.Create();
+	public float getFaceBrightness(float[] matrix, BlockFacing facing) {
         
-        Mat4f.RotateX(matrix, matrix, (float)rotationX * GameMath.DEG2RAD);            
-        Mat4f.RotateY(matrix, matrix, (float)rotationY * GameMath.DEG2RAD);
-        Mat4f.RotateZ(matrix, matrix, (float)rotationZ * GameMath.DEG2RAD);
-        
-        float[] pos = new float[] { facing.GetFacingVector().X, facing.GetFacingVector().Y, facing.GetFacingVector().Z, 1 };
+        float[] pos = new float[] { facing.GetFacingVector().X, facing.GetFacingVector().Y, facing.GetFacingVector().Z, 0 };
         pos = Mat4f.MulWithVec4(matrix, pos);
+
+        float minNormalShade = 0.55f; // chunkopaque.fsh, line 57
+        Vec3f lightPosition = new Vec3f(1, 1, 1);
         
-        float brightness = 0;
+        float nb = (float)Math.max(minNormalShade, 0.5 + 0.5 * lightPosition.Dot(pos));
         
-        for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
-        	BlockFacing f = BlockFacing.ALLFACES[i];
-        	float angle = (float)Math.acos(f.GetFacingVector().Dot(pos));
-        	
-        	if (angle >= GameMath.PIHALF) continue;
-        	
-        	brightness += (1 - angle / GameMath.PIHALF) * DefaultBlockSideBrightnessByFacing[f.GetIndex()]; 
-        }
-		
-		return brightness;
+        return Math.min(1, nb);
 	}
 	
 
@@ -347,6 +333,7 @@ public class Element implements IDrawable
 	public void draw(IDrawable selectedElem, boolean drawCallFromStepParent, float[] mat) {
 		if (!renderInEditor || (stepParentElement != null && !drawCallFromStepParent)) return;
 		
+
 		float b;
 		
 		GL11.glPushMatrix();
@@ -355,6 +342,7 @@ public class Element implements IDrawable
 			GL11.glDisable(GL_CULL_FACE);
 			
 			ApplyTransform(mat);
+			recalculateBrightnessValues(mat);
 			
 			GL11.glTranslated(originX, originY, originZ);
 			rotateAxis();
@@ -1225,7 +1213,6 @@ public class Element implements IDrawable
 		if (this.rotationX == rotation) return;
 		
 		this.rotationX = rotation;
-		recalculateBrightnessValues();
 		ModelCreator.DidModify();
 	}
 
@@ -1234,7 +1221,6 @@ public class Element implements IDrawable
 		if (this.rotationY == rotation) return;
 		
 		this.rotationY = rotation;
-		recalculateBrightnessValues();
 		ModelCreator.DidModify();
 	}
 	
@@ -1243,7 +1229,6 @@ public class Element implements IDrawable
 		if (this.rotationZ == rotation) return;
 		
 		this.rotationZ = rotation;
-		recalculateBrightnessValues();
 		ModelCreator.DidModify();
 	}
 	
@@ -1274,7 +1259,6 @@ public class Element implements IDrawable
 		if (this.shade == shade) return;
 		
 		this.shade = shade;
-		recalculateBrightnessValues();
 		ModelCreator.DidModify();
 	}
 

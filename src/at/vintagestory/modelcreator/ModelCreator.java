@@ -98,6 +98,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static boolean darkMode = false;
 	public static boolean saratyMode = false;
 	public static boolean uvShowNames = false;
+	public static int elementTreeHeight = 240;
 
 	
 	public static float TreadMillSpeed = 1f;
@@ -168,6 +169,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		noTexScale = prefs.getFloat("noTexScale", 2);
 		autoreloadTexture = prefs.getBoolean("autoreloadTexture", true);
 		repositionWhenReparented = prefs.getBoolean("repositionWhenReparented", true);
+		elementTreeHeight = prefs.getInt("elementTreeHeight", 240);
 		
 		Instance = this;
 		
@@ -1199,7 +1201,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 		
 		ModelCreator.updateValues(null);
-		currentProject.tree.jtree.updateUI();		
+		currentProject.tree.jtree.updateUI();
 	}
 	
 	

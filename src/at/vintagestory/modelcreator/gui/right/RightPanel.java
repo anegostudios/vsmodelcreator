@@ -25,31 +25,44 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 	
 	// Swing Variables
 	private SpringLayout layout;
-	private JScrollPane scrollPane;
+	public JScrollPane scrollPane;
 	private JPanel btnContainer;
-	private JButton btnAdd = new JButton();
-	private JButton btnRemove = new JButton();
-	private JButton btnDuplicate = new JButton();
-	private JTextField nameField = new JTextField();
-	private CuboidTabbedPane tabbedPane = new CuboidTabbedPane(this);
+	private JButton btnAdd;
+	private JButton btnRemove;
+	private JButton btnDuplicate;
+	private JTextField nameField;
+	private CuboidTabbedPane tabbedPane;
 	
 	RightKeyFramesPanel rightKeyFramesPanel;
 
 	public ElementTree tree = new ElementTree();
 	
-	int dy = 60;
+	public int dy = 60;
 	
 	public RightPanel(ModelCreator creator)
 	{
 		this.creator = creator;
 		setPreferredSize(new Dimension(215, 1450));
 		initComponents();
-		setLayout(dy);
 	}
 
 	public void initComponents()
 	{
+		removeAll();
+		
+		btnAdd = new JButton();
+		btnRemove = new JButton();
+		btnDuplicate = new JButton();
+		nameField = new JTextField();
+		tabbedPane = new CuboidTabbedPane(this);
+
 		ModelCreator.currentProject.tree = tree;
+		
+		add(tree.jtree);
+		scrollPane = new JScrollPane(tree.jtree);
+		scrollPane.setPreferredSize(new Dimension(205, ModelCreator.elementTreeHeight + dy));
+		add(scrollPane);
+
 		
 		Font defaultFont = new Font("SansSerif", Font.BOLD, 14);
 		btnContainer = new JPanel(new GridLayout(1, 3, 4, 0));
@@ -97,7 +110,7 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 					if (ModelCreator.currentProject.IsElementNameUsed(nameField.getText(), elem)) {
 						nameField.setBackground(new Color(50, 0, 0));
 					} else {
-						elem.setName(nameField.getText());
+						elem.setName(nameField.getText().replaceAll(",", ""));
 						nameField.setBackground(getBackground());
 					}
 				}
@@ -108,11 +121,7 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 		add(nameField);
 		
 
-		add(tree.jtree);
 
-		scrollPane = new JScrollPane(tree.jtree);
-		scrollPane.setPreferredSize(new Dimension(205, 240 + dy));
-		add(scrollPane);
 
 		tabbedPane.add("Cube", new ElementPanel(this));
 		tabbedPane.add("Face", new FacePanel(this));
@@ -143,14 +152,22 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 		});
 		
 		add(tabbedPane);
+		
+		setLayout(dy);
+		setSidebarWidth(ModelCreator.prefs.getInt("rightBarWidth", 215));
+
+		revalidate();
 	}
 
 	public void setLayout(int dy)
 	{
 		layout = new SpringLayout();
-		layout.putConstraint(SpringLayout.NORTH, nameField, 212 + 70 + dy, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.NORTH, btnContainer, 176 + 70 + dy, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.NORTH, tabbedPane, 250 + 70 + dy, SpringLayout.NORTH, this);
+		
+		int my = ModelCreator.elementTreeHeight - 240;
+		
+		layout.putConstraint(SpringLayout.NORTH, nameField, 212 + 70 + dy + my, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, btnContainer, 176 + 70 + dy + my, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, tabbedPane, 250 + 70 + dy + my, SpringLayout.NORTH, this);
 		setLayout(layout);
 	}
 
@@ -224,23 +241,30 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 		
 		if (nowResizingSidebar) {
 			final int newwidth = Math.min(600, Math.max(215, width + (lastGrabMouseX - nowMouseX)));
-			final int prevheight = getSize().height;
-			
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					setPreferredSize(new Dimension(newwidth, prevheight));
-					scrollPane.setPreferredSize(new Dimension(newwidth - 10, 240 + dy));
-					
-					invalidate();
-					ModelCreator.Instance.revalidate();					
-				}
-			});
+			setSidebarWidth(newwidth);
 			
 			lastGrabMouseX = nowMouseX;
 		}	
 	}
 
+	public void setSidebarWidth(int newwidth) {
+		final int prevheight = getSize().height;
+	
+		ModelCreator.prefs.putInt("rightBarWidth", newwidth);
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				setPreferredSize(new Dimension(newwidth, prevheight));
+				int my = ModelCreator.elementTreeHeight;
+				scrollPane.setPreferredSize(new Dimension(newwidth - 10, my + dy));
+				
+				invalidate();
+				ModelCreator.Instance.revalidate();					
+			}
+		});		
+	}
+	
 	public void Draw()
 	{
 		PointerInfo pinfo = MouseInfo.getPointerInfo(); 

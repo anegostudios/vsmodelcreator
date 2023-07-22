@@ -215,8 +215,6 @@ public class Face
 			GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL13.GL_CLAMP_TO_BORDER);
 			GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL13.GL_CLAMP_TO_BORDER);
-			
-			
 			GL11.glTexParameter(GL_TEXTURE_2D, GL11.GL_TEXTURE_BORDER_COLOR, color);
 			
 			bindTexture();
@@ -225,12 +223,7 @@ public class Face
 			
 			int coordIndex = blockFacing.GetIndex() * 12;
 			int uvPos = blockFacing.GetIndex() * 8;
-			int uvIndex = 0;
-			
-			
             int[] uvRotation = uvRotations[rotation % 4];
-            
-            
             double sizeU = textureUEnd - textureU;
             double sizeV = textureVEnd - textureV;
             

@@ -16,10 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.stream.Stream;
 
+import at.vintagestory.modelcreator.gui.right.ElementTree;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.AttachmentPoint;
@@ -131,6 +129,10 @@ public class Exporter
 		if (project.backDropShape != null) {
 			writer.write(space(2) + "\"backDropShape\": \"" + project.backDropShape + "\",");
 			writer.newLine();
+		}
+		if (ElementTree.collapsedPaths.size() > 0) {
+			writer.write(space(2) + "\"collapsedPaths\": \"" + ElementTree.saveCollapsedPaths() + "\",");
+			writer.newLine();			
 		}
 		writer.write(space(2) + "\"allAngles\": " + project.AllAngles + ",");
 		writer.newLine();

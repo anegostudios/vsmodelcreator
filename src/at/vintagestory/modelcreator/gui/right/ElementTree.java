@@ -32,11 +32,29 @@ public class ElementTree
 	public DefaultTreeModel treeModel;
 	private Toolkit toolkit = Toolkit.getDefaultToolkit();
 	
-	public HashSet<String> collapsedPaths = new HashSet<String>();
+	public static HashSet<String> collapsedPaths = new HashSet<String>();
 	
 	boolean ignoreExpandCollapse;
 	
+	public static void loadCollapsedPaths(String values) {
+		String[] parts = values.split(",");
+		ElementTree.collapsedPaths.clear();
+		for (int i = 0; i < parts.length; i++) {
+			collapsedPaths.add(parts[i]);
+		}
+	}
 	
+	public static String saveCollapsedPaths() {
+		String p = "";
+		int i=0;
+		for (String path : collapsedPaths) {
+			if (i > 0) p+=",";
+			p += path;
+			i++;
+		}
+		
+		return p;
+	}
 		
 	public ElementTree() {
 		rootNode = new DefaultMutableTreeNode("Root");
@@ -114,7 +132,7 @@ public class ElementTree
 			{
 				if (ignoreExpandCollapse) return;
 				TreePath path = arg0.getPath();
-				collapsedPaths.remove(path.toString());
+				collapsedPaths.remove(path.toString().substring(1).replace("]", "").replace(", ", "/"));
 			}
 			
 			@Override
@@ -122,8 +140,9 @@ public class ElementTree
 			{
 				if (ignoreExpandCollapse) return;
 				
-				TreePath path = arg0.getPath();		        
-		        collapsedPaths.add(path.toString());
+				TreePath path = arg0.getPath();
+				String strpath=path.toString().substring(1).replace("]", "").replace(", ", "/");
+		        collapsedPaths.add(strpath);
 			}
 		});
 		
@@ -359,7 +378,9 @@ public class ElementTree
         }
         
         String path = new TreePath(childNode.getPath()).toString();
-        if (collapsedPaths.contains(path)) {
+        String strpath=path.toString().substring(1).replace("]", "").replace(", ", "/");
+        
+        if (collapsedPaths.contains(strpath)) {
         	jtree.collapsePath(new TreePath(childNode.getPath()));
         } else {
             jtree.expandPath(new TreePath(childNode.getPath()));

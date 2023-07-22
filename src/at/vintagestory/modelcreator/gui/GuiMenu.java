@@ -87,6 +87,7 @@ public class GuiMenu extends JMenuBar
 	private JCheckBoxMenuItem itemSaratyMode;
 	private JCheckBoxMenuItem itemuvShowNames;
 	private JCheckBoxMenuItem itemShowShade;
+	private JMenuItem elementTreeHeight;
 	
 	private JMenuItem itemPreviewWind;
 	private JMenuItem itemPreviewWindOff;
@@ -211,6 +212,8 @@ public class GuiMenu extends JMenuBar
 			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D,Icons.transparent);
 			itemDarkMode.setSelected(ModelCreator.darkMode);
 			
+			elementTreeHeight = createItem("Element tree height...", "The height of the element tree on the right hand side", 0, null);
+			
 
 			itemPreviewWind = new JMenu("Wind preview mode");
 			itemPreviewWind.setIcon(Icons.wind);
@@ -294,6 +297,7 @@ public class GuiMenu extends JMenuBar
 		itemPreviewWind.add(itemPreviewWindOff);
 		itemPreviewWind.add(itemPreviewWindSelected);
 		itemPreviewWind.add(itemPreviewWindAll);
+		menuView.add(elementTreeHeight);
 		
 
 		menuProject.add(itemUnlockAngles);
@@ -586,7 +590,9 @@ public class GuiMenu extends JMenuBar
 		});
 		
 		
-	
+		elementTreeHeight.addActionListener(a -> {
+			ElementTreeHeightDialog.show(creator);
+		});	
 
 		itemGrid.addActionListener(a ->
 		{
