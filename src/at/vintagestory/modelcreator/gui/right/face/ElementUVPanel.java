@@ -361,6 +361,7 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 		
 		boolean ctrl = (modifiers & ActionEvent.CTRL_MASK) > 0;
 		boolean shift = (modifiers & ActionEvent.SHIFT_MASK) == 1;
+		boolean alt  = (modifiers & ActionEvent.ALT_MASK) > 0;
 		
 		Face face = cube.getSelectedFace();
 		Sized scale = face.getVoxel2PixelScale();
@@ -380,18 +381,34 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			size = direction * 1;
 		}
 		
+		if (alt) {
+			
+			switch (axis) {
+				case X:
+					cube.moveTexUV(size, 0);
+					break;
+				case Y:
+					cube.moveTexUV(0, size);
+					break;
+				default:
+					break;
+		}
+
+			
+		} else {		
 		
-		switch (axis) {
-			case X:
-				cube.setTexUStart(cube.getTexUStart() + size);
-				xStartField.setText(df.format(cube.getTexUStart()));
-				break;
-			case Y:
-				cube.setTexVStart(cube.getTexVStart() + size);
-				yStartField.setText(df.format(cube.getTexVStart()));
-				break;
-			default:
-				break;
+			switch (axis) {
+				case X:
+					cube.setTexUStart(cube.getTexUStart() + size);
+					xStartField.setText(df.format(cube.getTexUStart()));
+					break;
+				case Y:
+					cube.setTexVStart(cube.getTexVStart() + size);
+					yStartField.setText(df.format(cube.getTexVStart()));
+					break;
+				default:
+					break;
+			}
 		}
 		
 		ModelCreator.updateValues(sourceField);

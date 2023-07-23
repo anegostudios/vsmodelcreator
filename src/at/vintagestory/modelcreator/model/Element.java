@@ -1401,6 +1401,21 @@ public class Element implements IDrawable
 		ModelCreator.DidModify();
 		updateUV();
 	}
+	
+	public void moveTexUV(double texU, double texV)
+	{
+		for (int i = 0; i < 6; i++) {
+			Face f = faces[i];
+			if (!f.isEnabled()) continue;
+			
+			f.textureU += texU;
+			f.textureV += texV;
+			f.textureUEnd += texU;
+			f.textureVEnd += texV;
+		}
+		
+		ModelCreator.DidModify();
+	}
 
 
 	public boolean isAttachmentPointCodeUsed(String code, AttachmentPoint exceptPoint)

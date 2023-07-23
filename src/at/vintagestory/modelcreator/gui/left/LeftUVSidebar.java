@@ -237,6 +237,8 @@ public class LeftUVSidebar extends LeftSidebar
 		Element selectedElem = ModelCreator.currentProject.SelectedElement;
 		
 		for (Element elem : elems) {
+			if (!elem.getRenderInEditor()) continue;
+			
 			Face[] faces = elem.getAllFaces();
 			
 			for (int i = 0; i < 6; i++) {
@@ -893,6 +895,7 @@ public class LeftUVSidebar extends LeftSidebar
 			for (int i = 0; i < 6; i++) {
 				Face face = faces[i];
 				if (!face.isEnabled() || (currentHoveredTextureCode != null && !currentHoveredTextureCode.equals(face.getTextureCode()))) continue;
+				if (!elem.getRenderInEditor()) continue;
 				
 				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
 				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);

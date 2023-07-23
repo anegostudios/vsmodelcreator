@@ -225,7 +225,7 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 	{
 		int width = getSize().width;
 		int nowMouseX = MouseInfo.getPointerInfo().getLocation().x - ModelCreator.Instance.getX();
-		int edgeX = ModelCreator.Instance.leftSidebarWidth() + 2 + ModelCreator.canvas.getWidth();
+		int edgeX = -42 + ModelCreator.Instance.getRootPane().getWidth() - scrollPane.getWidth(); // ModelCreator.Instance.leftSidebarWidth() + 2 + ModelCreator.canvas.getWidth();
 		
 		if (Math.abs(edgeX - nowMouseX) < 8) {
 			if (Mouse.isButtonDown(0)) {
@@ -268,12 +268,17 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 	public void Draw()
 	{
 		PointerInfo pinfo = MouseInfo.getPointerInfo(); 
-	
+
+		if (!Mouse.isButtonDown(0)) {
+			nowResizingSidebar=false;
+		}
+		
 		if (pinfo != null) {
 		
 			int nowMouseX = pinfo.getLocation().x - ModelCreator.Instance.getX();
-			int edgeX = ModelCreator.Instance.leftSidebarWidth() + 2 + ModelCreator.canvas.getWidth();
+			int edgeX = -42 + ModelCreator.Instance.getRootPane().getWidth() - scrollPane.getWidth(); // ModelCreator.Instance.leftSidebarWidth() + 2 + ModelCreator.canvas.getWidth();
 			
+			//System.out.println(edgeX + " vs. " + nowMouseX);
 			
 			if (Math.abs(edgeX - nowMouseX) < 8) {
 				ModelCreator.Instance.isOnRightPanel=true;

@@ -300,6 +300,7 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 		
 		boolean ctrl = (modifiers & ActionEvent.CTRL_MASK) > 0;
 		boolean shift = (modifiers & ActionEvent.SHIFT_MASK) == 1;
+		boolean alt  = (modifiers & ActionEvent.ALT_MASK) > 0;
 		
 		if (shift) {
 			size = direction * 0.1;
@@ -322,29 +323,52 @@ public class FaceUVPanel extends JPanel implements IValueUpdater
 		JTextField targetField;
 		double targetValue;
 		
-		switch (type) {
-		case 0:
-			targetField = uStartField;
-			targetValue = Parser.parseDouble(targetField.getText(), face.getStartU()) + size;
-			face.setStartU(targetValue);			
-			break;
-		case 1:
-			targetField = vStartField;
-			targetValue = Parser.parseDouble(targetField.getText(), face.getStartV()) + size;
-			face.setStartV(targetValue);
-			break;
-		case 2:
-			targetField = uEndField;
-			targetValue = Parser.parseDouble(targetField.getText(), face.getEndU()) + size;
-			face.setEndU(targetValue);
-			break;
-		case 3:
-			targetField = vEndField;
-			targetValue = Parser.parseDouble(targetField.getText(), face.getEndV()) + size;
-			face.setEndV(targetValue);
-			break;
-		default:
-			return;
+		if (alt) {
+			
+			switch (type) {
+				case 0:
+					cube.moveTexUV(size, 0);
+					
+					targetField = uStartField;
+					targetValue = Parser.parseDouble(targetField.getText(), face.getStartU()) + size;
+					break;
+				case 1:
+					cube.moveTexUV(0, size);
+					
+					targetField = vStartField;
+					targetValue = Parser.parseDouble(targetField.getText(), face.getStartV()) + size;
+					break;
+				default:
+					return;
+			}
+			
+			
+		} else {		
+			switch (type) {
+				case 0:
+					targetField = uStartField;
+					targetValue = Parser.parseDouble(targetField.getText(), face.getStartU()) + size;
+					face.setStartU(targetValue);			
+					break;
+				case 1:
+					targetField = vStartField;
+					targetValue = Parser.parseDouble(targetField.getText(), face.getStartV()) + size;
+					face.setStartV(targetValue);
+					break;
+				case 2:
+					targetField = uEndField;
+					targetValue = Parser.parseDouble(targetField.getText(), face.getEndU()) + size;
+					face.setEndU(targetValue);
+					break;
+				case 3:
+					targetField = vEndField;
+					targetValue = Parser.parseDouble(targetField.getText(), face.getEndV()) + size;
+					face.setEndV(targetValue);
+					break;
+				default:
+					return;
+			}
+		
 		}
 		
 		
