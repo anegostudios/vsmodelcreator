@@ -236,7 +236,7 @@ public class GuiMenu extends JMenuBar
 			itemGenSnowLayer = createItem("Generate Snow Layer", "Attempts to generate a snow layer on all horizontal faces", KeyEvent.VK_B, Icons.weather_snow);
 			
 			itemuvUnrwapEverything = createItem("Unwrap all UVs", "Attempts to unwrap all uvs onto a texture without overlap", KeyEvent.VK_B, Icons.rainbow);
-			itemReduceDecimals = createItem("Reduce decimals", "Reduce all element positions and sizes to one decimal point", KeyEvent.VK_B, Icons.rainbow);
+			itemReduceDecimals = createItem("Reduce decimals", "Round all element positions and sizes to one decimal point", KeyEvent.VK_B, Icons.rainbow);
 
 			
 			itemAutoWind = new JMenu("Auto-Guess Wind mode");

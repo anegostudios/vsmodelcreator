@@ -1696,19 +1696,19 @@ public class Element implements IDrawable
 	
 	public void reduceDecimals()
 	{
-		startX = ((int)(startX * 10)) / 10.0; 
-		startY = ((int)(startY * 10)) / 10.0; 
-		startZ = ((int)(startZ * 10)) / 10.0;
-		width = ((int)(width * 10)) / 10.0;
-		height = ((int)(height * 10)) / 10.0;
-		depth = ((int)(depth * 10)) / 10.0;;
+		startX = ((int)Math.round(startX * 10)) / 10.0; 
+		startY = ((int)Math.round(startY * 10)) / 10.0; 
+		startZ = ((int)Math.round(startZ * 10)) / 10.0;
+		width = ((int)Math.round(width * 10)) / 10.0;
+		height = ((int)Math.round(height * 10)) / 10.0;
+		depth = ((int)Math.round(depth * 10)) / 10.0;;
 
-		originX = ((int)(originX * 10)) / 10.0;
-		originY = ((int)(originY * 10)) / 10.0;
-		originZ = ((int)(originZ * 10)) / 10.0;
-		rotationX = ((int)(rotationX * 10)) / 10.0;
-		rotationY = ((int)(rotationY * 10)) / 10.0;
-		rotationZ = ((int)(rotationZ * 10)) / 10.0;
+		originX = ((int)Math.round(originX * 10)) / 10.0;
+		originY = ((int)Math.round(originY * 10)) / 10.0;
+		originZ = ((int)Math.round(originZ * 10)) / 10.0;
+		rotationX = ((int)Math.round(rotationX * 10)) / 10.0;
+		rotationY = ((int)Math.round(rotationY * 10)) / 10.0;
+		rotationZ = ((int)Math.round(rotationZ * 10)) / 10.0;
 		
 		for (Element elem : ChildElements) { 
 			elem.reduceDecimals();
