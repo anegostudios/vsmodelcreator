@@ -42,7 +42,8 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 	public RightPanel(ModelCreator creator)
 	{
 		this.creator = creator;
-		setPreferredSize(new Dimension(215, 1450));
+		int width = ModelCreator.prefs.getInt("rightBarWidth", 215);
+		setPreferredSize(new Dimension(width, 1450));
 		initComponents();
 	}
 
@@ -60,7 +61,8 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 		
 		add(tree.jtree);
 		scrollPane = new JScrollPane(tree.jtree);
-		scrollPane.setPreferredSize(new Dimension(205, ModelCreator.elementTreeHeight + dy));
+		int width = ModelCreator.prefs.getInt("rightBarWidth", 215);
+		scrollPane.setPreferredSize(new Dimension(width-10, ModelCreator.elementTreeHeight + dy));
 		add(scrollPane);
 
 		
@@ -152,10 +154,7 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 		});
 		
 		add(tabbedPane);
-		
 		setLayout(dy);
-		setSidebarWidth(ModelCreator.prefs.getInt("rightBarWidth", 215));
-
 		revalidate();
 	}
 

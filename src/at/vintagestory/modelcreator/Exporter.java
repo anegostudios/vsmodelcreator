@@ -16,8 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import at.vintagestory.modelcreator.gui.right.ElementTree;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.AttachmentPoint;
