@@ -167,6 +167,8 @@ public class AnimationSelector
 				if (project.Animations.size() > 0) {
 					list.setSelectedIndex(nextSelected);
 					project.SelectedAnimation = project.Animations.get(nextSelected);
+				} else {
+					project.SelectedAnimation = null;
 				}
 				
 				ModelCreator.updateValues(btnImport);
