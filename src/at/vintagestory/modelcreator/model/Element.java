@@ -1584,7 +1584,7 @@ public class Element implements IDrawable
 		Element prevStepElem = stepParentElement;
 		
 		if (stepParentElement != null) {
-			stepParentElement.StepChildElements.remove(stepParentElement);
+			stepParentElement.StepChildElements.remove(this);
 			stepParentElement = null;
 		}
 		

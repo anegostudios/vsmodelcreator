@@ -193,6 +193,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		});
 		
 		animationsList.setPreferredSize(new Dimension(170, 29));
+		animationsList.setMaximumRowCount(25);
 		
 		//animationListPanel.setPreferredSize(new Dimension(186, 50));
 		animationListPanel.add(animationsList);
