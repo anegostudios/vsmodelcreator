@@ -7,6 +7,7 @@ import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -38,11 +39,13 @@ public class AnimationSelector
 	JList<String> list = new JList<String>();
 	JTextField nameField = new JTextField();
 	JTextField codeField = new JTextField();
+	
 	JScrollPane scroll = new JScrollPane(list);
 
 	
 	private JComboBox<String> activityStoppedList;
 	private JComboBox<String> animEndedList;
+	private JComboBox<String> versionList;
 	
 	SpringLayout layout;
 	
@@ -255,6 +258,23 @@ public class AnimationSelector
 		});
 		
 		
+
+		versionList = new JComboBox<String>();
+		versionList.setToolTipText("Version 0 is the old, blender incompatible VS animation system (R*T*v), Version 1 is the new VS animation system that is compatible with blender animations (T*R*v)");
+		versionList.addActionListener(e ->
+		{
+			if (ignoreSelectionChange) return;
+			
+			int selectedIndex = versionList.getSelectedIndex();
+			ModelCreator.currentProject.SelectedAnimation.version = selectedIndex;
+			ModelCreator.DidModify();
+		});
+		
+		versionList.setPreferredSize(new Dimension(60, 29));	
+		versionList.setModel(versionList());
+		
+		
+		
 		activityStoppedList = new JComboBox<String>();
 		activityStoppedList.setToolTipText("What should happen once the activity has ended");
 		activityStoppedList.addActionListener(e ->
@@ -292,8 +312,7 @@ public class AnimationSelector
 		rightPanel.add(codeField);
 		layout.putConstraint(SpringLayout.WEST, codeField, 0, SpringLayout.WEST, label);
 		layout.putConstraint(SpringLayout.NORTH, codeField, 0, SpringLayout.SOUTH, label);
-		
-		
+			
 		
 		label = new JLabel("On Activity stopped");
 		label.setPreferredSize(new Dimension(170, 29));
@@ -317,6 +336,16 @@ public class AnimationSelector
 		layout.putConstraint(SpringLayout.WEST, animEndedList, 0, SpringLayout.WEST, label);
 		layout.putConstraint(SpringLayout.NORTH, animEndedList, 0, SpringLayout.SOUTH, label);
 
+		
+		JLabel label2 = new JLabel("Version");
+		rightPanel.add(label2);
+		layout.putConstraint(SpringLayout.WEST, label2, 0, SpringLayout.WEST, animEndedList);
+		layout.putConstraint(SpringLayout.NORTH, label2, 10, SpringLayout.SOUTH, animEndedList);
+		rightPanel.add(versionList);
+		layout.putConstraint(SpringLayout.WEST, versionList, 0, SpringLayout.WEST, label2);
+		layout.putConstraint(SpringLayout.NORTH, versionList, 0, SpringLayout.SOUTH, label2);
+		
+	
 		
 		rightPanel.add(new JLabel(""));
 		
@@ -342,6 +371,15 @@ public class AnimationSelector
 	
 
 
+
+
+	private ComboBoxModel<String> versionList()
+	{
+		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
+		model.addElement("<html><b>0</b></html>");
+		model.addElement("<html><b>1</b></html>");
+		return model;
+	}
 
 	private DefaultComboBoxModel<String> activityStoppedList()
 	{
@@ -375,6 +413,7 @@ public class AnimationSelector
 		codeField.setEnabled(anim != null);
 		activityStoppedList.setEnabled(anim != null);
 		animEndedList.setEnabled(anim != null);
+		versionList.setEnabled(anim != null);
 		
 		if (anim == null) {
 			ignoreSelectionChange = false;
@@ -385,6 +424,7 @@ public class AnimationSelector
 		codeField.setText(anim.getCode());
 		activityStoppedList.setSelectedIndex(anim.OnActivityStopped == null ? 0 : anim.OnActivityStopped.index());
 		animEndedList.setSelectedIndex(anim.OnAnimationEnd == null ? 0 : anim.OnAnimationEnd.index());
+		versionList.setSelectedIndex(anim.version);
 		
 		ignoreSelectionChange = false;
 	}

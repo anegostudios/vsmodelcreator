@@ -319,9 +319,9 @@ public class Element implements IDrawable
 	}
 	
 
-	public void draw(IDrawable selectedElem)
+	public void draw(IDrawable selectedElem, boolean drawCallFromStepParent, int animVersion)
 	{
-		draw(selectedElem, false, Mat4f.Identity_(new float[16]));
+		draw(selectedElem, drawCallFromStepParent, Mat4f.Identity_(new float[16]));
 	}
 
 	
@@ -640,10 +640,10 @@ public class Element implements IDrawable
     	float[] vRotationAxis = new float[] { 0, 0, 0, 0 };
 
     	for (Animation anim : ModelCreator.currentProject.Animations) {
-    		for (Keyframe keyframe : anim.keyframes) {
+    		for (AnimationFrame keyframe : anim.keyframes) {
     			if (keyframe == null) continue;
 
-    			KeyFrameElement e = keyframe.GetKeyFrameElement(this);
+    			AnimFrameElement e = keyframe.GetKeyFrameElementFlat(this);
     			if (e == null) continue;
 
     			vOrigin[0] = (float) e.getOriginX();

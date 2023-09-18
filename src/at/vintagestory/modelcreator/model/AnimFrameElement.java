@@ -16,7 +16,7 @@ import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.util.Mat4f;
 
-public class KeyFrameElement implements IDrawable
+public class AnimFrameElement implements IDrawable
 {
 	// Persistent kf-elem data
 	public String AnimatedElementName;
@@ -42,41 +42,28 @@ public class KeyFrameElement implements IDrawable
 	private double originZ = 0;
 
 	
+	// Non-persistent kf-elem data 
 	
 	public List<IDrawable> ChildElements = new ArrayList<IDrawable>();
-
-	
-	// Non-persistent kf-elem data 
+	AnimFrameElement ParentElement;
+	public List<IDrawable> StepChildElements = new ArrayList<IDrawable>();
+	AnimFrameElement StepParentElement;
 	
 	public Element AnimatedElement;
 	public int FrameNumber;
-	KeyFrameElement ParentElement;
 	public boolean IsKeyFrame;
 	
 	// Rotation Point Indicator
 	protected Sphere sphere = new Sphere();
 
 	
-	public KeyFrameElement(boolean IsKeyFrame) {
+	public AnimFrameElement(boolean IsKeyFrame) {
 		this.IsKeyFrame = IsKeyFrame; 
 	}
 	
 	
-	public KeyFrameElement GetOrCreateChildElement(Element forElement) {
-		for (IDrawable elem : ChildElements) {
-			if (((KeyFrameElement)elem).AnimatedElement == forElement) return (KeyFrameElement)elem;
-		}
-		
-		KeyFrameElement elem = new KeyFrameElement(forElement, IsKeyFrame);
-		ChildElements.add(elem);
-		elem.ParentElement = this;
-		if (IsKeyFrame) ModelCreator.DidModify();
-		
-		return elem;
-	}
 	
-	
-	public KeyFrameElement(Element cuboid, boolean IsKeyFrame)
+	public AnimFrameElement(Element cuboid, boolean IsKeyFrame)
 	{
 		this.AnimatedElement = cuboid;
 		this.AnimatedElementName = cuboid.name;
@@ -87,7 +74,7 @@ public class KeyFrameElement implements IDrawable
 		boolean useless = !PositionSet && !RotationSet && !StretchSet;
 		
 		for (IDrawable elem : ChildElements) {
-			KeyFrameElement kf = (KeyFrameElement)elem;
+			AnimFrameElement kf = (AnimFrameElement)elem;
 			useless &= kf.IsUseless();
 		}
 		
@@ -104,10 +91,10 @@ public class KeyFrameElement implements IDrawable
 	
 	
 	@Override
-	public void draw(IDrawable selectedElem)
+	public void draw(IDrawable selectedElem, boolean drawCallFromStepParent, int animVersion)
 	{
-		if (!AnimatedElement.getRenderInEditor()) return;
-		
+		if (!AnimatedElement.getRenderInEditor()|| (AnimatedElement.stepParentElement != null && !drawCallFromStepParent)) return;
+
 		float b;
 		
 		double originX = AnimatedElement.originX + this.getOriginX();
@@ -125,27 +112,19 @@ public class KeyFrameElement implements IDrawable
 			GL11.glEnable(GL_BLEND);
 			GL11.glDisable(GL_CULL_FACE);
 			
-			// Correct (new)
-			/*GL11.glTranslated(originX, originY, originZ);
-			GL11.glTranslated(startX, startY, startZ);
-			GL11.glScaled(stretchX, stretchY, stretchZ);
-			
-			rotateAxis();
-			
-			GL11.glTranslated(-originX, -originY, -originZ);*/
-			
-			// Wrong (old)
 			GL11.glTranslated(originX, originY, originZ);
-			rotateAxis();
-			
-			GL11.glScaled(stretchX, stretchY, stretchZ);
-			
+			if (animVersion > 0) {		
+				// Correct (new)
+				GL11.glTranslated(startX, startY, startZ);
+				GL11.glScaled(stretchX, stretchY, stretchZ);
+				rotateAxis();
+			} else {
+				// Wrong (old)
+				rotateAxis();
+				GL11.glScaled(stretchX, stretchY, stretchZ);
+				GL11.glTranslated(startX, startY, startZ);
+			}
 			GL11.glTranslated(-originX, -originY, -originZ);
-			
-			GL11.glTranslated(startX, startY, startZ);
-			
-
-			
 			
 			for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
 				if (!AnimatedElement.faces[i].isEnabled()) continue;
@@ -159,7 +138,10 @@ public class KeyFrameElement implements IDrawable
 			GL11.glLoadName(0);
 			
 			for (int i = 0; i < ChildElements.size(); i++) {
-				ChildElements.get(i).draw(selectedElem);
+				ChildElements.get(i).draw(selectedElem, false, animVersion);
+			}
+			for (int i = 0; i < StepChildElements.size(); i++) {
+				StepChildElements.get(i).draw(selectedElem, true, animVersion);
 			}
 
 		}
@@ -439,8 +421,8 @@ public class KeyFrameElement implements IDrawable
 	}
 
 	
-	public KeyFrameElement clone(boolean iskeyframe, boolean withElementReference) {
-		KeyFrameElement cloned = new KeyFrameElement(iskeyframe);
+	public AnimFrameElement clone(boolean iskeyframe, boolean withElementReference) {
+		AnimFrameElement cloned = new AnimFrameElement(iskeyframe);
 		
 		cloned.AnimatedElementName = AnimatedElement == null ? AnimatedElementName : ((Element)AnimatedElement).name;
 		cloned.AnimatedElement = AnimatedElement;
@@ -464,7 +446,7 @@ public class KeyFrameElement implements IDrawable
 		cloned.RotShortestDistanceZ = RotShortestDistanceZ;
 		
 		for (IDrawable dw : ChildElements) {
-			cloned.ChildElements.add((IDrawable)((KeyFrameElement)dw).clone(iskeyframe, withElementReference));
+			cloned.ChildElements.add((IDrawable)((AnimFrameElement)dw).clone(iskeyframe, withElementReference));
 		}
 		
 		cloned.FrameNumber = FrameNumber;
@@ -472,7 +454,7 @@ public class KeyFrameElement implements IDrawable
 	}
 	
 	
-	public void setFrom(KeyFrameElement kelem) {
+	public void setFrom(AnimFrameElement kelem) {
 		AnimatedElementName = kelem.AnimatedElementName;
 		PositionSet = kelem.PositionSet;
 		RotationSet = kelem.RotationSet;
@@ -507,4 +489,8 @@ public class KeyFrameElement implements IDrawable
 		originY *= size;
 		originZ *= size;
 	}
+
+
+
+
 }

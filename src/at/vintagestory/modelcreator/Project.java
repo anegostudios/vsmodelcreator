@@ -117,25 +117,9 @@ public class Project
 		return -1;
 	}
 	
-	public KeyFrameElement getSelectedKeyFrameElement() {
-		if (SelectedAnimation == null || SelectedElement == null) return null;
-		
-		return SelectedAnimation.GetOrCreateKeyFrameElement(SelectedElement);
-	}
-	
-	
-	public Keyframe GetKeyFrame(int frameNumber) {
+	public AnimationFrame GetKeyFrame(int frameNumber) {
 		if (SelectedAnimation == null) return null;
 		return SelectedAnimation.keyframes[frameNumber];
-	}
-	
-	
-	public KeyFrameElement GetKeyFrameElement(Element elem, int index) {
-		if (SelectedAnimation == null) return null;		
-		Keyframe keyFrame = SelectedAnimation.keyframes[index];
-		if (keyFrame == null) return null;
-		
-		return keyFrame.GetKeyFrameElement(elem);
 	}
 	
 	
@@ -161,10 +145,8 @@ public class Project
 
 	public void calculateCurrentFrameElements() {
 		if (SelectedAnimation == null) return;
-		Keyframe keyFrame = SelectedAnimation.keyframes[SelectedAnimation.currentFrame];
+		AnimationFrame keyFrame = SelectedAnimation.keyframes[SelectedAnimation.currentFrame];
 		if (keyFrame == null) return;
-		
-		
 	}
 
 	public List<IDrawable> getCurrentFrameRootElements()
@@ -178,6 +160,12 @@ public class Project
 		}
 		
 		return SelectedAnimation.allFrames.get(SelectedAnimation.currentFrame).Elements;
+	}
+	
+	public int CurrentAnimVersion() {
+		if (SelectedAnimation == null || SelectedAnimation.keyframes.length == 0) return 0;
+		
+		return SelectedAnimation.version;
 	}
 	
 	
@@ -259,7 +247,7 @@ public class Project
 		}
 		
 		for (int i = 0; i < Animations.size(); i++) {
-			Animations.get(i).RemoveElement(curElem);
+			Animations.get(i).RemoveKeyFrameElement(curElem);
 			
 			if (Animations.get(i) == SelectedAnimation) {
 				Animations.get(i).SetFramesDirty();	
@@ -684,6 +672,7 @@ public class Project
 			elem.reloadStepparentRelationShip();
 		}
 	}
+	
 
 	public void ReduceDecimals() {
 		ModelCreator.changeHistory.beginMultichangeHistoryState();
@@ -796,6 +785,40 @@ public class Project
 		}
 		
 		return cnt;
+	}
+
+
+	public void attachToBackdropProject(Project backDropProject)
+	{
+		insertStepChildren(rootElements, backDropProject);
+		
+		for (Animation anim : Animations) {
+			anim.loadKeyFramesIntoProject(backDropProject);
+		}
+	}
+
+
+	private void insertStepChildren(ArrayList<Element> myElements, Project backDropProject)
+	{
+		for (Element myElem : myElements) {
+			if (myElem.stepparentName != null) {
+				insertStepChild(myElem, backDropProject);
+			}
+			
+			insertStepChildren(myElem.ChildElements, backDropProject);
+		}
+	}
+
+
+	private void insertStepChild(Element myElem, Project backDropProject)
+	{
+		Element hisElem = backDropProject.findElement(myElem.stepparentName);
+		if (hisElem != null) {
+			myElem.ParentElement = hisElem;
+			if (!hisElem.StepChildElements.contains(myElem)) {
+				hisElem.StepChildElements.add(myElem);
+			}
+		}
 	}
 
 }

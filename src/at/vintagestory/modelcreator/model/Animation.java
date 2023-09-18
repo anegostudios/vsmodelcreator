@@ -5,7 +5,6 @@ import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.enums.*;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
-import at.vintagestory.modelcreator.util.Vec3f;
 
 public class Animation
 {
@@ -13,7 +12,8 @@ public class Animation
 	int quantityFrames;
 	private String name;
 	private String code;
-	public Keyframe[] keyframes = new Keyframe[0];
+	public AnimationFrame[] keyframes = new AnimationFrame[0];
+	public int version;
 	
     public EnumEntityActivityStoppedHandling OnActivityStopped = EnumEntityActivityStoppedHandling.Rewind;
     public EnumEntityAnimationEndHandling OnAnimationEnd = EnumEntityAnimationEndHandling.Repeat;
@@ -21,9 +21,10 @@ public class Animation
 		
 	// Non-persistent animation data 
 	public int currentFrame;
-	public ArrayList<Keyframe> allFrames = new ArrayList<Keyframe>();
+	public ArrayList<AnimationFrame> allFrames = new ArrayList<AnimationFrame>();
 	public int[] frameNumbers = new int[0];
 	public boolean framesDirty = true;
+	
 	
 	public Animation() {
 		quantityFrames = 30;
@@ -50,7 +51,7 @@ public class Animation
 		if (quantityFrames < 0) return;
 		
 		for (int frame = 0; frame < quantityFrames; frame++) {
-			Keyframe keyframe = new Keyframe(false);
+			AnimationFrame keyframe = new AnimationFrame(false);
 			keyframe.setFrameNumber(frame);
 			
 			for (Element elem : project.rootElements) {
@@ -70,21 +71,23 @@ public class Animation
 		
 		for (int i = 0; i < keyframes.length; i++) {
 			for (IDrawable drawable : keyframes[i].Elements) {
-				KeyFrameElement prevkelem = (KeyFrameElement)drawable;
+				AnimFrameElement prevkelem = (AnimFrameElement)drawable;
 				
 				lerpKeyFrameElement(i, prevkelem);
 			}
 		}
+		
+		ReloadFrameNumbers();
 	}
 	
 
 	
-	void lerpKeyFrameElement(int keyFrameIndex, KeyFrameElement curKelem) {
+	void lerpKeyFrameElement(int keyFrameIndex, AnimFrameElement curKelem) {
 		
 		for (int flag = 0; flag < 3; flag++) {
 			if (!curKelem.IsSet(flag)) continue;
 			
-			KeyFrameElement nextkelem = getNextKeyFrameElementForFlag(keyFrameIndex, curKelem.AnimatedElement, flag);
+			AnimFrameElement nextkelem = getNextKeyFrameElementForFlag(keyFrameIndex, curKelem.AnimatedElement, flag);
 
 			int startFrame;
 			int frames;
@@ -102,9 +105,10 @@ public class Animation
 			
 			for (int x = 0; x < frames; x++) {
 				int frame = (startFrame + x) % quantityFrames;				
-				KeyFrameElement kelem = allFrames.get(frame).GetKeyFrameElement(curKelem.AnimatedElement);
+				AnimFrameElement kelem = allFrames.get(frame).GetAnimFrameElementRec(curKelem.AnimatedElement);
 				if (kelem == null) {
 					System.out.println("kelem for frame " + frame + " is null, will crash.");
+					kelem = allFrames.get(frame).GetAnimFrameElementRec(curKelem.AnimatedElement);
 				}
 				lerpKeyFrameElement(kelem, curKelem, nextkelem, flag, x);
 			}
@@ -112,20 +116,20 @@ public class Animation
 		
 		
 		for (IDrawable childKelem : curKelem.ChildElements) {
-			lerpKeyFrameElement(keyFrameIndex, (KeyFrameElement)childKelem);
+			lerpKeyFrameElement(keyFrameIndex, (AnimFrameElement)childKelem);
 		}
 	}
 	
 	
-	KeyFrameElement getNextKeyFrameElementForFlag(int index, Element forElement, int forFlag) {
-		Keyframe nextkeyframe;
+	AnimFrameElement getNextKeyFrameElementForFlag(int index, Element forElement, int forFlag) {
+		AnimationFrame nextkeyframe;
 		
 		int j = index + 1;
 		int tries = keyframes.length;
 		while (tries-- > 0) {
 			nextkeyframe = keyframes[j % keyframes.length];
 			
-			KeyFrameElement kelem = nextkeyframe.GetKeyFrameElement(forElement);
+			AnimFrameElement kelem = nextkeyframe.GetAnimFrameElementRec(forElement);
 			if (kelem != null && kelem.IsSet(forFlag)) {
 				return kelem;
 			}
@@ -137,22 +141,30 @@ public class Animation
 	}
 	
 	
-	KeyFrameElement createEmptyFrameForElement(Element element, int frameNumber) { 
-		KeyFrameElement kelem = new KeyFrameElement(element, false);
+	AnimFrameElement createEmptyFrameForElement(Element element, int frameNumber) {
+
+		AnimFrameElement kelem = new AnimFrameElement(element, false);
 		kelem.FrameNumber = frameNumber;
 		
 		for (Element child : element.ChildElements) {
-			KeyFrameElement childKeyFrameElem = createEmptyFrameForElement(child, frameNumber);
+			AnimFrameElement childKeyFrameElem = createEmptyFrameForElement(child, frameNumber);
 			childKeyFrameElem.ParentElement = kelem;
 			
 			kelem.ChildElements.add(childKeyFrameElem);
+		}
+		
+		for (Element child : element.StepChildElements) {
+			AnimFrameElement childKeyFrameElem = createEmptyFrameForElement(child, frameNumber);
+			childKeyFrameElem.StepParentElement = kelem;
+			
+			kelem.StepChildElements.add(childKeyFrameElem);
 		}
 				
 		return kelem;
 	}
 	
 	
-	void lerpKeyFrameElement(KeyFrameElement kElem, KeyFrameElement prev, KeyFrameElement next, int forFlag, int relativeFrame) { 
+	void lerpKeyFrameElement(AnimFrameElement kElem, AnimFrameElement prev, AnimFrameElement next, int forFlag, int relativeFrame) { 
 		if (prev == null && next == null) return;
 		
 		double t = 0;
@@ -190,7 +202,7 @@ public class Animation
 	}
 
 	
-	public void SetQuantityFrames(int quantity, Project project) {
+	public void SetQuantityFrames(int quantity) {
 		quantityFrames = quantity;
 		SetFramesDirty();
 		ModelCreator.DidModify();
@@ -211,8 +223,8 @@ public class Animation
 		currentFrame = mod(currentFrame - 1, quantityFrames);
 	}
 	
-	public KeyFrameElement TogglePosition(Element elem, boolean on) {
-		KeyFrameElement keyframe = GetOrCreateKeyFrameElement(elem);
+	public AnimFrameElement TogglePosition(Element elem, boolean on) {
+		AnimFrameElement keyframe = GetOrCreateKeyFrameElement(currentFrame, elem);
 		
 		if (keyframe.PositionSet == on) return keyframe;
 		
@@ -225,8 +237,8 @@ public class Animation
 		return keyframe;
 	}
 
-	public KeyFrameElement ToggleRotation(Element elem, boolean on) {
-		KeyFrameElement keyframe = GetOrCreateKeyFrameElement(elem);
+	public AnimFrameElement ToggleRotation(Element elem, boolean on) {
+		AnimFrameElement keyframe = GetOrCreateKeyFrameElement(currentFrame, elem);
 		
 		if (keyframe.RotationSet == on) return keyframe;
 		
@@ -239,8 +251,8 @@ public class Animation
 		return keyframe;
 	}
 
-	public KeyFrameElement ToggleStretch(Element elem, boolean on) {
-		KeyFrameElement keyframe = GetOrCreateKeyFrameElement(elem);
+	public AnimFrameElement ToggleStretch(Element elem, boolean on) {
+		AnimFrameElement keyframe = GetOrCreateKeyFrameElement(currentFrame, elem);
 		keyframe.StretchSet = on;
 		
 		if (keyframe.StretchSet == on) return keyframe;
@@ -253,60 +265,36 @@ public class Animation
 	}
 	
 	
-	public void RemoveKeyFramesIfUseless(KeyFrameElement keyframe) {
+	public void RemoveKeyFramesIfUseless(AnimFrameElement keyframe) {
 		if (keyframe.IsUseless()) {
 			RemoveKeyFrameElement(keyframe, currentFrame);
 			Element parentElem;
 			while ((parentElem = keyframe.AnimatedElement.ParentElement) != null) {
-				KeyFrameElement parentKf = GetKeyFrameElement(parentElem, currentFrame);
+				AnimFrameElement parentKf = GetKeyFrameElement(parentElem, currentFrame);
 				if (parentKf != null && parentKf.IsUseless()) {
 					RemoveKeyFrameElement(parentKf, currentFrame);
 				} else break;
 			}
 		}
-				
-	}
-
-	
-	public void SetOffset(Element elem, Vec3f position) {
-		KeyFrameElement keyframe = GetOrCreateKeyFrameElement(elem);
-		keyframe.setOffsetX(position.X);
-		keyframe.setOffsetY(position.Y);
-		keyframe.setOffsetZ(position.Z);
 	}
 	
-	public void SetRotation(Element elem, Vec3f xyzRotation) {
-		KeyFrameElement keyframe = GetOrCreateKeyFrameElement(elem);
-		keyframe.setRotationX(xyzRotation.X);
-		keyframe.setRotationY(xyzRotation.Y);
-		keyframe.setRotationZ(xyzRotation.Z);
-	}
 	
-	public void SetStretch(Element elem, Vec3f stretch) {
-		KeyFrameElement keyframe = GetOrCreateKeyFrameElement(elem);
-		keyframe.setStretchX(stretch.X);
-		keyframe.setStretchY(stretch.Y);
-		keyframe.setStretchZ(stretch.Z);
-	}
-
-
-	
-	public KeyFrameElement GetOrCreateKeyFrameElement(Element elem) {
-		Keyframe keyframe = GetKeyFrame(currentFrame);
+	public AnimationFrame GetOrCreateAnimationFrame(int frame) {
+		AnimationFrame keyframe = GetKeyFrame(frame);
 		
 		if (keyframe == null) {
-			keyframe = new Keyframe(true);
-			keyframe.setFrameNumber(currentFrame);
+			keyframe = new AnimationFrame(true);
+			keyframe.setFrameNumber(frame);
 			
 			// Grow array by 1. Insert new keyframe at the right spot
 			if (keyframes.length == 0) {
-				 keyframes = new Keyframe[] { keyframe };
+				 keyframes = new AnimationFrame[] { keyframe };
 			} else {
-				Keyframe[] newkeyframes = new Keyframe[keyframes.length + 1];
+				AnimationFrame[] newkeyframes = new AnimationFrame[keyframes.length + 1];
 				int j = 0;
 				boolean inserted = false;
 				for (int i = 0; i < keyframes.length; i++) {
-					if (inserted || keyframes[i].getFrameNumber() < currentFrame) {
+					if (inserted || keyframes[i].getFrameNumber() < frame) {
 						newkeyframes[j++] = keyframes[i];
 					} else {
 						newkeyframes[j++] = keyframe;
@@ -323,21 +311,26 @@ public class Animation
 			}
 			
 			ReloadFrameNumbers();
-		}
+		}		
 		
-		return keyframe.GetOrCreateKeyFrameElement(elem);
-	}	
+		return keyframe;
+	}
+
+	
+	public AnimFrameElement GetOrCreateKeyFrameElement(int frame, Element elem) {
+		AnimationFrame keyframe = GetOrCreateAnimationFrame(frame);		
+		return keyframe.GetOrCreateKeyFrameElementFlat(frame, elem);
+	}
 	
 	
-	
-	
-	public KeyFrameElement GetKeyFrameElement(Element elem, int forFrame) {
-		Keyframe keyframe = GetKeyFrame(forFrame);		
-		if (keyframe != null) return keyframe.GetKeyFrameElement(elem);
+	public AnimFrameElement GetKeyFrameElement(Element elem, int forFrame) {
+		AnimationFrame keyframe = GetKeyFrame(forFrame);		
+		if (keyframe != null) return keyframe.GetKeyFrameElementFlat(elem);
 		return null;
 	}
 	
-	public Keyframe GetKeyFrame(int frameNumber) {
+	
+	public AnimationFrame GetKeyFrame(int frameNumber) {
 		if (keyframes == null) return null;
 		
 		for (int i = 0; i < keyframes.length; i++) {
@@ -362,10 +355,10 @@ public class Animation
 		currentFrame = frameNumber;
 	}
 
-	public void RemoveElement(Element curElem)
+	public void RemoveKeyFrameElement(Element curElem)
 	{
 		for (int i = 0; i < keyframes.length; i++) {
-			KeyFrameElement kelem = keyframes[i].GetKeyFrameElement(curElem);
+			AnimFrameElement kelem = keyframes[i].GetKeyFrameElementFlat(curElem);
 			if (kelem == null) {
 				continue;
 			}
@@ -378,9 +371,9 @@ public class Animation
 	
 	
 
-	private void RemoveKeyFrameElement(KeyFrameElement keyframeelem, int forFrame)
+	private void RemoveKeyFrameElement(AnimFrameElement keyframeelem, int forFrame)
 	{
-		Keyframe keyframe = GetKeyFrame(forFrame);
+		AnimationFrame keyframe = GetKeyFrame(forFrame);
 		
 		if (keyframe == null) {
 			return;
@@ -390,7 +383,7 @@ public class Animation
 	}
 	
 	
-	private boolean RemoveKeyFrameElement(KeyFrameElement keyframeelem, Keyframe keyframe)
+	private boolean RemoveKeyFrameElement(AnimFrameElement keyframeelem, AnimationFrame keyframe)
 	{	
 		keyframe.RemoveElement(keyframeelem);
 		
@@ -403,9 +396,9 @@ public class Animation
 	}
 	
 	
-	public void RemoveKeyFrame(Keyframe keyframe) {
+	public void RemoveKeyFrame(AnimationFrame keyframe) {
 		// Shrink array by 1
-		Keyframe[] newkeyframes = new Keyframe[keyframes.length - 1];
+		AnimationFrame[] newkeyframes = new AnimationFrame[keyframes.length - 1];
 		
 		int j = 0;
 		for (int i = 0; i < keyframes.length; i++) {
@@ -423,16 +416,16 @@ public class Animation
 		ReloadFrameNumbers();
 		
 		for (int i = 0; i < keyframes.length; i++) {
-			Keyframe keyframe = keyframes[i];
+			AnimationFrame keyframe = keyframes[i];
 			
 			for (IDrawable kElem : keyframe.Elements) {
-				ResolveElem(project, keyframe, (KeyFrameElement)kElem);
+				ResolveElem(project, keyframe, (AnimFrameElement)kElem);
 			}
 		}
 	}
 
 
-	private void ResolveElem(Project project, Keyframe keyframe, KeyFrameElement kElem)
+	private void ResolveElem(Project project, AnimationFrame keyframe, AnimFrameElement kElem)
 	{
 		kElem.AnimatedElement = project.findElement(kElem.AnimatedElementName);
 		
@@ -443,10 +436,10 @@ public class Animation
 		kElem.FrameNumber = keyframe.getFrameNumber();
 		
 		for (IDrawable childElem : kElem.ChildElements) {
-			((KeyFrameElement)childElem).ParentElement = kElem;
-			((KeyFrameElement)childElem).FrameNumber = keyframe.getFrameNumber();
+			((AnimFrameElement)childElem).ParentElement = kElem;
+			((AnimFrameElement)childElem).FrameNumber = keyframe.getFrameNumber();
 			
-			ResolveElem(project, keyframe, (KeyFrameElement)childElem);
+			ResolveElem(project, keyframe, (AnimFrameElement)childElem);
 		}
 	}
 
@@ -477,9 +470,9 @@ public class Animation
 	{
 		ModelCreator.ignoreDidModify = true;
 		
-		Keyframe curFrame = null;
-		Keyframe prevFrame = null;
-		Keyframe nextFrame = null;
+		AnimationFrame curFrame = null;
+		AnimationFrame prevFrame = null;
+		AnimationFrame nextFrame = null;
 		
 		for (int i = 0; i < keyframes.length; i++) {
 			if (keyframes[i].getFrameNumber() == this.currentFrame) {
@@ -541,7 +534,7 @@ public class Animation
 		cloned.OnActivityStopped = OnActivityStopped;
 		cloned.OnAnimationEnd = OnAnimationEnd;
 		
-		cloned.keyframes = new Keyframe[keyframes.length];
+		cloned.keyframes = new AnimationFrame[keyframes.length];
 		
 		for (int i = 0; i < keyframes.length; i++) {
 			cloned.keyframes[i] = keyframes[i].clone(withElementReference);
@@ -551,9 +544,9 @@ public class Animation
 		return cloned;
 	}
 
-	public void InsertKeyFrame(Keyframe sourceFrame)
+	public void InsertKeyFrame(AnimationFrame sourceFrame)
 	{
-		Keyframe[] newKeyframes = new Keyframe[keyframes.length + 1];
+		AnimationFrame[] newKeyframes = new AnimationFrame[keyframes.length + 1];
 		
 		int j = 0;
 		for (int i = 0; i < keyframes.length; i++) {
@@ -572,6 +565,23 @@ public class Animation
 		ReloadFrameNumbers();
 		ModelCreator.DidModify();
 		ModelCreator.updateValues(null);
+	}
+
+	public void loadKeyFramesIntoProject(Project project)
+	{	
+		Animation hisanim = project.findAnimation(this.name);
+		if (hisanim == null) return;
+
+		for (AnimationFrame mykeyframe : keyframes) {
+			AnimationFrame hiskeyframe = hisanim.GetOrCreateAnimationFrame(mykeyframe.getFrameNumber());
+			
+			for (IDrawable mydrawable : mykeyframe.Elements) {
+				AnimFrameElement myFrameEle = (AnimFrameElement)mydrawable;
+				
+				AnimFrameElement hisFrameEle = hiskeyframe.GetKeyFrameElementFlat(myFrameEle.AnimatedElement);
+				if (hisFrameEle == null) hiskeyframe.Elements.add(myFrameEle);
+			}
+		}
 	}
 	
 }

@@ -15,8 +15,8 @@ import javax.swing.border.EmptyBorder;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Element;
-import at.vintagestory.modelcreator.model.KeyFrameElement;
-import at.vintagestory.modelcreator.model.Keyframe;
+import at.vintagestory.modelcreator.model.AnimFrameElement;
+import at.vintagestory.modelcreator.model.AnimationFrame;
 
 public class ResizeDialog
 {
@@ -95,10 +95,9 @@ public class ResizeDialog
 	{
 		if (elem == null) return;
 		
-		
 		for (Animation anim : ModelCreator.currentProject.Animations) {
-			for (Keyframe keyf : anim.keyframes) {
-				KeyFrameElement keyfelem = keyf.GetKeyFrameElement(elem);
+			for (AnimationFrame keyf : anim.keyframes) {
+				AnimFrameElement keyfelem = keyf.GetKeyFrameElementFlat(elem);
 				if (keyfelem != null) {
 					keyfelem.scaleAll(size);
 				}

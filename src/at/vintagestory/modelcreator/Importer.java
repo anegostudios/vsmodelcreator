@@ -20,13 +20,12 @@ import com.google.gson.JsonParser;
 
 import at.vintagestory.modelcreator.enums.EnumEntityActivityStoppedHandling;
 import at.vintagestory.modelcreator.enums.EnumEntityAnimationEndHandling;
-import at.vintagestory.modelcreator.gui.right.ElementTree;
 import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
-import at.vintagestory.modelcreator.model.Keyframe;
-import at.vintagestory.modelcreator.model.KeyFrameElement;
+import at.vintagestory.modelcreator.model.AnimationFrame;
+import at.vintagestory.modelcreator.model.AnimFrameElement;
 import at.vintagestory.modelcreator.model.PendingTexture;
 import java.util.ArrayList;
 
@@ -288,23 +287,27 @@ public class Importer
 		if (obj.has("keyframes") && obj.get("keyframes").isJsonArray()) {
 			JsonArray jsonkeyframes = obj.get("keyframes").getAsJsonArray();
 
-			ArrayList<Keyframe> keyframes = new ArrayList<Keyframe>();
+			ArrayList<AnimationFrame> keyframes = new ArrayList<AnimationFrame>();
 			
 			for (int i = 0; i < jsonkeyframes.size(); i++)
 			{
 				if (!jsonkeyframes.get(i).isJsonObject()) continue;
 				
-				Keyframe keyframe = readKeyframe(jsonkeyframes.get(i).getAsJsonObject());
+				AnimationFrame keyframe = readKeyframe(jsonkeyframes.get(i).getAsJsonObject());
 				if (keyframe != null) {
 					keyframes.add(keyframe);
 				}
 			}
 			
-			anim.keyframes = keyframes.toArray(new Keyframe[0]);
+			anim.keyframes = keyframes.toArray(new AnimationFrame[0]);
 		}
 		
 		if (obj.has("code") && obj.get("code").isJsonPrimitive()) {
 			anim.setCode(obj.get("code").getAsString());
+		}
+		
+		if (obj.has("version") && obj.get("version").isJsonPrimitive()) {
+			anim.version = obj.get("version").getAsInt();
 		}
 
 		if (obj.has("onActivityStopped") && obj.get("onActivityStopped").isJsonPrimitive()) {
@@ -319,9 +322,9 @@ public class Importer
 	}
 
 	
-	private Keyframe readKeyframe(JsonObject obj)
+	private AnimationFrame readKeyframe(JsonObject obj)
 	{
-		Keyframe keyframe = new Keyframe(true);
+		AnimationFrame keyframe = new AnimationFrame(true);
 		keyframe.setFrameNumber(obj.get("frame").getAsInt());
 		
 		if (obj.has("elements") && obj.get("elements").isJsonObject()) {
@@ -329,9 +332,9 @@ public class Importer
 			Set<Entry<String, JsonElement>> elems = obj.get("elements").getAsJsonObject().entrySet();
 			
 			for (Entry<String, JsonElement> elem : elems) {
-				KeyFrameElement keyframeElem = readKeyframeElemenet(elem.getValue().getAsJsonObject(), elem.getKey());
+				AnimFrameElement keyframeElem = readKeyframeElemenet(elem.getValue().getAsJsonObject(), elem.getKey());
 				
-				if(!keyframe.AddElementFromImport(project, keyframeElem)) {
+				if(!keyframe.AddKeyFrameElementFromImport(project, keyframeElem)) {
 					missingAnimationElements.add(keyframeElem.AnimatedElementName);
 				}
 			}
@@ -340,9 +343,9 @@ public class Importer
 		return keyframe;
 	}
 	
-	private KeyFrameElement readKeyframeElemenet(JsonObject obj, String name)
+	private AnimFrameElement readKeyframeElemenet(JsonObject obj, String name)
 	{
-		KeyFrameElement kelem = new KeyFrameElement(true);
+		AnimFrameElement kelem = new AnimFrameElement(true);
 		
 		kelem.AnimatedElementName = name;
 		

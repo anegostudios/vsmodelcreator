@@ -1039,8 +1039,8 @@ public class GuiMenu extends JMenuBar
 	}
 
 	public void updateValues(JComponent byGuiElem)
-	{
-		boolean enabled = !ModelCreator.currentProject.PlayAnimation;
+	{	
+		boolean enabled = !ModelCreator.AnimationPlaying();
 		
 		itemUndo.setEnabled(enabled && ModelCreator.changeHistory.CanUndo());
 		itemRedo.setEnabled(enabled && ModelCreator.changeHistory.CanRedo());

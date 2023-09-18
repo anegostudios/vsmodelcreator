@@ -21,7 +21,7 @@ import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Face;
-import at.vintagestory.modelcreator.model.KeyFrameElement;
+import at.vintagestory.modelcreator.model.AnimFrameElement;
 import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
 
@@ -91,7 +91,10 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 		rotationFields[num].setBackground(new Color(Face.ColorsByFace[colIndex].r, Face.ColorsByFace[colIndex].g, Face.ColorsByFace[colIndex].b));
 		
 		AwtUtil.addChangeListener(rotationFields[num], e -> {
-			KeyFrameElement element = keyFramesPanel.getCurrentElement();
+			keyFramesPanel.ensureAnimationExists();
+			
+			
+			AnimFrameElement element = keyFramesPanel.getCurrentElement();
 			if (element == null) return;
 			if (rotationFields[num].getText().length() == 0) return;
 			
@@ -103,6 +106,8 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 			if (num == 1) { if (element.getRotationY() == newRotation) return; element.setRotationY(newRotation); }
 			if (num == 2) { if (element.getRotationZ() == newRotation) return; element.setRotationZ(newRotation); }
 			ModelCreator.updateValues(rotationFields[num]);
+			
+			keyFramesPanel.copyFrameElemToBackdrop(element.AnimatedElement);
 		});
 		
 		
@@ -132,11 +137,13 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 		{
 			if (ignoreSliderChanges) return;
 			
+			keyFramesPanel.ensureAnimationExists();
+			
 			double newValue = multiplier * rotationSliders[num].getValue();
 			
 			rotationFields[num].setText(""+newValue);
 			
-			KeyFrameElement elem = keyFramesPanel.getCurrentElement();
+			AnimFrameElement elem = keyFramesPanel.getCurrentElement();
 			if (elem == null) return;
 			
 			if (num == 0) {
@@ -150,6 +157,8 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 			}
 			
 			ModelCreator.updateValues(rotationSliders[num]);
+			
+			keyFramesPanel.copyFrameElemToBackdrop(elem.AnimatedElement);
 		});
 		
 
@@ -169,7 +178,9 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 	public void modifyAngle(int num, int direction, int modifiers) {
 		if (ModelCreator.ignoreValueUpdates) return;
 		
-		KeyFrameElement elem = keyFramesPanel.getCurrentElement();
+		keyFramesPanel.ensureAnimationExists();
+		
+		AnimFrameElement elem = keyFramesPanel.getCurrentElement();
 		if (elem == null) return;		
 		float size = direction * ((modifiers & ActionEvent.SHIFT_MASK) == 1 ? 0.1f : 1f);
 		double newValue;
@@ -193,17 +204,19 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 		}
 		
 		ModelCreator.updateValues(rotationSliders[num]);
+		
+		keyFramesPanel.copyFrameElemToBackdrop(elem.AnimatedElement);
 	}
 	
 
 	@Override
 	public void updateValues(JComponent byGuiElem)
 	{
-		KeyFrameElement element = keyFramesPanel.getCurrentElement();
+		AnimFrameElement element = keyFramesPanel.getCurrentElement();
 		toggleFields(element, byGuiElem);
 	}
 	
-	public void toggleFields(KeyFrameElement element, JComponent byGuiElem) {
+	public void toggleFields(AnimFrameElement element, JComponent byGuiElem) {
 		ignoreSliderChanges = true;
 		
 		if (ModelCreator.currentProject.AllAngles) {

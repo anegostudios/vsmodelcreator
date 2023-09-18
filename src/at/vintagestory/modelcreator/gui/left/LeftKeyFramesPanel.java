@@ -37,9 +37,9 @@ import at.vintagestory.modelcreator.gui.animationsdialog.AnimationSelector;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Animation;
-import at.vintagestory.modelcreator.model.Keyframe;
+import at.vintagestory.modelcreator.model.AnimationFrame;
 import at.vintagestory.modelcreator.util.AwtUtil;
-import at.vintagestory.modelcreator.model.KeyFrameElement;
+import at.vintagestory.modelcreator.model.AnimFrameElement;
 
 public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 {
@@ -47,7 +47,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	private IElementManager manager;
 	
 	private JComboBox<String> animationsList;
-	private DefaultComboBoxModel<String> animationsListModel;
+	private DefaultComboBoxModel<String> animationsListModel;	
+	
 	JButton animationAddRemoveButton;	
 	
 	AbstractTableModel tableModel;
@@ -117,16 +118,17 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			@Override
 			public Object getValueAt(int rowIndex, int columnIndex)
 			{
-				int[] frameNumbers = ModelCreator.currentProject.GetFrameNumbers();
-				if (frameNumbers==null || ModelCreator.currentProject.SelectedAnimation == null) return "";
+				Project project = ModelCreator.CurrentAnimProject();
+				int[] frameNumbers = project.GetFrameNumbers();
+				if (frameNumbers==null || project.SelectedAnimation == null) return "";
 				
 				if (columnIndex == 0) return frameNumbers[rowIndex];
 				
-				Keyframe keyFrame = ModelCreator.currentProject.SelectedAnimation.keyframes[rowIndex];
+				AnimationFrame keyFrame = project.SelectedAnimation.keyframes[rowIndex];
 				
 				if (keyFrame == null) return "";
 				
-				KeyFrameElement keyframElem = keyFrame.GetKeyFrameElement(ModelCreator.currentProject.SelectedElement);
+				AnimFrameElement keyframElem = keyFrame.GetKeyFrameElementFlat(ModelCreator.currentProject.SelectedElement);
 				
 				if (keyframElem == null) return "";
 
@@ -140,8 +142,10 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			@Override
 			public int getRowCount()
 			{
-				if (ModelCreator.currentProject == null) return 0;
-				return ModelCreator.currentProject.GetKeyFrameCount();
+				Project project = ModelCreator.CurrentAnimProject();
+				
+				if (project == null) return 0;
+				return project.GetKeyFrameCount();
 			}
 			
 			@Override
@@ -181,22 +185,16 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		animationsList.addActionListener(e ->
 		{
 			if (ignoreSelectionChange) return;
-			
 			int selectedIndex = animationsList.getSelectedIndex();
-			if (selectedIndex > 0) {
-				ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.Animations.get(selectedIndex);	
-			} else {
-				ModelCreator.currentProject.SelectedAnimation = null;	
-			}
-			
-			ModelCreator.updateValues(animationsList);
+			selectAnimation(selectedIndex);
 		});
 		
 		animationsList.setPreferredSize(new Dimension(170, 29));
 		animationsList.setMaximumRowCount(25);
 		
-		//animationListPanel.setPreferredSize(new Dimension(186, 50));
 		animationListPanel.add(animationsList);
+
+		
 		
 		animationAddRemoveButton.setIcon(Icons.addremove);
 		animationAddRemoveButton.setToolTipText("Add/Remove Animation");
@@ -275,7 +273,9 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			@Override
 			public void stateChanged(ChangeEvent e)
 			{
-				ModelCreator.currentProject.SelectedAnimation.currentFrame = frameSlider.getValue();
+				Project project = ModelCreator.CurrentAnimProject();
+				project.SelectedAnimation.currentFrame = frameSlider.getValue();
+				
 				ModelCreator.updateFrame();		
 			}
 		});
@@ -309,10 +309,12 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		playPauseButton.setToolTipText("Play/Pause");
 		playPauseButton.addActionListener(e ->
 		{
-			ModelCreator.currentProject.PlayAnimation = !ModelCreator.currentProject.PlayAnimation;
-			playPauseButton.setIcon(ModelCreator.currentProject.PlayAnimation ? Icons.pause : Icons.play);
+			Project project = ModelCreator.CurrentAnimProject();
 			
-			if (!ModelCreator.currentProject.PlayAnimation) ModelCreator.updateFrame(); 
+			project.PlayAnimation = !project.PlayAnimation;
+			playPauseButton.setIcon(project.PlayAnimation ? Icons.pause : Icons.play);
+			
+			if (!project.PlayAnimation) ModelCreator.updateFrame(); 
 		});
 		playPauseButton.setPreferredSize(new Dimension(30, 30));
 		btnContainerTop.add(playPauseButton);
@@ -323,7 +325,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		prevFrameButton.setToolTipText("Previous Frame");
 		prevFrameButton.addActionListener(e ->
 		{
-			ModelCreator.currentProject.SelectedAnimation.PrevFrame();
+			Project project = ModelCreator.CurrentAnimProject();
+			project.SelectedAnimation.PrevFrame();
 			ModelCreator.updateFrame();
 		});
 		prevFrameButton.setPreferredSize(new Dimension(30, 30));
@@ -335,7 +338,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		nextFrameButton.setToolTipText("Next Frame");
 		nextFrameButton.addActionListener(e ->
 		{
-			ModelCreator.currentProject.SelectedAnimation.NextFrame();
+			Project project = ModelCreator.CurrentAnimProject();
+			project.SelectedAnimation.NextFrame();
 			ModelCreator.updateFrame();
 		});
 		nextFrameButton.setPreferredSize(new Dimension(30, 30));
@@ -345,7 +349,6 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		
 		
 		// 5. List of Keyframes
-
 		JLabel label = new JLabel("Key Frames");
 		label.setAlignmentX(LEFT_ALIGNMENT);
 		label.setPreferredSize(new Dimension(205, 30));
@@ -360,12 +363,13 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			public void valueChanged(ListSelectionEvent e)
 			{
 				if (ModelCreator.ignoreFrameUpdates) return;
+				Project project = ModelCreator.CurrentAnimProject();
 				
 				int row = keyFramesTable.getSelectedRow();
-				if (ModelCreator.currentProject.SelectedAnimation != null && row >= 0) {
-				 	Keyframe keyframe = ModelCreator.currentProject.SelectedAnimation.keyframes[row];
+				if (project.SelectedAnimation != null && row >= 0) {
+				 	AnimationFrame keyframe = project.SelectedAnimation.keyframes[row];
 				 	
-				 	ModelCreator.currentProject.SelectedAnimation.SetFrame(keyframe.getFrameNumber());
+				 	project.SelectedAnimation.SetFrame(keyframe.getFrameNumber());
 				 	ModelCreator.updateFrame();
 				}
 			}
@@ -380,16 +384,15 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		
 		
 		// 6. Keyframe editing buttons
-		
 		btnContainerBottom = new JPanel(new GridLayout(1, 4, 4, 0));
 		btnContainerBottom.setPreferredSize(new Dimension(205, 30));
-		
 
 		deleteFrameButton.setIcon(Icons.bin);
 		deleteFrameButton.setToolTipText("Delete Frame");
 		deleteFrameButton.addActionListener(e ->
 		{
-			ModelCreator.currentProject.SelectedAnimation.DeleteCurrentFrame();
+			Project project = ModelCreator.CurrentAnimProject();
+			project.SelectedAnimation.DeleteCurrentFrame();
 			ModelCreator.updateFrame();
 		});
 		deleteFrameButton.setPreferredSize(new Dimension(30, 30));
@@ -409,7 +412,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		moveFrameRightButton.setToolTipText("Move frame to the left");
 		moveFrameRightButton.addActionListener(e ->
 		{
-			ModelCreator.currentProject.SelectedAnimation.MoveSelectedFrame(-1);
+			Project project = ModelCreator.CurrentAnimProject();
+			project.SelectedAnimation.MoveSelectedFrame(-1);
 		});
 		moveFrameRightButton.setPreferredSize(new Dimension(30, 30));
 		btnContainerBottom.add(moveFrameRightButton);
@@ -420,7 +424,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		moveFrameLeftButton.setToolTipText("Move frame to the right");
 		moveFrameLeftButton.addActionListener(e ->
 		{
-			ModelCreator.currentProject.SelectedAnimation.MoveSelectedFrame(1);
+			Project project = ModelCreator.CurrentAnimProject();
+			project.SelectedAnimation.MoveSelectedFrame(1);
 		});
 		moveFrameLeftButton.setPreferredSize(new Dimension(30, 30));
 		btnContainerBottom.add(moveFrameLeftButton);
@@ -463,9 +468,32 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 
 
 
+	private void selectAnimation(int selectedIndex)
+	{
+		Project project = ModelCreator.CurrentAnimProject();
+		
+		if (selectedIndex >= 0) {
+			if (project.Animations.size() > 0) {
+				project.SelectedAnimation = project.Animations.get(selectedIndex);
+			}
+		} else {
+			project.SelectedAnimation = null;	
+		}
+		
+		ModelCreator.updateValues(animationsList);		
+	}
+
+
 	private void setNewQuantityFrames()
 	{
 		if (ignoreSelectionChange) return;
+		
+		if (ModelCreator.backdropAnimationsMode) {
+			durationTextField.setText(ModelCreator.currentBackdropProject.SelectedAnimation.GetQuantityFrames()+"");
+			return;
+		}
+		
+		Project project = ModelCreator.CurrentAnimProject();
 		
 		int newQuantityFrames = 0;
 		try {
@@ -473,17 +501,16 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		} catch (Exception ex) {}
 		
 		if (newQuantityFrames == 0) return;
-		if (newQuantityFrames == ModelCreator.currentProject.SelectedAnimation.GetQuantityFrames()) return;
+		if (newQuantityFrames == project.SelectedAnimation.GetQuantityFrames()) return;
 		
 		ignoreSelectionChange = true;
 		
-		Keyframe[] keyframes = ModelCreator.currentProject.SelectedAnimation.keyframes;
+		AnimationFrame[] keyframes = project.SelectedAnimation.keyframes;
 		if (keyframes.length > 0) {			
 			int maxKeyFrame = 0;
 			for (int i = 0; i < keyframes.length; i++) {
 				maxKeyFrame = Math.max(maxKeyFrame, keyframes[keyframes.length - 1].getFrameNumber());	
 			}
-			
 			
 			if (newQuantityFrames < maxKeyFrame) {
 				int dialogButton = JOptionPane.YES_NO_OPTION;
@@ -491,11 +518,11 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 				if (dialogResult == JOptionPane.YES_OPTION){
 					for (int i = 0; i < keyframes.length; i++) {
 						if (keyframes[i].getFrameNumber() > newQuantityFrames) {
-							ModelCreator.currentProject.SelectedAnimation.RemoveKeyFrame(keyframes[i]);
+							project.SelectedAnimation.RemoveKeyFrame(keyframes[i]);
 						}
 					}
-					ModelCreator.currentProject.SelectedAnimation.ReloadFrameNumbers();
-					ModelCreator.currentProject.SelectedAnimation.SetFramesDirty();
+					project.SelectedAnimation.ReloadFrameNumbers();
+					project.SelectedAnimation.SetFramesDirty();
 					ModelCreator.updateFrame();
 					ModelCreator.DidModify();
 				} else {
@@ -510,10 +537,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		if (newQuantityFrames > 0) frameSlider.setMaximum(newQuantityFrames - 1);
 		frameSlider.setEnabled(newQuantityFrames > 0);
 		
-		
-		
-		ModelCreator.currentProject.SelectedAnimation.SetQuantityFrames(newQuantityFrames, ModelCreator.currentProject);
-		ModelCreator.currentProject.SelectedAnimation.currentFrame = Math.min(ModelCreator.currentProject.SelectedAnimation.currentFrame, newQuantityFrames);
+		project.SelectedAnimation.SetQuantityFrames(newQuantityFrames);
+		project.SelectedAnimation.currentFrame = Math.min(project.SelectedAnimation.currentFrame, newQuantityFrames);
 		ModelCreator.updateFrame();
 		
 		ignoreSelectionChange = false;
@@ -522,21 +547,21 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	private void loadAnimationList()
 	{
 		animationsListModel = new DefaultComboBoxModel<String>();
-		Project project = ModelCreator.currentProject;
+		Project project = ModelCreator.CurrentAnimProject();
+		
 		for (Animation anim : project.Animations) {
 			animationsListModel.addElement("<html><b>"+ anim.getName() +"</b></html>");	
 		}
+		
 		animationsList.setModel(animationsListModel);
 		
-		if (animationsListModel.getSize() > 0 && ModelCreator.currentProject.SelectedAnimation == null) {
-			animationsList.setSelectedIndex(0);
-			ModelCreator.currentProject.SelectedAnimation = ModelCreator.currentProject.Animations.get(0);
-			ModelCreator.updateValues(null);
+		if (animationsListModel.getSize() > 0 && project.SelectedAnimation == null) {
+			selectAnimation(0);
 		}
 		
-		if (ModelCreator.currentProject.SelectedAnimation != null) {
+		if (project.SelectedAnimation != null) {
 			ignoreSelectionChange = true;
-			animationsList.setSelectedIndex(ModelCreator.currentProject.getSelectedAnimationIndex());
+			animationsList.setSelectedIndex(project.getSelectedAnimationIndex());
 			ignoreSelectionChange = false;
 		}
 	}
@@ -548,10 +573,11 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	{
 		loadAnimationList();	
 		
-		boolean enabled = ModelCreator.currentProject.SelectedAnimation != null; 
+		Project project = ModelCreator.CurrentAnimProject();
+		boolean enabled = project.SelectedAnimation != null; 
 		
 		durationTextField.setEnabled(enabled);
-		durationTextField.setText(enabled ? ModelCreator.currentProject.SelectedAnimation.GetQuantityFrames() + "" : "");
+		durationTextField.setText(enabled ? project.SelectedAnimation.GetQuantityFrames() + "" : "");
 		
 		playPauseButton.setEnabled(enabled);
 		prevFrameButton.setEnabled(enabled);
@@ -562,23 +588,23 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		moveFrameLeftButton.setEnabled(enabled);
 		duplicateFrameButton.setEnabled(enabled);
 		
-		currentFrameLabel.setText(enabled ? ("" + ModelCreator.currentProject.SelectedAnimation.currentFrame) : "");
+		currentFrameLabel.setText(enabled ? ("" + project.SelectedAnimation.currentFrame) : "");
 		
 		keyFramesTable.updateUI();
 		
 		frameSlider.setEnabled(enabled);
-		if (enabled) frameSlider.setMaximum(ModelCreator.currentProject.SelectedAnimation.GetQuantityFrames() - 1);
+		if (enabled) frameSlider.setMaximum(project.SelectedAnimation.GetQuantityFrames() - 1);
 	}
 
 	public void updateFrame()
 	{
-		if (ModelCreator.currentProject.SelectedAnimation == null) return;
+		Project project = ModelCreator.CurrentAnimProject();
+		if (project.SelectedAnimation == null) return;
 		
-		frameSlider.setValue(ModelCreator.currentProject.SelectedAnimation.currentFrame);		
-		currentFrameLabel.setText("" + ModelCreator.currentProject.SelectedAnimation.currentFrame);
+		frameSlider.setValue(project.SelectedAnimation.currentFrame);		
+		currentFrameLabel.setText("" + project.SelectedAnimation.currentFrame);
 		
-		
-		boolean enabled = !ModelCreator.currentProject.PlayAnimation && ModelCreator.currentProject.SelectedAnimation != null && ModelCreator.currentProject.SelectedAnimation.IsCurrentFrameKeyFrame();
+		boolean enabled = !project.PlayAnimation && project.SelectedAnimation != null && project.SelectedAnimation.IsCurrentFrameKeyFrame();
 		
 		deleteFrameButton.setEnabled(enabled);
 		duplicateFrameButton.setEnabled(enabled);
@@ -587,11 +613,11 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		
 		keyFramesTable.clearSelection();
 		
-		if (!ModelCreator.currentProject.PlayAnimation && ModelCreator.currentProject.SelectedAnimation != null && ModelCreator.currentProject.SelectedAnimation.IsCurrentFrameKeyFrame()) {
-			int[] frameNumbers = ModelCreator.currentProject.GetFrameNumbers();
+		if (!project.PlayAnimation && project.SelectedAnimation != null && project.SelectedAnimation.IsCurrentFrameKeyFrame()) {
+			int[] frameNumbers = project.GetFrameNumbers();
 			int index = 0;
 			for (; index < frameNumbers.length; index++) {
-				if (frameNumbers[index] == ModelCreator.currentProject.SelectedAnimation.currentFrame) {
+				if (frameNumbers[index] == project.SelectedAnimation.currentFrame) {
 					keyFramesTable.setRowSelectionInterval(index, index);
 					break;
 				}

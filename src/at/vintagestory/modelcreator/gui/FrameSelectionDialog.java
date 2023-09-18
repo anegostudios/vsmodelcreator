@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import at.vintagestory.modelcreator.ModelCreator;
-import at.vintagestory.modelcreator.model.Keyframe;
+import at.vintagestory.modelcreator.model.AnimationFrame;
 
 public class FrameSelectionDialog
 {
@@ -69,14 +69,14 @@ public class FrameSelectionDialog
 			}
 			
 			for (int i = 0; i < ModelCreator.currentProject.SelectedAnimation.keyframes.length; i++) {
-				Keyframe keyframe = ModelCreator.currentProject.SelectedAnimation.keyframes[i];
+				AnimationFrame keyframe = ModelCreator.currentProject.SelectedAnimation.keyframes[i];
 				if (keyframe.getFrameNumber() == forFrame) {
 					JOptionPane.showMessageDialog(null, "Can't duplicate to this frame, there is already a key frame at this position. Delete that one first.");
 					return;
 				}
 			}
 			
-			Keyframe sourceFrame = ModelCreator.currentProject.SelectedAnimation.allFrames.get(ModelCreator.currentProject.SelectedAnimation.currentFrame).clone(true);
+			AnimationFrame sourceFrame = ModelCreator.currentProject.SelectedAnimation.allFrames.get(ModelCreator.currentProject.SelectedAnimation.currentFrame).clone(true);
 			sourceFrame.setFrameNumber(forFrame);
 			
 			ModelCreator.currentProject.SelectedAnimation.InsertKeyFrame(sourceFrame);

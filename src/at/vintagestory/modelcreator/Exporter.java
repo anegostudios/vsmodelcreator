@@ -21,8 +21,8 @@ import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
-import at.vintagestory.modelcreator.model.Keyframe;
-import at.vintagestory.modelcreator.model.KeyFrameElement;
+import at.vintagestory.modelcreator.model.AnimationFrame;
+import at.vintagestory.modelcreator.model.AnimFrameElement;
 import at.vintagestory.modelcreator.model.TextureEntry;
 
 public class Exporter
@@ -198,6 +198,10 @@ public class Exporter
 
 		writer.write(space(3) + "\"name\": \"" + animation.getName() + "\",");
 		writer.newLine();
+		if (animation.version > 0) {
+			writer.write(space(3) + "\"version\": \"" + animation.version + "\",");
+			writer.newLine();
+		}
 		writer.write(space(3) + "\"code\": \"" + animation.getCode() + "\",");
 		writer.newLine();
 		writer.write(space(3) + "\"quantityframes\": " + animation.GetQuantityFrames() + ",");
@@ -230,7 +234,7 @@ public class Exporter
 
 	
 
-	private void writeKeyFrame(BufferedWriter writer, Keyframe keyframe) throws IOException
+	private void writeKeyFrame(BufferedWriter writer, AnimationFrame keyframe) throws IOException
 	{
 		writer.write(space(4) + "{");
 		writer.newLine();
@@ -241,13 +245,13 @@ public class Exporter
 		writer.newLine();
 		
 		
-		List<KeyFrameElement> keyframeElementsFlat = new ArrayList<KeyFrameElement>();
+		List<AnimFrameElement> keyframeElementsFlat = new ArrayList<AnimFrameElement>();
 		
 		collapseKeyFrameElements(keyframe.Elements, keyframeElementsFlat);
 		
 		int k = 0;
 		for (int i = 0; i < keyframeElementsFlat.size(); i++) {
-			KeyFrameElement kElem = keyframeElementsFlat.get(i);
+			AnimFrameElement kElem = keyframeElementsFlat.get(i);
 			if (!kElem.PositionSet && !kElem.RotationSet && !kElem.StretchSet) continue;
 
 			if (k > 0) {
@@ -266,10 +270,10 @@ public class Exporter
 	}
 	
 	
-	private void collapseKeyFrameElements(List<IDrawable> kfTree, List<KeyFrameElement> kfList)
+	private void collapseKeyFrameElements(List<IDrawable> kfTree, List<AnimFrameElement> kfList)
 	{
 		for (int i = 0; i < kfTree.size(); i++) {
-			KeyFrameElement kElem = (KeyFrameElement)kfTree.get(i);
+			AnimFrameElement kElem = (AnimFrameElement)kfTree.get(i);
 			
 			if (!kElem.IsUseless()) {
 				kfList.add(kElem);
@@ -284,7 +288,7 @@ public class Exporter
 	}
 
 
-	private void writeKeyFrameElement(BufferedWriter writer, KeyFrameElement kElem, int indent) throws IOException
+	private void writeKeyFrameElement(BufferedWriter writer, AnimFrameElement kElem, int indent) throws IOException
 	{
 		writer.write(space(indent) + "\"" + kElem.AnimatedElement.getName() + "\": { ");
 		

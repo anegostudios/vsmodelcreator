@@ -12,6 +12,7 @@ import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.Color;
 import at.vintagestory.modelcreator.Camera;
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.enums.EnumFonts;
 import at.vintagestory.modelcreator.gui.left.LeftSidebar;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
@@ -158,20 +159,21 @@ public class ModelRenderer
 		
 		glTranslatef(-8, 0, -8);
 		
-		List<IDrawable> rootelems = ModelCreator.getRootElementsForRender();
+		List<IDrawable> rootelems = getRootElementsForRender(ModelCreator.currentProject);
 		if (rootelems == null) return;
 		Element selectedElem = manager.getCurrentElement();
 
+		int version = ModelCreator.currentProject.CurrentAnimVersion();
 		for (int i = 0; i < rootelems.size(); i++)
 		{
-			rootelems.get(i).draw(selectedElem);
+			rootelems.get(i).draw(selectedElem, false, version);
 		}
 		
 		if (ModelCreator.currentBackdropProject != null) {
-			ArrayList<Element> elems = ModelCreator.currentBackdropProject.rootElements;
-			
+			List<IDrawable> elems = getRootElementsForRender(ModelCreator.currentBackdropProject);
+			version = ModelCreator.currentBackdropProject.CurrentAnimVersion();
 			for (int i = 0; i < elems.size(); i++) {
-				elems.get(i).draw(selectedElem);
+				elems.get(i).draw(selectedElem, false, version);
 			}
 		}
 		
@@ -494,7 +496,22 @@ public class ModelRenderer
 		}
 		
 	}
+
 	
+	public static List<IDrawable> getRootElementsForRender(Project project) {
+		if (project == null) return null;
+		
+		try {
+			if (ModelCreator.leftKeyframesPanel.isVisible()) {
+				return project.getCurrentFrameRootElements();
+			} else {
+				return new ArrayList<IDrawable>(project.rootElements);
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+			return new ArrayList<IDrawable>();
+		}
+	}
 	
 	
 }

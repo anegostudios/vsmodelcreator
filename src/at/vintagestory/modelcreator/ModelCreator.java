@@ -57,7 +57,6 @@ import at.vintagestory.modelcreator.input.command.ProjectCommand;
 import at.vintagestory.modelcreator.input.key.InputKeyEvent;
 import at.vintagestory.modelcreator.input.listener.ListenerKeyPressInterval;
 import at.vintagestory.modelcreator.input.listener.ListenerKeyPressOnce;
-import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.Animation;
@@ -98,6 +97,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static boolean darkMode = false;
 	public static boolean saratyMode = false;
 	public static boolean uvShowNames = false;
+	
+	public static boolean backdropAnimationsMode = true;
+	
 	public static int elementTreeHeight = 240;
 
 	
@@ -164,6 +166,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		showGrid = prefs.getBoolean("showGrid", true);
 		saratyMode = prefs.getBoolean("uvRotateRename", true);
+
 		uvShowNames = prefs.getBoolean("uvShowNames", true);
 		darkMode = prefs.getBoolean("darkMode", false);
 		noTexScale = prefs.getFloat("noTexScale", 2);
@@ -300,6 +303,14 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		}
 	}
 	
+	public static Project CurrentAnimProject() {
+		return ModelCreator.backdropAnimationsMode && ModelCreator.currentBackdropProject != null ? ModelCreator.currentBackdropProject : ModelCreator.currentProject;
+	}
+	
+	public static boolean AnimationPlaying() {
+		return (currentBackdropProject != null && currentBackdropProject.PlayAnimation) || (currentProject != null && currentProject.PlayAnimation); 
+	}
+	
 	public static String stackTraceToString(Throwable e) {
 	    StringBuilder sb = new StringBuilder();
 	    for (StackTraceElement element : e.getStackTrace()) {
@@ -410,7 +421,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				if (currentProject.SelectedAnimation != null) {
 					currentProject.SelectedAnimation.SetFramesDirty();
 				}
-								
+
+				if (currentBackdropProject != null && currentBackdropProject.SelectedAnimation != null) {
+					currentBackdropProject.SelectedAnimation.SetFramesDirty();
+				}
+				
 				guiMain.updateValues(byGuiElem);
 			 	((RightPanel)rightTopPanel).updateValues(byGuiElem);
 			 	leftKeyframesPanel.updateValues(byGuiElem);
@@ -432,6 +447,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	}
 	
 	public static void updateFrame() {
+		if (backdropAnimationsMode && currentBackdropProject != null) currentProject.SelectedAnimation.currentFrame = currentBackdropProject.SelectedAnimation.currentFrame;
+		
 		updateFrame(true);
 	}
 	
@@ -527,6 +544,13 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				project.SelectedAnimation.calculateAllFrames(project);
 			}
 
+			Project bdp = currentBackdropProject;
+			if (bdp != null && bdp.SelectedAnimation != null && bdp.SelectedAnimation.framesDirty) {
+				bdp.SelectedAnimation.calculateAllFrames(bdp);
+			}
+
+			
+			
 			newDim = newCanvasSize.getAndSet(null);
 
 			if (newDim != null)
@@ -601,6 +625,15 @@ public class ModelCreator extends JFrame implements ITextureCallback
 						updateFrame(true);
 					}
 				}
+				
+				
+				if (bdp != null && bdp.SelectedAnimation != null && bdp.PlayAnimation) {
+					if (frameCounter % 2 == 0) {
+						bdp.SelectedAnimation.NextFrame();
+						updateFrame(true);
+					}
+				}
+				
 
 				// Don't run faster than ~60 FPS (1000 / 60 = 16.67ms)
 				long duration = System.currentTimeMillis() - prevFrameMillisec; 
@@ -915,20 +948,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	}
 	
 	
-	public static List<IDrawable> getRootElementsForRender() {
-		if (currentProject == null) return null;
-		
-		try {
-			if (leftKeyframesPanel.isVisible()) {
-				return currentProject.getCurrentFrameRootElements();
-			} else {
-				return new ArrayList<IDrawable>(currentProject.rootElements);
-			}
-		} catch (Exception e) {
-			System.out.println(e);
-			return new ArrayList<IDrawable>();
-		}
-	}
+
 
 	public IElementManager getElementManager()
 	{
@@ -1192,10 +1212,12 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		changeHistory.addHistoryState(currentProject);
 		
 		currentProject.needsSaving = false;
+		currentProject.reloadStepparentRelationShips();
 		if (currentBackdropProject != null) {
 			currentBackdropProject.reloadStepparentRelationShips();
+			currentProject.attachToBackdropProject(currentBackdropProject);
 		}
-		currentProject.reloadStepparentRelationShips();
+		
 		
 		ignoreDidModify = false;
 
@@ -1236,6 +1258,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		currentProject.reloadStepparentRelationShips();
 		if (currentBackdropProject != null) {
 			currentBackdropProject.reloadStepparentRelationShips();
+			currentProject.attachToBackdropProject(currentBackdropProject);
 		}
 		
 		currentProject.needsSaving = true;		
@@ -1253,9 +1276,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		Project project = importer.loadFromJSON();
 		project.setIsBackdrop();
 		project.reloadStepparentRelationShips();
-			
+
 		currentBackdropProject = project;
-		
+		currentProject.attachToBackdropProject(currentBackdropProject);
 		
 		String shapeBasePath = ModelCreator.prefs.get("shapePath", ".");
 		
