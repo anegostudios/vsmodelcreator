@@ -200,7 +200,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		ensureAnimationExists();
 		
 		Animation anim = ModelCreator.currentProject.SelectedAnimation;
-		AnimFrameElement keyframeElem = enabled ? anim.GetOrCreateKeyFrameElement(anim.currentFrame, elem) : null;
+		AnimFrameElement keyframeElem = enabled ? anim.GetKeyFrameElement(elem, anim.currentFrame) : null;
 		
 		panelPosition.enabled = enabled && keyframeElem != null && keyframeElem.PositionSet;
 		panelRotation.enabled = enabled && keyframeElem != null && keyframeElem.RotationSet;

@@ -447,7 +447,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	}
 	
 	public static void updateFrame() {
-		if (backdropAnimationsMode && currentBackdropProject != null) currentProject.SelectedAnimation.currentFrame = currentBackdropProject.SelectedAnimation.currentFrame;
+		if (backdropAnimationsMode && currentBackdropProject != null && currentProject.SelectedAnimation != null) currentProject.SelectedAnimation.currentFrame = currentBackdropProject.SelectedAnimation.currentFrame;
 		
 		updateFrame(true);
 	}

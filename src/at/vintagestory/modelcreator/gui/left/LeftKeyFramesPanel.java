@@ -120,7 +120,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			{
 				Project project = ModelCreator.CurrentAnimProject();
 				int[] frameNumbers = project.GetFrameNumbers();
-				if (frameNumbers==null || project.SelectedAnimation == null) return "";
+				if (frameNumbers == null || project.SelectedAnimation == null) return "";
 				
 				if (columnIndex == 0) return frameNumbers[rowIndex];
 				
