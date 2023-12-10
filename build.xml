@@ -111,7 +111,7 @@
     <target name="createRelease" depends="clean_out,create_run_jar">
 
 
-        <tar destfile="output/vsmodelcreator_linux-x64.tar.gz">
+        <tar destfile="output/vsmodelcreator_linux-x64.tar.gz" compression="gzip">
             <fileset dir="output/linux" includes="**/*" />
         </tar>
 
