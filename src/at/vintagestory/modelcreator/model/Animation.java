@@ -224,7 +224,7 @@ public class Animation
 	}
 	
 	public AnimFrameElement TogglePosition(Element elem, boolean on) {
-		AnimFrameElement keyframe = GetOrCreateKeyFrameElement(currentFrame, elem);
+		AnimFrameElement keyframe = GetOrCreateKeyFrameElement(elem, currentFrame);
 		
 		if (keyframe.PositionSet == on) return keyframe;
 		
@@ -238,7 +238,7 @@ public class Animation
 	}
 
 	public AnimFrameElement ToggleRotation(Element elem, boolean on) {
-		AnimFrameElement keyframe = GetOrCreateKeyFrameElement(currentFrame, elem);
+		AnimFrameElement keyframe = GetOrCreateKeyFrameElement(elem, currentFrame);
 		
 		if (keyframe.RotationSet == on) return keyframe;
 		
@@ -252,7 +252,7 @@ public class Animation
 	}
 
 	public AnimFrameElement ToggleStretch(Element elem, boolean on) {
-		AnimFrameElement keyframe = GetOrCreateKeyFrameElement(currentFrame, elem);
+		AnimFrameElement keyframe = GetOrCreateKeyFrameElement(elem, currentFrame);
 		keyframe.StretchSet = on;
 		
 		if (keyframe.StretchSet == on) return keyframe;
@@ -317,7 +317,7 @@ public class Animation
 	}
 
 	
-	public AnimFrameElement GetOrCreateKeyFrameElement(int frame, Element elem) {
+	public AnimFrameElement GetOrCreateKeyFrameElement(Element elem, int frame) {
 		AnimationFrame keyframe = GetOrCreateAnimationFrame(frame);		
 		return keyframe.GetOrCreateKeyFrameElementFlat(frame, elem);
 	}

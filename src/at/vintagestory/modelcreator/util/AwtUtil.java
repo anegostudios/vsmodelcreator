@@ -48,7 +48,6 @@ public class AwtUtil
 	        @Override
 	        public void changedUpdate(DocumentEvent e) {
 	            if (ModelCreator.ignoreValueUpdates) return;
-	            //System.out.println("bla");
 	            
 	            lastChange++;
 	            SwingUtilities.invokeLater(() -> {

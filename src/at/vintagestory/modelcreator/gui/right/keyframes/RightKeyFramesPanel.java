@@ -61,7 +61,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 				Animation anim = ModelCreator.currentProject.SelectedAnimation;
 				int currentFrame = anim.currentFrame;
 				
-				AnimFrameElement frameElem = anim.GetOrCreateKeyFrameElement(currentFrame, elem);
+				AnimFrameElement frameElem = anim.GetOrCreateKeyFrameElement(elem, currentFrame);
 				keyFrameElem.setRotationX(frameElem.getRotationX());
 				keyFrameElem.setRotationY(frameElem.getRotationY());
 				keyFrameElem.setRotationZ(frameElem.getRotationZ());
@@ -90,7 +90,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 				Animation anim = ModelCreator.currentProject.SelectedAnimation;
 				int currentFrame = anim.currentFrame;
 				
-				AnimFrameElement frameElem = anim.GetOrCreateKeyFrameElement(currentFrame, elem);
+				AnimFrameElement frameElem = anim.GetOrCreateKeyFrameElement(elem, currentFrame);
 				
 				keyFrameElem.setOffsetX(frameElem.getOffsetX());
 				keyFrameElem.setOffsetY(frameElem.getOffsetY());
@@ -122,7 +122,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 				Animation anim = ModelCreator.currentProject.SelectedAnimation;
 				int currentFrame = anim.currentFrame;
 				
-				AnimFrameElement frameElem = anim.GetOrCreateKeyFrameElement(currentFrame, elem);
+				AnimFrameElement frameElem = anim.GetOrCreateKeyFrameElement(elem, currentFrame);
 				
 				keyFrameElem.setStretchX(frameElem.getStretchX());
 				keyFrameElem.setStretchY(frameElem.getStretchY());
@@ -158,9 +158,9 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		if (bdanim == null) return;
 		
 		Animation anim = ModelCreator.currentProject.SelectedAnimation;
-		AnimFrameElement mainFrameElem = anim.GetOrCreateKeyFrameElement(anim.currentFrame, elem);
+		AnimFrameElement mainFrameElem = anim.GetOrCreateKeyFrameElement(elem, anim.currentFrame);
 		
-		AnimFrameElement backFrameElem = bdanim.GetOrCreateKeyFrameElement(anim.currentFrame, elem);
+		AnimFrameElement backFrameElem = bdanim.GetOrCreateKeyFrameElement(elem, anim.currentFrame);
 		backFrameElem.setFrom(mainFrameElem);		
 	}
 
@@ -231,7 +231,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		if (elem == null || project.SelectedAnimation == null) return null;
 		
 		Animation anim = ModelCreator.currentProject.SelectedAnimation;
-		return anim.GetOrCreateKeyFrameElement(anim.currentFrame, elem);
+		return anim.GetKeyFrameElement(elem, anim.currentFrame);
 	}
 
 }

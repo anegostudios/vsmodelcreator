@@ -24,9 +24,9 @@ public class Project
 	// Persistent project data
 	public boolean AmbientOcclusion;
 	public ArrayList<PendingTexture> PendingTextures = new ArrayList<PendingTexture>();
-	public HashMap<String, TextureEntry> TexturesByCode = new HashMap<String, TextureEntry>();
-	public HashMap<String, int[]> TextureSizes = new HashMap<String, int[]>();
-	public HashMap<String, String> MissingTexturesByCode = new HashMap<String, String>();
+	public LinkedHashMap<String, TextureEntry> TexturesByCode = new LinkedHashMap<String, TextureEntry>();
+	public LinkedHashMap<String, int[]> TextureSizes = new LinkedHashMap<String, int[]>();
+	public LinkedHashMap<String, String> MissingTexturesByCode = new LinkedHashMap<String, String>();
 	
 	public ArrayList<Element> rootElements = new ArrayList<Element>();
 	public ArrayList<Animation> Animations = new ArrayList<Animation>();
@@ -726,7 +726,7 @@ public class Project
 			TryGenSnowLayer(celem);
 		}
 	
-		if (Math.abs(elem.getRotationX()) < 5 && Math.abs(elem.getRotationZ()) < 5) {
+		if (Math.abs(elem.getRotationX()) < 15 && Math.abs(elem.getRotationZ()) < 15) {
 			if (!elem.getAllFaces()[4].isEnabled()) return;
 			if (elem.getName().contains("-snow")) return;
 			

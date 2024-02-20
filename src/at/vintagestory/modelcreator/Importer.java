@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -32,7 +33,7 @@ import java.util.ArrayList;
 public class Importer
 {
 	private Map<String, String> textureMap = new HashMap<String, String>();
-	private HashMap<String, int[]> textureSizesMap = new HashMap<String, int[]>();
+	private LinkedHashMap<String, int[]> textureSizesMap = new LinkedHashMap<String, int[]>();
 	
 	private String[] faceNames = { "north", "east", "south", "west", "up", "down" };
 

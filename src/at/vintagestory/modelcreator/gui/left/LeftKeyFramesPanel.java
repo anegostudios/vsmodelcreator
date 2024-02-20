@@ -488,7 +488,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	{
 		if (ignoreSelectionChange) return;
 		
-		if (ModelCreator.backdropAnimationsMode) {
+		if (ModelCreator.backdropAnimationsMode && ModelCreator.currentBackdropProject != null) {
 			durationTextField.setText(ModelCreator.currentBackdropProject.SelectedAnimation.GetQuantityFrames()+"");
 			return;
 		}
@@ -502,6 +502,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		
 		if (newQuantityFrames == 0) return;
 		if (newQuantityFrames == project.SelectedAnimation.GetQuantityFrames()) return;
+		
+		newQuantityFrames = Math.min(newQuantityFrames, 5000);
 		
 		ignoreSelectionChange = true;
 		

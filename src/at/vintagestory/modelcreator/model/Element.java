@@ -1599,10 +1599,10 @@ public class Element implements IDrawable
 		if (elemName != null) {		
 			Element element = ModelCreator.currentProject.findElement(elemName);
 			
-			if (element != null) {
+			if (element != null && element != this) {
 				element.StepChildElements.add(this);
 				stepParentElement = element;
-				if (element != prevStepElem) ModelCreator.DidModify();				
+				if (element != prevStepElem) ModelCreator.DidModify();
 				return;
 			}
 			
@@ -1610,7 +1610,7 @@ public class Element implements IDrawable
 			if (ModelCreator.currentBackdropProject != null) {
 				element = ModelCreator.currentBackdropProject.findElement(elemName);
 			
-				if (element != null) {
+				if (element != null && element != this) {
 					element.StepChildElements.add(this);
 					stepParentElement = element;
 					if (element != prevStepElem) ModelCreator.DidModify();

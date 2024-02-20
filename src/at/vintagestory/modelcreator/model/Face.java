@@ -538,6 +538,12 @@ public class Face
 	public void setEnabled(boolean enabled)
 	{
 		if (this.enabled == enabled) return;
+		if (enabled && textureCode == null && ModelCreator.currentProject.EntityTextureMode) {
+			for (String key : ModelCreator.currentProject.TexturesByCode.keySet()) {
+				this.textureCode = key;
+				break;
+			}
+		}
 		
 		this.enabled = enabled;
 		ModelCreator.DidModify();
