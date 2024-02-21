@@ -207,6 +207,7 @@ public class ElementTree
 		jtree.removeAll();
 		jtree.updateUI();
 		jtree.clearSelection();
+		collapsedPaths.clear();
 	}
 
 	
