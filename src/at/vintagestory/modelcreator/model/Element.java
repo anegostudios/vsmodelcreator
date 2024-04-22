@@ -56,6 +56,7 @@ public class Element implements IDrawable
 	protected String name = "Cube1";
 	public String stepparentName;
 	protected boolean renderInEditor = true;
+	public java.awt.Color TextColor = java.awt.Color.WHITE;
 	
 	// Face Variables
 	protected int selectedFace = -1;

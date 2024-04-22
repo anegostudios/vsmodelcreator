@@ -1,6 +1,6 @@
 package at.vintagestory.modelcreator.gui;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +38,7 @@ import at.vintagestory.modelcreator.util.screenshot.Uploader;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.FileDialog;
 
 public class GuiMenu extends JMenuBar
 {
@@ -51,6 +52,7 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemLoad;
 	private JMenuItem itemTexturePath;
 	private JMenuItem itemShapePath;
+	private JMenuItem colorPath;
 
 	
 	private JMenuItem itemImport;
@@ -103,6 +105,7 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemRandomizeTextureAll;
 	private JMenuItem itemGenSnowLayer;
 	private JMenuItem itemuvUnrwapEverything;
+	private JMenuItem itemReloadColorConfig;
 	private JMenuItem itemReduceDecimals;
 	
 	private JMenu itemAutoWind;
@@ -155,6 +158,7 @@ public class GuiMenu extends JMenuBar
 			itemSaveAs = createItem("Save as...", "Save JSON", KeyEvent.VK_E, new ImageIcon(getClass().getClassLoader().getResource("icons/disk_multiple.png")));
 			itemTexturePath = createItem("Set Texture base path...", "Set the base path to look for textures", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
 			itemShapePath = createItem("Set Shape base path...", "Set the base path to look for backdrop models", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/cube.png")));
+			colorPath = createItem("Set Color config path...", "Set the path for the color config", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/rainbow.png")));
 			itemExit = createItem("Exit", "Exit Application", KeyEvent.VK_Q, new ImageIcon(getClass().getClassLoader().getResource("icons/exit.png")));
 		}
 		
@@ -234,11 +238,20 @@ public class GuiMenu extends JMenuBar
 			itemRandomizeTextureAll = createItem("Randomize All Element UVs", "Randomizes all element textures", KeyEvent.VK_B, Icons.rainbow);
 			
 			itemGenSnowLayer = createItem("Generate Snow Layer", "Attempts to generate a snow layer on all horizontal faces", KeyEvent.VK_B, Icons.weather_snow);
-			
+
 			itemuvUnrwapEverything = createItem("Unwrap all UVs", "Attempts to unwrap all uvs onto a texture without overlap", KeyEvent.VK_B, Icons.rainbow);
 			itemReduceDecimals = createItem("Reduce decimals", "Round all element positions and sizes to one decimal point", KeyEvent.VK_B, Icons.rainbow);
 
-			
+			itemReloadColorConfig = createItem("Reload Color Config", "Reloads the color config file", KeyEvent.VK_B, Icons.rainbow);
+
+			itemReloadColorConfig.addActionListener((e) -> {
+				String path = ModelCreator.prefs.get("colorPath", null);
+				if (ModelCreator.currentProject.tree != null && path != null) {
+					ModelCreator.LoadColorConfig(path);
+					ModelCreator.currentProject.tree.updateUI();
+				}
+			});
+
 			itemAutoWind = new JMenu("Auto-Guess Wind mode");
 			itemAutoWind.setIcon(Icons.wind);
 			itemAutoWind.setToolTipText("Tries to guess the correct wind mode and wind data on all elements");
@@ -326,6 +339,7 @@ public class GuiMenu extends JMenuBar
 		menuTools.add(itemGenSnowLayer);
 		menuTools.add(itemResize);
 		menuTools.add(itemuvUnrwapEverything);
+		menuTools.add(itemReloadColorConfig);
 		menuTools.add(itemReduceDecimals);
 		menuTools.add(itemRotateModel90Deg);
 		itemRotateModel90Deg.add(itemRotateModel90DegClockwise);
@@ -365,6 +379,7 @@ public class GuiMenu extends JMenuBar
 		menuFile.addSeparator();
 		menuFile.add(itemTexturePath);
 		menuFile.add(itemShapePath);
+		menuFile.add(colorPath);
 		menuFile.addSeparator();
 		menuFile.add(itemExit);
 
@@ -548,6 +563,20 @@ public class GuiMenu extends JMenuBar
 		};
 
 		itemShapePath.addActionListener(listener);
+
+		listener = e ->
+		{
+			JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("colorPath", "."));
+			chooser.setDialogTitle("Color Path");
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			int returnVal = chooser.showOpenDialog(null);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				String path = chooser.getSelectedFile().getAbsolutePath();
+				ModelCreator.prefs.put("colorPath", path);
+				ModelCreator.LoadColorConfig(path);
+			}
+		};
+		colorPath.addActionListener(listener);
 
 		
 		

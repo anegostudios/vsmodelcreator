@@ -1,6 +1,6 @@
 package at.vintagestory.modelcreator.gui.right;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -397,9 +397,30 @@ public class ElementTree
 	public void updateUI()
 	{
 		jtree.updateUI();
-		
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) jtree.getModel().getRoot();
+
+		for (int i = 0; i < root.getChildCount(); i++) {
+			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) root.getChildAt(i);
+			updateTreeTextColor(childNode, Color.WHITE);
+		}
 	}
 
+	public void updateTreeTextColor(DefaultMutableTreeNode node, Color color) {
+		Object userObject = node.getUserObject();
+		if (userObject instanceof Element) {
+			Element elem = (Element) userObject;
+			Color configColor = ElementTreeCellRenderer.colorConfig.get(elem.getName().toLowerCase());
+			if (configColor != null) {
+				color = configColor;
+			}
+			elem.TextColor = color;
+
+			for (int i = 0; i < node.getChildCount(); i++) {
+				DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) node.getChildAt(i);
+				updateTreeTextColor(childNode, color);
+			}
+		}
+	}
 
 	public static class FixedJTree extends JTree {
 		

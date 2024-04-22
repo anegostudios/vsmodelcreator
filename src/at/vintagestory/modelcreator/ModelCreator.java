@@ -16,11 +16,12 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -36,6 +37,10 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
+
+import at.vintagestory.modelcreator.gui.right.ElementTreeCellRenderer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -193,8 +198,12 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		if (args.length > 1) {
 			ModelCreator.prefs.put("shapePath", args[1]);
 		}
-		
-		
+
+		String colorPath = prefs.get("colorPath", null);
+		if (colorPath != null) {
+			LoadColorConfig(colorPath);
+		}
+
 		initComponents();
 		
 
@@ -1265,7 +1274,30 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		ModelCreator.updateValues(null);
 		currentProject.tree.jtree.updateUI();		
 	}
-	
+
+	public static void LoadColorConfig(String path) {
+
+		ElementTreeCellRenderer.colorConfig.clear();
+		JsonParser jp = new JsonParser();
+		try {
+			File f = new File(path);
+			if (!f.exists()) {
+				System.out.println("Color Config not found");
+				return;
+			}
+			FileReader fr = new FileReader(path);
+			JsonElement je = jp.parse(fr);
+			for (Map.Entry<String, JsonElement> entry : je.getAsJsonObject().entrySet()) {
+				Color col = Color.decode(entry.getValue().getAsString());
+				ElementTreeCellRenderer.colorConfig.put(entry.getKey().toLowerCase(), col);
+			}
+			if(currentProject.tree != null) {
+				currentProject.tree.updateUI();
+			}
+		} catch (FileNotFoundException ex) {
+			System.out.println(ex.getMessage());
+		}
+	}
 
 	public void LoadBackdropFile(String filePath)
 	{		
