@@ -556,6 +556,11 @@ public class Project
 		
 		ArrayList<String> nowFoundTextures = new ArrayList<String>(); 
 		
+
+		if (doReplaceAll) {
+			this.TexturesByCode.clear();
+		}
+		
 		if (!TexturesByCode.containsKey(textureCode)) {
 			// Try and match by filename if not matched by code
 			for (String key : MissingTexturesByCode.keySet()) {
@@ -602,6 +607,7 @@ public class Project
 				MissingTexturesByCode.remove(key);
 			}			
 		}
+		
 		
 		if (doReplaceAll || (doReplacedForSelectedElement && SelectedElement != null)) {
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
