@@ -165,10 +165,10 @@ public class Face
 	public int reflectiveMode;
 	
 	
-	public boolean isInBackdropProject;
+	public String ProjectType = "normal";
 	
 	public Project getProject() {
-		return isInBackdropProject ? ModelCreator.currentBackdropProject : ModelCreator.currentProject;
+		return ModelCreator.GetProject(ProjectType);
 	}
 
 	public Face() {
@@ -209,7 +209,7 @@ public class Face
 		
 		GL11.glPushMatrix();
 		{
-			if (!isInBackdropProject) GL11.glLoadName(openGlName);
+			if (ProjectType.equals("normal")) GL11.glLoadName(openGlName);
 			
 			GL11.glEnable(GL_TEXTURE_2D);
 			GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -307,7 +307,7 @@ public class Face
 			
 			GL11.glDisable(GL_TEXTURE_2D);
 			
-			if (!isInBackdropProject) GL11.glLoadName(0);
+			if (ProjectType.equals("normal")) GL11.glLoadName(0);
 
 		}
 		GL11.glPopMatrix();
@@ -372,9 +372,13 @@ public class Face
 		this.textureCode = textureCode;
 	}
 	
-	public void bindTexture() {
-		TextureEntry entry = isInBackdropProject && ModelCreator.currentBackdropProject != null ? ModelCreator.currentBackdropProject.getTextureEntryByCode(textureCode) : ModelCreator.currentProject.getTextureEntryByCode(textureCode);
-		textureBound = bindTexture(entry);
+	public void bindTexture()
+	{
+		Project project = ModelCreator.GetProject(ProjectType);
+		if (project != null) {
+			TextureEntry entry = project.getTextureEntryByCode(textureCode);
+			textureBound = bindTexture(entry);
+		}
 	}
 	
 	public static boolean bindTexture(TextureEntry entry)
@@ -746,9 +750,9 @@ public class Face
 		textureVEnd = textureV + size * height;
 	}
 
-	public void setIsBackdrop()
+	public void setProjectType(String type)
 	{
-		isInBackdropProject = true;
+		this.ProjectType = type;
 	}
 
 	public void RandomizeTexture()

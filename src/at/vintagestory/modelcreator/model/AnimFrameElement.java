@@ -13,6 +13,7 @@ import org.newdawn.slick.Color;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.enums.BlockFacing;
+import at.vintagestory.modelcreator.gui.middle.ModelRenderer;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.util.Mat4f;
 
@@ -48,6 +49,9 @@ public class AnimFrameElement implements IDrawable
 	AnimFrameElement ParentElement;
 	public List<IDrawable> StepChildElements = new ArrayList<IDrawable>();
 	AnimFrameElement StepParentElement;
+	
+	public List<IDrawable> AttachmentPoints = new ArrayList<IDrawable>();
+
 	
 	public Element AnimatedElement;
 	public int FrameNumber;
@@ -142,6 +146,43 @@ public class AnimFrameElement implements IDrawable
 			}
 			for (int i = 0; i < StepChildElements.size(); i++) {
 				StepChildElements.get(i).draw(selectedElem, true, animVersion);
+			}
+			
+			
+			if (ModelRenderer.isMountRender) {
+				List<IDrawable> elems = ModelRenderer.rootelems;
+				
+				for (int i = 0; i < AnimatedElement.AttachmentPoints.size(); i++) {
+					AttachmentPoint p = AnimatedElement.AttachmentPoints.get(i);
+					for (int j = 0; j < p.StepChildElements.size(); j++) {
+						GL11.glPushMatrix();
+						
+						if (animVersion > 0) {		
+							// Correct (new)
+							GL11.glTranslated(p.posX-8, p.posY-8, p.posZ-8);
+							GL11.glRotated(p.rotationX, 1, 0, 0);
+							GL11.glRotated(p.rotationY, 0, 1, 0);
+							GL11.glRotated(p.rotationZ, 0, 0, 1);
+						} else {
+							// Wrong (old)
+							GL11.glRotated(p.rotationX, 1, 0, 0);
+							GL11.glRotated(p.rotationY, 0, 1, 0);
+							GL11.glRotated(p.rotationZ, 0, 0, 1);
+							GL11.glTranslated(p.posX-8 , p.posY - 8, p.posZ-8);
+						}
+						
+						
+						for (int k = 0; k < elems.size(); k++) {
+							IDrawable drawable = elems.get(k);
+							if (((AnimFrameElement)drawable).AnimatedElement.name.equals(p.StepChildElements.get(j).name)) {
+								drawable.draw(selectedElem, drawCallFromStepParent, animVersion);
+								break;
+							}
+						}
+						
+						GL11.glPopMatrix();
+					}
+				}
 			}
 
 		}

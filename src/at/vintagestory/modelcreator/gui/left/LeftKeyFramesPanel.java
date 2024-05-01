@@ -49,9 +49,16 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	private JComboBox<String> animationsList;
 	private DefaultComboBoxModel<String> animationsListModel;	
 	
+	
+	private JComboBox<String> mountanimationsList;
+	private DefaultComboBoxModel<String> mountanimationsListModel;
+	
+	
 	JButton animationAddRemoveButton;	
 	
 	AbstractTableModel tableModel;
+	
+	JLabel mountAnimLabel;
 	
 	JTextField durationTextField;
 	JSlider frameSlider;
@@ -81,9 +88,14 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	public LeftKeyFramesPanel(IElementManager manager)
 	{
 		this.manager = manager;
+	}
+	
+	public void Load() {
+		this.removeAll();
 		setPreferredSize(new Dimension(215, 900));
 		initComponents();
-		addComponents();
+		addComponents();	
+		updateValues(this);
 	}
 
 
@@ -173,50 +185,72 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 
 	private void addComponents()
 	{
+		
+		// 0. Mount animation dropdown
+		if (ModelCreator.currentMountBackdropProject != null) {
+			add(mountAnimLabel=new JLabel("Mount Animation"));
+			
+			mountanimationsList = new JComboBox<String>();
+			
+			mountanimationsList.setToolTipText("The current mount animation to be played");
+			mountanimationsList.addActionListener(e ->
+			{
+				if (ignoreSelectionChange) return;
+				int selectedIndex = mountanimationsList.getSelectedIndex();
+				selectMountAnimation(selectedIndex);
+			});
+			
+			mountanimationsList.setPreferredSize(new Dimension(170, 29));
+			mountanimationsList.setMaximumRowCount(25);
+			
+			add(mountanimationsList);
+		}
+		
 		// 1. Animation DropDown
-		SpringLayout animationListPanelLayout = new SpringLayout();
-		JPanel animationListPanel = new JPanel(animationListPanelLayout);
-
-		animationListPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Animation</b></html>"));
-		
-		animationsList = new JComboBox<String>();
-		
-		animationsList.setToolTipText("The current animation you want to edit");
-		animationsList.addActionListener(e ->
 		{
-			if (ignoreSelectionChange) return;
-			int selectedIndex = animationsList.getSelectedIndex();
-			selectAnimation(selectedIndex);
-		});
-		
-		animationsList.setPreferredSize(new Dimension(170, 29));
-		animationsList.setMaximumRowCount(25);
-		
-		animationListPanel.add(animationsList);
+			SpringLayout animationListPanelLayout = new SpringLayout();
+			JPanel animationListPanel = new JPanel(animationListPanelLayout);
 
-		
-		
-		animationAddRemoveButton.setIcon(Icons.addremove);
-		animationAddRemoveButton.setToolTipText("Add/Remove Animation");
-		animationAddRemoveButton.addActionListener(e ->
-		{
-			AnimationSelector.display(manager);
-		});
-		
-		animationAddRemoveButton.setPreferredSize(new Dimension(30, 29));		
-		animationListPanel.add(animationAddRemoveButton);
-		
-		animationListPanelLayout.putConstraint(SpringLayout.WEST, animationsList, 0, SpringLayout.WEST, animationListPanel);
-		animationListPanelLayout.putConstraint(SpringLayout.NORTH, animationsList, 5, SpringLayout.NORTH, animationListPanel);
-				
-		animationListPanelLayout.putConstraint(SpringLayout.WEST, animationAddRemoveButton, 5, SpringLayout.EAST, animationsList);
-		animationListPanelLayout.putConstraint(SpringLayout.NORTH, animationAddRemoveButton, 5, SpringLayout.NORTH, animationListPanel);
-
-		animationListPanelLayout.putConstraint(SpringLayout.EAST, animationListPanel, 0, SpringLayout.EAST, animationAddRemoveButton);
-		animationListPanelLayout.putConstraint(SpringLayout.SOUTH, animationListPanel, 5, SpringLayout.SOUTH, animationAddRemoveButton);
-		
-		add(animationListPanel);
-
+			animationListPanel.setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Animation</b></html>"));
+			
+			animationsList = new JComboBox<String>();
+			
+			animationsList.setToolTipText("The current animation you want to edit");
+			animationsList.addActionListener(e ->
+			{
+				if (ignoreSelectionChange) return;
+				int selectedIndex = animationsList.getSelectedIndex();
+				selectAnimation(selectedIndex);
+			});
+			
+			animationsList.setPreferredSize(new Dimension(170, 29));
+			animationsList.setMaximumRowCount(25);
+			
+			animationListPanel.add(animationsList);
+	
+			
+			
+			animationAddRemoveButton.setIcon(Icons.addremove);
+			animationAddRemoveButton.setToolTipText("Add/Remove Animation");
+			animationAddRemoveButton.addActionListener(e ->
+			{
+				AnimationSelector.display(manager);
+			});
+			
+			animationAddRemoveButton.setPreferredSize(new Dimension(30, 29));		
+			animationListPanel.add(animationAddRemoveButton);
+			
+			animationListPanelLayout.putConstraint(SpringLayout.WEST, animationsList, 0, SpringLayout.WEST, animationListPanel);
+			animationListPanelLayout.putConstraint(SpringLayout.NORTH, animationsList, 5, SpringLayout.NORTH, animationListPanel);
+					
+			animationListPanelLayout.putConstraint(SpringLayout.WEST, animationAddRemoveButton, 5, SpringLayout.EAST, animationsList);
+			animationListPanelLayout.putConstraint(SpringLayout.NORTH, animationAddRemoveButton, 5, SpringLayout.NORTH, animationListPanel);
+	
+			animationListPanelLayout.putConstraint(SpringLayout.EAST, animationListPanel, 0, SpringLayout.EAST, animationAddRemoveButton);
+			animationListPanelLayout.putConstraint(SpringLayout.SOUTH, animationListPanel, 5, SpringLayout.SOUTH, animationAddRemoveButton);
+			
+			add(animationListPanel);
+		}
 		
 		// 2. Duration
 		JPanel durationPanel = new JPanel(new GridLayout(1, 2));
@@ -273,8 +307,22 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			@Override
 			public void stateChanged(ChangeEvent e)
 			{
+				if (ignoreChange) return;
+				
 				Project project = ModelCreator.CurrentAnimProject();
+				
+				int frameDelta = frameSlider.getValue() - project.SelectedAnimation.currentFrame;
+				if (frameDelta != 0 && ModelCreator.currentMountBackdropProject != null && ModelCreator.currentMountBackdropProject.SelectedAnimation != null) {
+					int newframe = ModelCreator.currentMountBackdropProject.SelectedAnimation.currentFrame + frameDelta;
+					ModelCreator.currentMountBackdropProject.SelectedAnimation.currentFrame = Animation.mod(newframe, ModelCreator.currentMountBackdropProject.SelectedAnimation.GetQuantityFrames());
+				}
+				
 				project.SelectedAnimation.currentFrame = frameSlider.getValue();
+				
+				
+				if (project.SelectedAnimation.currentFrame == 0 && ModelCreator.currentMountBackdropProject != null && ModelCreator.currentMountBackdropProject.SelectedAnimation != null) {
+					ModelCreator.currentMountBackdropProject.SelectedAnimation.currentFrame=0;
+				}
 				
 				ModelCreator.updateFrame();		
 			}
@@ -327,6 +375,17 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		{
 			Project project = ModelCreator.CurrentAnimProject();
 			project.SelectedAnimation.PrevFrame();
+			
+			if (ModelCreator.currentMountBackdropProject != null && ModelCreator.currentMountBackdropProject.SelectedAnimation != null) {
+				ModelCreator.currentMountBackdropProject.SelectedAnimation.PrevFrame();
+				
+				if (project.SelectedAnimation.currentFrame == 0) {
+					ModelCreator.currentMountBackdropProject.SelectedAnimation.currentFrame=0;
+				}
+
+			}				
+			
+			
 			ModelCreator.updateFrame();
 		});
 		prevFrameButton.setPreferredSize(new Dimension(30, 30));
@@ -340,6 +399,11 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		{
 			Project project = ModelCreator.CurrentAnimProject();
 			project.SelectedAnimation.NextFrame();
+
+			if (ModelCreator.currentMountBackdropProject != null && ModelCreator.currentMountBackdropProject.SelectedAnimation != null) {
+				ModelCreator.currentMountBackdropProject.SelectedAnimation.NextFrame();
+			}				
+
 			ModelCreator.updateFrame();
 		});
 		nextFrameButton.setPreferredSize(new Dimension(30, 30));
@@ -482,6 +546,20 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		
 		ModelCreator.updateValues(animationsList);		
 	}
+	
+	private void selectMountAnimation(int selectedIndex)
+	{
+		Project project = ModelCreator.currentMountBackdropProject;
+		
+		if (selectedIndex >= 0) {
+			if (project.Animations.size() > 0) {
+				Animation anim = project.Animations.get(selectedIndex);
+				project.SelectedAnimation = anim;
+			}
+		} else {
+			project.SelectedAnimation = null;	
+		}
+	}
 
 
 	private void setNewQuantityFrames()
@@ -566,6 +644,29 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 			animationsList.setSelectedIndex(project.getSelectedAnimationIndex());
 			ignoreSelectionChange = false;
 		}
+		
+		
+		// Mount anims
+		if (ModelCreator.currentMountBackdropProject != null) {
+			mountanimationsListModel = new DefaultComboBoxModel<String>();
+			project = ModelCreator.currentMountBackdropProject;
+			
+			for (Animation anim : project.Animations) {
+				mountanimationsListModel.addElement("<html><b>"+ anim.getName() +"</b></html>");	
+			}
+			
+			mountanimationsList.setModel(mountanimationsListModel);
+			
+			if (mountanimationsListModel.getSize() > 0 && project.SelectedAnimation == null) {
+				selectMountAnimation(0);
+			}
+			
+			if (project.SelectedAnimation != null) {
+				ignoreSelectionChange = true;
+				mountanimationsList.setSelectedIndex(project.getSelectedAnimationIndex());
+				ignoreSelectionChange = false;
+			}
+		}
 	}
 	
 	
@@ -573,6 +674,8 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	@Override
 	public void updateValues(JComponent byGuiElem)
 	{
+		if (animationsList == null) return;
+				
 		loadAnimationList();	
 		
 		Project project = ModelCreator.CurrentAnimProject();
@@ -598,13 +701,23 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		if (enabled) frameSlider.setMaximum(project.SelectedAnimation.GetQuantityFrames() - 1);
 	}
 
+	
+	boolean ignoreChange = false;
 	public void updateFrame()
 	{
+		if (animationsList == null) return;
+		
 		Project project = ModelCreator.CurrentAnimProject();
 		if (project.SelectedAnimation == null) return;
 		
-		frameSlider.setValue(project.SelectedAnimation.currentFrame);		
+		ignoreChange=true;
+		frameSlider.setValue(project.SelectedAnimation.currentFrame);
+		ignoreChange=false;
 		currentFrameLabel.setText("" + project.SelectedAnimation.currentFrame);
+		
+		if (ModelCreator.currentMountBackdropProject != null && ModelCreator.currentMountBackdropProject.SelectedAnimation != null) {
+			mountAnimLabel.setText("Mount Animation ("+ ModelCreator.currentMountBackdropProject.SelectedAnimation.currentFrame +")");
+		}
 		
 		boolean enabled = !project.PlayAnimation && project.SelectedAnimation != null && project.SelectedAnimation.IsCurrentFrameKeyFrame();
 		

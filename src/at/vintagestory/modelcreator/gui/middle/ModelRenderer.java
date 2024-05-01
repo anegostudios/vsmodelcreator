@@ -149,6 +149,9 @@ public class ModelRenderer
 				
 		GL11.glPopMatrix();
 	}
+	
+	public static List<IDrawable> rootelems;
+	public static boolean isMountRender;
 
 	public void drawGridAndElements()
 	{
@@ -158,24 +161,39 @@ public class ModelRenderer
 		GL11.glAlphaFunc(GL11.GL_GREATER, 0.05f);
 		
 		glTranslatef(-8, 0, -8);
-		
-		List<IDrawable> rootelems = getRootElementsForRender(ModelCreator.currentProject);
+
+		rootelems = getRootElementsForRender(ModelCreator.currentProject);
 		if (rootelems == null) return;
 		Element selectedElem = manager.getCurrentElement();
 
-		int version = ModelCreator.currentProject.CurrentAnimVersion();
-		for (int i = 0; i < rootelems.size(); i++)
-		{
-			rootelems.get(i).draw(selectedElem, false, version);
+		isMountRender=false;
+		if (ModelCreator.currentMountBackdropProject != null) {
+			isMountRender=true;
+			List<IDrawable> elems = getRootElementsForRender(ModelCreator.currentMountBackdropProject);
+			int version = ModelCreator.currentMountBackdropProject.CurrentAnimVersion();
+			for (int i = 0; i < elems.size(); i++) {
+				elems.get(i).draw(selectedElem, false, version);
+			}	
+		} 
+		else	
+		{	
+			int version = ModelCreator.currentProject.CurrentAnimVersion();
+			for (int i = 0; i < rootelems.size(); i++)
+			{
+				rootelems.get(i).draw(selectedElem, false, version);
+			}
 		}
+		
+		
 		
 		if (ModelCreator.currentBackdropProject != null) {
 			List<IDrawable> elems = getRootElementsForRender(ModelCreator.currentBackdropProject);
-			version = ModelCreator.currentBackdropProject.CurrentAnimVersion();
+			int version = ModelCreator.currentBackdropProject.CurrentAnimVersion();
 			for (int i = 0; i < elems.size(); i++) {
 				elems.get(i).draw(selectedElem, false, version);
 			}
 		}
+		
 		
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 
@@ -508,7 +526,8 @@ public class ModelRenderer
 				return new ArrayList<IDrawable>(project.rootElements);
 			}
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println(e + "\n");
+			e.printStackTrace();
 			return new ArrayList<IDrawable>();
 		}
 	}

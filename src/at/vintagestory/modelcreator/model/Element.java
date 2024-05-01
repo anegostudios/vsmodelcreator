@@ -49,7 +49,6 @@ public class Element implements IDrawable
 	public Element ParentElement;
 	public ArrayList<Element> ChildElements = new ArrayList<Element>();
 	public ArrayList<AttachmentPoint> AttachmentPoints = new ArrayList<AttachmentPoint>();
-	
 	public ArrayList<Element> StepChildElements = new ArrayList<Element>();
 	Element stepParentElement;
 	
@@ -173,6 +172,8 @@ public class Element implements IDrawable
 			faces[i].setAutoUVEnabled(oldFace.isAutoUVEnabled());
 			faces[i].setRotation(oldFace.getRotation());
 			faces[i].setGlow(oldFace.getGlow());
+			if (oldFace.WindModes != null) faces[i].WindModes = oldFace.WindModes.clone();
+			if (oldFace.WindData != null) faces[i].WindData = oldFace.WindData.clone();
 		}
 		
 		for (Element child : cuboid.ChildElements) {
@@ -372,16 +373,25 @@ public class Element implements IDrawable
 			for (int i = 0; i < StepChildElements.size(); i++) {
 				StepChildElements.get(i).draw(selectedElem, true, Mat4f.CloneIt(mat));
 			}
-			
 		}
 		
-		if (ModelCreator.renderAttachmentPoints) {
-			for (int i = 0; i < AttachmentPoints.size(); i++) {
-				AttachmentPoint p = AttachmentPoints.get(i);
-				if (p == ModelCreator.currentProject.SelectedAttachmentPoint) {
-					p.draw();
-				}
+		for (int i = 0; i < AttachmentPoints.size(); i++) {
+			AttachmentPoint p = AttachmentPoints.get(i);
+			if (ModelCreator.renderAttachmentPoints && p == ModelCreator.currentProject.SelectedAttachmentPoint) {
+				p.draw();
 			}
+			
+			GL11.glPushMatrix();
+
+			GL11.glRotated(p.rotationX, 1, 0, 0);
+			GL11.glRotated(p.rotationY, 0, 1, 0);
+			GL11.glRotated(p.rotationZ, 0, 0, 1);
+			GL11.glTranslated(p.posX - 8, p.posY, p.posZ - 8);
+			for (int j = 0; j < p.StepChildElements.size(); j++) {
+				
+				p.StepChildElements.get(j).draw(selectedElem, true, Mat4f.CloneIt(mat));
+			}
+			GL11.glPopMatrix();
 		}
 
 		
@@ -1527,14 +1537,14 @@ public class Element implements IDrawable
 	}
 
 	
-	public void setIsBackdrop()
+	public void setProjectType(String type)
 	{
 		for (Face face : faces) {
-			face.setIsBackdrop();
+			face.setProjectType(type);
 		}
 		
 		for (Element elem : ChildElements) {
-			elem.setIsBackdrop();
+			elem.setProjectType(type);
 		}
 	}
 	
@@ -1766,6 +1776,20 @@ public class Element implements IDrawable
 		}
 		
 		return tris;
+	}
+
+	public AttachmentPoint findAttachmentPoint(String elementName)
+	{
+		for (AttachmentPoint ap : AttachmentPoints) { 
+			if (ap.code.equals(elementName)) return ap;
+		}
+		
+		for (Element elem : ChildElements) { 
+			AttachmentPoint foundap = elem.findAttachmentPoint(elementName);
+			if (foundap != null) return foundap;
+		}
+		
+		return null;
 	}
 	
 	

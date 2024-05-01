@@ -77,6 +77,9 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemLoadAsBackdrop;
 	private JMenuItem itemClearBackdrop;
 	
+	private JMenuItem itemLoadAsMountBackdrop;
+	private JMenuItem itemClearMountBackdrop;
+	
 	
 	/* View */
 	private JMenu menuView;
@@ -187,9 +190,13 @@ public class GuiMenu extends JMenuBar
 			
 
 			itemLoadAsBackdrop = createItem("Set backdrop...", "Set a model as a backdrop", KeyEvent.VK_K, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
-			
 			itemClearBackdrop = createItem("Clear backdrop", "Remove the backdrop again", KeyEvent.VK_L, new ImageIcon(getClass().getClassLoader().getResource("icons/clear.png")));
 			itemClearBackdrop.setEnabled(false);
+			
+			
+			itemLoadAsMountBackdrop = createItem("Set mount backdrop...", "Set a model as a mount backdrop", KeyEvent.VK_K, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
+			itemClearMountBackdrop = createItem("Clear mount backdrop", "Remove the mount backdrop again", KeyEvent.VK_L, new ImageIcon(getClass().getClassLoader().getResource("icons/clear.png")));
+			itemClearMountBackdrop.setEnabled(false);
 		}
 		
 		menuView = new JMenu("View");
@@ -310,6 +317,10 @@ public class GuiMenu extends JMenuBar
 		menuProject.addSeparator();
 		menuProject.add(itemLoadAsBackdrop);
 		menuProject.add(itemClearBackdrop);
+		menuProject.addSeparator();
+		menuProject.add(itemLoadAsMountBackdrop);
+		menuProject.add(itemClearMountBackdrop);
+		
 
 		
 		menuEdit.add(itemUndo);
@@ -502,6 +513,14 @@ public class GuiMenu extends JMenuBar
 		
 		listener = e -> { OnClearBackdrop(); };	
 		itemClearBackdrop.addActionListener(listener);
+		
+		
+		listener = e -> { OnLoadMountBackdropFile(); };	
+		itemLoadAsMountBackdrop.addActionListener(listener);
+		
+		listener = e -> { OnClearMountBackdrop(); };	
+		itemClearMountBackdrop.addActionListener(listener);
+
 		
 
 		listener = e -> {
@@ -926,6 +945,25 @@ public class GuiMenu extends JMenuBar
 		ModelCreator.currentProject.backDropShape = null;
 		itemClearBackdrop.setEnabled(false);
 	}
+	
+	
+	
+	private void OnLoadMountBackdropFile()
+	{
+		String filepath = getJsonFilePathFromFileOpenDialog("Select file to import as mount backdrop");
+		if (filepath != null) creator.LoadMountBackdropFile(filepath);
+		
+		if (ModelCreator.currentMountBackdropProject != null) {
+			itemClearMountBackdrop.setEnabled(true);
+		}
+	}
+	
+	private void OnClearMountBackdrop() {
+		ModelCreator.currentMountBackdropProject = null;
+		ModelCreator.currentProject.mountBackDropShape = null;
+		itemClearMountBackdrop.setEnabled(false);
+	}
+	
 	
 
 	private void OnNewModel()

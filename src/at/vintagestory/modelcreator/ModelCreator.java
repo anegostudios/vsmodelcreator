@@ -60,6 +60,7 @@ import at.vintagestory.modelcreator.input.listener.ListenerKeyPressOnce;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.Animation;
+import at.vintagestory.modelcreator.model.AttachmentPoint;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.PendingTexture;
 import at.vintagestory.modelcreator.model.TextureEntry;
@@ -80,6 +81,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	public static Project currentProject;
 	public static Project currentBackdropProject;
+	public static Project currentMountBackdropProject;
 	public static ProjectChangeHistory changeHistory = new ProjectChangeHistory();
 	
 	public static boolean ignoreDidModify = false;	
@@ -156,6 +158,12 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	// Input listener class
 	private InputManager manager = new InputManager();
 	
+	
+	public static Project GetProject(String type) {
+		if (type == "backdrop") return currentBackdropProject;
+		if (type == "mountbackdrop") return currentMountBackdropProject;
+		return currentProject;
+	}
 	
 	public ModelCreator(String title, String[] args) throws LWJGLException
 	{
@@ -308,7 +316,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	}
 	
 	public static boolean AnimationPlaying() {
-		return (currentBackdropProject != null && currentBackdropProject.PlayAnimation) || (currentProject != null && currentProject.PlayAnimation); 
+		return currentProject != null && currentProject.PlayAnimation; 
 	}
 	
 	public static String stackTraceToString(Throwable e) {
@@ -447,7 +455,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	}
 	
 	public static void updateFrame() {
-		if (backdropAnimationsMode && currentBackdropProject != null && currentProject.SelectedAnimation != null) currentProject.SelectedAnimation.currentFrame = currentBackdropProject.SelectedAnimation.currentFrame;
+		if (backdropAnimationsMode && currentBackdropProject != null && currentProject.SelectedAnimation != null && currentBackdropProject.SelectedAnimation != null) {
+			currentProject.SelectedAnimation.currentFrame = currentBackdropProject.SelectedAnimation.currentFrame;
+		}
 		
 		updateFrame(true);
 	}
@@ -548,6 +558,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			if (bdp != null && bdp.SelectedAnimation != null && bdp.SelectedAnimation.framesDirty) {
 				bdp.SelectedAnimation.calculateAllFrames(bdp);
 			}
+			
+			Project mountbdp = currentMountBackdropProject;
+			if (mountbdp != null && mountbdp.SelectedAnimation != null && mountbdp.SelectedAnimation.framesDirty) {
+				mountbdp.SelectedAnimation.calculateAllFrames(mountbdp);
+			}
 
 			
 			
@@ -633,7 +648,13 @@ public class ModelCreator extends JFrame implements ITextureCallback
 						updateFrame(true);
 					}
 				}
-				
+
+				if (mountbdp != null && mountbdp.SelectedAnimation != null && project.PlayAnimation) {
+					if (frameCounter % 2 == 0) {
+						mountbdp.SelectedAnimation.NextFrame();
+					}
+				}
+
 
 				// Don't run faster than ~60 FPS (1000 / 60 = 16.67ms)
 				long duration = System.currentTimeMillis() - prevFrameMillisec; 
@@ -851,14 +872,14 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			final float wheel = Mouse.getDWheel();
 			if (wheel != 0)
 			{
-				modelrenderer.camera.addZ(wheel * (cameraMod / 5000F));
+				modelrenderer.camera.addZ(wheel * (cameraMod / 2500F));
 			}
 			
 			if (Keyboard.isKeyDown(Keyboard.KEY_MINUS) || Keyboard.isKeyDown(Keyboard.KEY_SUBTRACT)) {
-				modelrenderer.camera.addZ(-50 * (cameraMod / 5000F));
+				modelrenderer.camera.addZ(-50 * (cameraMod / 2500F));
 			}
 			if (Keyboard.isKeyDown(Keyboard.KEY_ADD)) {
-				modelrenderer.camera.addZ(50 * (cameraMod / 5000F));
+				modelrenderer.camera.addZ(50 * (cameraMod / 2500F));
 			}
 		}
 		
@@ -945,6 +966,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public void setSidebar(LeftSidebar s)
 	{
 		modelrenderer.renderedLeftSidebar = s;
+		if (s != null) s.Load();
 	}
 	
 	
@@ -1193,7 +1215,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			Importer importer = new Importer(filePath);
 			
 			ignoreValueUpdates = true;
-			Project project = importer.loadFromJSON();
+			Project project = importer.loadFromJSON("normal");
 			Project oldproject = currentProject;
 			currentProject = project;
 			
@@ -1224,6 +1246,13 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		ModelCreator.updateValues(null);
 		currentProject.tree.jtree.updateUI();
+		
+		if (currentMountBackdropProject != null) {
+			AttachmentPoint ap = currentMountBackdropProject.findAttachmentPoint("Rider");
+			for (Element rootelem : currentProject.rootElements) {
+				ap.StepChildElements.add(rootelem);
+			}
+		}
 	}
 	
 	
@@ -1233,7 +1262,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		ignoreValueUpdates = true;
 		
 		Importer importer = new Importer(filePath);
-		Project importedproject = importer.loadFromJSON();
+		Project importedproject = importer.loadFromJSON("normal");
 		
 		for(Element elem : importedproject.rootElements) {
 			currentProject.rootElements.add(elem);
@@ -1263,7 +1292,15 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		currentProject.needsSaving = true;		
 		ModelCreator.updateValues(null);
-		currentProject.tree.jtree.updateUI();		
+		currentProject.tree.jtree.updateUI();
+		
+		if (currentMountBackdropProject != null) {
+			Element elem = currentMountBackdropProject.findElement("Rider");
+			for (Element rootelem : currentProject.rootElements) {
+				elem.StepChildElements.add(rootelem);
+			}
+		}
+
 	}
 	
 
@@ -1273,8 +1310,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		ignoreValueUpdates = true;
 
 		Importer importer = new Importer(filePath);
-		Project project = importer.loadFromJSON();
-		project.setIsBackdrop();
+		Project project = importer.loadFromJSON("backdrop");
 		project.reloadStepparentRelationShips();
 
 		currentBackdropProject = project;
@@ -1296,6 +1332,44 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		ignoreValueUpdates = false;
 		ignoreDidModify = false;
 	}
+	
+	
+	
+	
+	public void LoadMountBackdropFile(String filePath)
+	{		
+		ignoreDidModify = true;
+		ignoreValueUpdates = true;
+
+		Importer importer = new Importer(filePath);
+		Project project = importer.loadFromJSON("mountbackdrop");
+
+		currentMountBackdropProject = project;
+		
+		String shapeBasePath = ModelCreator.prefs.get("shapePath", ".");
+		
+		String subPath = filePath;
+		if (filePath.contains(shapeBasePath) && shapeBasePath != ".") {
+			subPath = filePath.substring(shapeBasePath.length()  + 1);
+		}
+		else {
+			int index = filePath.indexOf("assets"+File.separator+"shapes"+File.separator);
+			if (index>0) subPath = filePath.substring(index + "assets/shapes/".length());
+		}
+		subPath = subPath.replace('\\', '/').replace(".json", "");
+		
+		currentProject.mountBackDropShape = subPath;
+		ignoreValueUpdates = false;
+		ignoreDidModify = false;
+
+		
+		AttachmentPoint ap = currentMountBackdropProject.findAttachmentPoint("Rider");
+		for (Element rootelem : currentProject.rootElements) {
+			ap.StepChildElements.add(rootelem);
+		}
+	}
+	
+	
 	
 
 	public void SaveProject(File file)
