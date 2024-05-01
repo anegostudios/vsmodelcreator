@@ -7,10 +7,8 @@ import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
@@ -988,21 +986,22 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		    public synchronized void drop(DropTargetDropEvent evt) {
 				modelrenderer.renderDropTagets = false;
 				
-				DataFlavor flavor = evt.getCurrentDataFlavors()[0];
-				
 				try {
-					if (flavor.getHumanPresentableName().contains("file")) {
-						evt.acceptDrop(evt.getDropAction());						
+
+					Transferable transferable = evt.getTransferable();
+					Object obj;
+					if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+						evt.acceptDrop(evt.getDropAction());
+						obj = transferable.getTransferData(DataFlavor.javaFileListFlavor);
+					} else {
+						obj = transferable.getTransferData(transferable.getTransferDataFlavors()[0]);
 					}
 					
-					Object obj = evt.getTransferable().getTransferData(flavor);
-					
+
 					if (obj instanceof DefaultMutableTreeNode[]) {
 						//evt.rejectDrop();
 						return;
 					}
-					
-					
 					
 					@SuppressWarnings("rawtypes")
 					List data = (List)obj;
