@@ -17,20 +17,20 @@ public class TextureEntry
 	public ImageIcon icon;
 	public Texture texture;
 	public String filePath;
-	public boolean isFromBackdrop = true;
+	public String projectType;
 	
 	public int Width;
 	public int Height;
 
 	DirectoryWatchService watchService;
 
-	public TextureEntry(String code, Texture texture, ImageIcon image, String textureLocation, boolean isFromBackdrop)
+	public TextureEntry(String code, Texture texture, ImageIcon image, String textureLocation, String projectType)
 	{
 		this.code = code;
 		this.texture = texture;
 		this.icon = image;
 		this.filePath = textureLocation;
-		this.isFromBackdrop = isFromBackdrop;
+		this.projectType = projectType;
 		
 		if (image == null) return;
 		
@@ -51,21 +51,12 @@ public class TextureEntry
 		                        @Override
 		                        public void onFileModify(String filePath) {
 		                            if (!ModelCreator.autoreloadTexture) return;
-		                            
-		                        	if (isFromBackdrop) {
-		                        		if (ModelCreator.currentBackdropProject != null) {
-		                        			PendingTexture ptex = new PendingTexture(self, 3);
-		                        			ptex.SetIsBackDrop();
-		                        			ModelCreator.Instance.AddPendingTexture(ptex);
-		                            	}
-		                        	} else {
-		                        		if (ModelCreator.currentProject != null) {
-		                        			ModelCreator.Instance.AddPendingTexture(new PendingTexture(self, 3));
-		                            	}	
-		                        	}
-		                        	
-		                        	
-		                        	
+		                            Project p = ModelCreator.GetProject(projectType);
+	                        		if (p != null) {
+	                        			PendingTexture ptex = new PendingTexture(self, 3);
+	                        			ptex.SetProjectType(projectType);
+	                        			ModelCreator.Instance.AddPendingTexture(ptex);
+	                            	}
 		                        }
 		                    },
 		                    f.getParent(),

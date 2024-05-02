@@ -10,7 +10,7 @@ public class PendingTexture
 {
 	public File textureFile;
 	public ITextureCallback callback;
-	public boolean fromBackdrop;
+	public String ProjectType = "normal"; // "normal", "backdrop", "mountbackdrop"
 	
 	boolean doReplaceAll;
 	boolean doReplacedForSelectedElement;
@@ -47,7 +47,7 @@ public class PendingTexture
 	{
 		try
 		{
-			Project project = fromBackdrop ? ModelCreator.currentBackdropProject : ModelCreator.currentProject;
+			Project project = ModelCreator.GetProject(ProjectType);
 			
 			if (entry != null) {
 				project.reloadExternalTexture(entry);
@@ -59,7 +59,7 @@ public class PendingTexture
 			
 
 			BooleanParam isNew = new BooleanParam();			
-			errormessge = project.loadTexture(textureName, this.textureFile, isNew, fromBackdrop, doReplaceAll, doReplacedForSelectedElement);
+			errormessge = project.loadTexture(textureName, this.textureFile, isNew, ProjectType, doReplaceAll, doReplacedForSelectedElement);
 			
 			if (callback != null) {
 				callback.onTextureLoaded(isNew.Value, errormessge, fileName);
@@ -78,9 +78,9 @@ public class PendingTexture
 	}
 
 
-	public void SetIsBackDrop()
+	public void SetProjectType(String type)
 	{
-		fromBackdrop = true;
+		ProjectType = type;
 	}
 
 

@@ -127,4 +127,8 @@ public abstract class LeftSidebar
 	public void onResized() {
 		
 	}
+	
+	public void Load() {
+		
+	}
 }

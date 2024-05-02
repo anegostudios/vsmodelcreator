@@ -54,12 +54,13 @@ public class Importer
 		//this.ignoreTextures = true;
 	}
 
-	public Project loadFromJSON()
+	public Project loadFromJSON(String projectType)
 	{
 		Warnings = "";
 		missingAnimationElements.clear();
 		
 		project = new Project(inputPath);
+		
 		
 		File path = new File(inputPath);
 		if (path.exists() && path.isFile())
@@ -70,7 +71,7 @@ public class Importer
 			{
 				fr = new FileReader(path);
 				reader = new BufferedReader(fr);
-				readComponents(reader, path.getParentFile());
+				readComponents(reader, path.getParentFile(), projectType);
 				reader.close();
 				fr.close();
 				
@@ -105,11 +106,12 @@ public class Importer
 		}
 		
 		project.TextureSizes = this.textureSizesMap;
+		project.setProjectType(projectType);
 		
 		return project;
 	}
 
-	private void readComponents(BufferedReader reader, File dir) throws IOException
+	private void readComponents(BufferedReader reader, File dir, String projectType) throws IOException
 	{
 		JsonParser parser = new JsonParser();
 		JsonElement read = parser.parse(reader);
@@ -117,7 +119,7 @@ public class Importer
 		if (read.isJsonObject())
 		{
 			JsonObject obj = read.getAsJsonObject();
-			loadTextures(dir, obj);
+			loadTextures(dir, obj, projectType);
 			
 			if (obj.has("elements") && obj.get("elements").isJsonArray())
 			{
@@ -204,13 +206,18 @@ public class Importer
 			project.backDropShape = obj.get("backDropShape").getAsString();
 		}
 		
+		if (obj.has("mountBackDropShape") && obj.get("mountBackDropShape").isJsonPrimitive())
+		{
+			project.mountBackDropShape = obj.get("mountBackDropShape").getAsString();
+		}
+		
 		if (obj.has("collapsedPaths") && obj.get("collapsedPaths").isJsonPrimitive())
 		{
 			ModelCreator.rightTopPanel.tree.loadCollapsedPaths(obj.get("collapsedPaths").getAsString());
 		}
 	}
 
-	private void loadTextures(File file, JsonObject obj)
+	private void loadTextures(File file, JsonObject obj, String projectType)
 	{
 		if (obj.has("textures") && obj.get("textures").isJsonObject())
 		{
@@ -231,7 +238,7 @@ public class Importer
 						textureMap.put(entry.getKey().replace("#", ""), textureSubPath);
 					}
 					
-					loadTexture(file, entry.getKey(), textureSubPath);
+					loadTexture(file, entry.getKey(), textureSubPath, projectType);
 				}
 			}
 		}
@@ -256,13 +263,15 @@ public class Importer
 	}
 	
 
-	private void loadTexture(File dir, String textureName, String textureSubPath)
+	private void loadTexture(File dir, String textureName, String textureSubPath, String projectType)
 	{
 		File textureFile = new File(textureSubPath + ".png");
 
 		if (textureFile.exists() && textureFile.isFile())
 		{
-			project.PendingTextures.add(new PendingTexture(textureName, textureFile, 0));
+			PendingTexture tex = new PendingTexture(textureName, textureFile, 0);
+			tex.SetProjectType(projectType);
+			project.PendingTextures.add(tex);
 			return;
 		}
 
@@ -272,7 +281,9 @@ public class Importer
 		
 		if (f.exists())
 		{
-			project.PendingTextures.add(new PendingTexture(textureName, f, 0));
+			PendingTexture tex = new PendingTexture(textureName, f, 0);
+			tex.SetProjectType(projectType);
+			project.PendingTextures.add(tex);
 			return;
 		}
 		

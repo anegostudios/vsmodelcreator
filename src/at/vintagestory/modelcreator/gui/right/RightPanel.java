@@ -144,6 +144,10 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 			}
 			
 			ModelCreator.leftKeyframesPanel.setVisible(tabbedPane.getSelectedIndex() == 2);
+			if (tabbedPane.getSelectedIndex() == 2) {
+				ModelCreator.leftKeyframesPanel.Load();
+			}
+			
 			ModelCreator.renderAttachmentPoints = tabbedPane.getSelectedIndex() == 3;
 			ModelCreator.guiMain.itemSaveGifAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);
 			ModelCreator.guiMain.itemSavePngAnimation.setEnabled(tabbedPane.getSelectedIndex() == 2 && ModelCreator.currentProject != null && ModelCreator.currentProject.SelectedAnimation != null);

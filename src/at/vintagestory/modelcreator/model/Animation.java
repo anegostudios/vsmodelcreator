@@ -110,6 +110,7 @@ public class Animation
 					System.out.println("kelem for frame " + frame + " is null, will crash.");
 					kelem = allFrames.get(frame).GetAnimFrameElementRec(curKelem.AnimatedElement);
 				}
+				
 				lerpKeyFrameElement(kelem, curKelem, nextkelem, flag, x);
 			}
 		}
@@ -518,7 +519,7 @@ public class Animation
 		return GetKeyFrame(currentFrame) != null;
 	}
 
-	private int mod(int x, int y)
+	public static int mod(int x, int y)
 	{
 	    int result = x % y;
 	    return result < 0? result + y : result;

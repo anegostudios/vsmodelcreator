@@ -2,6 +2,8 @@ package at.vintagestory.modelcreator.model;
 
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
+import java.util.ArrayList;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 
@@ -9,11 +11,12 @@ import at.vintagestory.modelcreator.ModelCreator;
 
 public class AttachmentPoint
 {
-	private String code;
+	public String code;
 	public Element ParentElem;
+	public ArrayList<Element> StepChildElements = new ArrayList<Element>();
 	
-	protected double posX = 0.0, posY = 0.0, posZ = 0.0;
-	protected double rotationX = 0, rotationY = 0, rotationZ = 0;
+	public double posX = 0.0, posY = 0.0, posZ = 0.0;
+	public double rotationX = 0, rotationY = 0, rotationZ = 0;
 	Sphere sphere = new Sphere();
 	
 	

@@ -36,6 +36,7 @@ public class Project
 	public boolean EntityTextureMode;
 	public boolean AllAngles;
 	public String backDropShape;
+	public String mountBackDropShape;
 	
 	// Non-persistent project data
 	public AttachmentPoint SelectedAttachmentPoint;
@@ -102,6 +103,29 @@ public class Project
 					if (returnVal == JFileChooser.APPROVE_OPTION)
 					{
 						ModelCreator.Instance.LoadBackdropFile(chooser.getSelectedFile().getAbsolutePath());
+					}					
+				}
+			}
+		}
+		
+		if (mountBackDropShape != null) {
+			if (new File(mountBackDropShape + ".json").exists()) {
+				ModelCreator.Instance.LoadMountBackdropFile(mountBackDropShape + ".json");
+			} else {
+				String shapeBasePath = ModelCreator.prefs.get("shapePath", ".");
+				String path = shapeBasePath + File.separator + mountBackDropShape + ".json";
+				if (new File(path).exists()) {
+					ModelCreator.Instance.LoadMountBackdropFile(path);
+				} else {
+					
+					JFileChooser chooser = new JFileChooser(ModelCreator.prefs.get("shapePath", "."));
+					chooser.setDialogTitle("Back drop shape file not found, select desired back drop shape file");
+					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					
+					int returnVal = chooser.showOpenDialog(null);
+					if (returnVal == JFileChooser.APPROVE_OPTION)
+					{
+						ModelCreator.Instance.LoadMountBackdropFile(chooser.getSelectedFile().getAbsolutePath());
 					}					
 				}
 			}
@@ -385,6 +409,20 @@ public class Project
 	}
 	
 	
+	public AttachmentPoint findAttachmentPoint(String elementName) {
+		return findAttachmentPoint(elementName, rootElements);
+	}
+	
+	public AttachmentPoint findAttachmentPoint(String elementName, List<Element> list) {
+		for (Element elem : list) {
+			AttachmentPoint point = elem.findAttachmentPoint(elementName);
+			if (point != null) return point;
+		}
+		
+		return null;
+	}
+	
+	
 	public Element findElement(String elementName) {
 		return findElement(elementName, rootElements);
 	}
@@ -399,6 +437,7 @@ public class Project
 		
 		return null;
 	}
+	
 	
 
 
@@ -528,7 +567,7 @@ public class Project
 	}
 	
 
-	public String loadTexture(String textureCode, File image, BooleanParam isNew, boolean fromBackdrop, boolean doReplaceAll, boolean doReplacedForSelectedElement) throws IOException
+	public String loadTexture(String textureCode, File image, BooleanParam isNew, String projectType, boolean doReplaceAll, boolean doReplacedForSelectedElement) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
 		Texture texture;
@@ -556,13 +595,18 @@ public class Project
 		
 		ArrayList<String> nowFoundTextures = new ArrayList<String>(); 
 		
+
+		if (doReplaceAll) {
+			this.TexturesByCode.clear();
+		}
+		
 		if (!TexturesByCode.containsKey(textureCode)) {
 			// Try and match by filename if not matched by code
 			for (String key : MissingTexturesByCode.keySet()) {
 				String val = MissingTexturesByCode.get(key);
 				String filename = val.substring(val.lastIndexOf("/")+1);
 				if (filename.equalsIgnoreCase(textureCode)) {
-					TexturesByCode.put(key, new TextureEntry(key, texture, icon, image.getAbsolutePath(), fromBackdrop));
+					TexturesByCode.put(key, new TextureEntry(key, texture, icon, image.getAbsolutePath(), projectType));
 					nowFoundTextures.add(key);
 				}	
 			}
@@ -573,7 +617,7 @@ public class Project
 			if (TexturesByCode.containsKey(textureCode)) {
 				TextureEntry entry = TexturesByCode.get(textureCode);
 				if (entry.getFilePath().equalsIgnoreCase(image.getAbsolutePath())) {
-					TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath(), fromBackdrop));
+					TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath(), projectType));
 				} else {
 					
 					int i = 2;
@@ -581,7 +625,7 @@ public class Project
 						
 						String altimgName = textureCode + i;
 						if (!TexturesByCode.containsKey(altimgName)) {
-							TexturesByCode.put(altimgName, new TextureEntry(altimgName, texture, icon, image.getAbsolutePath(), fromBackdrop));
+							TexturesByCode.put(altimgName, new TextureEntry(altimgName, texture, icon, image.getAbsolutePath(), projectType));
 							textureCode = altimgName;
 							break;
 						}					
@@ -592,7 +636,7 @@ public class Project
 				isNew.Value = false;
 			} else {
 				isNew.Value = true;
-				TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath(), fromBackdrop));	
+				TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath(), projectType));	
 			}			
 		} else {
 			
@@ -602,6 +646,7 @@ public class Project
 				MissingTexturesByCode.remove(key);
 			}			
 		}
+		
 		
 		if (doReplaceAll || (doReplacedForSelectedElement && SelectedElement != null)) {
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
@@ -649,14 +694,14 @@ public class Project
 
 
 
-	public void setIsBackdrop()
+	public void setProjectType(String type)
 	{
 		for (Element elem : rootElements) {
-			elem.setIsBackdrop();
+			elem.setProjectType(type);
 		}
 
 		for (PendingTexture tex : PendingTextures) {
-			tex.SetIsBackDrop();
+			tex.SetProjectType(tex.ProjectType);
 			ModelCreator.Instance.AddPendingTexture(tex);
 		}
 	}
