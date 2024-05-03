@@ -174,7 +174,11 @@ public class AnimFrameElement implements IDrawable
 						
 						for (int k = 0; k < elems.size(); k++) {
 							IDrawable drawable = elems.get(k);
-							if (((AnimFrameElement)drawable).AnimatedElement.name.equals(p.StepChildElements.get(j).name)) {
+							String name;
+							if (drawable instanceof AnimFrameElement) name=((AnimFrameElement)drawable).AnimatedElement.name;
+							else name=((Element)drawable).name;
+							
+							if (name.equals(p.StepChildElements.get(j).name)) {
 								drawable.draw(selectedElem, drawCallFromStepParent, animVersion);
 								break;
 							}
