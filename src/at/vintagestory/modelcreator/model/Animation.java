@@ -317,6 +317,18 @@ public class Animation
 		return keyframe;
 	}
 
+
+	public AnimFrameElement GetOrCreateLerpedKeyFrameElement(Element elem, int frame) {
+		AnimationFrame keyframe = GetKeyFrame(frame);
+		if (keyframe == null) {
+			keyframe = ModelCreator.currentProject.SelectedAnimation.allFrames.get(ModelCreator.currentProject.SelectedAnimation.currentFrame).clone(true);
+			keyframe.setFrameNumber(frame);
+			ModelCreator.currentProject.SelectedAnimation.InsertKeyFrame(keyframe);
+		}
+		
+		return keyframe.GetOrCreateKeyFrameElementFlat(frame, elem);
+	}
+
 	
 	public AnimFrameElement GetOrCreateKeyFrameElement(Element elem, int frame) {
 		AnimationFrame keyframe = GetOrCreateAnimationFrame(frame);		
@@ -526,7 +538,7 @@ public class Animation
 	}
 	
 	
-	public Animation clone(boolean withElementReference) {
+	public Animation clone() {
 		Animation cloned = new Animation();
 		
 		cloned.name = name;
@@ -538,7 +550,7 @@ public class Animation
 		cloned.keyframes = new AnimationFrame[keyframes.length];
 		
 		for (int i = 0; i < keyframes.length; i++) {
-			cloned.keyframes[i] = keyframes[i].clone(withElementReference);
+			cloned.keyframes[i] = keyframes[i].clone();
 		}
 		
 		

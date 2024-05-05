@@ -237,6 +237,7 @@ public class ModelRenderer
 	public void drawPerspectiveGrid()
 	{
 		if (!ModelCreator.showGrid) return;
+		if (ModelCreator.showTreadmill) return;
 		
 		float d1 = 0.8f;
 		float d2 = 0.6f;

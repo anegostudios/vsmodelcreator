@@ -111,6 +111,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static float TreadMillSpeed = 1f;
 	
 	public static float noTexScale = 2;
+	
+	public static int currentRightTab;
 
 	// Canvas Variables
 	private final static AtomicReference<Dimension> newCanvasSize = new AtomicReference<Dimension>();

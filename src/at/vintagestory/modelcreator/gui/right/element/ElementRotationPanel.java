@@ -11,6 +11,7 @@ import java.util.Hashtable;
 import javax.swing.*;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
+import at.vintagestory.modelcreator.gui.SliderMouseHandler;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
@@ -83,7 +84,6 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		
 		rotationFields[num].setBackground(new Color(Face.ColorsByFace[colIndex].r, Face.ColorsByFace[colIndex].g, Face.ColorsByFace[colIndex].b));
 		
-		
 		AwtUtil.addChangeListener(rotationFields[num], e -> {
 			Element element = manager.getCurrentElement();
 			if (element == null) return;
@@ -113,7 +113,7 @@ public class ElementRotationPanel extends JPanel implements IValueUpdater
 		rotationSliders[num].setPaintLabels(true);
 		rotationSliders[num].setLabelTable(getLabelTable());
 		rotationSliders[num].setPreferredSize(new Dimension(160, 40));
-		
+		rotationSliders[num].addMouseListener(new SliderMouseHandler());
 		
 		rotationSliders[num].addChangeListener(e ->
 		{

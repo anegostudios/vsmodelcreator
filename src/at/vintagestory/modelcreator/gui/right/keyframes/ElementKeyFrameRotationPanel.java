@@ -19,6 +19,7 @@ import javax.swing.SpringLayout;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
+import at.vintagestory.modelcreator.gui.SliderMouseHandler;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.model.AnimFrameElement;
@@ -131,6 +132,7 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 		rotationSliders[num].setPaintLabels(true);
 		rotationSliders[num].setLabelTable(getLabelTable());
 		rotationSliders[num].setPreferredSize(new Dimension(160, 40));
+		rotationSliders[num].addMouseListener(new SliderMouseHandler());
 		
 		
 		rotationSliders[num].addChangeListener(e ->

@@ -132,16 +132,16 @@ public class AnimationFrame
 	}
 	
 	
-	public AnimationFrame clone(boolean withElementReference) {
-		return clone(IsKeyFrame, withElementReference);
+	public AnimationFrame clone() {
+		return clone(IsKeyFrame);
 	}
 	
-	public AnimationFrame clone(boolean iskeyframe, boolean withElementReference) {
+	public AnimationFrame clone(boolean iskeyframe) {
 		AnimationFrame cloned = new AnimationFrame(iskeyframe);
 		cloned.FrameNumber = FrameNumber;
 		
 		for (IDrawable dw : Elements) {
-			cloned.Elements.add((IDrawable) ((AnimFrameElement)dw).clone(iskeyframe, withElementReference));
+			cloned.Elements.add((IDrawable) ((AnimFrameElement)dw).clone(iskeyframe));
 		}
 		
 		

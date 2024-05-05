@@ -12,6 +12,7 @@ import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Animation;
+import at.vintagestory.modelcreator.model.AnimationFrame;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.AnimFrameElement;
 
@@ -55,13 +56,14 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
 			
 			Element elem = ModelCreator.rightTopPanel.getCurrentElement();
+			Animation anim = ModelCreator.currentProject.SelectedAnimation;
+			int currentFrame = anim.currentFrame;
+			AnimationFrame aframe = anim.allFrames.get(currentFrame);
+			AnimFrameElement frameElem = aframe.GetAnimFrameElementRec(elem);
+
 			AnimFrameElement keyFrameElem = ModelCreator.currentProject.SelectedAnimation.ToggleRotation(elem, btnRot.isSelected());
 			
-			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) == 1) {
-				Animation anim = ModelCreator.currentProject.SelectedAnimation;
-				int currentFrame = anim.currentFrame;
-				
-				AnimFrameElement frameElem = anim.GetOrCreateKeyFrameElement(elem, currentFrame);
+			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) != 1) {
 				keyFrameElem.setRotationX(frameElem.getRotationX());
 				keyFrameElem.setRotationY(frameElem.getRotationY());
 				keyFrameElem.setRotationZ(frameElem.getRotationZ());
@@ -84,14 +86,15 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
 			
 			Element elem = ModelCreator.rightTopPanel.getCurrentElement();
+			Animation anim = ModelCreator.currentProject.SelectedAnimation;
+			int currentFrame = anim.currentFrame;
+			AnimationFrame aframe = anim.allFrames.get(currentFrame);
+			AnimFrameElement frameElem = aframe.GetAnimFrameElementRec(elem);
+
+			
 			AnimFrameElement keyFrameElem = ModelCreator.currentProject.SelectedAnimation.TogglePosition(ModelCreator.rightTopPanel.getCurrentElement(), btnPos.isSelected());
 			
-			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) == 1) {
-				Animation anim = ModelCreator.currentProject.SelectedAnimation;
-				int currentFrame = anim.currentFrame;
-				
-				AnimFrameElement frameElem = anim.GetOrCreateKeyFrameElement(elem, currentFrame);
-				
+			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) != 1) {
 				keyFrameElem.setOffsetX(frameElem.getOffsetX());
 				keyFrameElem.setOffsetY(frameElem.getOffsetY());
 				keyFrameElem.setOffsetZ(frameElem.getOffsetZ());
@@ -116,14 +119,16 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
 			
 			Element elem = ModelCreator.rightTopPanel.getCurrentElement();
+			
+			Animation anim = ModelCreator.currentProject.SelectedAnimation;
+			int currentFrame = anim.currentFrame;
+			AnimationFrame aframe = anim.allFrames.get(currentFrame);
+			AnimFrameElement frameElem = aframe.GetAnimFrameElementRec(elem);
+
+			
 			AnimFrameElement keyFrameElem = ModelCreator.currentProject.SelectedAnimation.ToggleStretch(ModelCreator.rightTopPanel.getCurrentElement(), btnStretch.isSelected());
 			
-			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) == 1) {
-				Animation anim = ModelCreator.currentProject.SelectedAnimation;
-				int currentFrame = anim.currentFrame;
-				
-				AnimFrameElement frameElem = anim.GetOrCreateKeyFrameElement(elem, currentFrame);
-				
+			if ((a.getModifiers() & ActionEvent.SHIFT_MASK) != 1) {
 				keyFrameElem.setStretchX(frameElem.getStretchX());
 				keyFrameElem.setStretchY(frameElem.getStretchY());
 				keyFrameElem.setStretchZ(frameElem.getStretchZ());
@@ -136,14 +141,13 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		});
 		
 		
-		btnContainer.add(btnStretch);
+//		btnContainer.add(btnStretch);
 		
 		
 		
 		add(btnContainer);
 		add(panelRotation);
 		add(panelPosition);
-		//add(panelSize);	
 		
 		updateValues(null);
 	}

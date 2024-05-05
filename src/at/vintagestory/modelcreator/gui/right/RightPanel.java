@@ -135,6 +135,8 @@ public class RightPanel extends JPanel implements IElementManager, IValueUpdater
 		
 		tabbedPane.addChangeListener(c ->
 		{
+			ModelCreator.currentRightTab = tabbedPane.getSelectedIndex();
+			
 			if (tabbedPane.getSelectedIndex() == 1)
 			{
 				creator.setSidebar(creator.uvSidebar);

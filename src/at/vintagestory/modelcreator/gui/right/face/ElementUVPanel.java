@@ -303,6 +303,8 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			setMaximumSize(new Dimension(186, 25));
 		}
 		
+		// For some reasonn this checkbox shows up outside its tab?
+		alternateUnwrap.setVisible(ModelCreator.currentRightTab == 1);
 		
 		
 		autoUnwrap.setEnabled(enabled);

@@ -71,7 +71,7 @@ public class ControlsDialog
 				+ "</ul>"
 				+ "<p><b>Keyframe Pane (Right)<b></p>"
 				+ "<ul>"
-				+ "<li>Hold SHIFT and toggle 'Position', 'Rotation' or 'Stretch' to create a new tweening keyframe, i.e. take on the current position/rotation/stretch values of the current frame</li>"
+				+ "<li>Hold SHIFT and toggle 'Position', 'Rotation' or 'Stretch' to NOT create a new tweening keyframe, i.e. take on the current position/rotation/stretch values of the current frame</li>"
 				+ "</ul>"		
 				+ "</html>"
 		);

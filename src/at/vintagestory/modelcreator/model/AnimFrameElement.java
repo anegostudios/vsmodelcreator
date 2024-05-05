@@ -188,8 +188,8 @@ public class AnimFrameElement implements IDrawable
 					}
 				}
 			}
-
 		}
+		
 		GL11.glPopMatrix();
 		
 		
@@ -466,7 +466,7 @@ public class AnimFrameElement implements IDrawable
 	}
 
 	
-	public AnimFrameElement clone(boolean iskeyframe, boolean withElementReference) {
+	public AnimFrameElement clone(boolean iskeyframe) {
 		AnimFrameElement cloned = new AnimFrameElement(iskeyframe);
 		
 		cloned.AnimatedElementName = AnimatedElement == null ? AnimatedElementName : ((Element)AnimatedElement).name;
@@ -491,7 +491,7 @@ public class AnimFrameElement implements IDrawable
 		cloned.RotShortestDistanceZ = RotShortestDistanceZ;
 		
 		for (IDrawable dw : ChildElements) {
-			cloned.ChildElements.add((IDrawable)((AnimFrameElement)dw).clone(iskeyframe, withElementReference));
+			cloned.ChildElements.add((IDrawable)((AnimFrameElement)dw).clone(iskeyframe));
 		}
 		
 		cloned.FrameNumber = FrameNumber;

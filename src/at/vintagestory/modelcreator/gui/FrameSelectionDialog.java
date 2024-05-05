@@ -78,7 +78,6 @@ public class FrameSelectionDialog
 			
 			AnimationFrame sourceFrame = ModelCreator.currentProject.SelectedAnimation.allFrames.get(ModelCreator.currentProject.SelectedAnimation.currentFrame).clone(true);
 			sourceFrame.setFrameNumber(forFrame);
-			
 			ModelCreator.currentProject.SelectedAnimation.InsertKeyFrame(sourceFrame);
 			
 			dialog.dispose();

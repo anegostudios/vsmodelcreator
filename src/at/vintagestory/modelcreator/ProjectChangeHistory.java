@@ -57,7 +57,7 @@ public class ProjectChangeHistory
 		
 		Project oldProject = ModelCreator.currentProject;
 		
-		ModelCreator.currentProject = ProjectSnapshots.get(currentHistoryState).clone(false);
+		ModelCreator.currentProject = ProjectSnapshots.get(currentHistoryState).clone();
 		ModelCreator.currentProject.tree = oldProject.tree;
 		if (oldProject.SelectedElement != null) {
 			ModelCreator.currentProject.SelectedElement = ModelCreator.currentProject.findElement(oldProject.SelectedElement.getName());	
@@ -112,7 +112,7 @@ public class ProjectChangeHistory
 			currentHistoryState--;
 		}
 		
-		ProjectSnapshots.add(0, project.clone(false));
+		ProjectSnapshots.add(0, project.clone());
 		//System.out.println("added history state, states = " + ProjectSnapshots.size());
 		
 		if (ProjectSnapshots.size() > maxHistoryStates) {
