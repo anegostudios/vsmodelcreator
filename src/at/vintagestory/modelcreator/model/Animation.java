@@ -380,6 +380,10 @@ public class Animation
 				i--;
 			}
 		}
+
+		for (Element childelem : curElem.ChildElements) {
+			RemoveKeyFrameElement(childelem);
+		}
 	}
 	
 	

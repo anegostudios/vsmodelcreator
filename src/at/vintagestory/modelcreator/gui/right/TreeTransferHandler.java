@@ -179,9 +179,11 @@ class TreeTransferHandler extends TransferHandler {
             if (oldParent == newParent) continue;
             
             // Make sure the element is removed everywhere. (Step-parented elements might be a root element *and* have a parent element)
-        	oldParentPath = ownElem.GetParentPath();     
-        	oldParent.ChildElements.remove(ownElem);
-        	oldParent.StepChildElements.remove(ownElem);
+        	oldParentPath = ownElem.GetParentPath();
+        	if (oldParent != null) {
+        		oldParent.ChildElements.remove(ownElem);
+        		oldParent.StepChildElements.remove(ownElem);
+        	}
         	ModelCreator.currentProject.rootElements.remove(ownElem);
         	
             
