@@ -178,15 +178,17 @@ class TreeTransferHandler extends TransferHandler {
             Element newParent = parent.getUserObject() instanceof Element ? (Element) parent.getUserObject() : null;
             if (oldParent == newParent) continue;
             
-            if (oldParent != null) {
-            	oldParentPath = ownElem.GetParentPath();            	
-            	oldParent.ChildElements.remove(ownElem);
-            } else {
-            	ModelCreator.currentProject.rootElements.remove(ownElem);
-            }
+            // Make sure the element is removed everywhere. (Step-parented elements might be a root element *and* have a parent element)
+        	oldParentPath = ownElem.GetParentPath();     
+        	oldParent.ChildElements.remove(ownElem);
+        	oldParent.StepChildElements.remove(ownElem);
+        	ModelCreator.currentProject.rootElements.remove(ownElem);
+        	
             
             if (newParent != null) {            	
             	newParent.ChildElements.add(ownElem);
+                // Must not have a step parent when parented 
+	            ownElem.setStepParent(null);                
             } else {
             	ModelCreator.currentProject.rootElements.add(ownElem);
             }
@@ -195,9 +197,10 @@ class TreeTransferHandler extends TransferHandler {
             
             newParentPath = ownElem.GetParentPath();
             
-            if (ModelCreator.repositionWhenReparented ) {
+            if (ModelCreator.repositionWhenReparented) {
             	applyReparentTransform(ownElem, oldParentPath, newParentPath);
             }
+            
             
             tree.setSelectionPath(new TreePath(nodes[i].getPath()));
         }

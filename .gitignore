@@ -1,6 +1,7 @@
 ### IntelliJ IDEA ###
 out/
 output/
+output-jar/
 !**/src/main/**/out/
 !**/src/test/**/out/
 

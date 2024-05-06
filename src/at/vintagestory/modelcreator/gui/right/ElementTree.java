@@ -133,6 +133,8 @@ public class ElementTree
 				if (ignoreExpandCollapse) return;
 				TreePath path = arg0.getPath();
 				collapsedPaths.remove(path.toString().substring(1).replace("]", "").replace(", ", "/"));
+				
+				ModelCreator.currentProject.collapsedPaths = saveCollapsedPaths();
 			}
 			
 			@Override
@@ -143,6 +145,8 @@ public class ElementTree
 				TreePath path = arg0.getPath();
 				String strpath=path.toString().substring(1).replace("]", "").replace(", ", "/");
 		        collapsedPaths.add(strpath);
+		        
+		        ModelCreator.currentProject.collapsedPaths = saveCollapsedPaths();
 			}
 		});
 		

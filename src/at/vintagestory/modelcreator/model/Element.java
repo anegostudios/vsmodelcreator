@@ -334,7 +334,6 @@ public class Element implements IDrawable
 	
 	public void draw(IDrawable selectedElem, boolean drawCallFromStepParent, float[] mat) {
 		if (!renderInEditor || (stepParentElement != null && !drawCallFromStepParent)) return;
-		
 
 		float b;
 		

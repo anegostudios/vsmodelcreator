@@ -49,6 +49,7 @@ public class Project
 	public static int nextAttachmentPointNumber = 1;
 	
 	public String filePath;
+	public String collapsedPaths;
 	
 	
 	public Project(String filePath) {
@@ -72,6 +73,7 @@ public class Project
 		
 		ModelCreator.ignoreValueUpdates = true;
 		tree.clearElements();
+		if (collapsedPaths != null) tree.loadCollapsedPaths(collapsedPaths);
 		ModelCreator.ignoreValueUpdates = false;
 		
 		for (Element elem : rootElements) {
@@ -450,6 +452,7 @@ public class Project
 		cloned.EntityTextureMode = EntityTextureMode;
 		cloned.TextureWidth = TextureWidth;
 		cloned.TextureHeight = TextureHeight;
+		cloned.collapsedPaths = collapsedPaths;
 		
 		for (String key : TextureSizes.keySet()) {
 			cloned.TextureSizes.put(key, TextureSizes.get(key));

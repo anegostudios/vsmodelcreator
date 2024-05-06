@@ -2,6 +2,8 @@ package at.vintagestory.modelcreator;
 
 import java.util.ArrayList;
 
+import at.vintagestory.modelcreator.gui.right.ElementTree;
+import at.vintagestory.modelcreator.gui.right.RightPanel;
 import at.vintagestory.modelcreator.model.Animation;
 
 
@@ -78,6 +80,12 @@ public class ProjectChangeHistory
 		
 		ModelCreator.updateValues(null);
 		ModelCreator.currentProject.tree.jtree.updateUI();
+		
+		if (ModelCreator.rightTopPanel != null) {
+			ElementTree tree = ((RightPanel)ModelCreator.rightTopPanel).tree;			
+			if (ModelCreator.currentProject.collapsedPaths != null) tree.loadCollapsedPaths(ModelCreator.currentProject.collapsedPaths);
+		}
+		
 		
 		ModelCreator.ignoreDidModify = false;
 	}
