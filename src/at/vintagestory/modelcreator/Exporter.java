@@ -192,6 +192,8 @@ public class Exporter
 	
 	private void writeAnimation(BufferedWriter writer, Animation animation) throws IOException
 	{
+		if (animation.keyframes.length == 0) return;
+		
 		writer.newLine();
 		writer.write(space(2) + "{");
 		writer.newLine();
