@@ -184,8 +184,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	
 
 	private void addComponents()
-	{
-		
+	{		
 		// 0. Mount animation dropdown
 		if (ModelCreator.currentMountBackdropProject != null) {
 			add(mountAnimLabel=new JLabel("Mount Animation"));
@@ -303,7 +302,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 		frameSlider.setPaintLabels(true);
 		frameSlider.setPreferredSize(new Dimension(170, 40));
 		frameSlider.addChangeListener(new ChangeListener()
-		{			
+		{
 			@Override
 			public void stateChanged(ChangeEvent e)
 			{
@@ -382,8 +381,7 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 				if (project.SelectedAnimation.currentFrame == 0) {
 					ModelCreator.currentMountBackdropProject.SelectedAnimation.currentFrame=0;
 				}
-
-			}				
+			}
 			
 			
 			ModelCreator.updateFrame();

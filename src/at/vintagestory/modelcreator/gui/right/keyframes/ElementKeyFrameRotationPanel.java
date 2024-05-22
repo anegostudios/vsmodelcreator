@@ -11,17 +11,23 @@ import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.gui.SliderMouseHandler;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Face;
+import at.vintagestory.modelcreator.model.FocusListenerImpl;
 import at.vintagestory.modelcreator.model.AnimFrameElement;
 import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
@@ -37,6 +43,9 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 	
 	private JTextField[] rotationFields;
 	private JSlider[] rotationSliders;
+	
+	private boolean[] rotationFieldsListenEdit = new boolean[3];
+	private boolean[] rotationSlidersListenEdit = new boolean[3];
 	
 
 	static int ROTATION_MIN = -4;
@@ -90,10 +99,24 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 		int colIndex = num == 1 ? 4 : (num == 0 ? 1 : 2);
 		
 		rotationFields[num].setBackground(new Color(Face.ColorsByFace[colIndex].r, Face.ColorsByFace[colIndex].g, Face.ColorsByFace[colIndex].b));
+				
+		rotationFields[num].addFocusListener(new FocusListenerImpl()
+		{
+			@Override
+			public void focusGained(java.awt.event.FocusEvent e) {
+				rotationFieldsListenEdit[num]=true;	
+			}
+
+			 @Override
+		     public void focusLost(java.awt.event.FocusEvent e) {
+			 	rotationFieldsListenEdit[num]=false;
+		     }
+		});
 		
 		AwtUtil.addChangeListener(rotationFields[num], e -> {
-			keyFramesPanel.ensureAnimationExists();
-			
+			if (ignoreSliderChanges || !rotationFieldsListenEdit[num]) return;
+						
+			keyFramesPanel.ensureAnimationExists();	
 			
 			AnimFrameElement element = keyFramesPanel.getCurrentElement();
 			if (element == null) return;
@@ -134,10 +157,23 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 		rotationSliders[num].setPreferredSize(new Dimension(160, 40));
 		rotationSliders[num].addMouseListener(new SliderMouseHandler());
 		
+		rotationSliders[num].addFocusListener(new FocusListenerImpl()
+		{
+			@Override
+			public void focusGained(java.awt.event.FocusEvent e) {
+				rotationSlidersListenEdit[num]=true;
+			}
+
+			 @Override
+		     public void focusLost(java.awt.event.FocusEvent e) {
+				 rotationSlidersListenEdit[num]=false;
+		     }
+		});
+		
 		
 		rotationSliders[num].addChangeListener(e ->
 		{
-			if (ignoreSliderChanges) return;
+			if (ignoreSliderChanges || !rotationSlidersListenEdit[num]) return;
 			
 			keyFramesPanel.ensureAnimationExists();
 			
@@ -216,6 +252,16 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 	{
 		AnimFrameElement element = keyFramesPanel.getCurrentElement();
 		toggleFields(element, byGuiElem);
+	}
+	
+	public void setAnimActive(boolean active) {
+		AnimFrameElement element = keyFramesPanel.getCurrentElement();
+		boolean enabled = element != null && this.enabled;
+		
+		for (int i = 0; i < 3; i++) {
+			rotationFields[i].setEnabled(!active && enabled);
+			rotationSliders[i].setEnabled(!active && enabled);
+		}
 	}
 	
 	public void toggleFields(AnimFrameElement element, JComponent byGuiElem) {

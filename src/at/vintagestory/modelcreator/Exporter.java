@@ -173,6 +173,8 @@ public class Exporter
 
 			for (int i = 0; i < project.Animations.size(); i++)
 			{
+				if (project.Animations.get(i).keyframes.length == 0) continue;				
+
 				writeAnimation(writer, project.Animations.get(i));
 				
 				if (i != project.Animations.size() - 1) {
@@ -192,8 +194,6 @@ public class Exporter
 	
 	private void writeAnimation(BufferedWriter writer, Animation animation) throws IOException
 	{
-		if (animation.keyframes.length == 0) return;
-		
 		writer.newLine();
 		writer.write(space(2) + "{");
 		writer.newLine();

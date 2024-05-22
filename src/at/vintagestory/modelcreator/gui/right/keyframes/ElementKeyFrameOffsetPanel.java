@@ -18,6 +18,7 @@ import at.vintagestory.modelcreator.enums.EnumAxis;
 import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
 import at.vintagestory.modelcreator.model.Element;
+import at.vintagestory.modelcreator.model.FocusListenerImpl;
 import at.vintagestory.modelcreator.model.AnimFrameElement;
 import at.vintagestory.modelcreator.util.AwtUtil;
 import at.vintagestory.modelcreator.util.Parser;
@@ -41,6 +42,10 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 	private DecimalFormat df = new DecimalFormat("#.##");
 	
 	public boolean enabled = true;
+
+	protected boolean xPositionFieldListenEdit;
+	protected boolean yPositionFieldListenEdit;
+	protected boolean zPositionFieldListenEdit;
 
 	public ElementKeyFrameOffsetPanel(RightKeyFramesPanel keyFramesPanel)
 	{
@@ -75,20 +80,35 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		xPositionField.setHorizontalAlignment(JTextField.CENTER);
 		
 		AwtUtil.addChangeListener(xPositionField, e -> {
+			if (!xPositionFieldListenEdit) return;
+			
 			keyFramesPanel.ensureAnimationExists();
 			AnimFrameElement element = keyFramesPanel.getCurrentElement();
 			if (element == null) return;
 			
-			String text = xPositionField.getText(); 			
+			String text = xPositionField.getText(); 
 			if (text.length() == 0) return;
 			if (!Parser.isDouble(text)) return;
 			double newValue = Parser.parseDouble(text, 0);
 			if (newValue != element.getOffsetX()) {
 				element.setOffsetX(newValue);
-				ModelCreator.updateValues(xPositionField);				
+				ModelCreator.updateValues(xPositionField);
 			}
 			
 			keyFramesPanel.copyFrameElemToBackdrop(element.AnimatedElement);
+		});
+		
+		xPositionField.addFocusListener(new FocusListenerImpl()
+		{
+			@Override
+			public void focusGained(java.awt.event.FocusEvent e) {
+				xPositionFieldListenEdit=true;
+			}
+
+			 @Override
+		     public void focusLost(java.awt.event.FocusEvent e) {
+				 xPositionFieldListenEdit=false;
+		     }
 		});
 		
 		xPositionField.addMouseWheelListener(new MouseWheelListener()
@@ -108,22 +128,37 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		yPositionField.setHorizontalAlignment(JTextField.CENTER);
 		
 		AwtUtil.addChangeListener(yPositionField, e -> {
+			if (!yPositionFieldListenEdit) return;
+
 			keyFramesPanel.ensureAnimationExists();
 			AnimFrameElement element = keyFramesPanel.getCurrentElement();
 			if (element == null) return;
 			
-			String text = yPositionField.getText(); 			
+			String text = yPositionField.getText(); 
 			if (text.length() == 0) return;
 			if (!Parser.isDouble(text)) return;
 			double newValue = Parser.parseDouble(text, 0);
 			if (newValue != element.getOffsetY()) {
 				element.setOffsetY(newValue);
-				ModelCreator.updateValues(yPositionField);				
+				ModelCreator.updateValues(yPositionField);
 			}
 			
 			keyFramesPanel.copyFrameElemToBackdrop(element.AnimatedElement);
 		});
 
+		yPositionField.addFocusListener(new FocusListenerImpl()
+		{
+			@Override
+			public void focusGained(java.awt.event.FocusEvent e) {
+				yPositionFieldListenEdit=true;
+			}
+
+			 @Override
+		     public void focusLost(java.awt.event.FocusEvent e) {
+				 yPositionFieldListenEdit=false;
+		     }
+		});
+		
 		
 		yPositionField.addMouseWheelListener(new MouseWheelListener()
 		{
@@ -141,21 +176,37 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		zPositionField.setHorizontalAlignment(JTextField.CENTER);
 		
 		AwtUtil.addChangeListener(zPositionField, e -> {
+			if (!zPositionFieldListenEdit) return;
+			
 			keyFramesPanel.ensureAnimationExists();
 			AnimFrameElement element = keyFramesPanel.getCurrentElement();
 			if (element == null) return;
 
-			String text = zPositionField.getText(); 			
+			String text = zPositionField.getText(); 
 			if (text.length() == 0) return;
 			if (!Parser.isDouble(text)) return;
 			double newValue = Parser.parseDouble(text, 0);
 			if (newValue != element.getOffsetZ()) {
 				element.setOffsetZ(newValue);
-				ModelCreator.updateValues(zPositionField);				
+				ModelCreator.updateValues(zPositionField);
 			}
 			
 			keyFramesPanel.copyFrameElemToBackdrop(element.AnimatedElement);
 		});
+		
+		zPositionField.addFocusListener(new FocusListenerImpl()
+		{
+			@Override
+			public void focusGained(java.awt.event.FocusEvent e) {
+				zPositionFieldListenEdit=true;
+			}
+
+			 @Override
+		     public void focusLost(java.awt.event.FocusEvent e) {
+				 zPositionFieldListenEdit=false;
+		     }
+		});
+		
 		
 		zPositionField.addMouseWheelListener(new MouseWheelListener()
 		{
@@ -275,9 +326,14 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		toggleFields(cube, byGuiElem);
 	}
 	
-	
-	public void toggleFields(AnimFrameElement cube, JComponent byGuiElem) {
+	public void setAnimActive(boolean active) {
+		AnimFrameElement cube = keyFramesPanel.getCurrentElement();
 		boolean enabled = cube != null && this.enabled;
+		
+		setEditable(!active && enabled);
+	}
+	
+	protected void setEditable(boolean enabled) {
 		btnPlusX.setEnabled(enabled);
 		btnPlusY.setEnabled(enabled);
 		btnPlusZ.setEnabled(enabled);
@@ -287,7 +343,15 @@ public class ElementKeyFrameOffsetPanel extends JPanel implements IValueUpdater
 		
 		xPositionField.setEnabled(enabled);
 		yPositionField.setEnabled(enabled);
-		zPositionField.setEnabled(enabled);
+		zPositionField.setEnabled(enabled);	
+	}
+
+	
+	
+	public void toggleFields(AnimFrameElement cube, JComponent byGuiElem) {
+		boolean enabled = cube != null && this.enabled;
+		setEditable(enabled);
+		
 		if (byGuiElem != xPositionField) xPositionField.setText(enabled ? df.format(cube.getOffsetX()) : "");
 		if (byGuiElem != yPositionField) yPositionField.setText(enabled ? df.format(cube.getOffsetY()) : "");
 		if (byGuiElem != zPositionField) zPositionField.setText(enabled ? df.format(cube.getOffsetZ()) : "");

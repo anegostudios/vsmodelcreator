@@ -199,7 +199,14 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		Project project = ModelCreator.CurrentAnimProject();
 		
 		boolean enabled = project.SelectedAnimation != null && elem != null && project.GetFrameCount() > 0;
-		if (ModelCreator.AnimationPlaying()) return;
+		panelPosition.setAnimActive(ModelCreator.AnimationPlaying());
+		panelRotation.setAnimActive(ModelCreator.AnimationPlaying());
+		
+		if (ModelCreator.AnimationPlaying()) {
+			btnPos.setEnabled(false);
+			btnRot.setEnabled(false);
+			return;
+		}
 		
 		ensureAnimationExists();
 		
@@ -211,16 +218,15 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 		
 		btnPos.setSelected(panelPosition.enabled);
 		btnRot.setSelected(panelRotation.enabled);
-		btnStretch.setSelected(enabled && keyframeElem != null && keyframeElem.StretchSet);
+		//btnStretch.setSelected(enabled && keyframeElem != null && keyframeElem.StretchSet);
 		
 	
 		panelRotation.toggleFields(keyframeElem != null ? getCurrentElement() : null, byGuiElem);
 		panelPosition.toggleFields(keyframeElem != null ? getCurrentElement() : null, byGuiElem);
 		
-		
 		btnPos.setEnabled(enabled);
 		btnRot.setEnabled(enabled);
-		btnStretch.setEnabled(enabled);		
+		//btnStretch.setEnabled(enabled);		
 	}
 	
 

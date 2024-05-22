@@ -143,9 +143,22 @@ public class Project
 		return -1;
 	}
 	
-	public AnimationFrame GetKeyFrame(int frameNumber) {
+	public AnimationFrame GetKeyFrame(int frameIndex) {
 		if (SelectedAnimation == null) return null;
-		return SelectedAnimation.keyframes[frameNumber];
+		return SelectedAnimation.keyframes[frameIndex];
+	}
+	
+	public AnimationFrame GetKeyFrameForFrame(int frameNumber) {
+		if (SelectedAnimation == null) return null;
+		
+		AnimationFrame[] kfs = ModelCreator.currentProject.SelectedAnimation.keyframes;
+		for (int i = 0; i < kfs.length; i++) {
+			if (kfs[i].getFrameNumber() == frameNumber) {
+				return kfs[i];
+			}
+		}
+		 
+		return null;
 	}
 	
 	
