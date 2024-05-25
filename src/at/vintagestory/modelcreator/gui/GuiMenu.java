@@ -775,10 +775,10 @@ public class GuiMenu extends JMenuBar
 		itemRotateModel90DegClockwise.addActionListener(a -> {
 			Element elem = ModelCreator.currentProject.SelectedElement;
 
-			ModelCreator.ignoreDidModify = true;
+			ModelCreator.ignoreDidModify++;
 			elem.rotate90DegAroundCenter(0, -1, 0);
 
-			ModelCreator.ignoreDidModify = false;
+			ModelCreator.ignoreDidModify--;
 			ModelCreator.DidModify();
 
 			ModelCreator.updateValues(itemRotateModel90DegClockwise);
@@ -787,10 +787,10 @@ public class GuiMenu extends JMenuBar
 		itemRotateModel90DegAntiClockwise.addActionListener(a -> {
 			Element elem = ModelCreator.currentProject.SelectedElement;
 
-			ModelCreator.ignoreDidModify = true;
+			ModelCreator.ignoreDidModify++;
 			elem.rotate90DegAroundCenter(0, 1, 0);
 
-			ModelCreator.ignoreDidModify = false;
+			ModelCreator.ignoreDidModify--;
 			ModelCreator.DidModify();
 
 			ModelCreator.updateValues(itemRotateModel90DegAntiClockwise);
@@ -884,7 +884,7 @@ public class GuiMenu extends JMenuBar
 
 	private void autoGuessWindMode(int mode)
 	{
-		ModelCreator.ignoreDidModify = true;
+		ModelCreator.ignoreDidModify++;
 		
 		Element curelem = ModelCreator.currentProject.SelectedElement;
 		if (curelem != null) {
@@ -895,7 +895,7 @@ public class GuiMenu extends JMenuBar
 			}
 		}
 		
-		ModelCreator.ignoreDidModify = false;
+		ModelCreator.ignoreDidModify--;
 		ModelCreator.DidModify();
 
 		ModelCreator.updateValues(this);

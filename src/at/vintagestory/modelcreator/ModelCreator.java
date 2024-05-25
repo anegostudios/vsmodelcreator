@@ -87,7 +87,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static Project currentMountBackdropProject;
 	public static ProjectChangeHistory changeHistory = new ProjectChangeHistory();
 	
-	public static boolean ignoreDidModify = false;	
+	public static int ignoreDidModify = 0;	
 	public static boolean ignoreValueUpdates = false;
 	public static boolean ignoreFrameUpdates = false;
 	
@@ -339,7 +339,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 
 	public static void DidModify() {
-		if (ignoreDidModify) return;
+		if (ignoreDidModify > 0) return;
 		if (currentProject == null) return;
 		
 		currentProject.needsSaving = true;
@@ -1213,7 +1213,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			if (returnVal == JOptionPane.NO_OPTION || returnVal == JOptionPane.CLOSED_OPTION) return;
 		}
 				
-		ignoreDidModify = true;
+		ignoreDidModify++;
 		
 		if (filePath == null) {
 			setTitle("(untitled) - " + windowTitle);
@@ -1239,7 +1239,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			setTitle(new File(currentProject.filePath).getName() + " - " + windowTitle);
 		}
 		
-		ignoreDidModify = true;
+		
 		changeHistory.clear();
 		changeHistory.addHistoryState(currentProject);
 		
@@ -1251,7 +1251,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		}
 		
 		
-		ignoreDidModify = false;
+		ignoreDidModify--;
 
 		
 		ModelCreator.updateValues(null);
@@ -1268,7 +1268,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	public void ImportFile(String filePath)
 	{
-		ignoreDidModify = true;
+		ignoreDidModify++;
 		ignoreValueUpdates = true;
 		
 		Importer importer = new Importer(filePath);
@@ -1292,7 +1292,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		currentProject.LoadIntoEditor(ModelCreator.rightTopPanel);
 		
-		ignoreDidModify = false;
+		ignoreDidModify--;
 		
 		currentProject.reloadStepparentRelationShips();
 		if (currentBackdropProject != null) {
@@ -1339,7 +1339,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 
 	public void LoadBackdropFile(String filePath)
 	{		
-		ignoreDidModify = true;
+		ignoreDidModify++;
 		ignoreValueUpdates = true;
 
 		Importer importer = new Importer(filePath);
@@ -1363,7 +1363,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		currentProject.backDropShape = subPath;
 		ignoreValueUpdates = false;
-		ignoreDidModify = false;
+		ignoreDidModify--;
 	}
 	
 	
@@ -1371,7 +1371,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	public void LoadMountBackdropFile(String filePath)
 	{		
-		ignoreDidModify = true;
+		ignoreDidModify++;
 		ignoreValueUpdates = true;
 
 		Importer importer = new Importer(filePath);
@@ -1393,7 +1393,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		currentProject.mountBackDropShape = subPath;
 		ignoreValueUpdates = false;
-		ignoreDidModify = false;
+		ignoreDidModify--;
 
 		
 		AttachmentPoint ap = currentMountBackdropProject.findAttachmentPoint("Rider");
@@ -1442,6 +1442,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				if (!filePath.endsWith(".json")) {
 					chooser.setSelectedFile(new File(filePath + ".json"));
 				}
+				
 				SaveProject(chooser.getSelectedFile());
 			}
 		}

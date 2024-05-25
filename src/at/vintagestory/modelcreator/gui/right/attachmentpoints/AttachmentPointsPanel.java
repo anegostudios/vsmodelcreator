@@ -92,9 +92,9 @@ public class AttachmentPointsPanel extends JPanel implements IValueUpdater
 		btnAdd.addActionListener(e -> {
 			if (ModelCreator.currentProject.SelectedElement == null) return;
 			
-			ModelCreator.ignoreDidModify = true;
+			ModelCreator.ignoreDidModify++;
 			ModelCreator.currentProject.SelectedAttachmentPoint = ModelCreator.currentProject.SelectedElement.addNewAttachmentPoint();
-			ModelCreator.ignoreDidModify = false;
+			ModelCreator.ignoreDidModify--;
 			ModelCreator.DidModify();
 			
 			updateValues(btnAdd);

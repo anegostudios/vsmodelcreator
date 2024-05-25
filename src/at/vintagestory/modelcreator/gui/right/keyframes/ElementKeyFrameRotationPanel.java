@@ -131,7 +131,7 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 			if (num == 2) { if (element.getRotationZ() == newRotation) return; element.setRotationZ(newRotation); }
 			ModelCreator.updateValues(rotationFields[num]);
 			
-			keyFramesPanel.copyFrameElemToBackdrop(element.AnimatedElement);
+			keyFramesPanel.copyKeyFrameElemToBackdrop(element.AnimatedElement);
 		});
 		
 		
@@ -196,7 +196,7 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 			
 			ModelCreator.updateValues(rotationSliders[num]);
 			
-			keyFramesPanel.copyFrameElemToBackdrop(elem.AnimatedElement);
+			keyFramesPanel.copyKeyFrameElemToBackdrop(elem.AnimatedElement);
 		});
 		
 
@@ -237,13 +237,13 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 		default:
 			newValue = elem.getRotationZ() + size;
 			elem.setRotationZ(newValue);
-			rotationFields[num].setText(""+df.format(newValue));			
+			rotationFields[num].setText(""+df.format(newValue));
 			break;
 		}
 		
 		ModelCreator.updateValues(rotationSliders[num]);
 		
-		keyFramesPanel.copyFrameElemToBackdrop(elem.AnimatedElement);
+		keyFramesPanel.copyKeyFrameElemToBackdrop(elem.AnimatedElement);
 	}
 	
 

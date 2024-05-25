@@ -105,7 +105,7 @@ public class AnimationSelector
 				if (anim == null) return;
 				if (anim.getName() != null && anim.getName().equals(nameField.getText())) return;
 
-				ModelCreator.ignoreDidModify = true;
+				ModelCreator.ignoreDidModify++;
 				if (suggestCode) {
 					anim.setCode(nameField.getText().toLowerCase().replaceAll(" ", ""));
 					codeField.setText(anim.getCode());
@@ -113,7 +113,7 @@ public class AnimationSelector
 				anim.setName(nameField.getText());
 				
 				model.set(list.getSelectedIndex(), nameField.getText());
-				ModelCreator.ignoreDidModify = false;
+				ModelCreator.ignoreDidModify--;
 				
 				ModelCreator.updateValues(nameField);
 				ModelCreator.DidModify();

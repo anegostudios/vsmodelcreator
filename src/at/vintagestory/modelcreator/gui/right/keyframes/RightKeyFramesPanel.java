@@ -72,7 +72,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 			ModelCreator.updateValues(btnRot);
 			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 			
-			copyFrameElemToBackdrop(elem);
+			copyKeyFrameElemToBackdrop(elem);
 		});
 		btnContainer.add(btnRot);
 		
@@ -103,7 +103,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 			ModelCreator.updateValues(btnPos);
 			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 			
-			copyFrameElemToBackdrop(elem);
+			copyKeyFrameElemToBackdrop(elem);
 		});
 		
 		btnContainer.add(btnPos);
@@ -137,12 +137,8 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 			ModelCreator.updateValues(btnStretch);
 			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 			
-			copyFrameElemToBackdrop(elem);
+			copyKeyFrameElemToBackdrop(elem);
 		});
-		
-		
-//		btnContainer.add(btnStretch);
-		
 		
 		
 		add(btnContainer);
@@ -154,7 +150,7 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 	
 
 
-	public void copyFrameElemToBackdrop(Element elem)
+	public void copyKeyFrameElemToBackdrop(Element elem)
 	{
 		if (ModelCreator.currentBackdropProject == null) return;
 		
@@ -176,11 +172,13 @@ public class RightKeyFramesPanel extends JPanel implements IValueUpdater
 			Project curProj = ModelCreator.currentProject; 
 			curProj.SelectedAnimation = curProj.findAnimation(anim.getCode());
 			if (curProj.SelectedAnimation == null) {
+				ModelCreator.ignoreDidModify++;
 				curProj.Animations.add(curProj.SelectedAnimation = new Animation());
 				
 				curProj.SelectedAnimation.setCode(anim.getCode());
 				curProj.SelectedAnimation.setName(anim.getName());
 				curProj.SelectedAnimation.SetQuantityFrames(anim.GetQuantityFrames());
+				ModelCreator.ignoreDidModify--;
 			}
 		}
 		

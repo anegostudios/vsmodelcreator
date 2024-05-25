@@ -90,6 +90,9 @@ public class Project
 		if (backDropShape != null) {
 			if (new File(backDropShape + ".json").exists()) {
 				ModelCreator.Instance.LoadBackdropFile(backDropShape + ".json");
+				
+				copyKeyFrameElementsToBackDrop();
+				
 			} else {
 				String shapeBasePath = ModelCreator.prefs.get("shapePath", ".");
 				String path = shapeBasePath + File.separator + backDropShape + ".json";
@@ -134,6 +137,54 @@ public class Project
 		}
 	}	
 	
+	public void copyKeyFrameElementsToBackDrop()
+	{
+		ArrayList<Animation> anims = Animations;
+
+		for (Animation anim : anims) {
+			Animation bdanim = ModelCreator.currentBackdropProject.findAnimation(anim.getName());
+			if (bdanim == null) continue;
+			
+			for (AnimationFrame frame : anim.keyframes) {
+				AnimationFrame bdframe = bdanim.GetKeyFrame(frame.getFrameNumber());
+				if (bdframe == null) break;
+				
+				copyKeyFrameElementsToBackDrop(frame.getFrameNumber(), frame.Elements, bdanim);
+			}
+		}
+		
+	}
+	
+	private void copyKeyFrameElementsToBackDrop(int frame, List<IDrawable> elements, Animation bdanim)
+	{
+		for (IDrawable animframele : elements) {
+			AnimFrameElement afe = (AnimFrameElement)animframele;
+			
+			for (int i = 0; i < elements.size(); i++) {
+				AnimFrameElement bdafe = (AnimFrameElement)elements.get(i);
+				
+				AnimFrameElement backFrameElem = bdanim.GetOrCreateKeyFrameElement(bdafe.AnimatedElement, frame);
+				backFrameElem.setFrom(afe);
+			}
+			
+			if (afe.ChildElements != null) {
+				copyKeyFrameElementsToBackDrop(frame, afe.ChildElements, bdanim);
+			}
+		}
+		
+	}
+
+
+	public void copyKeyFrameElemToBackdrop(Animation anim, Animation bdanim, Element elem)
+	{
+		AnimFrameElement mainFrameElem = anim.GetKeyFrameElement(elem, anim.currentFrame);
+		if (mainFrameElem == null) return;
+		
+		AnimFrameElement backFrameElem = bdanim.GetOrCreateKeyFrameElement(elem, anim.currentFrame);
+		backFrameElem.setFrom(mainFrameElem);		
+	}
+
+
 	public int getSelectedAnimationIndex()
 	{
 		for (int i = 0; i < Animations.size(); i++) {
@@ -243,7 +294,7 @@ public class Project
 	
 	
 	public void duplicateCurrentElement() {
-		ModelCreator.ignoreDidModify = true;
+		ModelCreator.ignoreDidModify++;
 		
 		if (SelectedElement != null) {
 			Element newElem = new Element(SelectedElement);
@@ -263,7 +314,7 @@ public class Project
 			
 		}
 		
-		ModelCreator.ignoreDidModify = false;
+		ModelCreator.ignoreDidModify--;
 		
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.DidModify();
@@ -274,7 +325,7 @@ public class Project
 	
 	
 	public void removeCurrentElement() {
-		ModelCreator.ignoreDidModify = true;
+		ModelCreator.ignoreDidModify++;
 		
 		Element curElem = SelectedElement;
 		Element nextElem = tree.getNextSelectedElement();
@@ -295,7 +346,7 @@ public class Project
 		
 		curElem.onRemoved();
 		
-		ModelCreator.ignoreDidModify = false;
+		ModelCreator.ignoreDidModify--;
 		
 		if (nextElem != null) {
 			tree.selectElement(nextElem);
@@ -466,6 +517,7 @@ public class Project
 		cloned.TextureWidth = TextureWidth;
 		cloned.TextureHeight = TextureHeight;
 		cloned.collapsedPaths = collapsedPaths;
+		cloned.backDropShape = backDropShape;
 		
 		for (String key : TextureSizes.keySet()) {
 			cloned.TextureSizes.put(key, TextureSizes.get(key));
@@ -476,7 +528,9 @@ public class Project
 		}
 		
 		for (Animation anim : Animations) {
-			cloned.Animations.add(anim.clone());
+			Animation clonedAninm = anim.clone();
+			cloned.Animations.add(clonedAninm);
+			clonedAninm.ResolveRelations(cloned);
 		}
 		
 		cloned.needsSaving = needsSaving;

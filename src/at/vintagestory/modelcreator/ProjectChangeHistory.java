@@ -32,11 +32,7 @@ public class ProjectChangeHistory
 		if (currentHistoryState + 1 >= ProjectSnapshots.size()) return false;
 		
 		currentHistoryState++;
-		
 		ApplyState();
-		
-		//System.out.println("applied undo, state now at " + currentHistoryState);
-		
 		return true;
 	}
 	
@@ -46,16 +42,13 @@ public class ProjectChangeHistory
 		
 		currentHistoryState--;
 		ApplyState();
-		
-		//System.out.println("applied redo, state now at " + currentHistoryState);
-		
 		return true;
 	}
 	
 	
 	void ApplyState() {
 		
-		ModelCreator.ignoreDidModify = true;
+		ModelCreator.ignoreDidModify++;
 		
 		Project oldProject = ModelCreator.currentProject;
 		
@@ -87,7 +80,7 @@ public class ProjectChangeHistory
 		}
 		
 		
-		ModelCreator.ignoreDidModify = false;
+		ModelCreator.ignoreDidModify--;
 	}
 	
 	
@@ -121,7 +114,6 @@ public class ProjectChangeHistory
 		}
 		
 		ProjectSnapshots.add(0, project.clone());
-		//System.out.println("added history state, states = " + ProjectSnapshots.size());
 		
 		if (ProjectSnapshots.size() > maxHistoryStates) {
 			ProjectSnapshots.remove(ProjectSnapshots.size() - 1);

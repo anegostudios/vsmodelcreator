@@ -67,8 +67,7 @@ public class Animation
 		// - Loop through all Key frames
 		//   - Loop through all key frame elements
 		//     - Loop through all 3 data groups (position, rotation, stretch)
-		//       - Get next key frame. Interpolate all frames between current and next keyframe.
-		
+		//       - Get next key frame. Interpolate all frames between current and next keyframe
 		for (int i = 0; i < keyframes.length; i++) {
 			for (IDrawable drawable : keyframes[i].Elements) {
 				AnimFrameElement prevkelem = (AnimFrameElement)drawable;
@@ -230,9 +229,9 @@ public class Animation
 		if (keyframe.PositionSet == on) return keyframe;
 		
 		keyframe.PositionSet = on;
-		ModelCreator.ignoreDidModify = true;
+		ModelCreator.ignoreDidModify++;
 		if (!on) RemoveKeyFramesIfUseless(keyframe);
-		ModelCreator.ignoreDidModify = false;
+		ModelCreator.ignoreDidModify--;
 		ModelCreator.DidModify();
 		
 		return keyframe;
@@ -244,9 +243,9 @@ public class Animation
 		if (keyframe.RotationSet == on) return keyframe;
 		
 		keyframe.RotationSet = on;
-		ModelCreator.ignoreDidModify = true;
+		ModelCreator.ignoreDidModify++;
 		if (!on) RemoveKeyFramesIfUseless(keyframe);
-		ModelCreator.ignoreDidModify = false;
+		ModelCreator.ignoreDidModify--;
 		ModelCreator.DidModify();
 		
 		return keyframe;
@@ -257,9 +256,9 @@ public class Animation
 		keyframe.StretchSet = on;
 		
 		if (keyframe.StretchSet == on) return keyframe;
-		ModelCreator.ignoreDidModify = true;
+		ModelCreator.ignoreDidModify++;
 		if (!on) RemoveKeyFramesIfUseless(keyframe);
-		ModelCreator.ignoreDidModify = false;
+		ModelCreator.ignoreDidModify--;
 		ModelCreator.DidModify();
 		
 		return keyframe;
@@ -485,7 +484,7 @@ public class Animation
 
 	public void MoveSelectedFrame(int direction)
 	{
-		ModelCreator.ignoreDidModify = true;
+		ModelCreator.ignoreDidModify++;
 		
 		AnimationFrame curFrame = null;
 		AnimationFrame prevFrame = null;
@@ -516,7 +515,7 @@ public class Animation
 		this.currentFrame = nextFrameNumber;
 		ReloadFrameNumbers();
 		
-		ModelCreator.ignoreDidModify = false;
+		ModelCreator.ignoreDidModify--;
 		
 		ModelCreator.DidModify();
 		ModelCreator.updateValues(null);
