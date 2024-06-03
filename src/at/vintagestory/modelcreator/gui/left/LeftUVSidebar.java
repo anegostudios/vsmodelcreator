@@ -52,6 +52,7 @@ public class LeftUVSidebar extends LeftSidebar
 	int canvasHeight;
 	
 	Stack<RenderFaceTask> renderLastStack = new Stack<RenderFaceTask>();
+	Stack<RenderFaceTask> renderLastStack2 = new Stack<RenderFaceTask>();
 	
 	
 	public LeftUVSidebar(String title, IElementManager manager)
@@ -159,7 +160,6 @@ public class LeftUVSidebar extends LeftSidebar
 		glPushMatrix();
 		{
 			glTranslatef(10, 30, 0);
-			
 			glPushMatrix(); {
 				
 				glColor3f(1, 1, 1);
@@ -220,6 +220,12 @@ public class LeftUVSidebar extends LeftSidebar
 				
 				drawElementList(textureCode, ModelCreator.currentProject.rootElements, texBoxWidth, texBoxHeight, canvasHeight);
 				
+				// selected face at the very top
+				while (renderLastStack2.size() > 0) {
+					RenderFaceTask rft = renderLastStack2.pop();
+					drawFace(rft.elem, rft.face);
+				}
+
 				glPopMatrix();
 			}
 		}
@@ -246,6 +252,11 @@ public class LeftUVSidebar extends LeftSidebar
 				if (!face.isEnabled() || (textureCode != null && !textureCode.equals(face.getTextureCode()))) continue;
 				
 				if (elem == selectedElem) {
+					if (face == selectedElem.getSelectedFace()) {
+						renderLastStack2.push(new RenderFaceTask(face, elem));
+						continue;
+					}
+						
 					renderLastStack.push(new RenderFaceTask(face, elem));
 					continue;
 				}
@@ -271,34 +282,7 @@ public class LeftUVSidebar extends LeftSidebar
 		while (renderLastStack.size() > 0) {
 			RenderFaceTask rft = renderLastStack.pop();
 			drawFace(rft.elem, rft.face);
-		}
-		
-		if (selectedElem != null) {
-			Face selectedFace = selectedElem.getSelectedFace();
-			if (selectedFace != null) {
-				Sized uv = selectedFace.translateVoxelPosToUvPos(selectedFace.getStartU(), selectedFace.getStartV(), true);
-				Sized uvend = selectedFace.translateVoxelPosToUvPos(selectedFace.getEndU(), selectedFace.getEndV(), true);
-	
-				glColor3f(0f, 1f, 0.5f);
-				glBegin(GL_LINES);
-				{
-					glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
-					glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
-	
-					glVertex2d(uv.W * texBoxWidth, uvend.H * texBoxHeight);
-					glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
-	
-					glVertex2d(uvend.W * texBoxWidth, uvend.H * texBoxHeight);
-					glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
-	
-					glVertex2d(uvend.W * texBoxWidth, uv.H * texBoxHeight);
-					glVertex2d(uv.W * texBoxWidth, uv.H * texBoxHeight);
-				}
-				
-				glEnd();
-			}
-		}
-	}
+		}	}
 	
 	private void drawFace(Element elem, Face face) {
 		Element selectedElem = ModelCreator.currentProject.SelectedElement;
@@ -335,8 +319,7 @@ public class LeftUVSidebar extends LeftSidebar
 
 		
 		if (elem == selectedElem) {
-			glColor3f(0f, 0f, 1f);
-			
+			glColor3f(0f, 0f, 1f);			
 			if (face == selectedFace) {
 				glColor3f(0f, 1f, 0.5f);
 			}
@@ -367,6 +350,7 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		glEnd();
 		
+
 
 		boolean renderName = (ModelCreator.uvShowNames && (!elem.isAutoUnwrapEnabled() || (elem.getUnwrapMode() <= 0 && sidei ==0) || sidei == elem.getUnwrapMode() - 1));
 		
@@ -891,11 +875,11 @@ public class LeftUVSidebar extends LeftSidebar
 				
 		for (Element elem : elems) {
 			Face[] faces = elem.getAllFaces();
+			if (!elem.getRenderInEditor()) continue;
 			
 			for (int i = 0; i < 6; i++) {
 				Face face = faces[i];
 				if (!face.isEnabled() || (currentHoveredTextureCode != null && !currentHoveredTextureCode.equals(face.getTextureCode()))) continue;
-				if (!elem.getRenderInEditor()) continue;
 				
 				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
 				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);
