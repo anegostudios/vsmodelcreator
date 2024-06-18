@@ -13,7 +13,7 @@ public class CommandRandomizeTexture implements ProjectCommand
 	{
 		if (ModelCreator.currentProject.SelectedElement != null) {		
     		history.beginMultichangeHistoryState();
-    		ModelCreator.currentProject.SelectedElement.RandomizeTexture();
+    		ModelCreator.currentProject.SelectedElement.RandomizeTexture(true);
 			history.endMultichangeHistoryState(ModelCreator.currentProject);
 		}
 		

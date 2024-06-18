@@ -145,11 +145,11 @@ public class Project
 			Animation bdanim = ModelCreator.currentBackdropProject.findAnimation(anim.getName());
 			if (bdanim == null) continue;
 			
-			for (AnimationFrame frame : anim.keyframes) {
-				AnimationFrame bdframe = bdanim.GetKeyFrame(frame.getFrameNumber());
+			for (AnimationFrame keyframe : anim.keyframes) {
+				AnimationFrame bdframe = bdanim.GetKeyFrame(keyframe.getFrameNumber());
 				if (bdframe == null) break;
 				
-				copyKeyFrameElementsToBackDrop(frame.getFrameNumber(), frame.Elements, bdanim);
+				copyKeyFrameElementsToBackDrop(keyframe.getFrameNumber(), keyframe.Elements, bdanim);
 			}
 		}
 		
@@ -159,19 +159,14 @@ public class Project
 	{
 		for (IDrawable animframele : elements) {
 			AnimFrameElement afe = (AnimFrameElement)animframele;
-			
-			for (int i = 0; i < elements.size(); i++) {
-				AnimFrameElement bdafe = (AnimFrameElement)elements.get(i);
 				
-				AnimFrameElement backFrameElem = bdanim.GetOrCreateKeyFrameElement(bdafe.AnimatedElement, frame);
-				backFrameElem.setFrom(afe);
-			}
+			AnimFrameElement backFrameElem = bdanim.GetOrCreateKeyFrameElement(afe.AnimatedElement, frame);
+			backFrameElem.setFrom(afe);
 			
 			if (afe.ChildElements != null) {
 				copyKeyFrameElementsToBackDrop(frame, afe.ChildElements, bdanim);
 			}
 		}
-		
 	}
 
 
@@ -933,6 +928,20 @@ public class Project
 			if (!hisElem.StepChildElements.contains(myElem)) {
 				hisElem.StepChildElements.add(myElem);
 			}
+		}
+	}
+
+
+	public void EnsureAnimationSelected(Animation templateAnim)
+	{
+		if (templateAnim == null) {
+			this.SelectedAnimation=null;
+			return;
+		}
+		
+		this.SelectedAnimation = findAnimation(templateAnim.getName());
+		if (this.SelectedAnimation == null) {
+			this.Animations.add(this.SelectedAnimation = templateAnim.shallowClone());
 		}
 	}
 

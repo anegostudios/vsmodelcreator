@@ -102,7 +102,25 @@ public class LeftUVSidebar extends LeftSidebar
 		if (ModelCreator.transparent) {
 			GL11.glDisable(GL11.GL_BLEND);
 		}
-
+	}
+	
+	ArrayList<String> getTextureCodes() {
+		ArrayList<String> codes = new ArrayList<String>();
+		
+		String prioTextureCode=null;
+		if (ModelCreator.currentProject.SelectedElement != null) {
+			prioTextureCode = ModelCreator.currentProject.SelectedElement.getSelectedFace().getTextureCode();
+			if (prioTextureCode != null && ModelCreator.currentProject.TexturesByCode.containsKey(prioTextureCode)) {
+				codes.add(prioTextureCode);
+			}
+		}
+		
+		for (String textureCode : ModelCreator.currentProject.TexturesByCode.keySet()) {
+			if (prioTextureCode != null && prioTextureCode.equals(textureCode)) continue;
+			codes.add(textureCode);
+		}
+		
+		return codes;
 	}
 	
 	
@@ -117,7 +135,7 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			glPushMatrix();
 			
-			for (String textureCode : ModelCreator.currentProject.TexturesByCode.keySet()) {
+			for (String textureCode : getTextureCodes()) {
 				offsetY = drawRectsAndTexture(textureCode);				
 				glTranslatef(0, offsetY, 0);
 			}
@@ -282,7 +300,8 @@ public class LeftUVSidebar extends LeftSidebar
 		while (renderLastStack.size() > 0) {
 			RenderFaceTask rft = renderLastStack.pop();
 			drawFace(rft.elem, rft.face);
-		}	}
+		}	
+	}
 	
 	private void drawFace(Element elem, Face face) {
 		Element selectedElem = ModelCreator.currentProject.SelectedElement;
@@ -837,8 +856,9 @@ public class LeftUVSidebar extends LeftSidebar
 		int mouseX = Mouse.getX() - 10;
 		int mouseY = (canvasHeight - Mouse.getY()) - 30;
 		String currentHoveredTextureCode = null;
+		boolean found=false;
 		
-		for (String textureCode : ModelCreator.currentProject.TexturesByCode.keySet()) {
+		for (String textureCode : getTextureCodes()) {
 			double texWidth = ModelCreator.currentProject.TextureWidth;
 			double texHeight = ModelCreator.currentProject.TextureHeight;
 			Sized scale;
@@ -863,11 +883,14 @@ public class LeftUVSidebar extends LeftSidebar
 			
 			if (mouseY >= 0 && mouseY < texBoxHeight) {
 				currentHoveredTextureCode = textureCode;
+				found=true;
 				break;
 			}
 			
 			mouseY -= texBoxHeight + 20;
 		}
+		
+		if (!found) return null; 
 		
 		
 		double mouseU = (double)mouseX / texBoxWidth;
@@ -884,8 +907,6 @@ public class LeftUVSidebar extends LeftSidebar
 				Sized uv = face.translateVoxelPosToUvPos(face.getStartU(), face.getStartV(), true);
 				Sized uvend = face.translateVoxelPosToUvPos(face.getEndU(), face.getEndV(), true);
 
-				//System.out.println(mouseU + "/" + mouseV + " inside " + uv.W + "/" + uv.H +" =>" + uvend.W +"/"+uvend.H);
-				
 				if (mouseU >= uv.W && mouseV >= uv.H && mouseU <= uvend.W && mouseV <= uvend.H) {
 					grabbedFaceIndex = i;
 					return elem;

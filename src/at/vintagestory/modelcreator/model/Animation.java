@@ -599,5 +599,15 @@ public class Animation
 			}
 		}
 	}
+
+	public Animation shallowClone()
+	{
+		Animation anim = new Animation();
+		anim.quantityFrames = quantityFrames;
+		anim.name = name;
+		anim.code = code;
+		anim.version = version;
+		return anim;
+	}
 	
 }

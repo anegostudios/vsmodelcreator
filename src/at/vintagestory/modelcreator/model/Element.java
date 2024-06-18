@@ -1649,7 +1649,7 @@ public class Element implements IDrawable
 		StepChildElements.clear();
 	}
 
-	public void RandomizeTexture()
+	public void RandomizeTexture(boolean randomizeChildren)
 	{
 		if (ModelCreator.currentProject.EntityTextureMode && autoUnwrap) {
 			double uMin = 9999, vMin = 9999, uMax = -9999, vMax = -9999;
@@ -1675,18 +1675,21 @@ public class Element implements IDrawable
 				if (entry != null) {
 					texWidth = entry.Width  / scale.W;
 					texHeight = entry.Height / scale.H;
-				}				
+				}
 			}
 			
-			double wiggleRoomU = texWidth - (uMax - uMin); 			
-			double wiggleRoomV = texHeight - (vMax - vMin);
 			
-			double ustart = Math.floor(Face.rand.nextFloat() * wiggleRoomU * scale.W) / scale.W;
-			double vstart = Math.floor(Face.rand.nextFloat() * wiggleRoomV * scale.H) / scale.H;
-
-			texUStart = ustart;
-			texVStart = vstart;
-			updateUV();
+			if (scale != null) { 
+				double wiggleRoomU = texWidth - (uMax - uMin); 			
+				double wiggleRoomV = texHeight - (vMax - vMin);
+				
+				double ustart = Math.floor(Face.rand.nextFloat() * wiggleRoomU * scale.W) / scale.W;
+				double vstart = Math.floor(Face.rand.nextFloat() * wiggleRoomV * scale.H) / scale.H;
+	
+				texUStart = ustart;
+				texVStart = vstart;
+				updateUV();
+			}
 			
 		} else {
 			for (int i = 0; i < faces.length; i++) {
@@ -1694,8 +1697,10 @@ public class Element implements IDrawable
 			}	
 		}
 		
-		for (Element elem : ChildElements) { 
-			elem.RandomizeTexture();
+		if (randomizeChildren) {
+			for (Element elem : ChildElements) { 
+				elem.RandomizeTexture(randomizeChildren);
+			}
 		}
 		
 		ModelCreator.DidModify();

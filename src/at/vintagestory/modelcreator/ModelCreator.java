@@ -1400,6 +1400,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		for (Element rootelem : currentProject.rootElements) {
 			ap.StepChildElements.add(rootelem);
 		}
+		
+		ModelCreator.leftKeyframesPanel.Load();
 	}
 	
 	

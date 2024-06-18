@@ -24,6 +24,7 @@ public class Icons
 	public static Icon disk_multiple;
 	public static Icon exit;
 	public static Icon cube;
+	public static Icon dice;
 	public static Icon inout;
 	public static Icon rainbow;
 	public static Icon smallcube;
@@ -77,6 +78,7 @@ public class Icons
 		
 		wind = new ImageIcon(loader.getResource("icons/wind.png"));
 		cube = new ImageIcon(loader.getResource("icons/cube.png"));
+		dice = new ImageIcon(loader.getResource("icons/dice.png"));
 		inout = new ImageIcon(loader.getResource("icons/arrow_inout.png"));
 		rainbow = new ImageIcon(loader.getResource("icons/rainbow.png"));
 		smallcube = new ImageIcon(loader.getResource("icons/smallcube.png"));

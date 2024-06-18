@@ -104,8 +104,12 @@ public class GuiMenu extends JMenuBar
 	/* Tools */
 	private JMenu menuTools;
 	private JMenuItem itemResize;
-	private JMenuItem itemRandomizeTexture;
+	
+	private JMenu itemRandomizeTexture;
+	private JMenuItem itemRandomizeTextureEle;
+	private JMenuItem itemRandomizeTextureEleRec;
 	private JMenuItem itemRandomizeTextureAll;
+	
 	private JMenuItem itemGenSnowLayer;
 	private JMenuItem itemuvUnrwapEverything;
 	private JMenuItem itemReloadColorConfig;
@@ -241,8 +245,15 @@ public class GuiMenu extends JMenuBar
 		menuTools = new JMenu("Tools");
 		{
 			itemResize = createItem("Resize Element", "Resize a cube, including child elements", KeyEvent.VK_R, Icons.inout);
-			itemRandomizeTexture = createItem("Randomize Selected Element UVs", "Randomizes an element texture, including child elements", KeyEvent.VK_B, Icons.rainbow);
-			itemRandomizeTextureAll = createItem("Randomize All Element UVs", "Randomizes all element textures", KeyEvent.VK_B, Icons.rainbow);
+			
+			itemRandomizeTexture = new JMenu("Randomize Texture");
+			itemRandomizeTexture.setIcon(Icons.dice);
+			itemRandomizeTexture.setToolTipText("Assign a random UV to element(s)");
+			{
+				itemRandomizeTextureEle = createItem("Selected Element", "Randomizes an element texture", KeyEvent.VK_B, Icons.dice);
+				itemRandomizeTextureEleRec = createItem("Selected Element+Children", "Randomizes an element texture, including child elements", KeyEvent.VK_B, Icons.dice);
+				itemRandomizeTextureAll = createItem("All Elements", "Randomizes all element textures", KeyEvent.VK_B, Icons.dice);
+			}
 			
 			itemGenSnowLayer = createItem("Generate Snow Layer", "Attempts to generate a snow layer on all horizontal faces", KeyEvent.VK_B, Icons.weather_snow);
 
@@ -344,17 +355,21 @@ public class GuiMenu extends JMenuBar
 		menuEdit.addSeparator();
 		menuEdit.add(itemRepositionWhenReparented);
 		
-		
+		itemRandomizeTexture.add(itemRandomizeTextureEle);
+		itemRandomizeTexture.add(itemRandomizeTextureEleRec);
+		itemRandomizeTexture.add(itemRandomizeTextureAll);
 		menuTools.add(itemRandomizeTexture);
-		menuTools.add(itemRandomizeTextureAll);
+		
 		menuTools.add(itemGenSnowLayer);
 		menuTools.add(itemResize);
 		menuTools.add(itemuvUnrwapEverything);
 		menuTools.add(itemReloadColorConfig);
 		menuTools.add(itemReduceDecimals);
+		
 		menuTools.add(itemRotateModel90Deg);
 		itemRotateModel90Deg.add(itemRotateModel90DegClockwise);
 		itemRotateModel90Deg.add(itemRotateModel90DegAntiClockwise);
+		
 		menuTools.add(itemAutoWind);
 
 		menuTools.add(triCount);
@@ -459,10 +474,20 @@ public class GuiMenu extends JMenuBar
 		itemRedo.getActionMap().put(key, buttonAction2);
 		itemRedo.setAccelerator(strokes[5]);
 		
+
 		
+		itemRandomizeTextureEle.addActionListener(a ->
+		{
+			Element elem = ModelCreator.currentProject.SelectedElement;
+	    	if (elem != null) {		
+				ModelCreator.changeHistory.beginMultichangeHistoryState();
+				elem.RandomizeTexture(false);
+				ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
+			}
+		});
+				
 		
-		
-		Action buttonActionRandomize = new AbstractAction("Randomize Selected Element UVs") {		 
+		Action buttonActionRandomize = new AbstractAction("Selected Element+Children") {		 
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -470,19 +495,23 @@ public class GuiMenu extends JMenuBar
 		    	Element elem = ModelCreator.currentProject.SelectedElement;
 		    	if (elem != null) {		
 					ModelCreator.changeHistory.beginMultichangeHistoryState();
-					elem.RandomizeTexture();
+					elem.RandomizeTexture(true);
 					ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 				}
 		    }
 		};
 		
-		String rkey = "Randomize Selected Element UVs";
-		itemRandomizeTexture.setAction(buttonActionRandomize);
-		itemRandomizeTexture.setIcon(Icons.rainbow);
+		String rkey = "Selected Element+Children";
+		itemRandomizeTextureEleRec.setAction(buttonActionRandomize);
+		itemRandomizeTextureEleRec.setIcon(Icons.dice);
 		buttonAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_B);
-		itemRandomizeTexture.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(strokes[7], key);
-		itemRandomizeTexture.getActionMap().put(rkey, buttonAction);
-		itemRandomizeTexture.setAccelerator(strokes[7]);
+		itemRandomizeTextureEleRec.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(strokes[7], key);
+		itemRandomizeTextureEleRec.getActionMap().put(rkey, buttonAction);
+		itemRandomizeTextureEleRec.setAccelerator(strokes[7]);
+		
+		
+
+		
 		
 
 		ActionListener glistener = a -> { ModelCreator.currentProject.TryGenSnowLayer(); }; 
@@ -498,7 +527,7 @@ public class GuiMenu extends JMenuBar
 		{
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
 			for (Element elem : ModelCreator.currentProject.rootElements) {
-				elem.RandomizeTexture();	
+				elem.RandomizeTexture(true);	
 			}
 			
 			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
@@ -796,10 +825,10 @@ public class GuiMenu extends JMenuBar
 			ModelCreator.updateValues(itemRotateModel90DegAntiClockwise);
 		});
 		
-		itemRandomizeTexture.addActionListener(a -> {
+		itemRandomizeTextureEleRec.addActionListener(a -> {
 			Element elem = ModelCreator.currentProject.SelectedElement;			
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
-			elem.RandomizeTexture();
+			elem.RandomizeTexture(true);
 			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 		});
 

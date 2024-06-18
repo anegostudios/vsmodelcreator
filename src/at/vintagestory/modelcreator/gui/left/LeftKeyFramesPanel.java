@@ -432,6 +432,13 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 				 	AnimationFrame keyframe = project.SelectedAnimation.keyframes[row];
 				 	
 				 	project.SelectedAnimation.SetFrame(keyframe.getFrameNumber());
+				 	
+				 	
+					if (ModelCreator.currentMountBackdropProject != null && ModelCreator.currentMountBackdropProject.SelectedAnimation != null) {
+						ModelCreator.currentMountBackdropProject.SelectedAnimation.currentFrame = Animation.mod(keyframe.getFrameNumber(), ModelCreator.currentMountBackdropProject.SelectedAnimation.GetQuantityFrames());
+					}
+				 	
+				 	
 				 	ModelCreator.updateFrame();
 				}
 			}
@@ -533,14 +540,21 @@ public class LeftKeyFramesPanel extends JPanel implements IValueUpdater
 	private void selectAnimation(int selectedIndex)
 	{
 		Project project = ModelCreator.CurrentAnimProject();
+		Project mainproj = ModelCreator.currentProject;
 		
 		if (selectedIndex >= 0) {
 			if (project.Animations.size() > 0) {
 				project.SelectedAnimation = project.Animations.get(selectedIndex);
 			}
+			
 		} else {
 			project.SelectedAnimation = null;	
 		}
+		
+		if (mainproj != project) {
+			mainproj.EnsureAnimationSelected(project.SelectedAnimation);
+		}
+
 		
 		ModelCreator.updateValues(animationsList);		
 	}
