@@ -1285,6 +1285,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		for (PendingTexture tex : importedproject.PendingTextures) {
 			currentProject.PendingTextures.add(tex);
 		}
+		
+		for (String key : importedproject.TextureSizes.keySet()) {
+			currentProject.TextureSizes.put(key, importedproject.TextureSizes.get(key));
+		}
 
 		changeHistory.addHistoryState(currentProject);
 
