@@ -15,6 +15,7 @@ import at.vintagestory.modelcreator.gui.texturedialog.TextureDialog;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.ITextureCallback;
 import at.vintagestory.modelcreator.model.ClipboardTexture;
+import at.vintagestory.modelcreator.model.ClipboardUV;
 import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.util.Clipboard;
 
@@ -28,13 +29,15 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 	private JButton btnClear;
 	private JButton btnCopy;
 	private JButton btnPaste;
+	private JButton btnCopyUV;
+	private JButton btnPasteUV;
 	
 	public static TextureDialog dlg;
 
 	public FaceTexturePanel(IElementManager manager)
 	{
 		this.manager = manager;
-		setLayout(new GridLayout(2, 2, 4, 4));
+		setLayout(new GridLayout(3, 2, 4, 4));
 		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Texture</b></html>"));
 		setMaximumSize(new Dimension(186, 90));
 		initComponents();
@@ -119,9 +122,45 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 				}
 			}
 		});
-		
 		btnPaste.setFont(defaultFont);
 		btnPaste.setToolTipText("<html>Pastes the clipboard texture to this face.<br><b>Hold shift to paste to all faces</b></html>");
+		
+		btnCopyUV = new JButton("Copy UV");
+		btnCopy.setIcon(Icons.copy);
+		btnCopyUV.addActionListener(e -> 
+		{
+			if (manager.getCurrentElement() != null)
+			{
+				Face face = manager.getCurrentElement().getSelectedFace();
+				Clipboard.copyUV(face.getStartU(), face.getStartV(), face.getEndU(), face.getEndV());
+			}
+		});
+		btnCopyUV.setFont(defaultFont);
+		btnCopyUV.setToolTipText("Copies the UV coordinates on this face to the clipboard");
+		
+		btnPasteUV = new JButton("Paste UV");
+		btnPasteUV.setIcon(Icons.clipboard);
+		btnPasteUV.addActionListener(e ->
+		{
+			ClipboardUV uv = Clipboard.getUV();
+			if (manager.getCurrentElement() != null && uv != null)
+			{
+				boolean haveShift = (e.getModifiers() & ActionEvent.SHIFT_MASK) > 0;
+				boolean haveCtrl = (e.getModifiers() & ActionEvent.CTRL_MASK) > 0;
+
+				if (haveShift)
+				{
+					manager.getCurrentElement().setUVAllFaces(uv, haveCtrl);
+				}
+				else
+				{
+					Face face = manager.getCurrentElement().getSelectedFace();
+					face.setUV(uv.getUStart(), uv.getVStart(), uv.getUEnd(), uv.getVEnd());
+				}
+			}
+		});
+		btnPasteUV.setFont(defaultFont);
+		btnPasteUV.setToolTipText("<html>Pastes the clipboard UV to this face.<br><b>Hold shift to paste to all faces</b><br><b>Hold ctrl to paste recursively to all children</b></html>");
 	}
 
 	public void addComponents()
@@ -130,6 +169,8 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		add(btnClear);
 		add(btnCopy);
 		add(btnPaste);
+		add(btnCopyUV);
+		add(btnPasteUV);
 	}
 
 	@Override

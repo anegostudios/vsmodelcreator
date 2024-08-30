@@ -293,6 +293,23 @@ public class Element implements IDrawable
 			}
 		}
 	}
+
+	public void setUVAllFaces(ClipboardUV uv, boolean recursive)
+	{
+		for (Face face : faces)
+		{
+			face.setStartU(uv.getUStart());
+			face.setStartV(uv.getVStart());
+			face.setEndU(uv.getUEnd());
+			face.setEndV(uv.getVEnd());
+		}
+		
+		if (recursive) {		
+			for (Element elem : ChildElements) {
+				elem.setUVAllFaces(uv, recursive);
+			}
+		}
+	}
 	
 	
 	

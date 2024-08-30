@@ -512,6 +512,14 @@ public class Face
 		textureVEnd = ve;
 		ModelCreator.DidModify();
 	}
+	
+	public void setUV(double us, double vs, double ue, double ve)
+	{
+		this.setStartU(us);
+		this.setStartV(vs);
+		this.setEndU(ue);
+		this.setEndV(ve);
+	}
 
 	public String getTextureCode()
 	{
