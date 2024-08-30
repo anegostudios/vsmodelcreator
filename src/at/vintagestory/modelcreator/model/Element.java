@@ -311,7 +311,20 @@ public class Element implements IDrawable
 		}
 	}
 	
-	
+	public void setWindAllFaces(int[] windModes, boolean recursive)
+	{
+
+		for (Face face : faces)
+		{
+			face.WindModes = windModes;
+		}
+		
+		if (recursive) {		
+			for (Element elem : ChildElements) {
+				elem.setWindAllFaces(windModes, recursive);
+			}
+		}
+	}
 	
 	public void recalculateBrightnessValues(float[] mat) {
 		for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {

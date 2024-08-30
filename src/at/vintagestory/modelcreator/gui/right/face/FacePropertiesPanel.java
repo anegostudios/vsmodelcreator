@@ -2,6 +2,7 @@ package at.vintagestory.modelcreator.gui.right.face;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -18,16 +19,21 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.JButton;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;
 import at.vintagestory.modelcreator.enums.BlockFacing;
 import at.vintagestory.modelcreator.gui.ComponentUtil;
+import at.vintagestory.modelcreator.gui.Icons;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.interfaces.IValueUpdater;
+import at.vintagestory.modelcreator.model.ClipboardTexture;
+import at.vintagestory.modelcreator.model.ClipboardWind;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.model.Face;
 import at.vintagestory.modelcreator.util.AwtUtil;
+import at.vintagestory.modelcreator.util.Clipboard;
 import at.vintagestory.modelcreator.util.Mat4f;
 import at.vintagestory.modelcreator.util.Vec3f;
 
@@ -43,6 +49,8 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 	private JRadioButton boxSnapUv;
 	private JTextField glowValue;
 	private JTextField windData;
+	private JButton btnCopyWind;
+	private JButton btnPasteWind;
 	
 	JComboBox<String> bla = new JComboBox<String>();
 	@SuppressWarnings("unchecked")
@@ -50,12 +58,14 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 
 	private JComboBox<String> reflectiveMode;
 	
+	Font defaultFont = new Font("SansSerif", Font.BOLD, 14);
+	
 	public FacePropertiesPanel(IElementManager manager)
 	{
 		this.manager = manager;
 		setLayout(new BorderLayout(0, 5));
 		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Properties</b></html>"));
-		setMaximumSize(new Dimension(250, 400));
+		setMaximumSize(new Dimension(250, 700));
 		initComponents();
 		addComponents();
 	}
@@ -169,6 +179,47 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 		});
 		
 		horizontalBox.add(reflectiveMode);
+		
+		btnCopyWind = new JButton("Copy Wind");
+		btnCopyWind.setIcon(Icons.copy);
+		btnCopyWind.addActionListener(e ->
+		{
+			if (manager.getCurrentElement() != null)
+			{
+				Face face = manager.getCurrentElement().getSelectedFace();
+				Clipboard.copyWindSettings(face.WindModes);
+			}
+		});
+		btnCopyWind.setFont(defaultFont);
+		btnCopyWind.setToolTipText("Copies the wind settings on this face to clipboard");
+		
+		horizontalBox.add(btnCopyWind);
+
+		btnPasteWind = new JButton("Paste Wind");
+		btnPasteWind.setIcon(Icons.clipboard);
+		btnPasteWind.addActionListener(e ->
+		{
+			ClipboardWind windSettings = Clipboard.getWindSettings();
+			if (manager.getCurrentElement() != null && windSettings != null)
+			{
+				boolean haveShift = (e.getModifiers() & ActionEvent.SHIFT_MASK) > 0;
+				boolean haveCtrl = (e.getModifiers() & ActionEvent.CTRL_MASK) > 0;
+
+				if (haveShift)
+				{
+					manager.getCurrentElement().setWindAllFaces(windSettings.getWindSettings(), haveCtrl);
+				}
+				else
+				{
+					Face face = manager.getCurrentElement().getSelectedFace();
+					face.WindModes = windSettings.getWindSettings();
+				}
+			}
+		});
+		btnPasteWind.setFont(defaultFont);
+		btnPasteWind.setToolTipText("<html>Pastes the clipboard wind settings to this face.<br><b>Hold shift to paste to all faces</b></html>");
+		
+		horizontalBox.add(btnPasteWind);
 		
 		for (int i = 0; i < 4; i++) {
 			int index=i;
