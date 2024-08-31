@@ -109,7 +109,8 @@ public class LeftUVSidebar extends LeftSidebar
 		
 		String prioTextureCode=null;
 		if (ModelCreator.currentProject.SelectedElement != null) {
-			prioTextureCode = ModelCreator.currentProject.SelectedElement.getSelectedFace().getTextureCode();
+			Face face = ModelCreator.currentProject.SelectedElement.getSelectedFace();
+			if (face != null) prioTextureCode = face.getTextureCode();
 			if (prioTextureCode != null && ModelCreator.currentProject.TexturesByCode.containsKey(prioTextureCode)) {
 				codes.add(prioTextureCode);
 			}

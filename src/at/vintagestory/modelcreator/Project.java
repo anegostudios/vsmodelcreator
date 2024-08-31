@@ -632,7 +632,7 @@ public class Project
 	}
 	
 
-	public String loadTexture(String textureCode, File image, BooleanParam isNew, String projectType, boolean doReplaceAll, boolean doReplacedForSelectedElement) throws IOException
+	public String loadTexture(String textureCode, File image, BooleanParam isNew, String projectType, boolean doReplaceAll, boolean doReplacedForSelectedElement, boolean insertTextureSizeEntry) throws IOException
 	{
 		FileInputStream is = new FileInputStream(image);
 		Texture texture;
@@ -650,7 +650,7 @@ public class Project
 			texture.release();
 			return "Cannot load this texture, the width or length is not a multiple of 8 ("+texture.getImageHeight()+"x"+texture.getImageWidth()+")";
 		}
-		
+				
 		
 		ImageIcon icon = upscaleIcon(new ImageIcon(image.getAbsolutePath()), 256);
 		
@@ -702,7 +702,7 @@ public class Project
 			} else {
 				isNew.Value = true;
 				TexturesByCode.put(textureCode, new TextureEntry(textureCode, texture, icon, image.getAbsolutePath(), projectType));	
-			}			
+			}
 		} else {
 			
 			isNew.Value = true;
@@ -712,6 +712,13 @@ public class Project
 			}			
 		}
 		
+		if (insertTextureSizeEntry) {
+			TextureSizes.put(textureCode, new int[] {
+				(int)(texture.getImageWidth() / ModelCreator.noTexScale),
+				(int)(texture.getImageHeight() / ModelCreator.noTexScale)
+			});
+		}
+				
 		
 		if (doReplaceAll || (doReplacedForSelectedElement && SelectedElement != null)) {
 			ModelCreator.changeHistory.beginMultichangeHistoryState();

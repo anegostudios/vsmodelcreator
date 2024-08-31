@@ -14,6 +14,7 @@ public class PendingTexture
 	
 	boolean doReplaceAll;
 	boolean doReplacedForSelectedElement;
+	boolean insertTextureSizeEntry;
 	
 	public TextureEntry entry;
 	
@@ -59,7 +60,7 @@ public class PendingTexture
 			
 
 			BooleanParam isNew = new BooleanParam();			
-			errormessge = project.loadTexture(textureName, this.textureFile, isNew, ProjectType, doReplaceAll, doReplacedForSelectedElement);
+			errormessge = project.loadTexture(textureName, this.textureFile, isNew, ProjectType, doReplaceAll, doReplacedForSelectedElement, insertTextureSizeEntry);
 			
 			if (callback != null) {
 				callback.onTextureLoaded(isNew.Value, errormessge, fileName);
@@ -93,5 +94,11 @@ public class PendingTexture
 	public void SetReplacesSelectElementTextures()
 	{
 		doReplacedForSelectedElement = true;		
+	}
+
+
+	public void SetInsertTextureSizeEntry()
+	{
+		insertTextureSizeEntry=true;		
 	}
 }

@@ -227,7 +227,6 @@ public class Face
             double sizeU = textureUEnd - textureU;
             double sizeV = textureVEnd - textureV;
             
-            
             sizeXyz.Set(
                 (float)(cuboid.width) / 1f,
                 (float)(cuboid.height) / 1f,

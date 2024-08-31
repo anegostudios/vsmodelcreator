@@ -1047,9 +1047,8 @@ public class ModelCreator extends JFrame implements ITextureCallback
 								
 								//int x = evt.getLocation().x;
 								int y = evt.getLocation().y;
-								
+								pendingTexture.SetInsertTextureSizeEntry();
 								if (y >= canvHeight / 3) {
-									
 									if (y >= 2 * canvHeight / 3) {
 										pendingTexture.SetReplacesAllTextures();	
 									} else {

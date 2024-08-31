@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.model.TextureEntry;
 
 public class TextureSizeDialog
 {
@@ -77,9 +78,19 @@ public class TextureSizeDialog
 		
 		if (count > 0) {
 			for (String keycode : entries) {
+				String labelname = keycode;
+				TextureEntry entry = ModelCreator.currentProject.TexturesByCode.get(keycode);
+				if (entry != null) {
+					String[] parts = entry.filePath.split("(\\\\|/)");
+					int len = parts.length;
+					
+					if (len >= 2) {			
+						labelname = parts[len-2] + "/" + parts[len-1];
+					}
+				}
 				
-				label = new JLabel(keycode);
-				label.setPreferredSize(new Dimension(30, 20));
+				label = new JLabel(labelname);
+				label.setPreferredSize(new Dimension(150, 20));
 				panelRow2.add(label);
 				panelRow2.add(new JLabel(""));
 				
