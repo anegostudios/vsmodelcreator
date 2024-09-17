@@ -198,13 +198,19 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		setLayout(new BorderLayout(10, 0));
 		setIconImages(getIcons());
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		
-		if (args.length > 0) {
-			ModelCreator.prefs.put("texturePath", args[0]);			
-		}
-		
-		if (args.length > 1) {
-			ModelCreator.prefs.put("shapePath", args[1]);
+
+		String loadFile = null;
+		for (int i = 0; i < args.length; i++) {
+			if (Objects.equals(args[i], "-t") && args.length > i + 1) {
+				ModelCreator.prefs.put("texturePath", args[i + 1]);
+				i++;
+			} else if (Objects.equals(args[i], "-s") && args.length > i + 1) {
+				ModelCreator.prefs.put("shapePath", args[i + 1]);
+				i++;
+			} else if (Objects.equals(args[i], "-f") && args.length > i + 1) {
+				loadFile = args[i + 1];
+				i++;
+			}
 		}
 
 		String colorPath = prefs.get("colorPath", null);
@@ -293,9 +299,12 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		currentProject.LoadIntoEditor(getElementManager());
 		updateValues(null);
 
-		
 		prevFrameMillisec = System.currentTimeMillis();
-		
+
+		if (loadFile != null) {
+			LoadFile(loadFile);
+		}
+
 		try
 		{
 			Display.create();
