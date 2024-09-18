@@ -232,7 +232,7 @@ public class GuiMenu extends JMenuBar
 
 			itemPreviewWind = new JMenu("Wind preview mode");
 			itemPreviewWind.setIcon(Icons.wind);
-			itemPreviewWind.setToolTipText("Makes elements sway if configured so, please not that the sway is not the same as in game");
+			itemPreviewWind.setToolTipText("Makes elements sway if configured so, please note that the sway is not the same as in game");
 			{
 				itemPreviewWindOff = createItem("Off", null, KeyEvent.VK_B, Icons.clear);
 				itemPreviewWindSelected = createItem("Only selected element", null, KeyEvent.VK_B, Icons.wind);

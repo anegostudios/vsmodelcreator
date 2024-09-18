@@ -293,8 +293,38 @@ public class Element implements IDrawable
 			}
 		}
 	}
+
+	public void setUVAllFaces(ClipboardUV uv, boolean recursive)
+	{
+		for (Face face : faces)
+		{
+			face.setStartU(uv.getUStart());
+			face.setStartV(uv.getVStart());
+			face.setEndU(uv.getUEnd());
+			face.setEndV(uv.getVEnd());
+		}
+		
+		if (recursive) {		
+			for (Element elem : ChildElements) {
+				elem.setUVAllFaces(uv, recursive);
+			}
+		}
+	}
 	
-	
+	public void setWindAllFaces(int[] windModes, boolean recursive)
+	{
+
+		for (Face face : faces)
+		{
+			face.WindModes = windModes;
+		}
+		
+		if (recursive) {		
+			for (Element elem : ChildElements) {
+				elem.setWindAllFaces(windModes, recursive);
+			}
+		}
+	}
 	
 	public void recalculateBrightnessValues(float[] mat) {
 		for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
