@@ -79,19 +79,14 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	private static final long serialVersionUID = 1L;
 	
 	public static ModelCreator Instance;
-	
 	public static Preferences prefs;
-	
 	public static Project currentProject;
 	public static Project currentBackdropProject;
 	public static Project currentMountBackdropProject;
-	public static ProjectChangeHistory changeHistory = new ProjectChangeHistory();
-	
+	public static ProjectChangeHistory changeHistory = new ProjectChangeHistory();	
 	public static int ignoreDidModify = 0;	
 	public static boolean ignoreValueUpdates = false;
 	public static boolean ignoreFrameUpdates = false;
-	
-	
 	public static boolean showGrid = true;
 	public static boolean showTreadmill = false;
 	public static boolean showShade = true;
@@ -102,16 +97,10 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static boolean darkMode = false;
 	public static boolean saratyMode = false;
 	public static boolean uvShowNames = false;
-	
 	public static boolean backdropAnimationsMode = true;
-	
 	public static int elementTreeHeight = 240;
-
-	
 	public static float TreadMillSpeed = 1f;
-	
 	public static float noTexScale = 2;
-	
 	public static int currentRightTab;
 
 	// Canvas Variables
@@ -1298,6 +1287,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			currentProject.TextureSizes.put(key, importedproject.TextureSizes.get(key));
 		}
 
+		changeHistory.beginMultichangeHistoryState();
 		changeHistory.addHistoryState(currentProject);
 
 		ignoreValueUpdates = false;
@@ -1323,6 +1313,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			}
 		}
 
+		changeHistory.endMultichangeHistoryState(currentProject);
 	}
 
 	public static void LoadColorConfig(String path) {

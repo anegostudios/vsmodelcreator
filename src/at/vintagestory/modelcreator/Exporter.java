@@ -204,7 +204,7 @@ public class Exporter
 			writer.write(space(3) + "\"version\": \"" + animation.version + "\",");
 			writer.newLine();
 		}
-		writer.write(space(3) + "\"code\": \"" + animation.getCode() + "\",");
+		writer.write(space(3) + "\"code\": \"" + animation.getCode().toLowerCase() + "\",");
 		writer.newLine();
 		writer.write(space(3) + "\"quantityframes\": " + animation.GetQuantityFrames() + ",");
 		writer.newLine();

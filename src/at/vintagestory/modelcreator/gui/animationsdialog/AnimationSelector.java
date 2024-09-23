@@ -245,6 +245,8 @@ public class AnimationSelector
 			@Override
 			public void keyReleased(KeyEvent e)
 			{
+				codeField.setText(codeField.getText().toLowerCase());
+
 				Animation anim = ModelCreator.currentProject.SelectedAnimation;
 				if (anim == null) return;
 				
