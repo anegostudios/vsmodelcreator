@@ -170,13 +170,14 @@ class TreeTransferHandler extends TransferHandler {
         List<Element> newParentPath = new ArrayList<Element>();
         
         // Add data to model.
-        for(int i = 0; i < nodes.length; i++) {
-            model.insertNodeInto(nodes[i], parent, index++);
+        for(int i = 0; i < nodes.length; i++) {       	
+            model.insertNodeInto(nodes[i], parent, index);
             Element ownElem = (Element)nodes[i].getUserObject();
             
             Element oldParent = ownElem.ParentElement; 
             Element newParent = parent.getUserObject() instanceof Element ? (Element) parent.getUserObject() : null;
-            if (oldParent == newParent) continue;
+            
+        	int prevIndex = oldParent == null ? ModelCreator.currentProject.rootElements.indexOf(ownElem) : oldParent.ChildElements.indexOf(ownElem);
             
             // Make sure the element is removed everywhere. (Step-parented elements might be a root element *and* have a parent element)
         	oldParentPath = ownElem.GetParentPath();
@@ -186,14 +187,17 @@ class TreeTransferHandler extends TransferHandler {
         	}
         	ModelCreator.currentProject.rootElements.remove(ownElem);
         	
+        	int insertIndex = oldParent == newParent && index >= prevIndex ? index - 1 : index;
             
-            if (newParent != null) {            	
-            	newParent.ChildElements.add(ownElem);
+            if (newParent != null) {
+            	newParent.ChildElements.add(insertIndex, ownElem);
                 // Must not have a step parent when parented 
 	            ownElem.setStepParent(null);                
             } else {
-            	ModelCreator.currentProject.rootElements.add(ownElem);
+            	ModelCreator.currentProject.rootElements.add(insertIndex, ownElem);
             }
+            
+            index++;
             
             ownElem.ParentElement = newParent;
             

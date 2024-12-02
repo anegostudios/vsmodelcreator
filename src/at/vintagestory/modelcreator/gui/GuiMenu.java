@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import at.vintagestory.modelcreator.ModelCreator;
+import at.vintagestory.modelcreator.model.Animation;
 import at.vintagestory.modelcreator.model.Element;
 import at.vintagestory.modelcreator.util.Mat4f;
 import at.vintagestory.modelcreator.util.UVMapExporter;
@@ -78,6 +80,8 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemNoTextureSize;
 	private JMenuItem itemLoadAsBackdrop;
 	private JMenuItem itemClearBackdrop;
+	private JCheckBoxMenuItem itemSaratyMode;
+	private JMenuItem itemSaveDisabledFaces;
 	
 	private JMenuItem itemLoadAsMountBackdrop;
 	private JMenuItem itemClearMountBackdrop;
@@ -89,7 +93,7 @@ public class GuiMenu extends JMenuBar
 	private JCheckBoxMenuItem itemTransparency;
 	private JCheckBoxMenuItem itemTexture;
 	private JCheckBoxMenuItem itemDarkMode;	
-	private JCheckBoxMenuItem itemSaratyMode;
+	
 	private JCheckBoxMenuItem itemuvShowNames;
 	private JCheckBoxMenuItem itemShowShade;
 	private JMenuItem elementTreeHeight;
@@ -110,6 +114,7 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemRandomizeTextureEleRec;
 	private JMenuItem itemRandomizeTextureAll;
 	
+	private JMenuItem itemclearTextures;
 	private JMenuItem itemGenSnowLayer;
 	private JMenuItem itemuvUnrwapEverything;
 	private JMenuItem itemReloadColorConfig;
@@ -130,6 +135,7 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemRotateModel90DegAntiClockwise;
 	
 	private JMenuItem triCount;
+	private JMenuItem autoAnimCodes;
 	
 
 	/* Export */
@@ -196,6 +202,8 @@ public class GuiMenu extends JMenuBar
 			itemSaratyMode = createCheckboxItem("Saraty Mode", "When enabled, changes the auto-uv-unwrap feature to be more Saraty-compatible", KeyEvent.VK_D,Icons.transparent);
 			itemSaratyMode.setSelected(ModelCreator.saratyMode);
 			
+			itemSaveDisabledFaces = createCheckboxItem("Save disabled faces", "Whether disabled faces also get saved to file.", 0, Icons.transparent);
+			itemSaveDisabledFaces.setSelected(ModelCreator.saveDisabledFaces);
 
 			itemLoadAsBackdrop = createItem("Set backdrop...", "Set a model as a backdrop", KeyEvent.VK_K, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
 			itemClearBackdrop = createItem("Clear backdrop", "Remove the backdrop again", KeyEvent.VK_L, new ImageIcon(getClass().getClassLoader().getResource("icons/clear.png")));
@@ -256,6 +264,8 @@ public class GuiMenu extends JMenuBar
 			}
 			
 			itemGenSnowLayer = createItem("Generate Snow Layer", "Attempts to generate a snow layer on all horizontal faces", KeyEvent.VK_B, Icons.weather_snow);
+			
+			itemclearTextures = createItem("Delete unused textures", "Remove textures from the model file that are not used", KeyEvent.VK_B, Icons.clear);
 
 			itemuvUnrwapEverything = createItem("Unwrap all UVs", "Attempts to unwrap all uvs onto a texture without overlap", KeyEvent.VK_B, Icons.rainbow);
 			itemReduceDecimals = createItem("Reduce decimals", "Round all element positions and sizes to one decimal point", KeyEvent.VK_B, Icons.rainbow);
@@ -295,6 +305,8 @@ public class GuiMenu extends JMenuBar
 			}
 			
 			triCount = createItem("Count triangles", "Count amount of triangles used in this model", 0, Icons.coin);
+			
+			autoAnimCodes = createItem("Autogenerate animation codes", "Takes all animation names, makes them lowercase, replaces spaces with dashes and sets the animation code to that value", 0, Icons.coin);
 		}
 
 		
@@ -335,6 +347,7 @@ public class GuiMenu extends JMenuBar
 		menuProject.add(itemSingleTexture);
 		menuProject.add(itemNoTextureSize);
 		menuProject.add(itemSaratyMode);
+		menuProject.add(itemSaveDisabledFaces);
 		menuProject.addSeparator();
 		menuProject.add(itemAutoReloadTextures);
 		menuProject.add(itemReloadTextures);
@@ -360,6 +373,7 @@ public class GuiMenu extends JMenuBar
 		itemRandomizeTexture.add(itemRandomizeTextureAll);
 		menuTools.add(itemRandomizeTexture);
 		
+		menuTools.add(itemclearTextures);
 		menuTools.add(itemGenSnowLayer);
 		menuTools.add(itemResize);
 		menuTools.add(itemuvUnrwapEverything);
@@ -373,6 +387,7 @@ public class GuiMenu extends JMenuBar
 		menuTools.add(itemAutoWind);
 
 		menuTools.add(triCount);
+		menuTools.add(autoAnimCodes);
 		
 		itemAutoWind.add(itemAutoWindNormal);
 		itemAutoWind.add(itemAutoWindWeak);
@@ -512,8 +527,10 @@ public class GuiMenu extends JMenuBar
 		
 
 		
+				
+		ActionListener clistener = a -> { ModelCreator.currentProject.clearUnusedTextures(); }; 
+		itemclearTextures.addActionListener(clistener);
 		
-
 		ActionListener glistener = a -> { ModelCreator.currentProject.TryGenSnowLayer(); }; 
 		itemGenSnowLayer.addActionListener(glistener);
 		
@@ -716,6 +733,11 @@ public class GuiMenu extends JMenuBar
 			ModelCreator.prefs.putBoolean("uvRotateRename", ModelCreator.saratyMode);
 		});
 		
+		itemSaveDisabledFaces.addActionListener(a -> {
+			ModelCreator.saveDisabledFaces = itemSaveDisabledFaces.isSelected();
+			ModelCreator.prefs.putBoolean("saveDisabledFaces", ModelCreator.saveDisabledFaces);
+		});
+		
 		itemuvShowNames.addActionListener(a -> {
 			ModelCreator.uvShowNames = itemuvShowNames.isSelected();
 			ModelCreator.prefs.putBoolean("uvShowNames", ModelCreator.uvShowNames);
@@ -908,6 +930,15 @@ public class GuiMenu extends JMenuBar
 		triCount.addActionListener(a -> {
 			int tris = ModelCreator.currentProject.countTriangles();
 			JOptionPane.showMessageDialog(null, "Amount of triangles: " + tris);
+		});
+		
+		autoAnimCodes.addActionListener(a -> {
+			ModelCreator.changeHistory.beginMultichangeHistoryState();
+			ArrayList<Animation> anims = ModelCreator.currentProject.Animations;
+			for (Animation anim : anims) {
+				anim.setCode(anim.getName().toLowerCase().replace(' ', '-'));
+			}
+			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 		});
 	}
 

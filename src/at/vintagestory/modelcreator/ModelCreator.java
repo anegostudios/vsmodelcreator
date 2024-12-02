@@ -85,6 +85,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static Project currentMountBackdropProject;
 	public static ProjectChangeHistory changeHistory = new ProjectChangeHistory();	
 	public static int ignoreDidModify = 0;	
+	
+	
+	public static boolean saveDisabledFaces = false;	
 	public static boolean ignoreValueUpdates = false;
 	public static boolean ignoreFrameUpdates = false;
 	public static boolean showGrid = true;
@@ -169,6 +172,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		showGrid = prefs.getBoolean("showGrid", true);
 		saratyMode = prefs.getBoolean("uvRotateRename", true);
 
+		saveDisabledFaces = prefs.getBoolean("saveDisabledFaces", true);
 		uvShowNames = prefs.getBoolean("uvShowNames", true);
 		darkMode = prefs.getBoolean("darkMode", false);
 		noTexScale = prefs.getFloat("noTexScale", 2);

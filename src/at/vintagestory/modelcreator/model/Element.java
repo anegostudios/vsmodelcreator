@@ -7,6 +7,7 @@ import static org.lwjgl.opengl.GL11.GL_LINES;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import at.vintagestory.modelcreator.util.*;
@@ -1795,6 +1796,17 @@ public class Element implements IDrawable
 		}
 		
 		return null;
+	}
+
+	public void CollectTextureCodes(HashSet<String> usedCodes)
+	{
+		for (Element elem : ChildElements) {
+			elem.CollectTextureCodes(usedCodes);
+		}
+		
+		for (Face face : faces) {
+			usedCodes.add(face.getTextureCode());
+		}
 	}
 	
 	

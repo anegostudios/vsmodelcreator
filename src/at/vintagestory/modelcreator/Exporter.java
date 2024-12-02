@@ -595,7 +595,7 @@ public class Exporter
 		writer.newLine();
 		for (Face face : cuboid.getAllFaces())
 		{
-			if (!face.isEnabled()) continue;
+			if (!face.isEnabled() && !ModelCreator.saveDisabledFaces) continue;
 			if (facesWritten > 0) {
 				writer.write(",");
 				writer.newLine();
@@ -625,6 +625,9 @@ public class Exporter
 			}			
 			if (face.reflectiveMode > 0) {
 				writer.write(", \"reflectiveMode\": " + face.reflectiveMode);
+			}
+			if (!face.isEnabled() ) {
+				writer.write(", \"enabled\": false");	
 			}
 			
 			writer.write(" }");

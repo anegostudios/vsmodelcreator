@@ -952,4 +952,29 @@ public class Project
 		}
 	}
 
+
+	public void clearUnusedTextures()
+	{
+		HashSet<String> usedCodes = new HashSet<String>();
+		
+		for (Element elem : rootElements) {
+			elem.CollectTextureCodes(usedCodes);
+		}
+		
+		boolean modified=false;
+		
+		for (String texCode : new HashSet<String>(TexturesByCode.keySet())) {
+			if (!usedCodes.contains(texCode)) { TexturesByCode.remove(texCode); if (!modified) ModelCreator.changeHistory.beginMultichangeHistoryState(); modified = true; }
+		}
+		for (String texCode : new HashSet<String>(TextureSizes.keySet())) {
+			if (!usedCodes.contains(texCode)) { TextureSizes.remove(texCode); if (!modified) ModelCreator.changeHistory.beginMultichangeHistoryState(); modified = true; }	
+		}
+		
+		if (modified) {
+			ModelCreator.changeHistory.endMultichangeHistoryState(this);
+			ModelCreator.DidModify();
+		}
+		
+	}
+
 }

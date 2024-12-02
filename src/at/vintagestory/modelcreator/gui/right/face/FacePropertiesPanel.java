@@ -55,7 +55,7 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 		this.manager = manager;
 		setLayout(new BorderLayout(0, 5));
 		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Properties</b></html>"));
-		setMaximumSize(new Dimension(250, 400));
+		setMaximumSize(new Dimension(250, 500));
 		initComponents();
 		addComponents();
 	}
@@ -146,7 +146,6 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 		horizontalBox.add(boxSnapUv);
 		horizontalBox.add(new JLabel("Glow Level (0..255)"));
 		horizontalBox.add(glowValue);
-		
 		horizontalBox.add(new JLabel("Reflective Mode"));
 		
 		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
@@ -430,6 +429,10 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 		model.addElement("<html><b>Fruit</b></html>");         // 8
 		model.addElement("<html><b>WeakWindNoBend</b></html>");         // 9
 		model.addElement("<html><b>Inverse Bend (Vines)</b></html>");         // 10
+		
+		model.addElement("<html><b>Waterplant (Seaweed)</b></html>");         // 11
+		model.addElement("<html><b>Follow Water waves</b></html>");         // 12
+		model.addElement("<html><b>Weak wind + reduced alphatest</b></html>");         // 13
 		
 		return model;
 	}
