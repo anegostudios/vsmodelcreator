@@ -2,6 +2,9 @@
 
 This is the official tool for creating and animating blocks, items and entities for [Vintage Story](http://www.vintagestory.at/). It is based on on [MrCrayfish's Model Creator for Minecraft](https://github.com/MrCrayfish/ModelCreator) but extends upon it with many more features and saves the models in a format the vintage story engine can read.
 
+> [!NOTE]
+> Requires Java 8 to run, download from: https://www.java.com
+
 Current featureset:
 - Create/Remove/Modify/Arrange single cubes to build shapes
 - Texture Mapping Mode, automatic texture reload
