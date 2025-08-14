@@ -297,8 +297,8 @@ public class Project
 			if (newElem.ParentElement != null) {
 				newElem.ParentElement.ChildElements.add(newElem);
 			}
-
-			if (newElem.ParentElement == null) {
+												// Special case: Step parented elements will be in the root list, but also have a parent
+			if (newElem.ParentElement == null || (SelectedElement.stepparentName != null && ModelCreator.currentProject.rootElements.contains(SelectedElement))) {
 				rootElements.add(newElem);
 			}
 			
