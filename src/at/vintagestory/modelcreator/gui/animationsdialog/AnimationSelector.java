@@ -140,6 +140,10 @@ public class AnimationSelector
 			model.addElement(anim.getName());
 			list.setSelectedIndex(project.getSelectedAnimationIndex());
 			
+			activityStoppedList.setSelectedIndex(3);
+			animEndedList.setSelectedIndex(3);
+
+			
 			ModelCreator.updateValues(btnSelect);
 			
 			nameField.setText(ModelCreator.currentProject.SelectedAnimation.getName());
@@ -348,9 +352,7 @@ public class AnimationSelector
 		layout.putConstraint(SpringLayout.NORTH, versionList, 0, SpringLayout.SOUTH, label2);
 		
 	
-		
 		rightPanel.add(new JLabel(""));
-		
 		
 		dialog.add(rightPanel);
 		

@@ -381,6 +381,8 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 		windModeList[2].setEnabled(cube != null);
 		windModeList[3].setEnabled(cube != null);
 		
+		reflectiveMode.setEnabled(cube != null);
+		
 		windData.setEnabled(false);
 		
 		
@@ -409,6 +411,8 @@ public class FacePropertiesPanel extends JPanel implements IValueUpdater
 			} else {
 				windData.setText("");
 			}
+			
+			reflectiveMode.setSelectedIndex(face.reflectiveMode);
 		}
 	}
 	
