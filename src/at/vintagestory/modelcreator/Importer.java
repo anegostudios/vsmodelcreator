@@ -667,9 +667,9 @@ public class Importer
 			}
 
 			face.setReflectiveMode(0);
-			if (obj.has("reflective") && obj.get("reflective").isJsonPrimitive())
+			if (obj.has("reflectiveMode") && obj.get("reflectiveMode").isJsonPrimitive())
 			{
-				face.setReflectiveMode(obj.get("reflective").getAsInt());
+				face.setReflectiveMode(obj.get("reflectiveMode").getAsInt());
 			}
 
 			if (obj.has("enabled")) {
