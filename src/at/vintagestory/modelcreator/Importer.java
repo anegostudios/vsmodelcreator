@@ -656,6 +656,11 @@ public class Importer
 				face.setTextureCode(loc);
 			}
 
+
+			if (obj.has("frostable")) {
+				face.Frostable = obj.get("frostable").getAsBoolean();
+			}
+			
 			if (obj.has("rotation") && obj.get("rotation").isJsonPrimitive())
 			{
 				face.setRotation((int) obj.get("rotation").getAsDouble() / 90);
@@ -676,6 +681,7 @@ public class Importer
 				boolean enabled = obj.get("enabled").getAsBoolean();
 				face.setEnabled(enabled);
 			}
+			
 			
 			if (obj.has("windMode") && obj.get("windMode").isJsonArray()) {
 				JsonArray modes = obj.get("windMode").getAsJsonArray();

@@ -605,6 +605,11 @@ public class Exporter
 			writer.write(space(indentation + 1) + "\"" + Face.getFaceName(face.getSide()) + "\": { ");
 			writer.write("\"texture\": \"#" + face.getTextureCode() + "\"");
 			writer.write(", \"uv\": [ " + d2s(face.getStartU()) + ", " + d2s(face.getStartV()) + ", " + d2s(face.getEndU()) + ", " + d2s(face.getEndV()) + " ]");
+			
+			if (!face.Frostable) {
+				writer.write(", \"frostable\": false");	
+			}
+			
 			if (face.getRotation() > 0) {
 				writer.write(", \"rotation\": " + (int) face.getRotation() * 90);
 			}
@@ -626,6 +631,7 @@ public class Exporter
 			if (face.reflectiveMode > 0) {
 				writer.write(", \"reflectiveMode\": " + face.reflectiveMode);
 			}
+			
 			if (!face.isEnabled() ) {
 				writer.write(", \"enabled\": false");	
 			}

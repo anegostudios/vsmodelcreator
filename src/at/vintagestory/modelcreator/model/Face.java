@@ -155,6 +155,7 @@ public class Face
 	public int openGlName = 0;
 	public int[] WindModes = null;
 	public int[] WindData = null;
+	public boolean Frostable=true;
 	
 	private Element cuboid;
 	private int side;
@@ -717,6 +718,7 @@ public class Face
 		cloned.snapUV = snapUV;
 		cloned.WindData = WindData == null ? null : WindData.clone();
 		cloned.WindModes = WindModes == null ? null : WindModes.clone();
+		cloned.Frostable = Frostable;
 		return cloned;
 	}
 	
