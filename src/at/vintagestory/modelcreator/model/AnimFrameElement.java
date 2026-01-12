@@ -133,7 +133,7 @@ public class AnimFrameElement implements IDrawable
 			for (int i = 0; i < BlockFacing.ALLFACES.length; i++) {
 				if (!AnimatedElement.faces[i].isEnabled()) continue;
 				
-				b = AnimatedElement.brightnessByFace[BlockFacing.ALLFACES[i].GetIndex()];
+				b = ModelCreator.showShade ? AnimatedElement.brightnessByFace[BlockFacing.ALLFACES[i].GetIndex()] : 1f;
 				Color c = Face.ColorsByFace[i];
 				GL11.glColor3f(c.r * b, c.g * b, c.b * b);
 								

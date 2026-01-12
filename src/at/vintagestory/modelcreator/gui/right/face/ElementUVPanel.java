@@ -277,6 +277,13 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 	public void updateValues(JComponent byGuiElem)
 	{
 		Element cube = manager.getCurrentElement();
+		final java.util.function.IntUnaryOperator clampToMenu = (idx) -> {
+			int max = menuList.getItemCount() - 1;
+			if (max < 0) return -1;
+			if (idx < 0) return 0;
+			if (idx > max) return max;
+			return idx;
+		};
 		
 		boolean autoUnwrapEnabled = cube != null && cube.isAutoUnwrapEnabled();
 		boolean enabled = cube != null;
@@ -303,7 +310,6 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			setMaximumSize(new Dimension(186, 25));
 		}
 		
-		// For some reasonn this checkbox shows up outside its tab?
 		alternateUnwrap.setVisible(ModelCreator.currentRightTab == 1);
 		
 		
@@ -316,7 +322,13 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			
 			if (byGuiElem != xStartField) xStartField.setText(df.format(cube.getTexUStart()));
 			if (byGuiElem != yStartField) yStartField.setText(df.format(cube.getTexVStart()));
-			if (byGuiElem != menuList) menuList.setSelectedIndex(cube.getUnwrapMode());
+			if (byGuiElem != menuList) {
+				int desired = clampToMenu.applyAsInt(cube.getUnwrapMode());
+				if (desired >= 0) {
+					if (desired != cube.getUnwrapMode()) cube.setUnwrapMode(desired);
+					menuList.setSelectedIndex(desired);
+				}
+			}
 		}
 		else
 		{
@@ -348,7 +360,13 @@ public class ElementUVPanel extends JPanel implements IValueUpdater
 			}
 				
 			
-			menuList.setSelectedIndex(index);
+			int safeIndex = clampToMenu.applyAsInt(index);
+			if (safeIndex >= 0) {
+				menuList.setSelectedIndex(safeIndex);
+				if (safeIndex != index && cube != null && cube.getUnwrapMode() != safeIndex) {
+					cube.setUnwrapMode(safeIndex);
+				}
+			}
 		}
 		
 	}
