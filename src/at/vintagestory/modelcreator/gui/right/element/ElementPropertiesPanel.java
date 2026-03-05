@@ -34,6 +34,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 	
 	JTextField climateColorMapField;
 	JTextField seasonColorMapField;
+	JTextField zoffsetField;
 	private JComboBox<String> renderPassList;
 	//private JComboBox<String> windModeList;
 	JButton stepparentButton;
@@ -42,7 +43,7 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 	public ElementPropertiesPanel(IElementManager manager)
 	{
 		this.manager = manager;
-		setLayout(new GridLayout(10, 2, 0, 5));
+		setLayout(new GridLayout(12, 2, 0, 5));
 		
 		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Element Properties</b></html>"));
 		setPreferredSize(new Dimension(200, 240));
@@ -104,6 +105,27 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 			}
 		});
 		
+		zoffsetField = new JTextField();
+		zoffsetField.setToolTipText("Leave empty for no zoffset (set to 0..7)");
+		zoffsetField.setPreferredSize(new Dimension(190, 25));
+		
+		zoffsetField.addKeyListener(new KeyAdapter()
+		{
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				Element elem = manager.getCurrentElement();
+				if (elem != null) {
+					int nowZOffset = Integer.parseInt(zoffsetField.getText());
+					int prevZOffset = elem.getZOffset();
+					elem.setZOffset(nowZOffset);
+					
+					if (nowZOffset != prevZOffset) ModelCreator.DidModify();
+					ModelCreator.updateValues(zoffsetField);
+				}
+			}
+		});
+		
 		
 		
 		
@@ -143,6 +165,9 @@ public class ElementPropertiesPanel extends JPanel implements IValueUpdater
 		
 		add(new JLabel("Render pass"));
 		add(renderPassList);
+		
+		add(new JLabel("Z-Offset"));
+		add(zoffsetField);
 
 		
 		JLabel label = new JLabel("Stepparent element");
