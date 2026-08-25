@@ -81,6 +81,7 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemLoadAsBackdrop;
 	private JMenuItem itemClearBackdrop;
 	private JCheckBoxMenuItem itemSaratyMode;
+	private JCheckBoxMenuItem itemRoundUVMode;
 	private JMenuItem itemSaveDisabledFaces;
 	
 	private JMenuItem itemLoadAsMountBackdrop;
@@ -198,6 +199,9 @@ public class GuiMenu extends JMenuBar
 			
 			itemSingleTexture = createCheckboxItem("Entity Texturing Mode", "When creating entities, it is often more useful to use only a single texture and have the uv boxes unwrap side by side.", 0, Icons.transparent);
 			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);
+			
+			itemRoundUVMode = createCheckboxItem("Round UV Mode", "When enabled, the auto-uv-unwrap will round up or round down to the closest desired pixel density to minimize stretching and squeezing of pixels", KeyEvent.VK_D,Icons.transparent);
+			itemRoundUVMode.setSelected(ModelCreator.roundUVMode);
 			
 			itemSaratyMode = createCheckboxItem("Saraty Mode", "When enabled, changes the auto-uv-unwrap feature to be more Saraty-compatible", KeyEvent.VK_D,Icons.transparent);
 			itemSaratyMode.setSelected(ModelCreator.saratyMode);
@@ -346,6 +350,7 @@ public class GuiMenu extends JMenuBar
 		menuProject.add(itemUnlockAngles);
 		menuProject.add(itemSingleTexture);
 		menuProject.add(itemNoTextureSize);
+		menuProject.add(itemRoundUVMode);
 		menuProject.add(itemSaratyMode);
 		menuProject.add(itemSaveDisabledFaces);
 		menuProject.addSeparator();
@@ -726,6 +731,11 @@ public class GuiMenu extends JMenuBar
 		itemDarkMode.addActionListener(a -> {
 			ModelCreator.darkMode = itemDarkMode.isSelected();
 			ModelCreator.prefs.putBoolean("darkMode", ModelCreator.darkMode);
+		});
+		
+		itemRoundUVMode.addActionListener(a -> {
+			ModelCreator.roundUVMode = itemRoundUVMode.isSelected();
+			ModelCreator.prefs.putBoolean("roundUVMode", ModelCreator.roundUVMode);
 		});
 		
 		itemSaratyMode.addActionListener(a -> {

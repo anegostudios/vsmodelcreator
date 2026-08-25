@@ -99,6 +99,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public static boolean repositionWhenReparented = true;
 	public static boolean darkMode = false;
 	public static boolean saratyMode = false;
+	public static boolean roundUVMode = true;
 	public static boolean uvShowNames = false;
 	public static boolean backdropAnimationsMode = true;
 	public static int elementTreeHeight = 240;
@@ -171,6 +172,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		
 		showGrid = prefs.getBoolean("showGrid", true);
 		saratyMode = prefs.getBoolean("uvRotateRename", true);
+		roundUVMode = prefs.getBoolean("roundUVMode", true);
 
 		saveDisabledFaces = prefs.getBoolean("saveDisabledFaces", true);
 		uvShowNames = prefs.getBoolean("uvShowNames", true);

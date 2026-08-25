@@ -600,15 +600,26 @@ public class Face
 				
 				double width = cuboid.getFaceDimension(side).getWidth();
 				double height = cuboid.getFaceDimension(side).getHeight();
+
+				double rw, rh;
+				if (ModelCreator.roundUVMode) {
+					rw = Math.round(width * scale.W + 0.000001);      // Stupid rounding errors -.-
+					rh = Math.round(height * scale.H + 0.000001);	
+				} else {
+					rw = Math.floor(width * scale.W + 0.000001);      // Stupid rounding errors -.-
+					rh = Math.floor(height * scale.H + 0.000001);
+				}				
 				
 				if (rotation == 0 || rotation == 2) {
 					// Math.max because if the element is not even a full pixel wide, we should still use a single pixel to texture it
 					
-					textureUEnd = textureU + Math.max(1/scale.W, Math.floor(width * scale.W + 0.000001) / scale.W);      // Stupid rounding errors -.-
-					textureVEnd = textureV + Math.max(1/scale.H, Math.floor(height * scale.H + 0.000001) / scale.H);	
+					textureUEnd = textureU + Math.max(1/scale.W, rw / scale.W);
+					textureVEnd = textureV + Math.max(1/scale.H, rh / scale.H);
+					
 				} else {
-					textureUEnd = textureU + Math.max(1/scale.H, Math.floor(height * scale.W + 0.000001) / scale.W);
-					textureVEnd = textureV + Math.max(1/scale.W, Math.floor(width * scale.H + 0.000001) / scale.H);
+					
+					textureUEnd = textureU + Math.max(1/scale.H, rh / scale.H);
+					textureVEnd = textureV + Math.max(1/scale.W, rw / scale.W);
 				}
 			} else {
 				
