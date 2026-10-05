@@ -363,23 +363,23 @@ public class Importer
 		
 		if (obj.has("offsetX") || obj.has("offsetY") || obj.has("offsetZ")) {
 			kelem.PositionSet = true;
-			kelem.setOffsetX(obj.get("offsetX").getAsDouble());
-			kelem.setOffsetY(obj.get("offsetY").getAsDouble());
-			kelem.setOffsetZ(obj.get("offsetZ").getAsDouble());
+			if (obj.has("offsetX")) kelem.setOffsetX(obj.get("offsetX").getAsDouble());
+			if (obj.has("offsetY")) kelem.setOffsetY(obj.get("offsetY").getAsDouble());
+			if (obj.has("offsetZ")) kelem.setOffsetZ(obj.get("offsetZ").getAsDouble());
 		}
 		
 		if (obj.has("rotationX") || obj.has("rotationY") || obj.has("rotationZ")) {
 			kelem.RotationSet = true;
-			kelem.setRotationX(obj.get("rotationX").getAsDouble());
-			kelem.setRotationY(obj.get("rotationY").getAsDouble());
-			kelem.setRotationZ(obj.get("rotationZ").getAsDouble());
+			if (obj.has("rotationX")) kelem.setRotationX(obj.get("rotationX").getAsDouble());
+			if (obj.has("rotationY")) kelem.setRotationY(obj.get("rotationY").getAsDouble());
+			if (obj.has("rotationZ")) kelem.setRotationZ(obj.get("rotationZ").getAsDouble());
 		}
 		
 		if (obj.has("stretchX") || obj.has("stretchY") || obj.has("stretchZ")) {
 			kelem.StretchSet = true;
-			kelem.setStretchX(obj.get("stretchX").getAsDouble());
-			kelem.setStretchY(obj.get("stretchY").getAsDouble());
-			kelem.setStretchZ(obj.get("stretchZ").getAsDouble());
+			if (obj.has("stretchX")) kelem.setStretchX(obj.get("stretchX").getAsDouble());
+			if (obj.has("stretchY")) kelem.setStretchY(obj.get("stretchY").getAsDouble());
+			if (obj.has("stretchZ")) kelem.setStretchZ(obj.get("stretchZ").getAsDouble());
 		}
 		
 		if (obj.has("rotShortestDistanceX")) {
